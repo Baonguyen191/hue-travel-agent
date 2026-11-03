@@ -10,7 +10,7 @@ from typing import Any, Protocol
 
 from travel_agent.domain.models import Category, Coordinates, Place
 
-_SCHEMA = """
+PLACES_SCHEMA = """
 CREATE TABLE IF NOT EXISTS places (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -26,10 +26,19 @@ CREATE TABLE IF NOT EXISTS places (
 CREATE INDEX IF NOT EXISTS idx_places_category ON places (category);
 """
 
-_COLUMNS = (
-    "id, name, category, lat, lon, opening_hours_raw, "
-    "source, source_place_id, license, collected_at"
+PLACE_COLUMN_NAMES = (
+    "id",
+    "name",
+    "category",
+    "lat",
+    "lon",
+    "opening_hours_raw",
+    "source",
+    "source_place_id",
+    "license",
+    "collected_at",
 )
+_COLUMNS = ", ".join(PLACE_COLUMN_NAMES)
 
 _UPSERT = (
     f"INSERT INTO places ({_COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
@@ -55,7 +64,7 @@ class InMemoryPlaceRepository:
 class SqlitePlaceRepository:
     def __init__(self, path: str | Path) -> None:
         self._conn = sqlite3.connect(str(path))
-        self._conn.executescript(_SCHEMA)
+        self._conn.executescript(PLACES_SCHEMA)
 
     def close(self) -> None:
         self._conn.close()
@@ -70,7 +79,7 @@ class SqlitePlaceRepository:
         row = self._conn.execute(
             f"SELECT {_COLUMNS} FROM places WHERE id = ?", (place_id,)
         ).fetchone()
-        return None if row is None else _from_row(row)
+        return None if row is None else row_to_place(row)
 
     def list_places(self, category: Category | None = None, limit: int = 50) -> list[Place]:
         if category is None:
@@ -82,7 +91,7 @@ class SqlitePlaceRepository:
                 f"SELECT {_COLUMNS} FROM places WHERE category = ? ORDER BY name LIMIT ?",
                 (category.value, limit),
             )
-        return [_from_row(row) for row in cursor.fetchall()]
+        return [row_to_place(row) for row in cursor.fetchall()]
 
     def count_by_category(self) -> dict[Category, int]:
         rows = self._conn.execute(
@@ -106,7 +115,8 @@ def _to_row(place: Place) -> tuple[Any, ...]:
     )
 
 
-def _from_row(row: tuple[Any, ...]) -> Place:
+def row_to_place(row: tuple[Any, ...]) -> Place:
+    """`row` theo thứ tự `PLACE_COLUMN_NAMES`."""
     (pid, name, category, lat, lon, hours, source, source_place_id, license_, collected) = row
     return Place(
         id=pid,
