@@ -1,0 +1,17 @@
+{
+  "osm3s": {"timestamp_osm_base": "2026-11-03T08:00:00Z"},
+  "elements": [
+    {"type": "node", "id": 1, "lat": 16.47, "lon": 107.58,
+     "tags": {"name": "Bảo tàng Mẫu", "tourism": "museum", "opening_hours": "Mo-Su 07:00-17:00"}},
+    {"type": "way", "id": 2, "center": {"lat": 16.46, "lon": 107.59},
+     "tags": {"name": "Cafe Mẫu", "amenity": "cafe"}},
+    {"type": "node", "id": 3, "lat": 16.45, "lon": 107.57,
+     "tags": {"tourism": "attraction"}},
+    {"type": "node", "id": 4, "lat": 16.44, "lon": 107.56,
+     "tags": {"name": "Tạp hóa Mẫu", "shop": "convenience"}},
+    {"type": "relation", "id": 5,
+     "tags": {"name": "Lăng Mẫu", "historic": "tomb"}},
+    {"type": "node", "id": 6, "lat": 16.43, "lon": 107.55,
+     "tags": {"name": " Quán Mẫu ", "amenity": "restaurant"}}
+  ]
+}
