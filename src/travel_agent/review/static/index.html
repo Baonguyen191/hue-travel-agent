@@ -266,9 +266,11 @@ function renderMap(lat, lon) {
     return;
   }
   map = L.map(el).setView([lat, lon], 17);
-  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  // tile.openstreetmap.org không truy cập được từ mạng hiện tại (kiểm tra 2026-11-03),
+  // nên dùng tile HOT do OSM France host. Nếu cả hai đều lỗi, các link phía trên vẫn dùng được.
+  L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+    maxZoom: 19, subdomains: "abc",
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles: Humanitarian OSM Team, OSM France',
   }).addTo(map);
   L.marker([lat, lon]).addTo(map);
 }
