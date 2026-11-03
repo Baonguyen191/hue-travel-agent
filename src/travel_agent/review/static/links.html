@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nguồn dữ liệu</title>
+<style>
+  :root {
+    --bg: #f6f5f2; --panel: #ffffff; --ink: #1d1d1f; --muted: #6b6b70; --line: #e3e1dc;
+    --accent: #2f5d8a; --ok: #2e7d4f; --warn: #b26a00; --bad: #b3261e; --code: #f0eee9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #161618; --panel: #1f1f22; --ink: #ececee; --muted: #9a9aa2; --line: #333338;
+      --accent: #7fb0e0; --ok: #5cc28a; --warn: #e3a64a; --bad: #f08a80; --code: #2a2a2e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { display: flex; gap: 24px; align-items: center; justify-content: space-between; padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  h1 { font-size: 17px; margin: 0; }
+  h2 { font-size: 15px; margin: 0 0 10px; }
+  a { color: var(--accent); }
+  main { max-width: 1100px; margin: 0 auto; padding: 18px 20px 40px; display: grid; gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  .hint { color: var(--muted); font-size: 12.5px; margin: 0 0 12px; }
+  textarea, input, select { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; }
+  textarea { min-height: 140px; resize: vertical; font-family: ui-monospace, Consolas, monospace; font-size: 13px; }
+  .row { display: grid; grid-template-columns: 220px 1fr auto; gap: 10px; margin-top: 10px; align-items: end; }
+  label { display: grid; gap: 4px; color: var(--muted); font-size: 12.5px; }
+  button.primary { border: 0; border-radius: 7px; padding: 9px 18px; font: inherit; font-weight: 600; background: var(--accent); color: #fff; cursor: pointer; white-space: nowrap; }
+  button.primary:disabled { opacity: .5; cursor: default; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .tabs button { border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 14px; padding: 3px 12px; cursor: pointer; font-size: 12px; }
+  .tabs button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tabs span { opacity: .75; margin-left: 4px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  td.url a { overflow-wrap: anywhere; }
+  .col-topic { width: 130px; } .col-status { width: 110px; } .col-date { width: 150px; } .col-del { width: 56px; }
+  .badge { font-size: 12px; padding: 2px 8px; border-radius: 10px; color: #fff; white-space: nowrap; }
+  .badge.new { background: var(--muted); } .badge.processed { background: var(--ok); } .badge.failed { background: var(--bad); }
+  .note { color: var(--muted); font-size: 12.5px; margin-top: 2px; overflow-wrap: anywhere; }
+  .del { border: 1px solid var(--line); background: transparent; color: var(--bad); border-radius: 6px; padding: 3px 8px; cursor: pointer; }
+  .empty { color: var(--muted); padding: 12px 0; }
+  #toast { position: fixed; right: 20px; bottom: 20px; padding: 10px 14px; border-radius: 8px; background: var(--ink); color: var(--bg); opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 480px; }
+  #toast.show { opacity: .95; } #toast.error { background: var(--bad); color: #fff; }
+  @media (max-width: 760px) {
+    header { padding: 10px 16px; }
+    main { padding: 14px 16px 32px; }
+    .row { grid-template-columns: 1fr; }
+    .col-topic, .col-date { display: none; }
+    td.topic, td.date { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Nguồn dữ liệu</h1>
+  <a href="/">← Duyệt địa điểm</a>
+</header>
+<main>
+  <section class="card">
+    <h2>Thêm link</h2>
+    <p class="hint">
+      Dán một hoặc nhiều link, mỗi dòng một link. Link chỉ được lưu lại; việc đọc và trích dữ liệu
+      làm sau. Khi xử lý, nguồn nào không cho phép thu thập hoặc không rõ giấy phép sẽ được đánh dấu
+      "Không dùng được".
+    </p>
+    <form id="addForm" autocomplete="off">
+      <label>Link<textarea id="urls" placeholder="https://...&#10;https://..." required></textarea></label>
+      <div class="row">
+        <label>Chủ đề
+          <select id="topic">
+            <option value="sights">Điểm tham quan</option>
+            <option value="food">Ẩm thực</option>
+            <option value="stay">Lưu trú</option>
+            <option value="itinerary">Lịch trình mẫu, kinh nghiệm</option>
+            <option value="other">Khác</option>
+          </select>
+        </label>
+        <label>Ghi chú (tùy chọn)<input id="note" placeholder="Ví dụ: danh sách lăng tẩm, cần lấy giờ mở cửa"></label>
+        <button class="primary" id="addBtn" type="submit">Thêm</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card">
+    <div class="tabs" id="tabs"></div>
+    <div id="listWrap"><p class="empty">Đang tải…</p></div>
+  </section>
+</main>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+"use strict";
+const TOPIC_LABEL = { sights: "Điểm tham quan", food: "Ẩm thực", stay: "Lưu trú", itinerary: "Lịch trình mẫu", other: "Khác" };
+const STATUS_LABEL = { all: "Tất cả", new: "Chưa xử lý", processed: "Đã xử lý", failed: "Không dùng được" };
+const TABS = ["all", "new", "processed", "failed"];
+const state = { status: "all", items: [], counts: null };
+
+const $ = (id) => document.getElementById(id);
+const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const fmtDate = (iso) => new Date(iso).toLocaleString("vi-VN");
+
+async function api(path, options = {}) {
+  const response = await fetch(path, { headers: { "Content-Type": "application/json" }, ...options });
+  if (!response.ok) {
+    let message = `${response.status} ${response.statusText}`;
+    try {
+      const body = await response.json();
+      message = Array.isArray(body.detail)
+        ? body.detail.map((d) => String(d.msg).replace(/^Value error, /, "")).join("; ")
+        : body.detail || message;
+    } catch (_) { /* giữ message mặc định */ }
+    throw new Error(message);
+  }
+  return response.status === 204 ? null : response.json();
+}
+
+let toastTimer = null;
+function toast(message, isError = false) {
+  const el = $("toast");
+  el.textContent = message;
+  el.className = "show" + (isError ? " error" : "");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => (el.className = ""), isError ? 6000 : 2200);
+}
+
+async function load() {
+  const params = state.status === "all" ? "" : "?" + new URLSearchParams({ status: state.status });
+  const data = await api("/api/links" + params);
+  state.items = data.items;
+  state.counts = data.counts;
+  render();
+}
+
+function render() {
+  const c = state.counts;
+  $("tabs").innerHTML = TABS.map((t) => `<button type="button" data-status="${t}" class="${t === state.status ? "active" : ""}">${STATUS_LABEL[t]}<span>${t === "all" ? c.total : c[t]}</span></button>`).join("");
+  if (!state.items.length) {
+    $("listWrap").innerHTML = '<p class="empty">Chưa có link nào.</p>';
+    return;
+  }
+  $("listWrap").innerHTML = `
+    <table>
+      <thead><tr>
+        <th>Link</th><th class="col-topic">Chủ đề</th><th class="col-status">Trạng thái</th>
+        <th class="col-date">Thêm lúc</th><th class="col-del"></th>
+      </tr></thead>
+      <tbody>${state.items.map((link) => `
+        <tr>
+          <td class="url"><a href="${esc(link.url)}" target="_blank" rel="noopener noreferrer">${esc(link.url)}</a>
+            ${link.note ? `<div class="note">${esc(link.note)}</div>` : ""}</td>
+          <td class="topic">${esc(TOPIC_LABEL[link.topic] || link.topic)}</td>
+          <td><span class="badge ${link.status}">${STATUS_LABEL[link.status]}</span></td>
+          <td class="date">${esc(fmtDate(link.added_at))}</td>
+          <td><button type="button" class="del" data-id="${link.id}" title="Xóa link">Xóa</button></td>
+        </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+
+$("addForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const urls = $("urls").value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  if (!urls.length) { toast("Chưa có link nào để thêm", true); return; }
+  $("addBtn").disabled = true;
+  try {
+    const result = await api("/api/links", {
+      method: "POST",
+      body: JSON.stringify({ urls, topic: $("topic").value, note: $("note").value }),
+    });
+    const dup = result.duplicates.length ? `, ${result.duplicates.length} link đã có từ trước` : "";
+    toast(`Đã thêm ${result.added.length} link${dup}`);
+    $("urls").value = "";
+    $("note").value = "";
+    await load();
+  } catch (error) {
+    toast(error.message, true);
+  } finally {
+    $("addBtn").disabled = false;
+  }
+});
+
+$("tabs").addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-status]");
+  if (!button) return;
+  state.status = button.dataset.status;
+  load().catch((e) => toast(e.message, true));
+});
+
+$("listWrap").addEventListener("click", async (event) => {
+  const button = event.target.closest("button.del");
+  if (!button) return;
+  const link = state.items.find((item) => String(item.id) === button.dataset.id);
+  if (button.dataset.confirm !== "1") {
+    button.dataset.confirm = "1";
+    button.textContent = "Chắc?";
+    setTimeout(() => { button.dataset.confirm = ""; button.textContent = "Xóa"; }, 3000);
+    return;
+  }
+  try {
+    await api(`/api/links/${encodeURIComponent(button.dataset.id)}`, { method: "DELETE" });
+    toast(`Đã xóa ${link ? link.url : "link"}`);
+    await load();
+  } catch (error) {
+    toast(error.message, true);
+  }
+});
+
+load().catch((error) => {
+  $("listWrap").innerHTML = `<p class="empty">Không tải được danh sách: ${esc(error.message)}</p>`;
+});
+</script>
+</body>
+</html>

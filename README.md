@@ -48,6 +48,19 @@ Xuất các địa điểm đã duyệt (đã áp override):
 travel-agent export-approved --db data\hue.sqlite --out data\hue_places_approved.jsonl
 ```
 
+## Thêm link nguồn dữ liệu
+
+Cũng trong server `review`, mở http://127.0.0.1:8765/links:
+- Dán một hoặc nhiều link (mỗi dòng một link), chọn chủ đề, thêm ghi chú nếu cần.
+- Link chỉ được lưu, không tự tải. Xử lý từng nguồn làm sau, sau khi kiểm tra điều khoản và
+  giấy phép của nguồn đó.
+
+Liệt kê link chưa xử lý:
+
+```powershell
+travel-agent links --db data\hue.sqlite --status new
+```
+
 ## Độ phủ dữ liệu Huế (OSM, 2026-11-03T16:31:11Z)
 
 | Mục | Số lượng |

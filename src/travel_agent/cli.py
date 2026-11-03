@@ -17,6 +17,8 @@ from travel_agent.data.osm import OSM_ATTRIBUTION, build_overpass_query, places_
 from travel_agent.data.place_repository import SqlitePlaceRepository
 from travel_agent.domain.models import Category
 from travel_agent.review.store import ReviewStore
+from travel_agent.sources.models import LinkStatus
+from travel_agent.sources.store import LinkStore
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 # Khung bao gần đúng: nội đô Huế, các lăng phía nam, Thuận An. Xem lại trên bản đồ trước khi tải.
@@ -62,6 +64,11 @@ def _build_parser() -> argparse.ArgumentParser:
     review.add_argument("--db", type=Path, required=True)
     review.add_argument("--port", type=int, default=8765)
     review.set_defaults(func=_cmd_review)
+
+    links = sub.add_parser("links", help="Liệt kê link nguồn dữ liệu đã thêm")
+    links.add_argument("--db", type=Path, required=True)
+    links.add_argument("--status", type=LinkStatus, choices=list(LinkStatus))
+    links.set_defaults(func=_cmd_links)
 
     export = sub.add_parser("export-approved", help="Xuất địa điểm đã duyệt ra JSONL")
     export.add_argument("--db", type=Path, required=True)
@@ -143,8 +150,22 @@ def _cmd_review(args: argparse.Namespace) -> int:
 
     from travel_agent.review.app import create_app
 
-    print(f"Trang duyệt: http://127.0.0.1:{args.port}  (Ctrl+C để dừng)")
+    print(f"Trang duyệt: http://127.0.0.1:{args.port}")
+    print(f"Thêm link nguồn dữ liệu: http://127.0.0.1:{args.port}/links  (Ctrl+C để dừng)")
     uvicorn.run(create_app(args.db), host="127.0.0.1", port=args.port, log_level="warning")
+    return 0
+
+
+def _cmd_links(args: argparse.Namespace) -> int:
+    if not _require_db(args.db):
+        return 2
+    store = LinkStore(args.db)
+    try:
+        for link in store.list(args.status):
+            note = link.note or ""
+            print(f"{link.id}\t{link.status.value}\t{link.topic.value}\t{link.url}\t{note}")
+    finally:
+        store.close()
     return 0
 
 
