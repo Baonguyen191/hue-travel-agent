@@ -1,0 +1,45 @@
+vars:
+  - configs/eval.yaml
+
+stages:
+  make_evalset:
+    cmd: >-
+      python -m travel_agent make-evalset
+      --seed ${evalset.seed}
+      --out data/eval/hue_eval_v1.jsonl
+    frozen: true
+    params:
+      - configs/eval.yaml:
+          - evalset
+    outs:
+      - data/eval/hue_eval_v1.jsonl:
+          cache: false
+
+  baseline_eval:
+    cmd: >-
+      python -m travel_agent eval
+      --db data/hue.sqlite
+      --evalset data/eval/hue_eval_v1.jsonl
+      --split dev
+      --model ${baseline.model}
+      --temperature ${generation.temperature}
+      --seed ${generation.seed}
+      --num-predict ${generation.num_predict}
+      --run-name baseline
+      --mlflow
+      --out reports/eval/baseline_dev.json
+    deps:
+      - data/hue.sqlite
+      - data/eval/hue_eval_v1.jsonl
+      - src/travel_agent/planning
+      - src/travel_agent/training
+      - src/travel_agent/validation
+    params:
+      - configs/eval.yaml:
+          - baseline
+          - generation
+    outs:
+      - reports/eval/baseline_dev.outcomes.jsonl
+    metrics:
+      - reports/eval/baseline_dev.json:
+          cache: false

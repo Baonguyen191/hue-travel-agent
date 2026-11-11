@@ -76,6 +76,40 @@ travel-agent links --db data\hue.sqlite --status new
 | park | 16 |
 | museum | 12 |
 
+## Eval và MLOps
+
+Thiết kế: `docs/superpowers/specs/2026-11-11-sft-rl-training-design.md`.
+
+Cài thêm công cụ MLOps:
+
+```powershell
+.venv\Scripts\python -m pip install -e ".[dev,mlops]"
+```
+
+Cấu hình một lần trên mỗi máy (cache DVC, DVC remote và MLflow nằm ngoài OneDrive):
+
+```powershell
+New-Item -ItemType Directory -Force C:\dev\travelagent-dvc, C:\dev\travelagent-dvc-cache, C:\dev\travelagent-runs
+.venv\Scripts\dvc cache dir --local C:\dev\travelagent-dvc-cache
+.venv\Scripts\dvc remote add --local -d localstore C:\dev\travelagent-dvc
+```
+
+Chạy pipeline (cần Ollama đang chạy và đã pull model ghi trong `configs/eval.yaml`):
+
+```powershell
+.venv\Scripts\Activate.ps1
+$env:PYTHONPATH="src"
+dvc repro baseline_eval
+dvc metrics show
+```
+
+- **Bộ eval:** `data/eval/hue_eval_v1.jsonl`, 70 dev và 30 test. Stage `make_evalset` đã đóng băng;
+  không sinh lại. Lệnh `eval --split test` cần thêm `--allow-test` và chỉ dùng cho lần so sánh cuối.
+- **Tham số:** sửa trong `configs/eval.yaml`, không sửa trong `dvc.yaml`.
+- **MLflow:** `.venv\Scripts\mlflow ui --backend-store-uri sqlite:///C:/dev/travelagent-runs/mlflow.db`.
+- **Lưu ý:** duyệt tay địa điểm làm đổi `data/hue.sqlite`, nên `dvc repro` sẽ chạy lại eval.
+  Chạy `dvc add data/hue.sqlite` sau mỗi đợt duyệt để ghi version dữ liệu mới.
+
 ## Kiểm thử
 
 ```powershell
@@ -84,3 +118,5 @@ travel-agent links --db data\hue.sqlite --status new
 .venv\Scripts\mypy src
 .venv\Scripts\python -m pytest
 ```
+
+Hoặc chạy tất cả bằng một lệnh: `powershell -File scripts\check.ps1`.

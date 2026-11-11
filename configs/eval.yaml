@@ -1,0 +1,10 @@
+evalset:
+  seed: 20261111
+baseline:
+  # Tag Ollama của Qwen3.5 4B. Giá trị này là phỏng đoán theo quy ước đặt tên;
+  # Task 8 Step 1 xác minh và sửa lại.
+  model: qwen3.5:4b
+generation:
+  temperature: 0.0
+  seed: 0
+  num_predict: 2048
