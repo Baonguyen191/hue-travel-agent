@@ -1,0 +1,14 @@
+schema: '2.0'
+stages:
+  make_evalset:
+    cmd: python -m travel_agent make-evalset --seed 20261111 --out 
+      data/eval/hue_eval_v1.jsonl
+    params:
+      configs/eval.yaml:
+        evalset:
+          seed: 20261111
+    outs:
+    - path: data/eval/hue_eval_v1.jsonl
+      hash: md5
+      md5: b1bc815466560006ebcd1070b33fcff1
+      size: 22292
