@@ -1,4 +1,4 @@
-"""CLI: travel-agent fetch-osm | ingest-osm | places | review | export-approved."""
+"""CLI: travel-agent fetch-osm | ingest-osm | ingest-huetripo | places | review | export-..."""
 
 from __future__ import annotations
 
@@ -13,6 +13,11 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+from travel_agent.data.hue_open_data import build_major_sights, manifest_fetched_at
+from travel_agent.data.huetripo import DURATION_KEY as HUETRIPO_DURATION_KEY
+from travel_agent.data.huetripo import HOURS_KEY as HUETRIPO_HOURS_KEY
+from travel_agent.data.huetripo import SOURCE as HUETRIPO_SOURCE
+from travel_agent.data.huetripo import load_huetripo
 from travel_agent.data.osm import OSM_ATTRIBUTION, build_overpass_query, places_from_overpass
 from travel_agent.data.place_repository import SqlitePlaceRepository
 from travel_agent.domain.models import Category
@@ -53,6 +58,22 @@ def _build_parser() -> argparse.ArgumentParser:
     ingest.add_argument("raw", type=Path)
     ingest.add_argument("--db", type=Path, required=True)
     ingest.set_defaults(func=_cmd_ingest)
+
+    hue_od = sub.add_parser(
+        "ingest-hue-open-data",
+        help="Nạp điểm tham quan lớn, phổ biến từ dữ liệu mở data.hue.gov.vn đã tải",
+    )
+    hue_od.add_argument("raw_dir", type=Path)
+    hue_od.add_argument("--db", type=Path, required=True)
+    hue_od.set_defaults(func=_cmd_ingest_hue_open_data)
+
+    huetripo = sub.add_parser(
+        "ingest-huetripo",
+        help="Nạp điểm tham quan, ăn uống, chợ từ dữ liệu huetripo.hue.gov.vn đã crawl",
+    )
+    huetripo.add_argument("raw_dir", type=Path)
+    huetripo.add_argument("--db", type=Path, required=True)
+    huetripo.set_defaults(func=_cmd_ingest_huetripo)
 
     places = sub.add_parser("places", help="Liệt kê địa điểm trong DB")
     places.add_argument("--db", type=Path, required=True)
@@ -120,6 +141,47 @@ def _cmd_ingest(args: argparse.Namespace) -> int:
     print(f"Có opening_hours: {with_hours}/{len(places)}")
     for category, count in sorted(counts.items()):
         print(f"  {category.value}: {count}")
+    return 0
+
+
+def _cmd_ingest_hue_open_data(args: argparse.Namespace) -> int:
+    args.db.parent.mkdir(parents=True, exist_ok=True)
+    repo = SqlitePlaceRepository(args.db)
+    try:
+        osm_places = repo.list_places(limit=-1, source="osm")
+        result = build_major_sights(args.raw_dir, manifest_fetched_at(args.raw_dir), osm_places)
+        repo.upsert_many(result.places)
+    finally:
+        repo.close()
+    print(f"Đã nạp {len(result.places)} điểm tham quan lớn, phổ biến (nguồn data.hue.gov.vn).")
+    for place in sorted(result.places, key=lambda p: p.name):
+        print(f"  {place.id}\t{place.name}\t{place.attributes.get('Nguồn tọa độ', '')}")
+    if result.missing:
+        print("Thiếu tọa độ ở cả dữ liệu mở và OSM, chưa nạp: " + ", ".join(result.missing))
+    return 0
+
+
+def _cmd_ingest_huetripo(args: argparse.Namespace) -> int:
+    result = load_huetripo(args.raw_dir)
+    args.db.parent.mkdir(parents=True, exist_ok=True)
+    repo = SqlitePlaceRepository(args.db)
+    try:
+        repo.upsert_many(result.places)
+        counts = repo.count_by_category(source=HUETRIPO_SOURCE)
+    finally:
+        repo.close()
+    total = len(result.places)
+    with_hours = sum(1 for place in result.places if HUETRIPO_HOURS_KEY in place.attributes)
+    with_duration = sum(1 for place in result.places if HUETRIPO_DURATION_KEY in place.attributes)
+    print(f"Đã nạp {total} địa điểm (nguồn {HUETRIPO_SOURCE}).")
+    print(f"Có giờ mở cửa theo nguồn: {with_hours}/{total}")
+    print(f"Có thời gian trải nghiệm TB: {with_duration}/{total}")
+    for category, count in sorted(counts.items()):
+        print(f"  {category.value}: {count}")
+    if result.skipped:
+        print("Bỏ qua (không phải điểm dừng trong lịch trình hoặc thiếu tọa độ):")
+        for label, count in result.skipped.most_common():
+            print(f"  {label}: {count}")
     return 0
 
 

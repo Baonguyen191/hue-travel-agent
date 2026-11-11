@@ -100,6 +100,9 @@
   <aside>
     <div class="tabs" id="tabs"></div>
     <div class="filters">
+      <select id="source" aria-label="Lọc theo nguồn"><option value="">Mọi nguồn</option></select>
+    </div>
+    <div class="filters">
       <select id="category" aria-label="Lọc theo loại"><option value="">Mọi loại</option></select>
       <input id="search" type="search" placeholder="Tìm tên hoặc id" aria-label="Tìm kiếm">
     </div>
@@ -125,7 +128,8 @@ const CATEGORY_LABEL = {
 const TABS = ["pending", "needs_fix", "approved", "rejected", "all"];
 const OVERRIDE_FIELDS = ["name_override", "category_override", "opening_hours_override", "evidence", "note"];
 const PAGE = 50;
-const state = { status: "pending", category: "", q: "", items: [], total: 0, sel: -1, stats: null, meta: null, busy: false };
+const state = { status: "pending", source: "", category: "", q: "", items: [], total: 0, sel: -1, stats: null, meta: null, busy: false };
+const SOURCE_LABEL = { "data.hue.gov.vn": "Dữ liệu mở Huế (data.hue.gov.vn)", osm: "OpenStreetMap" };
 let map = null;
 
 const $ = (id) => document.getElementById(id);
@@ -158,7 +162,7 @@ function toast(message, isError = false) {
 }
 
 async function loadStats() {
-  state.stats = await api("/api/stats");
+  state.stats = await api("/api/stats" + (state.source ? "?" + new URLSearchParams({ source: state.source }) : ""));
   const s = state.stats;
   const done = s.approved + s.needs_fix + s.rejected;
   const pct = (n) => (s.total ? (n * 100) / s.total : 0);
@@ -176,6 +180,7 @@ async function loadList(reset) {
   if (reset) { state.items = []; state.sel = -1; }
   const params = new URLSearchParams({ offset: state.items.length, limit: PAGE });
   if (state.status !== "all") params.set("status", state.status);
+  if (state.source) params.set("source", state.source);
   if (state.category) params.set("category", state.category);
   if (state.q) params.set("q", state.q);
   const data = await api("/api/places?" + params);
@@ -226,11 +231,12 @@ function renderDetail() {
       <div class="title-row"><h2>${esc(it.effective.name)}</h2><span class="badge ${it.status}">${STATUS_LABEL[it.status]}</span></div>
       <dl class="facts">
         <dt>Loại</dt><dd>${esc(catLabel(p.category))}${r.category_override ? ` → <b>${esc(catLabel(r.category_override))}</b>` : ""}</dd>
-        <dt>Tên gốc (OSM)</dt><dd>${esc(p.name)}</dd>
-        <dt>Giờ mở cửa (OSM)</dt><dd><code>${esc(p.opening_hours_raw || "—")}</code> ${hoursTag(it)}</dd>
+        <dt>Tên gốc (nguồn)</dt><dd>${esc(p.name)}</dd>
+        <dt>Giờ mở cửa đã chuẩn hóa</dt><dd><code>${esc(p.opening_hours_raw || "—")}</code> ${hoursTag(it)}</dd>
         <dt>Tọa độ</dt><dd>${lat.toFixed(6)}, ${lon.toFixed(6)}</dd>
         <dt>Nguồn</dt><dd>${esc(p.source)} · ${esc(p.license)} · dữ liệu lúc ${esc(fmtDate(p.collected_at))}</dd>
         <dt>ID</dt><dd><code>${esc(p.id)}</code></dd>
+        ${Object.entries(p.attributes || {}).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}
       </dl>
       <div class="links">
         ${it.osm_url ? `<a href="${esc(it.osm_url)}" target="_blank" rel="noopener">Mở trên OpenStreetMap</a>` : ""}
@@ -331,6 +337,10 @@ $("tabs").addEventListener("click", (event) => {
   state.status = button.dataset.status;
   loadStats().then(() => loadList(true)).catch((e) => toast(e.message, true));
 });
+$("source").addEventListener("change", (event) => {
+  state.source = event.target.value;
+  loadStats().then(() => loadList(true)).catch((e) => toast(e.message, true));
+});
 $("category").addEventListener("change", (event) => {
   state.category = event.target.value;
   loadList(true).catch((e) => toast(e.message, true));
@@ -353,6 +363,12 @@ $("more").addEventListener("click", () => loadList(false).catch((e) => toast(e.m
   try {
     state.meta = await api("/api/meta");
     $("category").insertAdjacentHTML("beforeend", state.meta.categories.map((c) => `<option value="${c}">${esc(catLabel(c))}</option>`).join(""));
+    const sources = Object.entries(state.meta.sources || {});
+    $("source").insertAdjacentHTML("beforeend", sources.map(([s, n]) => `<option value="${esc(s)}">${esc(SOURCE_LABEL[s] || s)} (${n})</option>`).join(""));
+    if (state.meta.sources && state.meta.sources["data.hue.gov.vn"]) {
+      state.source = "data.hue.gov.vn";
+      $("source").value = state.source;
+    }
     await loadStats();
     await loadList(true);
   } catch (error) {

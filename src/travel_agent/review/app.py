@@ -48,16 +48,17 @@ def create_app(db_path: Path) -> FastAPI:
         return (STATIC_DIR / "index.html").read_text(encoding="utf-8")
 
     @app.get("/api/meta")
-    def meta() -> dict[str, Any]:
+    def meta(store: StoreDep) -> dict[str, Any]:
         return {
             "categories": [category.value for category in Category],
             "statuses": [status.value for status in ReviewStatus],
+            "sources": store.sources(),
             "attribution": OSM_ATTRIBUTION,
         }
 
     @app.get("/api/stats")
-    def stats(store: StoreDep) -> dict[str, int]:
-        return store.stats()
+    def stats(store: StoreDep, source: str | None = None) -> dict[str, int]:
+        return store.stats(source=source or None)
 
     @app.get("/api/places")
     def list_places(
@@ -65,10 +66,11 @@ def create_app(db_path: Path) -> FastAPI:
         status: ReviewStatus | None = None,
         category: Category | None = None,
         q: str | None = None,
+        source: str | None = None,
         offset: Annotated[int, Query(ge=0)] = 0,
         limit: Annotated[int, Query(ge=1, le=200)] = 50,
     ) -> dict[str, Any]:
-        items, total = store.query(status, category, q, offset, limit)
+        items, total = store.query(status, category, q, offset, limit, source=source or None)
         return {"items": [to_item(item) for item in items], "total": total}
 
     @app.get("/api/place")

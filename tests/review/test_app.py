@@ -61,4 +61,5 @@ def test_invalid_hours_override_is_422(db_path: Path) -> None:
 def test_meta_lists_categories(db_path: Path) -> None:
     meta = client(db_path).get("/api/meta").json()
     assert "museum" in meta["categories"]
+    assert meta["sources"] == {"osm": 3}
     assert meta["attribution"] == "© OpenStreetMap contributors"

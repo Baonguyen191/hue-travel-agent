@@ -1,4 +1,5 @@
 import datetime as dt
+import sqlite3
 from pathlib import Path
 
 from travel_agent.data.place_repository import SqlitePlaceRepository
@@ -27,6 +28,39 @@ def test_roundtrip(tmp_path: Path) -> None:
     repo.upsert_many([original])
     assert repo.get("osm:node/1") == original
     assert repo.get("osm:node/404") is None
+    repo.close()
+
+
+def test_attributes_roundtrip_and_source_filter(tmp_path: Path) -> None:
+    repo = SqlitePlaceRepository(tmp_path / "places.sqlite")
+    official = make_place("hueod:a", Category.HISTORIC).model_copy(
+        update={"source": "data.hue.gov.vn", "attributes": {"Giá vé": "Người lớn: 200.000đ"}}
+    )
+    repo.upsert_many([official, make_place("osm:node/1", Category.CAFE)])
+    assert repo.get("hueod:a") == official
+    assert [p.id for p in repo.list_places(source="data.hue.gov.vn")] == ["hueod:a"]
+    assert repo.count_by_category(source="osm") == {Category.CAFE: 1}
+    repo.close()
+
+
+def test_old_database_without_attributes_column_is_migrated(tmp_path: Path) -> None:
+    path = tmp_path / "old.sqlite"
+    conn = sqlite3.connect(path)
+    conn.execute(
+        "CREATE TABLE places (id TEXT PRIMARY KEY, name TEXT NOT NULL, category TEXT NOT NULL, "
+        "lat REAL NOT NULL, lon REAL NOT NULL, opening_hours_raw TEXT, source TEXT NOT NULL, "
+        "source_place_id TEXT NOT NULL, license TEXT NOT NULL, collected_at TEXT NOT NULL)"
+    )
+    conn.execute(
+        "INSERT INTO places VALUES ('osm:node/1', 'Cũ', 'cafe', 16.47, 107.58, NULL, 'osm', "
+        "'node/1', 'ODbL-1.0', '2026-11-03T08:00:00+00:00')"
+    )
+    conn.commit()
+    conn.close()
+    repo = SqlitePlaceRepository(path)
+    place = repo.get("osm:node/1")
+    assert place is not None
+    assert place.attributes == {}
     repo.close()
 
 

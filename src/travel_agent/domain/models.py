@@ -55,6 +55,9 @@ class Place(BaseModel):
     source_place_id: str = Field(min_length=1)
     license: str = Field(min_length=1)
     collected_at: dt.datetime
+    # Thông tin theo nguồn, giữ nguyên dạng chữ (địa chỉ, giá vé, lượt khách, nguồn tọa độ...).
+    # Chưa chuẩn hóa nên không dùng trực tiếp cho validator.
+    attributes: dict[str, str] = Field(default_factory=dict)
 
 
 class PlanRequest(BaseModel):

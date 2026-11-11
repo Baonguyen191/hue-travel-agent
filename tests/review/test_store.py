@@ -87,6 +87,15 @@ def test_category_filter_uses_override_and_search_matches_name(store: ReviewStor
     assert found[0].place.id == "osm:node/1"
 
 
+def test_sources_and_source_filter(store: ReviewStore) -> None:
+    assert store.sources() == {"osm": 3}
+    _, total = store.query(source="osm")
+    assert total == 3
+    _, none = store.query(source="data.hue.gov.vn")
+    assert none == 0
+    assert store.stats(source="data.hue.gov.vn")["total"] == 0
+
+
 def test_pagination(store: ReviewStore) -> None:
     first, total = store.query(limit=2)
     second, _ = store.query(offset=2, limit=2)

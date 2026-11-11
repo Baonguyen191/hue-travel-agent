@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import sqlite3
 from collections.abc import Iterable
 from pathlib import Path
@@ -21,7 +22,8 @@ CREATE TABLE IF NOT EXISTS places (
     source TEXT NOT NULL,
     source_place_id TEXT NOT NULL,
     license TEXT NOT NULL,
-    collected_at TEXT NOT NULL
+    collected_at TEXT NOT NULL,
+    attributes_json TEXT NOT NULL DEFAULT '{}'
 );
 CREATE INDEX IF NOT EXISTS idx_places_category ON places (category);
 """
@@ -37,16 +39,27 @@ PLACE_COLUMN_NAMES = (
     "source_place_id",
     "license",
     "collected_at",
+    "attributes_json",
 )
 _COLUMNS = ", ".join(PLACE_COLUMN_NAMES)
 
 _UPSERT = (
-    f"INSERT INTO places ({_COLUMNS}) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+    f"INSERT INTO places ({_COLUMNS}) VALUES ({', '.join('?' for _ in PLACE_COLUMN_NAMES)}) "
     "ON CONFLICT(id) DO UPDATE SET name=excluded.name, category=excluded.category, "
     "lat=excluded.lat, lon=excluded.lon, opening_hours_raw=excluded.opening_hours_raw, "
     "source=excluded.source, source_place_id=excluded.source_place_id, "
-    "license=excluded.license, collected_at=excluded.collected_at"
+    "license=excluded.license, collected_at=excluded.collected_at, "
+    "attributes_json=excluded.attributes_json"
 )
+
+
+def ensure_places_schema(conn: sqlite3.Connection) -> None:
+    """Tạo bảng `places` và nâng cấp DB cũ (trước khi có cột `attributes_json`)."""
+    conn.executescript(PLACES_SCHEMA)
+    columns = {row[1] for row in conn.execute("PRAGMA table_info(places)")}
+    if "attributes_json" not in columns:
+        with conn:
+            conn.execute("ALTER TABLE places ADD COLUMN attributes_json TEXT NOT NULL DEFAULT '{}'")
 
 
 class PlaceLookup(Protocol):
@@ -64,7 +77,7 @@ class InMemoryPlaceRepository:
 class SqlitePlaceRepository:
     def __init__(self, path: str | Path) -> None:
         self._conn = sqlite3.connect(str(path))
-        self._conn.executescript(PLACES_SCHEMA)
+        ensure_places_schema(self._conn)
 
     def close(self) -> None:
         self._conn.close()
@@ -81,22 +94,36 @@ class SqlitePlaceRepository:
         ).fetchone()
         return None if row is None else row_to_place(row)
 
-    def list_places(self, category: Category | None = None, limit: int = 50) -> list[Place]:
-        if category is None:
-            cursor = self._conn.execute(
-                f"SELECT {_COLUMNS} FROM places ORDER BY name LIMIT ?", (limit,)
-            )
-        else:
-            cursor = self._conn.execute(
-                f"SELECT {_COLUMNS} FROM places WHERE category = ? ORDER BY name LIMIT ?",
-                (category.value, limit),
-            )
+    def list_places(
+        self,
+        category: Category | None = None,
+        limit: int = 50,
+        source: str | None = None,
+    ) -> list[Place]:
+        clauses: list[str] = []
+        params: list[Any] = []
+        if category is not None:
+            clauses.append("category = ?")
+            params.append(category.value)
+        if source is not None:
+            clauses.append("source = ?")
+            params.append(source)
+        where = ("WHERE " + " AND ".join(clauses)) if clauses else ""
+        cursor = self._conn.execute(
+            f"SELECT {_COLUMNS} FROM places {where} ORDER BY name LIMIT ?", [*params, limit]
+        )
         return [row_to_place(row) for row in cursor.fetchall()]
 
-    def count_by_category(self) -> dict[Category, int]:
-        rows = self._conn.execute(
-            "SELECT category, COUNT(*) FROM places GROUP BY category"
-        ).fetchall()
+    def count_by_category(self, source: str | None = None) -> dict[Category, int]:
+        if source is None:
+            rows = self._conn.execute(
+                "SELECT category, COUNT(*) FROM places GROUP BY category"
+            ).fetchall()
+        else:
+            rows = self._conn.execute(
+                "SELECT category, COUNT(*) FROM places WHERE source = ? GROUP BY category",
+                (source,),
+            ).fetchall()
         return {Category(category): count for category, count in rows}
 
 
@@ -112,12 +139,25 @@ def _to_row(place: Place) -> tuple[Any, ...]:
         place.source_place_id,
         place.license,
         place.collected_at.isoformat(),
+        json.dumps(place.attributes, ensure_ascii=False),
     )
 
 
 def row_to_place(row: tuple[Any, ...]) -> Place:
     """`row` theo thứ tự `PLACE_COLUMN_NAMES`."""
-    (pid, name, category, lat, lon, hours, source, source_place_id, license_, collected) = row
+    (
+        pid,
+        name,
+        category,
+        lat,
+        lon,
+        hours,
+        source,
+        source_place_id,
+        license_,
+        collected,
+        attributes_json,
+    ) = row
     return Place(
         id=pid,
         name=name,
@@ -128,4 +168,5 @@ def row_to_place(row: tuple[Any, ...]) -> Place:
         source_place_id=source_place_id,
         license=license_,
         collected_at=dt.datetime.fromisoformat(collected),
+        attributes=json.loads(attributes_json or "{}"),
     )

@@ -7,7 +7,11 @@ import sqlite3
 from pathlib import Path
 from typing import Any
 
-from travel_agent.data.place_repository import PLACE_COLUMN_NAMES, PLACES_SCHEMA, row_to_place
+from travel_agent.data.place_repository import (
+    PLACE_COLUMN_NAMES,
+    ensure_places_schema,
+    row_to_place,
+)
 from travel_agent.domain.models import Category
 from travel_agent.review.models import Review, ReviewedPlace, ReviewInput, ReviewStatus
 
@@ -45,7 +49,8 @@ class ReviewStore:
         # check_same_thread=False: FastAPI có thể mở và dùng connection ở hai thread khác nhau
         # trong cùng một request; mỗi request có connection riêng nên không dùng chung.
         self._conn = sqlite3.connect(str(path), check_same_thread=False)
-        self._conn.executescript(PLACES_SCHEMA + REVIEWS_SCHEMA)
+        ensure_places_schema(self._conn)
+        self._conn.executescript(REVIEWS_SCHEMA)
 
     def close(self) -> None:
         self._conn.close()
@@ -57,8 +62,9 @@ class ReviewStore:
         search: str | None = None,
         offset: int = 0,
         limit: int = 50,
+        source: str | None = None,
     ) -> tuple[list[ReviewedPlace], int]:
-        where, params = _where(status, category, search)
+        where, params = _where(status, category, search, source)
         total = self._conn.execute(f"SELECT COUNT(*) {_FROM} {where}", params).fetchone()[0]
         rows = self._conn.execute(
             f"SELECT {_PLACE_SELECT}, {_REVIEW_SELECT} {_FROM} {where} "
@@ -73,9 +79,16 @@ class ReviewStore:
         ).fetchone()
         return None if row is None else _to_reviewed(row)
 
-    def stats(self) -> dict[str, int]:
+    def sources(self) -> dict[str, int]:
         rows = self._conn.execute(
-            f"SELECT COALESCE(r.status, 'pending'), COUNT(*) {_FROM} GROUP BY 1"
+            "SELECT source, COUNT(*) FROM places GROUP BY source ORDER BY source"
+        ).fetchall()
+        return {str(source): int(count) for source, count in rows}
+
+    def stats(self, source: str | None = None) -> dict[str, int]:
+        where, params = _where(None, None, None, source)
+        rows = self._conn.execute(
+            f"SELECT COALESCE(r.status, 'pending'), COUNT(*) {_FROM} {where} GROUP BY 1", params
         ).fetchall()
         counts = {status.value: 0 for status in ReviewStatus}
         counts.update({str(status): int(count) for status, count in rows})
@@ -115,10 +128,16 @@ class ReviewStore:
 
 
 def _where(
-    status: ReviewStatus | None, category: Category | None, search: str | None
+    status: ReviewStatus | None,
+    category: Category | None,
+    search: str | None,
+    source: str | None = None,
 ) -> tuple[str, list[Any]]:
     clauses: list[str] = []
     params: list[Any] = []
+    if source:
+        clauses.append("p.source = ?")
+        params.append(source)
     if status is ReviewStatus.PENDING:
         clauses.append("r.place_id IS NULL")
     elif status is not None:
