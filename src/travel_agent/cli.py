@@ -1,4 +1,4 @@
-"""CLI: travel-agent fetch-osm | ingest-osm | ingest-huetripo | places | review | export-..."""
+"""CLI: travel-agent fetch-osm | ingest-* | places | review | export-... | make-evalset | eval"""
 
 from __future__ import annotations
 
@@ -24,6 +24,7 @@ from travel_agent.domain.models import Category
 from travel_agent.review.store import ReviewStore
 from travel_agent.sources.models import LinkStatus
 from travel_agent.sources.store import LinkStore
+from travel_agent.training.commands import add_training_commands
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 # Khung bao gần đúng: nội đô Huế, các lăng phía nam, Thuận An. Xem lại trên bản đồ trước khi tải.
@@ -95,6 +96,7 @@ def _build_parser() -> argparse.ArgumentParser:
     export.add_argument("--db", type=Path, required=True)
     export.add_argument("--out", type=Path, required=True)
     export.set_defaults(func=_cmd_export)
+    add_training_commands(sub)
     return parser
 
 
