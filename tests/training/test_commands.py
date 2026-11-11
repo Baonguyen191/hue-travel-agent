@@ -100,3 +100,71 @@ def test_eval_refuses_test_split_without_flag(
 
 def test_eval_refuses_missing_db(evalset: Path, tmp_path: Path) -> None:
     assert run_eval_cmd(tmp_path / "missing.sqlite", evalset, tmp_path / "x.json") == 2
+
+
+def test_load_usable_places_applies_reviewer_overrides(db: Path) -> None:
+    store = ReviewStore(db)
+    store.save(
+        ReviewInput(place_id="t:cafe/2", status=ReviewStatus.APPROVED, name_override="Mới"), NOW
+    )
+    store.close()
+    names = {place.id: place.name for place in load_usable_places(db)}
+    assert names["t:cafe/2"] == "Mới"
+
+
+def test_eval_passes_gate_against_equal_baseline(
+    db: Path, evalset: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(commands, "OllamaGenerator", FakeGenerator)
+    first = tmp_path / "first.json"
+    assert run_eval_cmd(db, evalset, first) == 0
+    second = tmp_path / "second.json"
+    assert run_eval_cmd(db, evalset, second, "--baseline", str(first)) == 0
+
+
+def test_eval_refuses_missing_baseline_before_running(
+    db: Path, evalset: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(commands, "OllamaGenerator", FakeGenerator)
+    out = tmp_path / "out.json"
+    missing = tmp_path / "nope.json"
+    assert run_eval_cmd(db, evalset, out, "--baseline", str(missing)) == 2
+    assert not out.exists()
+
+
+def test_eval_refuses_malformed_baseline(
+    db: Path, evalset: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(commands, "OllamaGenerator", FakeGenerator)
+    out = tmp_path / "out.json"
+    bad = tmp_path / "bad.json"
+    bad.write_text(json.dumps({"x": 1}), encoding="utf-8")
+    assert run_eval_cmd(db, evalset, out, "--baseline", str(bad)) == 2
+    assert not out.exists()
+    bad.write_text("không phải json", encoding="utf-8")
+    assert run_eval_cmd(db, evalset, out, "--baseline", str(bad)) == 2
+    assert not out.exists()
+
+
+def test_eval_meta_records_generation_config(
+    db: Path, evalset: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(commands, "OllamaGenerator", FakeGenerator)
+    out = tmp_path / "a.json"
+    assert run_eval_cmd(db, evalset, out, "--host", "http://h:1", "--no-schema") == 0
+    meta = json.loads(out.read_text(encoding="utf-8"))["meta"]
+    assert meta["schema_format"] is False
+    assert meta["limit"] == 5
+    assert meta["host"] == "http://h:1"
+
+
+def test_eval_meta_limit_is_all_when_unset(
+    db: Path, evalset: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(commands, "OllamaGenerator", FakeGenerator)
+    out = tmp_path / "a.json"
+    base = ["eval", "--db", str(db), "--evalset", str(evalset), "--model", "fake"]
+    assert main([*base, "--out", str(out)]) == 0
+    meta = json.loads(out.read_text(encoding="utf-8"))["meta"]
+    assert meta["limit"] == "all"
+    assert meta["schema_format"] is True

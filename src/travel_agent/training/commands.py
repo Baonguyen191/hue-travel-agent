@@ -73,6 +73,18 @@ def current_commit() -> str:
     return result.stdout.strip()
 
 
+def _load_baseline(path: Path) -> EvalSummary | None:
+    """Đọc phần summary của file mốc; in lỗi tiếng Việt và trả None nếu thiếu hoặc sai dạng."""
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return EvalSummary.model_validate(data["summary"])
+    except OSError:
+        print(f"Không đọc được file mốc {path}.", file=sys.stderr)
+    except (ValueError, KeyError, TypeError) as exc:
+        print(f"File mốc {path} không hợp lệ: {exc}", file=sys.stderr)
+    return None
+
+
 def _cmd_make_evalset(args: argparse.Namespace) -> int:
     entries = build_eval_set(args.seed)
     write_eval_set(entries, args.out)
@@ -90,6 +102,12 @@ def _cmd_eval(args: argparse.Namespace) -> int:
     if args.split is Split.TEST and not args.allow_test:
         print("Bộ test đóng băng. Thêm --allow-test khi chạy so sánh cuối.", file=sys.stderr)
         return EXIT_USAGE
+
+    baseline: EvalSummary | None = None
+    if args.baseline is not None:
+        baseline = _load_baseline(args.baseline)
+        if baseline is None:
+            return EXIT_USAGE
 
     entries = read_eval_set(args.evalset, args.split)
     if args.limit is not None:
@@ -111,6 +129,9 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         "temperature": args.temperature,
         "seed": args.seed,
         "num_predict": args.num_predict,
+        "schema_format": not args.no_schema,
+        "limit": "all" if args.limit is None else args.limit,
+        "host": args.host,
         "git_commit": current_commit(),
         "evalset_sha256": file_sha256(args.evalset),
         "db_sha256": file_sha256(args.db),
@@ -136,9 +157,8 @@ def _cmd_eval(args: argparse.Namespace) -> int:
 
     if args.mlflow:
         log_eval_run(args.run_name, meta, summary)
-    if args.baseline is not None:
-        previous = json.loads(args.baseline.read_text(encoding="utf-8"))["summary"]
-        problems = regressions(summary, EvalSummary.model_validate(previous))
+    if baseline is not None:
+        problems = regressions(summary, baseline)
         for problem in problems:
             print(f"KHÔNG QUA CỔNG: {problem}", file=sys.stderr)
         if problems:
