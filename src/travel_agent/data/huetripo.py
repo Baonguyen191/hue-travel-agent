@@ -48,7 +48,7 @@ NAME_PREFIXES = (
     ("tu viện", Category.RELIGIOUS),
     ("chợ", Category.MARKET),
 )
-CAFE_FIELDS ={"quán cà phê/trà", "tiệm bánh"}
+CAFE_FIELDS = {"quán cà phê/trà", "tiệm bánh"}
 MARKET_FIELDS = {"chợ", "cửa hàng đặc sản và quà tặng", "trung tâm thương mại"}
 CONTACT_TYPES = ("Điện thoại", "Website")
 
