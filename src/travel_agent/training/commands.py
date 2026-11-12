@@ -8,13 +8,14 @@ import json
 import subprocess
 import sys
 from pathlib import Path
+from typing import TextIO
 
 from travel_agent.domain.models import Place
 from travel_agent.review.models import ReviewStatus
 from travel_agent.review.store import ReviewStore
 from travel_agent.routing.travel_time import HaversineEstimator
 from travel_agent.training.generator import DEFAULT_HOST, OllamaGenerator
-from travel_agent.training.metrics import EvalSummary, regressions, summarize
+from travel_agent.training.metrics import EvalSummary, PlanOutcome, regressions, summarize
 from travel_agent.training.requests import Split, build_eval_set, read_eval_set, write_eval_set
 from travel_agent.training.runner import run_eval
 from travel_agent.training.tracking import log_eval_run
@@ -86,6 +87,11 @@ def _load_baseline(path: Path) -> EvalSummary | None:
     return None
 
 
+def _append_outcome(handle: TextIO, outcome: PlanOutcome) -> None:
+    handle.write(outcome.model_dump_json() + "\n")
+    handle.flush()
+
+
 def _cmd_make_evalset(args: argparse.Namespace) -> int:
     entries = build_eval_set(args.seed)
     write_eval_set(entries, args.out)
@@ -122,7 +128,17 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         num_ctx=args.num_ctx,
         schema_format=not args.no_schema,
     )
-    outcomes = run_eval(entries, load_usable_places(args.db), generator, HaversineEstimator())
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    outcomes_path = args.out.with_suffix(".outcomes.jsonl")
+    # Ghi từng outcome ngay khi có: lỗi giữa chừng (Ollama chết) không làm mất phần đã chạy.
+    with outcomes_path.open("w", encoding="utf-8", newline="\n") as handle:
+        outcomes = run_eval(
+            entries,
+            load_usable_places(args.db),
+            generator,
+            HaversineEstimator(),
+            on_outcome=lambda outcome: _append_outcome(handle, outcome),
+        )
     summary = summarize(outcomes)
     meta: dict[str, str | int | float] = {
         "run_name": args.run_name,
@@ -140,13 +156,8 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         "db_sha256": file_sha256(args.db),
     }
 
-    args.out.parent.mkdir(parents=True, exist_ok=True)
     report = {"meta": meta, "summary": summary.model_dump(mode="json")}
     args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    outcomes_path = args.out.with_suffix(".outcomes.jsonl")
-    with outcomes_path.open("w", encoding="utf-8", newline="\n") as handle:
-        for outcome in outcomes:
-            handle.write(outcome.model_dump_json() + "\n")
 
     print(f"{args.run_name}: {summary.n} request, model {args.model}, split {args.split.value}")
     print(f"  first_pass_valid_rate: {summary.first_pass_valid_rate:.3f}")

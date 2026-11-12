@@ -1,6 +1,9 @@
+import pytest
+
 from tests.training.factories import PLACES, REQUEST, VALID_RAW
 from tests.validation.factories import FixedTravelTime
-from travel_agent.training.generator import Generation
+from travel_agent.training.generator import Generation, GenerationError
+from travel_agent.training.metrics import PlanOutcome
 from travel_agent.training.requests import EvalEntry, Split, request_key
 from travel_agent.training.runner import candidate_seed, run_eval
 
@@ -59,3 +62,31 @@ def test_outcome_keeps_raw_and_generation_metadata() -> None:
         120,
         80,
     )
+
+
+def test_on_outcome_is_called_after_each_request_in_order() -> None:
+    seen: list[PlanOutcome] = []
+    outcomes = run_eval(
+        [ENTRY, ENTRY], PLACES, FakeGenerator(VALID_RAW), FixedTravelTime(), on_outcome=seen.append
+    )
+    assert seen == outcomes
+    assert len(seen) == 2
+
+
+def test_outcomes_before_a_generation_error_were_already_reported() -> None:
+    class FailsOnThird(FakeGenerator):
+        def generate(self, messages: list[dict[str, str]]) -> Generation:
+            if len(self.seen) == 2:
+                raise GenerationError("Ollama chết")
+            return super().generate(messages)
+
+    seen: list[PlanOutcome] = []
+    with pytest.raises(GenerationError):
+        run_eval(
+            [ENTRY] * 4,
+            PLACES,
+            FailsOnThird(VALID_RAW),
+            FixedTravelTime(),
+            on_outcome=seen.append,
+        )
+    assert len(seen) == 2

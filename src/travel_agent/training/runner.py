@@ -24,8 +24,12 @@ def run_eval(
     generator: PlanGenerator,
     travel: TravelTimeProvider,
     clock: Callable[[], float] = time.perf_counter,
+    on_outcome: Callable[[PlanOutcome], None] | None = None,
 ) -> list[PlanOutcome]:
-    """Không bắt `GenerationError`: lỗi hạ tầng làm hỏng lần eval, không tính cho model."""
+    """Không bắt `GenerationError`: lỗi hạ tầng làm hỏng lần eval, không tính cho model.
+
+    `on_outcome` được gọi ngay sau mỗi request, để caller ghi dần kết quả ra đĩa.
+    """
     outcomes: list[PlanOutcome] = []
     for entry in entries:
         candidates = select_candidates(entry.request, places, candidate_seed(entry.key))
@@ -33,17 +37,18 @@ def run_eval(
         started = clock()
         generation = generator.generate(messages)
         latency_s = clock() - started
-        outcomes.append(
-            score_output(
-                entry.key,
-                entry.request,
-                generation.content,
-                candidates,
-                travel,
-                latency_s,
-                done_reason=generation.done_reason,
-                prompt_tokens=generation.prompt_tokens,
-                completion_tokens=generation.completion_tokens,
-            )
+        outcome = score_output(
+            entry.key,
+            entry.request,
+            generation.content,
+            candidates,
+            travel,
+            latency_s,
+            done_reason=generation.done_reason,
+            prompt_tokens=generation.prompt_tokens,
+            completion_tokens=generation.completion_tokens,
         )
+        outcomes.append(outcome)
+        if on_outcome is not None:
+            on_outcome(outcome)
     return outcomes

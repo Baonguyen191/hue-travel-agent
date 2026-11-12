@@ -14,7 +14,7 @@ from travel_agent.review.models import ReviewInput, ReviewStatus
 from travel_agent.review.store import ReviewStore
 from travel_agent.training import commands
 from travel_agent.training.commands import load_usable_places
-from travel_agent.training.generator import Generation
+from travel_agent.training.generator import Generation, GenerationError
 from travel_agent.training.requests import EVAL_SIZE, TEST_SIZE, read_eval_set
 
 
@@ -240,3 +240,25 @@ def test_eval_outcomes_keep_raw_output_and_done_reason(
     assert first["raw"] == "không phải json"
     assert first["done_reason"] == "stop"
     assert first["stops_per_day"] == []
+
+
+def test_eval_keeps_outcomes_written_before_a_generation_error(
+    db: Path, evalset: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    class FailsOnThird(FakeGenerator):
+        calls = 0
+
+        def generate(self, messages: list[dict[str, str]]) -> Generation:
+            FailsOnThird.calls += 1
+            if FailsOnThird.calls == 3:
+                raise GenerationError("Ollama chết")
+            return super().generate(messages)
+
+    monkeypatch.setattr(commands, "OllamaGenerator", FailsOnThird)
+    out = tmp_path / "reports" / "run.json"
+    with pytest.raises(GenerationError):
+        run_eval_cmd(db, evalset, out)
+    lines = out.with_suffix(".outcomes.jsonl").read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 2
+    assert all(json.loads(line)["raw"] == "không phải json" for line in lines)
+    assert not out.exists()  # báo cáo tổng hợp chỉ ghi khi chạy xong
