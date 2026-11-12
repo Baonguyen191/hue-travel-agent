@@ -2,7 +2,11 @@ from collections import Counter
 
 from tests.planning.factories import make_place, make_pool, make_request
 from travel_agent.domain.models import Category, Pace
-from travel_agent.planning.candidates import candidate_limit, select_candidates
+from travel_agent.planning.candidates import (
+    candidate_limit,
+    preferred_categories,
+    select_candidates,
+)
 
 
 def test_limit_scales_with_pace_and_days() -> None:
@@ -66,3 +70,51 @@ def test_small_pool_returns_everything() -> None:
     ]
     chosen = select_candidates(make_request(), pool, seed=8)
     assert {place.id for place in chosen} == {"t:a", "t:b", "t:c"}
+
+
+def test_every_preferred_category_with_places_is_covered_even_with_small_limit() -> None:
+    """Loại ở cuối enum (religious, park) từng bị cắt khi limit nhỏ."""
+    request = make_request(interests=["spiritual", "photography"])
+    wanted = preferred_categories(request.interests)
+    assert Category.RELIGIOUS in wanted
+    for seed in range(40):
+        chosen = select_candidates(request, make_pool(), seed=seed)
+        assert len(chosen) == 12
+        assert wanted <= {place.category for place in chosen}, seed
+
+
+def test_preferred_categories_covered_for_each_single_interest() -> None:
+    for interest in ("spiritual", "nature", "photography", "food", "culture"):
+        request = make_request(interests=[interest])
+        wanted = preferred_categories(request.interests)
+        for seed in range(10):
+            chosen = select_candidates(request, make_pool(), seed=seed)
+            assert wanted <= {place.category for place in chosen}, (interest, seed)
+
+
+def test_preferred_category_missing_from_pool_is_skipped() -> None:
+    pool = [place for place in make_pool() if place.category is not Category.RELIGIOUS]
+    chosen = select_candidates(make_request(interests=["spiritual"]), pool, seed=1)
+    assert len(chosen) == 12
+    assert Category.RELIGIOUS not in {place.category for place in chosen}
+
+
+def test_no_non_preferred_category_is_always_the_one_cut() -> None:
+    """Khi limit không đủ cho mọi loại, loại bị bỏ phải xoay theo seed, không cố định."""
+    request = make_request(num_days=2, pace=Pace.RELAXED, interests=["history"])
+    assert candidate_limit(request) - 4 < len(Category)  # trừ 4 bữa ăn: ít chỗ hơn số loại
+    dropped: set[frozenset[Category]] = set()
+    for seed in range(40):
+        chosen = select_candidates(request, make_pool(), seed=seed)
+        dropped.add(frozenset(set(Category) - {place.category for place in chosen}))
+    assert len(dropped) > 1
+
+
+def test_many_interests_still_cover_every_preferred_category() -> None:
+    """Loại khớp sở thích nhiều hơn số chỗ: mỗi loại vẫn phải có ít nhất một điểm."""
+    request = make_request(pace=Pace.RELAXED, interests=["culture", "food", "sightseeing"])
+    wanted = preferred_categories(request.interests)
+    assert len(wanted) * 2 > candidate_limit(request)
+    for seed in range(40):
+        chosen = select_candidates(request, make_pool(), seed=seed)
+        assert wanted <= {place.category for place in chosen}, seed

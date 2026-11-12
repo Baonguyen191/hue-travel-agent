@@ -46,7 +46,11 @@ def preferred_categories(interests: Sequence[str]) -> set[Category]:
 
 
 def select_candidates(request: PlanRequest, places: Sequence[Place], seed: int) -> list[Place]:
-    """Giữ chỗ cho bữa ăn, rồi lấy xoay vòng theo loại; loại khớp sở thích được lấy nhiều hơn."""
+    """Giữ chỗ cho bữa ăn, rồi lấy xoay vòng theo loại; loại khớp sở thích được lấy nhiều hơn.
+
+    Mỗi vòng đi loại khớp sở thích trước, rồi tới các loại còn lại bắt đầu từ vị trí xoay theo seed,
+    để khi limit nhỏ loại bị cắt không luôn là loại cuối enum.
+    """
     rng = random.Random(seed)
     queues: dict[Category, list[Place]] = {category: [] for category in Category}
     for place in sorted(places, key=lambda item: item.id):
@@ -61,11 +65,18 @@ def select_candidates(request: PlanRequest, places: Sequence[Place], seed: int) 
     del restaurants[:meals]
 
     preferred = preferred_categories(request.interests)
+    first = [category for category in Category if category in preferred]
+    rest = [category for category in Category if category not in preferred]
+    start = rng.randrange(len(rest)) if rest else 0
+    order = [*first, *rest[start:], *rest[:start]]
+    # Mỗi vòng: một điểm cho mỗi loại khớp sở thích, một điểm cho mỗi loại còn lại, rồi các điểm
+    # thêm của loại khớp sở thích. Nhờ vậy khi limit nhỏ, mọi loại khớp sở thích vẫn có mặt.
+    passes = [(order, 1), (first, PREFERRED_PICKS_PER_ROUND - 1)]
     while len(chosen) < limit and any(queues.values()):
-        for category in Category:
-            picks = PREFERRED_PICKS_PER_ROUND if category in preferred else 1
-            for _ in range(picks):
-                if queues[category] and len(chosen) < limit:
-                    chosen.append(queues[category].pop())
+        for categories, picks in passes:
+            for category in categories:
+                for _ in range(picks):
+                    if queues[category] and len(chosen) < limit:
+                        chosen.append(queues[category].pop())
     rng.shuffle(chosen)
     return chosen
