@@ -51,7 +51,7 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
 
 def load_usable_places(db: Path) -> list[Place]:
     """Mọi địa điểm trừ loại người duyệt đã loại; đã áp override của người duyệt."""
-    store = ReviewStore(db)
+    store = ReviewStore(db, read_only=True)  # file DB là dependency của DVC, không được ghi
     try:
         items, _ = store.query(limit=-1)  # LIMIT -1 = không giới hạn
     finally:

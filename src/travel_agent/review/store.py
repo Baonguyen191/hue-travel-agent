@@ -34,6 +34,13 @@ _REVIEW_SELECT = (
     "r.evidence, r.note, r.reviewed_at"
 )
 _FROM = "FROM places p LEFT JOIN place_reviews r ON r.place_id = p.id"
+# Thay cho `place_reviews` khi DB chưa có bảng này (chế độ chỉ đọc): không bản ghi nào.
+_NO_REVIEWS = (
+    "(SELECT NULL AS place_id, NULL AS status, NULL AS name_override, "
+    "NULL AS category_override, NULL AS opening_hours_override, NULL AS evidence, "
+    "NULL AS note, NULL AS reviewed_at WHERE 0)"
+)
+_FROM_NO_REVIEWS = f"FROM places p LEFT JOIN {_NO_REVIEWS} r ON r.place_id = p.id"
 _UPSERT = (
     "INSERT INTO place_reviews (place_id, status, name_override, category_override, "
     "opening_hours_override, evidence, note, reviewed_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?) "
@@ -45,12 +52,25 @@ _UPSERT = (
 
 
 class ReviewStore:
-    def __init__(self, path: str | Path) -> None:
+    def __init__(self, path: str | Path, *, read_only: bool = False) -> None:
+        """`read_only=True` mở file ở chế độ `mode=ro` và không chạy DDL nào, nên không đổi byte
+        của file (eval dùng để file DVC dependency giữ nguyên). Thiếu bảng `place_reviews` thì
+        coi như chưa địa điểm nào được duyệt. Không gọi `save`/`clear` ở chế độ này.
+        """
         # check_same_thread=False: FastAPI có thể mở và dùng connection ở hai thread khác nhau
         # trong cùng một request; mỗi request có connection riêng nên không dùng chung.
-        self._conn = sqlite3.connect(str(path), check_same_thread=False)
-        ensure_places_schema(self._conn)
-        self._conn.executescript(REVIEWS_SCHEMA)
+        if read_only:
+            uri = f"{Path(path).resolve().as_uri()}?mode=ro"
+            self._conn = sqlite3.connect(uri, uri=True, check_same_thread=False)
+            has_reviews = self._conn.execute(
+                "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'place_reviews'"
+            ).fetchone()
+            self._from = _FROM if has_reviews else _FROM_NO_REVIEWS
+        else:
+            self._conn = sqlite3.connect(str(path), check_same_thread=False)
+            ensure_places_schema(self._conn)
+            self._conn.executescript(REVIEWS_SCHEMA)
+            self._from = _FROM
 
     def close(self) -> None:
         self._conn.close()
@@ -65,9 +85,9 @@ class ReviewStore:
         source: str | None = None,
     ) -> tuple[list[ReviewedPlace], int]:
         where, params = _where(status, category, search, source)
-        total = self._conn.execute(f"SELECT COUNT(*) {_FROM} {where}", params).fetchone()[0]
+        total = self._conn.execute(f"SELECT COUNT(*) {self._from} {where}", params).fetchone()[0]
         rows = self._conn.execute(
-            f"SELECT {_PLACE_SELECT}, {_REVIEW_SELECT} {_FROM} {where} "
+            f"SELECT {_PLACE_SELECT}, {_REVIEW_SELECT} {self._from} {where} "
             "ORDER BY p.name, p.id LIMIT ? OFFSET ?",
             [*params, limit, offset],
         ).fetchall()
@@ -75,7 +95,7 @@ class ReviewStore:
 
     def get(self, place_id: str) -> ReviewedPlace | None:
         row = self._conn.execute(
-            f"SELECT {_PLACE_SELECT}, {_REVIEW_SELECT} {_FROM} WHERE p.id = ?", (place_id,)
+            f"SELECT {_PLACE_SELECT}, {_REVIEW_SELECT} {self._from} WHERE p.id = ?", (place_id,)
         ).fetchone()
         return None if row is None else _to_reviewed(row)
 
@@ -88,7 +108,8 @@ class ReviewStore:
     def stats(self, source: str | None = None) -> dict[str, int]:
         where, params = _where(None, None, None, source)
         rows = self._conn.execute(
-            f"SELECT COALESCE(r.status, 'pending'), COUNT(*) {_FROM} {where} GROUP BY 1", params
+            f"SELECT COALESCE(r.status, 'pending'), COUNT(*) {self._from} {where} GROUP BY 1",
+            params,
         ).fetchall()
         counts = {status.value: 0 for status in ReviewStatus}
         counts.update({str(status): int(count) for status, count in rows})

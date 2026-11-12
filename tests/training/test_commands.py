@@ -1,4 +1,6 @@
+import hashlib
 import json
+import sqlite3
 from pathlib import Path
 from typing import Any
 
@@ -55,6 +57,44 @@ def test_load_usable_places_drops_rejected(db: Path) -> None:
     ids = {place.id for place in load_usable_places(db)}
     assert "t:cafe/0" not in ids
     assert "t:cafe/1" in ids
+
+
+def _tables(path: Path) -> set[str]:
+    conn = sqlite3.connect(path)
+    try:
+        return {row[0] for row in conn.execute("SELECT name FROM sqlite_master")}
+    finally:
+        conn.close()
+
+
+def test_load_usable_places_does_not_modify_db_without_reviews_table(db: Path) -> None:
+    """DB là dependency của DVC: eval không được ghi vào nó."""
+    assert "place_reviews" not in _tables(db)
+    before = hashlib.md5(db.read_bytes()).hexdigest()
+    places = load_usable_places(db)
+    assert len(places) == len(make_pool(per_category=6))
+    assert hashlib.md5(db.read_bytes()).hexdigest() == before
+    assert "place_reviews" not in _tables(db)
+
+
+def test_load_usable_places_works_in_non_ascii_path(tmp_path: Path) -> None:
+    folder = tmp_path / "Máy tính #1"
+    folder.mkdir()
+    path = folder / "hue.sqlite"
+    repo = SqlitePlaceRepository(path)
+    repo.upsert_many(make_pool(per_category=2))
+    repo.close()
+    assert len(load_usable_places(path)) == len(make_pool(per_category=2))
+
+
+def test_load_usable_places_keeps_reviews_table_untouched(db: Path) -> None:
+    store = ReviewStore(db)
+    store.save(ReviewInput(place_id="t:cafe/0", status=ReviewStatus.REJECTED), NOW)
+    store.close()
+    before = hashlib.md5(db.read_bytes()).hexdigest()
+    ids = {place.id for place in load_usable_places(db)}
+    assert "t:cafe/0" not in ids
+    assert hashlib.md5(db.read_bytes()).hexdigest() == before
 
 
 def test_eval_writes_summary_and_outcomes(
