@@ -35,6 +35,10 @@ stages:
       - src/travel_agent/planning
       - src/travel_agent/training
       - src/travel_agent/validation
+      - src/travel_agent/routing
+      - src/travel_agent/domain
+      - src/travel_agent/review
+      - src/travel_agent/data/place_repository.py
     params:
       - configs/eval.yaml:
           - baseline
