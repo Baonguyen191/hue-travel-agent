@@ -1,5 +1,9 @@
+import http.client
+import io
 import json
 import re
+import urllib.error
+import urllib.request
 from typing import Any
 
 import pytest
@@ -10,6 +14,7 @@ from travel_agent.training.generator import (
     Generation,
     GenerationError,
     OllamaGenerator,
+    http_post_json,
 )
 from travel_agent.training.parsing import parse_itinerary
 
@@ -146,3 +151,50 @@ def test_num_ctx_is_sent_in_options() -> None:
     transport = FakeTransport({"message": {"content": "{}"}})
     OllamaGenerator("model-x", num_ctx=16384, transport=transport).generate(MESSAGES)
     assert transport.calls[0][1]["options"]["num_ctx"] == 16384
+
+
+def _raising_urlopen(exc: BaseException) -> Any:
+    def urlopen(*args: Any, **kwargs: Any) -> Any:
+        raise exc
+
+    return urlopen
+
+
+def test_http_error_message_includes_response_body(monkeypatch: pytest.MonkeyPatch) -> None:
+    body = json.dumps({"error": "model 'qwen3.5:4b' not found"})
+    error = urllib.error.HTTPError(
+        "http://h/api/chat", 404, "Not Found", http.client.HTTPMessage(), io.BytesIO(body.encode())
+    )
+    monkeypatch.setattr(urllib.request, "urlopen", _raising_urlopen(error))
+    with pytest.raises(GenerationError, match="model 'qwen3.5:4b' not found") as info:
+        http_post_json("http://h/api/chat", {}, 1.0)
+    assert "404" in str(info.value)
+    assert "qwen3.5:4b" in str(info.value)
+
+
+def test_http_error_with_unreadable_body_still_raises_generation_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    error = urllib.error.HTTPError(
+        "http://h/api/chat", 500, "Server Error", http.client.HTTPMessage(), None
+    )
+    monkeypatch.setattr(urllib.request, "urlopen", _raising_urlopen(error))
+    with pytest.raises(GenerationError, match="500"):
+        http_post_json("http://h/api/chat", {}, 1.0)
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        ConnectionResetError("reset"),
+        http.client.IncompleteRead(b"abc"),
+        urllib.error.URLError("refused"),
+        TimeoutError("timeout"),
+    ],
+)
+def test_transport_failures_become_generation_error(
+    monkeypatch: pytest.MonkeyPatch, exc: BaseException
+) -> None:
+    monkeypatch.setattr(urllib.request, "urlopen", _raising_urlopen(exc))
+    with pytest.raises(GenerationError):
+        http_post_json("http://h/api/chat", {}, 1.0)

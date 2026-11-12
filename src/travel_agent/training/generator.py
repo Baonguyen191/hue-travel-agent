@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import http.client
 import json
 import urllib.error
 import urllib.request
@@ -78,11 +79,23 @@ def http_post_json(url: str, payload: dict[str, Any], timeout_s: float) -> dict[
     try:
         with urllib.request.urlopen(request, timeout=timeout_s) as response:
             decoded = json.loads(response.read().decode("utf-8"))
-    except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+    except urllib.error.HTTPError as exc:
+        # Body có JSON {"error": ...} của Ollama: model chưa pull, think/format không hỗ trợ...
+        raise GenerationError(f"Ollama trả HTTP {exc.code}: {_error_body(exc)}") from exc
+    except (OSError, http.client.HTTPException, ValueError) as exc:
+        # URLError, TimeoutError, ConnectionResetError là OSError; JSONDecodeError là ValueError.
         raise GenerationError(f"Gọi Ollama thất bại: {exc}") from exc
     if not isinstance(decoded, dict):
         raise GenerationError("Ollama trả về dữ liệu không phải JSON object")
     return decoded
+
+
+def _error_body(error: urllib.error.HTTPError) -> str:
+    try:
+        body = error.read().decode("utf-8", errors="replace").strip()
+    except (OSError, http.client.HTTPException, AttributeError):
+        body = ""
+    return body or str(error.reason)
 
 
 class OllamaGenerator:
