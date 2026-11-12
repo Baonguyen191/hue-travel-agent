@@ -4,9 +4,11 @@ Chỉ nạp loại có thể làm điểm dừng trong lịch trình: điểm du
 cửa hàng đặc sản. Lưu trú, lữ hành, vận chuyển và tiện ích (ATM, nhà vệ sinh...) bị bỏ qua
 và được đếm trong `skipped`.
 
-Giờ mở cửa theo nguồn chỉ có giờ, không ghi ngày trong tuần, nên chỉ lưu ở `attributes`;
-`opening_hours_raw` để trống cho người duyệt xác nhận (giống importer data.hue.gov.vn).
-Site không công bố giấy phép dữ liệu, nên `license` ghi rõ là chưa rõ.
+Giờ mở cửa theo nguồn chỉ có giờ, không ghi ngày trong tuần. Khi có đủ giờ mở và giờ đóng và
+khoảng giờ không qua nửa đêm, giờ được ghi vào `opening_hours_raw` dạng `HH:MM-HH:MM` và giả
+định "áp dụng mọi ngày" được ghi rõ trong `attributes`. Các trường hợp khác (thiếu một mốc, bằng
+nhau, qua nửa đêm) để `opening_hours_raw` trống (chưa rõ). Giá trị người duyệt ghi đè vẫn được
+ưu tiên. Site không công bố giấy phép dữ liệu, nên `license` ghi rõ là chưa rõ.
 """
 
 from __future__ import annotations
@@ -27,6 +29,8 @@ BASE_URL = "https://huetripo.hue.gov.vn"
 LICENSE = "Chưa rõ: huetripo.hue.gov.vn không công bố giấy phép dữ liệu (ghi nguồn khi dùng)"
 
 HOURS_KEY = "Giờ mở cửa (theo nguồn, không ghi ngày)"
+HOURS_ASSUMPTION_KEY = "Giờ mở cửa: giả định"
+HOURS_ASSUMPTION = "áp dụng mọi ngày trong tuần (nguồn không ghi ngày)"
 DURATION_KEY = "Thời gian trải nghiệm TB (phút)"
 MISSING_COORDS = "thiếu tọa độ"
 
@@ -104,6 +108,18 @@ def _hours(detail: dict[str, Any]) -> str | None:
     return None
 
 
+def _opening_hours_raw(detail: dict[str, Any]) -> str | None:
+    """`HH:MM-HH:MM` (không ghi ngày = mọi ngày) khi đủ hai mốc và đóng muộn hơn mở; còn lại None.
+
+    Thiếu một mốc, hai mốc bằng nhau hoặc qua nửa đêm đều để chưa rõ: không đoán mốc còn thiếu
+    và parser chưa hỗ trợ khoảng giờ qua nửa đêm.
+    """
+    opens, closes = _hhmm(detail.get("gioMoCua")), _hhmm(detail.get("gioDongCua"))
+    if opens and closes and closes > opens:
+        return f"{opens}-{closes}"
+    return None
+
+
 def _plain_text(markup: str) -> str:
     text = html.unescape(re.sub(r"<[^>]+>", " ", markup))
     text = re.sub(r"\s+", " ", text).strip()
@@ -130,6 +146,8 @@ def _attributes(detail: dict[str, Any], url_detail: str | None) -> dict[str, str
     hours = _hours(detail)
     if hours:
         attrs[HOURS_KEY] = hours
+    if _opening_hours_raw(detail):
+        attrs[HOURS_ASSUMPTION_KEY] = HOURS_ASSUMPTION
     duration = detail.get("thoiGianTraiNghiemTB")
     if duration:
         attrs[DURATION_KEY] = str(duration)
@@ -189,7 +207,7 @@ def place_from_detail(
         name=str(detail["tenDiaDiem"]).strip(),
         category=category,
         coords=coords,
-        opening_hours_raw=None,
+        opening_hours_raw=_opening_hours_raw(detail),
         source=SOURCE,
         source_place_id=str(detail["diaDiemID"]),
         license=LICENSE,

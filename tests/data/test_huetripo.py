@@ -5,8 +5,16 @@ import json
 from pathlib import Path
 from typing import Any
 
-from travel_agent.data.huetripo import LICENSE, SOURCE, load_huetripo, place_from_detail
+from travel_agent.data.huetripo import (
+    HOURS_ASSUMPTION_KEY,
+    HOURS_KEY,
+    LICENSE,
+    SOURCE,
+    load_huetripo,
+    place_from_detail,
+)
 from travel_agent.domain.models import Category
+from travel_agent.domain.opening_hours import parse_opening_hours
 
 NOW = dt.datetime(2026, 11, 4, tzinfo=dt.UTC)
 
@@ -52,17 +60,52 @@ def test_attraction_maps_to_place_with_provenance() -> None:
     assert place.collected_at == NOW
 
 
-def test_hours_without_weekdays_stay_in_attributes() -> None:
+def test_normal_range_is_normalised_and_assumption_is_labelled() -> None:
     place = place_from_detail(detail(), NOW)
     assert place is not None
-    assert place.opening_hours_raw is None
-    assert place.attributes["Giờ mở cửa (theo nguồn, không ghi ngày)"] == "07:30 – 17:30"
+    assert place.opening_hours_raw == "07:30-17:30"
+    assert place.attributes[HOURS_KEY] == "07:30 – 17:30"
+    assert place.attributes[HOURS_ASSUMPTION_KEY] == (
+        "áp dụng mọi ngày trong tuần (nguồn không ghi ngày)"
+    )
 
 
-def test_only_one_hour_bound_is_labelled() -> None:
+def test_normalised_hours_round_trip_through_the_parser() -> None:
+    place = place_from_detail(detail(), NOW)
+    assert place is not None
+    weekly = parse_opening_hours(place.opening_hours_raw)
+    assert weekly is not None
+    for weekday in range(7):
+        assert weekly.covers(weekday, dt.time(8, 0), dt.time(9, 0))
+        assert not weekly.covers(weekday, dt.time(17, 0), dt.time(18, 0))
+
+
+def test_only_one_hour_bound_is_labelled_and_stays_unknown() -> None:
     place = place_from_detail(detail(gioDongCua=None), NOW)
     assert place is not None
-    assert place.attributes["Giờ mở cửa (theo nguồn, không ghi ngày)"] == "mở 07:30"
+    assert place.attributes[HOURS_KEY] == "mở 07:30"
+    assert place.opening_hours_raw is None
+    assert HOURS_ASSUMPTION_KEY not in place.attributes
+    closing_only = place_from_detail(detail(gioMoCua=None), NOW)
+    assert closing_only is not None
+    assert closing_only.attributes[HOURS_KEY] == "đóng 17:30"
+    assert closing_only.opening_hours_raw is None
+    assert HOURS_ASSUMPTION_KEY not in closing_only.attributes
+
+
+def test_range_crossing_midnight_stays_unknown() -> None:
+    place = place_from_detail(detail(gioMoCua="18:00:00", gioDongCua="02:00:00"), NOW)
+    assert place is not None
+    assert place.opening_hours_raw is None
+    assert place.attributes[HOURS_KEY] == "18:00 – 02:00"
+    assert HOURS_ASSUMPTION_KEY not in place.attributes
+
+
+def test_equal_bounds_stay_unknown() -> None:
+    place = place_from_detail(detail(gioMoCua="08:00:00", gioDongCua="08:00:00"), NOW)
+    assert place is not None
+    assert place.opening_hours_raw is None
+    assert HOURS_ASSUMPTION_KEY not in place.attributes
 
 
 def test_missing_hours_and_duration_add_no_attribute() -> None:
