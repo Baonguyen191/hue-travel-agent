@@ -1,8 +1,7 @@
 evalset:
   seed: 20261111
 baseline:
-  # Tag Ollama của Qwen3.5 4B. Giá trị này là phỏng đoán theo quy ước đặt tên;
-  # Task 8 Step 1 xác minh và sửa lại.
+  # Tag Ollama của Qwen3.5 4B (Q4_K_M, Apache-2.0), xác minh bằng `ollama show` ngày 2026-11-12.
   model: qwen3.5:4b
 generation:
   temperature: 0.0

@@ -12,3 +12,69 @@ stages:
       hash: md5
       md5: b1bc815466560006ebcd1070b33fcff1
       size: 22292
+  baseline_eval:
+    cmd: python -m travel_agent eval --db data/hue.sqlite --evalset 
+      data/eval/hue_eval_v1.jsonl --split dev --model qwen3.5:4b --temperature 
+      0.0 --seed 0 --num-predict 2048 --num-ctx 8192 --run-name baseline 
+      --mlflow --out reports/eval/baseline_dev.json
+    deps:
+    - path: data/eval/hue_eval_v1.jsonl
+      hash: md5
+      md5: b1bc815466560006ebcd1070b33fcff1
+      size: 22292
+    - path: data/hue.sqlite
+      hash: md5
+      md5: c7fa245031b1e8c4e31dfd4fcf77859e
+      size: 1929216
+    - path: src/travel_agent/data/place_repository.py
+      hash: md5
+      md5: e2bfecfdfb454078cb852cd541e583a2
+      size: 5259
+    - path: src/travel_agent/domain
+      hash: md5
+      md5: 482a3cddbcd19494f0b6220d0b035372.dir
+      size: 6701
+      nfiles: 3
+    - path: src/travel_agent/planning
+      hash: md5
+      md5: 1b823ea0f8bd858186b30c921c01e1e8.dir
+      size: 7645
+      nfiles: 3
+    - path: src/travel_agent/review
+      hash: md5
+      md5: 908a5ab10ff890116074bfdb7f42f0cd.dir
+      size: 47127
+      nfiles: 6
+    - path: src/travel_agent/routing
+      hash: md5
+      md5: 75b82ed5e9bb095fc373c43cfbba574f.dir
+      size: 2173
+      nfiles: 2
+    - path: src/travel_agent/training
+      hash: md5
+      md5: aeaa73eed58e33801b66877cdb40b9a4.dir
+      size: 25557
+      nfiles: 8
+    - path: src/travel_agent/validation
+      hash: md5
+      md5: f080cde7e7c0428bff39d11ee934ddff.dir
+      size: 10668
+      nfiles: 3
+    params:
+      configs/eval.yaml:
+        baseline:
+          model: qwen3.5:4b
+        generation:
+          temperature: 0.0
+          seed: 0
+          num_predict: 2048
+          num_ctx: 8192
+    outs:
+    - path: reports/eval/baseline_dev.json
+      hash: md5
+      md5: 626bd399dd47f895a46cfb374f9b5bcf
+      size: 1097
+    - path: reports/eval/baseline_dev.outcomes.jsonl
+      hash: md5
+      md5: a5b77cf87e5b59cfed9e3128bc5a8246
+      size: 143694
