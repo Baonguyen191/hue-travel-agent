@@ -8,9 +8,45 @@ import urllib.request
 from collections.abc import Callable
 from typing import Any, Protocol
 
-from travel_agent.domain.models import Itinerary
-
 DEFAULT_HOST = "http://127.0.0.1:11434"
+
+_TIME_PATTERN = "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+_DATE_PATTERN = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+
+# Schema viết tay, cùng hình dạng với `Itinerary`. Không dùng `Itinerary.model_json_schema()`:
+# nó sinh `format: time`, mà grammar của llama.cpp (Ollama) có thể đòi hậu tố múi giờ.
+# Test giữ hai bên khớp nhau. Giờ và ngày chỉ ràng buộc bằng pattern, không có từ khóa `format`.
+ITINERARY_FORMAT_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "days": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "date": {"type": "string", "pattern": _DATE_PATTERN},
+                    "stops": {
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "place_id": {"type": "string", "minLength": 1},
+                                "arrive": {"type": "string", "pattern": _TIME_PATTERN},
+                                "depart": {"type": "string", "pattern": _TIME_PATTERN},
+                                "note": {"type": ["string", "null"]},
+                            },
+                            "required": ["place_id", "arrive", "depart"],
+                        },
+                    },
+                },
+                "required": ["date", "stops"],
+            },
+        }
+    },
+    "required": ["days"],
+}
 
 Transport = Callable[[str, dict[str, Any], float], dict[str, Any]]
 
@@ -37,7 +73,7 @@ def http_post_json(url: str, payload: dict[str, Any], timeout_s: float) -> dict[
 
 
 class OllamaGenerator:
-    """Gọi `/api/chat` của Ollama, thinking tắt, ép output theo JSON schema của Itinerary.
+    """Gọi `/api/chat` của Ollama, thinking tắt, ép output theo `ITINERARY_FORMAT_SCHEMA`.
 
     `schema_format=False` dùng `format: "json"` cho bản Ollama không nhận schema này.
     """
@@ -58,9 +94,7 @@ class OllamaGenerator:
         self._url = f"{host.rstrip('/')}/api/chat"
         self._options = {"temperature": temperature, "seed": seed, "num_predict": num_predict}
         self._timeout_s = timeout_s
-        self._format: dict[str, Any] | str = (
-            Itinerary.model_json_schema() if schema_format else "json"
-        )
+        self._format: dict[str, Any] | str = ITINERARY_FORMAT_SCHEMA if schema_format else "json"
         self._transport = transport or http_post_json
 
     def generate(self, messages: list[dict[str, str]]) -> str:

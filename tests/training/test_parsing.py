@@ -27,3 +27,10 @@ def test_code_fence_is_not_repaired() -> None:
 def test_wrong_schema_returns_none() -> None:
     assert parse_itinerary('{"days": []}') is None
     assert parse_itinerary('{"plan": "x"}') is None
+
+
+def test_timezone_aware_time_returns_none() -> None:
+    for suffix in ("Z", "+07:00"):
+        raw = VALID_RAW.replace('"08:30"', f'"08:30:00{suffix}"')
+        assert raw != VALID_RAW
+        assert parse_itinerary(raw) is None

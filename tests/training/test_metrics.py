@@ -37,6 +37,13 @@ def test_unparseable_output_is_not_valid() -> None:
     assert outcome.stop_count == 0
 
 
+def test_timezone_aware_time_is_parse_error_not_crash() -> None:
+    raw = VALID_RAW.replace('"10:30"', '"10:30:00+07:00"')
+    assert raw != VALID_RAW
+    outcome = score(raw)
+    assert (outcome.parsed, outcome.valid) == (False, False)
+
+
 def test_summarize_rates() -> None:
     outcomes = [
         PlanOutcome(

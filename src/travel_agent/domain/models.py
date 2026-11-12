@@ -9,7 +9,7 @@ from __future__ import annotations
 import datetime as dt
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class Coordinates(BaseModel):
@@ -82,6 +82,14 @@ class PlannedStop(BaseModel):
     arrive: dt.time
     depart: dt.time
     note: str | None = None
+
+    @field_validator("arrive", "depart")
+    @classmethod
+    def _time_is_naive(cls, value: dt.time) -> dt.time:
+        """Giờ là giờ địa phương. Giờ có múi giờ ("08:30Z") làm so sánh giờ trong validator lỗi."""
+        if value.tzinfo is not None:
+            raise ValueError("giờ không được kèm múi giờ")
+        return value
 
 
 class PlannedDay(BaseModel):
