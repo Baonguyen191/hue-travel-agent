@@ -14,15 +14,19 @@ from travel_agent.review.models import ReviewInput, ReviewStatus
 from travel_agent.review.store import ReviewStore
 from travel_agent.training import commands
 from travel_agent.training.commands import load_usable_places
+from travel_agent.training.generator import Generation
 from travel_agent.training.requests import EVAL_SIZE, TEST_SIZE, read_eval_set
 
 
 class FakeGenerator:
+    created: list[dict[str, Any]] = []
+
     def __init__(self, model: str, **kwargs: Any) -> None:
         self.model = model
+        FakeGenerator.created.append(kwargs)
 
-    def generate(self, messages: list[dict[str, str]]) -> str:
-        return "không phải json"
+    def generate(self, messages: list[dict[str, str]]) -> Generation:
+        return Generation(content="không phải json", done_reason="stop")
 
 
 @pytest.fixture
@@ -208,3 +212,31 @@ def test_eval_meta_limit_is_all_when_unset(
     meta = json.loads(out.read_text(encoding="utf-8"))["meta"]
     assert meta["limit"] == "all"
     assert meta["schema_format"] is True
+
+
+def test_eval_passes_num_ctx_and_records_it_in_meta(
+    db: Path, evalset: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(commands, "OllamaGenerator", FakeGenerator)
+    FakeGenerator.created.clear()
+    default_out = tmp_path / "d.json"
+    assert run_eval_cmd(db, evalset, default_out) == 0
+    assert FakeGenerator.created[-1]["num_ctx"] == 8192
+    assert json.loads(default_out.read_text(encoding="utf-8"))["meta"]["num_ctx"] == 8192
+    out = tmp_path / "c.json"
+    assert run_eval_cmd(db, evalset, out, "--num-ctx", "4096") == 0
+    assert FakeGenerator.created[-1]["num_ctx"] == 4096
+    assert json.loads(out.read_text(encoding="utf-8"))["meta"]["num_ctx"] == 4096
+
+
+def test_eval_outcomes_keep_raw_output_and_done_reason(
+    db: Path, evalset: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(commands, "OllamaGenerator", FakeGenerator)
+    out = tmp_path / "r.json"
+    assert run_eval_cmd(db, evalset, out) == 0
+    lines = out.with_suffix(".outcomes.jsonl").read_text(encoding="utf-8").splitlines()
+    first = json.loads(lines[0])
+    assert first["raw"] == "không phải json"
+    assert first["done_reason"] == "stop"
+    assert first["stops_per_day"] == []

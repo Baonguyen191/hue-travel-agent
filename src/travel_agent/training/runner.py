@@ -31,7 +31,19 @@ def run_eval(
         candidates = select_candidates(entry.request, places, candidate_seed(entry.key))
         messages = build_messages(entry.request, candidates)
         started = clock()
-        raw = generator.generate(messages)
+        generation = generator.generate(messages)
         latency_s = clock() - started
-        outcomes.append(score_output(entry.key, entry.request, raw, candidates, travel, latency_s))
+        outcomes.append(
+            score_output(
+                entry.key,
+                entry.request,
+                generation.content,
+                candidates,
+                travel,
+                latency_s,
+                done_reason=generation.done_reason,
+                prompt_tokens=generation.prompt_tokens,
+                completion_tokens=generation.completion_tokens,
+            )
+        )
     return outcomes

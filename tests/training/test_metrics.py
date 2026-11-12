@@ -44,6 +44,37 @@ def test_timezone_aware_time_is_parse_error_not_crash() -> None:
     assert (outcome.parsed, outcome.valid) == (False, False)
 
 
+def test_outcome_keeps_raw_stops_per_day_and_issue_details() -> None:
+    outcome = score_output(
+        "k1",
+        REQUEST,
+        UNKNOWN_PLACE_RAW,
+        PLACES,
+        FixedTravelTime(),
+        latency_s=2.0,
+        done_reason="stop",
+        prompt_tokens=100,
+        completion_tokens=50,
+    )
+    assert outcome.raw == UNKNOWN_PLACE_RAW
+    assert outcome.stops_per_day == [3]
+    assert (outcome.done_reason, outcome.prompt_tokens, outcome.completion_tokens) == (
+        "stop",
+        100,
+        50,
+    )
+    [unknown] = [issue for issue in outcome.issues if issue["code"] == "unknown_place"]
+    assert set(unknown) == {"code", "severity", "message", "day_index", "stop_index", "place_id"}
+    assert unknown["place_id"] == "x:404"
+    assert [issue["code"] for issue in outcome.issues] == outcome.issue_codes
+
+
+def test_unparsed_output_keeps_raw_text() -> None:
+    outcome = score("không phải json")
+    assert outcome.raw == "không phải json"
+    assert (outcome.stops_per_day, outcome.issues) == ([], [])
+
+
 def test_summarize_rates() -> None:
     outcomes = [
         PlanOutcome(

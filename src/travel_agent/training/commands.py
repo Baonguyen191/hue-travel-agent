@@ -42,6 +42,7 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     run.add_argument("--temperature", type=float, default=0.0)
     run.add_argument("--seed", type=int, default=0)
     run.add_argument("--num-predict", type=int, default=2048)
+    run.add_argument("--num-ctx", type=int, default=8192, help="Cửa sổ ngữ cảnh gửi cho Ollama")
     run.add_argument("--no-schema", action="store_true", help='Dùng format "json" thay schema')
     run.add_argument("--run-name", default="eval")
     run.add_argument("--mlflow", action="store_true", help="Ghi tham số và metric vào MLflow")
@@ -118,6 +119,7 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         temperature=args.temperature,
         seed=args.seed,
         num_predict=args.num_predict,
+        num_ctx=args.num_ctx,
         schema_format=not args.no_schema,
     )
     outcomes = run_eval(entries, load_usable_places(args.db), generator, HaversineEstimator())
@@ -129,6 +131,7 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         "temperature": args.temperature,
         "seed": args.seed,
         "num_predict": args.num_predict,
+        "num_ctx": args.num_ctx,
         "schema_format": not args.no_schema,
         "limit": "all" if args.limit is None else args.limit,
         "host": args.host,

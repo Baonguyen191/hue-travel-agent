@@ -20,12 +20,18 @@ class PlanOutcome(BaseModel):
     key: str
     parsed: bool
     valid: bool
+    raw: str = ""  # output thô của model, giữ để xem lại lỗi và làm dữ liệu sau này
     day_count: int = 0
     stop_count: int = 0
     unknown_place_count: int = 0
     place_ids: list[str] = Field(default_factory=list)
+    stops_per_day: list[int] = Field(default_factory=list)
     issue_codes: list[str] = Field(default_factory=list)
+    issues: list[dict[str, str | int | None]] = Field(default_factory=list)
     latency_s: float = 0.0
+    done_reason: str | None = None
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
 
 
 class EvalSummary(BaseModel):
@@ -46,11 +52,21 @@ def score_output(
     candidates: Sequence[Place],
     travel: TravelTimeProvider,
     latency_s: float,
+    *,
+    done_reason: str | None = None,
+    prompt_tokens: int | None = None,
+    completion_tokens: int | None = None,
 ) -> PlanOutcome:
     """Chỉ candidate mới là địa điểm hợp lệ: id ngoài danh sách bị báo `unknown_place`."""
+    meta = {
+        "latency_s": latency_s,
+        "done_reason": done_reason,
+        "prompt_tokens": prompt_tokens,
+        "completion_tokens": completion_tokens,
+    }
     itinerary = parse_itinerary(raw)
     if itinerary is None:
-        return PlanOutcome(key=key, parsed=False, valid=False, latency_s=latency_s)
+        return PlanOutcome(key=key, parsed=False, valid=False, raw=raw, **meta)
     report = validate_itinerary(request, itinerary, InMemoryPlaceRepository(candidates), travel)
     codes = [issue.code.value for issue in report.issues]
     place_ids = [stop.place_id for day in itinerary.days for stop in day.stops]
@@ -58,12 +74,15 @@ def score_output(
         key=key,
         parsed=True,
         valid=report.is_valid,
+        raw=raw,
         day_count=len(itinerary.days),
         stop_count=len(place_ids),
         unknown_place_count=codes.count(IssueCode.UNKNOWN_PLACE.value),
         place_ids=place_ids,
+        stops_per_day=[len(day.stops) for day in itinerary.days],
         issue_codes=codes,
-        latency_s=latency_s,
+        issues=[issue.model_dump(mode="json") for issue in report.issues],
+        **meta,
     )
 
 

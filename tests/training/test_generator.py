@@ -7,6 +7,7 @@ import pytest
 from tests.training.factories import VALID_RAW
 from travel_agent.training.generator import (
     ITINERARY_FORMAT_SCHEMA,
+    Generation,
     GenerationError,
     OllamaGenerator,
 )
@@ -30,7 +31,7 @@ def test_sends_chat_request_with_thinking_off_and_schema() -> None:
     generator = OllamaGenerator(
         "model-x", temperature=0.2, seed=5, num_predict=512, transport=transport
     )
-    assert generator.generate(MESSAGES) == '{"days": []}'
+    assert generator.generate(MESSAGES) == Generation(content='{"days": []}')
     [(url, payload, timeout_s)] = transport.calls
     assert url == "http://127.0.0.1:11434/api/chat"
     assert timeout_s == 600.0
@@ -40,7 +41,7 @@ def test_sends_chat_request_with_thinking_off_and_schema() -> None:
         "stream": False,
         "think": False,
         "format": ITINERARY_FORMAT_SCHEMA,
-        "options": {"temperature": 0.2, "seed": 5, "num_predict": 512},
+        "options": {"temperature": 0.2, "seed": 5, "num_predict": 512, "num_ctx": 8192},
     }
 
 
@@ -114,3 +115,34 @@ def test_format_schema_rejects_timezone_suffix_and_missing_fields() -> None:
     assert not _conforms(ITINERARY_FORMAT_SCHEMA, {"days": []})
     ok = {"place_id": "p", "arrive": "08:30", "depart": "09:00"}
     assert _conforms(ITINERARY_FORMAT_SCHEMA, {"days": [{"date": "2026-12-01", "stops": [ok]}]})
+
+
+def test_generation_carries_done_reason_and_token_counts() -> None:
+    transport = FakeTransport(
+        {
+            "message": {"content": "{}"},
+            "done_reason": "length",
+            "prompt_eval_count": 1500,
+            "eval_count": 2048,
+        }
+    )
+    generation = OllamaGenerator("model-x", transport=transport).generate(MESSAGES)
+    assert generation == Generation(
+        content="{}", done_reason="length", prompt_tokens=1500, completion_tokens=2048
+    )
+
+
+def test_generation_metadata_is_none_when_ollama_omits_it() -> None:
+    transport = FakeTransport({"message": {"content": "{}"}, "done_reason": 7, "eval_count": "x"})
+    generation = OllamaGenerator("model-x", transport=transport).generate(MESSAGES)
+    assert (generation.done_reason, generation.prompt_tokens, generation.completion_tokens) == (
+        None,
+        None,
+        None,
+    )
+
+
+def test_num_ctx_is_sent_in_options() -> None:
+    transport = FakeTransport({"message": {"content": "{}"}})
+    OllamaGenerator("model-x", num_ctx=16384, transport=transport).generate(MESSAGES)
+    assert transport.calls[0][1]["options"]["num_ctx"] == 16384

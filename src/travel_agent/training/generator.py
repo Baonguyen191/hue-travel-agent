@@ -6,7 +6,9 @@ import json
 import urllib.error
 import urllib.request
 from collections.abc import Callable
-from typing import Any, Protocol
+from typing import Any, Protocol, TypeVar
+
+from pydantic import BaseModel
 
 DEFAULT_HOST = "http://127.0.0.1:11434"
 
@@ -48,6 +50,8 @@ ITINERARY_FORMAT_SCHEMA: dict[str, Any] = {
     "required": ["days"],
 }
 
+_T = TypeVar("_T")
+
 Transport = Callable[[str, dict[str, Any], float], dict[str, Any]]
 
 
@@ -55,8 +59,17 @@ class GenerationError(RuntimeError):
     """Lỗi hạ tầng khi gọi model (mạng, timeout, model chưa pull). Không phải lỗi của model."""
 
 
+class Generation(BaseModel):
+    """Một lần model trả lời: nội dung thô cùng thông tin Ollama cho biết khi có."""
+
+    content: str
+    done_reason: str | None = None  # "stop" là tự dừng, "length" là chạm num_predict
+    prompt_tokens: int | None = None
+    completion_tokens: int | None = None
+
+
 class PlanGenerator(Protocol):
-    def generate(self, messages: list[dict[str, str]]) -> str: ...
+    def generate(self, messages: list[dict[str, str]]) -> Generation: ...
 
 
 def http_post_json(url: str, payload: dict[str, Any], timeout_s: float) -> dict[str, Any]:
@@ -86,18 +99,24 @@ class OllamaGenerator:
         temperature: float = 0.0,
         seed: int = 0,
         num_predict: int = 2048,
+        num_ctx: int = 8192,
         timeout_s: float = 600.0,
         schema_format: bool = True,
         transport: Transport | None = None,
     ) -> None:
         self._model = model
         self._url = f"{host.rstrip('/')}/api/chat"
-        self._options = {"temperature": temperature, "seed": seed, "num_predict": num_predict}
+        self._options = {
+            "temperature": temperature,
+            "seed": seed,
+            "num_predict": num_predict,
+            "num_ctx": num_ctx,
+        }
         self._timeout_s = timeout_s
         self._format: dict[str, Any] | str = ITINERARY_FORMAT_SCHEMA if schema_format else "json"
         self._transport = transport or http_post_json
 
-    def generate(self, messages: list[dict[str, str]]) -> str:
+    def generate(self, messages: list[dict[str, str]]) -> Generation:
         payload = {
             "model": self._model,
             "messages": messages,
@@ -111,4 +130,16 @@ class OllamaGenerator:
         content = message.get("content") if isinstance(message, dict) else None
         if not isinstance(content, str):
             raise GenerationError(f"Ollama không trả nội dung: {response.get('error', response)}")
-        return content
+        return Generation(
+            content=content,
+            done_reason=_optional(response.get("done_reason"), str),
+            prompt_tokens=_optional(response.get("prompt_eval_count"), int),
+            completion_tokens=_optional(response.get("eval_count"), int),
+        )
+
+
+def _optional(value: object, kind: type[_T]) -> _T | None:
+    """Giá trị đúng kiểu thì giữ, thiếu hoặc sai kiểu thì None (bool không tính là int)."""
+    if isinstance(value, kind) and not isinstance(value, bool):
+        return value
+    return None

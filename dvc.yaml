@@ -25,6 +25,7 @@ stages:
       --temperature ${generation.temperature}
       --seed ${generation.seed}
       --num-predict ${generation.num_predict}
+      --num-ctx ${generation.num_ctx}
       --run-name baseline
       --mlflow
       --out reports/eval/baseline_dev.json
