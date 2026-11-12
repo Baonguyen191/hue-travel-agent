@@ -2,9 +2,12 @@ import json
 import os
 from pathlib import Path
 
+import pytest
+
 from tests.planning.factories import make_place, make_request
-from travel_agent.domain.models import Category
+from travel_agent.domain.models import Category, TravelMode
 from travel_agent.planning.prompt import SYSTEM_PROMPT, build_messages
+from travel_agent.routing.travel_time import HaversineEstimator
 
 SNAPSHOT = Path(__file__).parent / "snapshots" / "generation_messages.json"
 
@@ -59,3 +62,34 @@ def test_messages_match_snapshot() -> None:
             json.dumps(messages, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
     assert messages == json.loads(SNAPSHOT.read_text(encoding="utf-8"))
+
+
+def _rule_5() -> str:
+    [rule] = [line for line in SYSTEM_PROMPT.splitlines() if line.startswith("5. ")]
+    return rule
+
+
+def test_rule_5_states_the_travel_time_estimate_the_validator_uses() -> None:
+    """Số trong prompt lấy từ HaversineEstimator, nên prompt và validator không lệch nhau."""
+    rule = _rule_5()
+    assert "ước tính" in rule
+    assert f"× {HaversineEstimator.DETOUR_FACTOR:g}" in rule
+    for mode in TravelMode:
+        assert f"{mode.value} {HaversineEstimator.SPEED_KMH[mode]:g} km/h" in rule
+        assert f"{mode.value} {HaversineEstimator.START_OVERHEAD_MIN[mode]:g} phút" in rule
+
+
+def test_rule_5_tracks_estimator_constants(monkeypatch: pytest.MonkeyPatch) -> None:
+    import importlib
+
+    from travel_agent.planning import prompt
+
+    monkeypatch.setattr(HaversineEstimator, "DETOUR_FACTOR", 1.7)
+    monkeypatch.setitem(HaversineEstimator.SPEED_KMH, TravelMode.CAR, 31.0)
+    try:
+        reloaded = importlib.reload(prompt)
+        assert "× 1.7" in reloaded.SYSTEM_PROMPT
+        assert "car 31 km/h" in reloaded.SYSTEM_PROMPT
+    finally:
+        monkeypatch.undo()
+        importlib.reload(prompt)

@@ -7,17 +7,31 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
-from travel_agent.domain.models import Place, PlanRequest
+from travel_agent.domain.models import Place, PlanRequest, TravelMode
+from travel_agent.routing.travel_time import HaversineEstimator
 
-SYSTEM_PROMPT = """Bạn lập lịch trình du lịch cho thành phố Huế.
+
+def _per_mode(values: dict[TravelMode, float], unit: str) -> str:
+    return ", ".join(f"{mode.value} {values[mode]:g} {unit}" for mode in TravelMode)
+
+
+# Số lấy thẳng từ HaversineEstimator (cùng ước tính validator dùng) để prompt không lệch validator.
+TRAVEL_TIME_RULE = (
+    "Điểm dừng trong ngày xếp theo thứ tự thời gian, không chồng giờ, và chừa đủ thời gian "
+    "di chuyển giữa hai điểm. Thời gian di chuyển ước tính = khoảng cách đường chim bay "
+    f"× {HaversineEstimator.DETOUR_FACTOR:g}, đi với tốc độ "
+    f"{_per_mode(HaversineEstimator.SPEED_KMH, 'km/h')}, cộng thời gian khởi hành "
+    f"{_per_mode(HaversineEstimator.START_OVERHEAD_MIN, 'phút')}."
+)
+
+_PROMPT_TEMPLATE = """Bạn lập lịch trình du lịch cho thành phố Huế.
 
 Quy tắc bắt buộc:
 1. Chỉ dùng place_id có trong danh sách ĐỊA ĐIỂM. Không tự tạo place_id.
 2. Mỗi place_id chỉ xuất hiện một lần trong toàn bộ lịch trình.
 3. Số ngày bằng đúng num_days. Ngày đầu là start_date, các ngày sau liên tiếp.
 4. Mọi điểm dừng nằm trong khung day_start đến day_end. depart phải sau arrive.
-5. Điểm dừng trong ngày xếp theo thứ tự thời gian, không chồng giờ, và chừa đủ thời gian \
-di chuyển giữa hai điểm theo travel_mode (ước lượng từ tọa độ).
+5. @@TRAVEL_TIME_RULE@@
 6. Nếu địa điểm có giờ mở cửa thì cả khoảng arrive đến depart phải nằm trong giờ mở cửa. \
 "unknown" nghĩa là không rõ giờ.
 7. Số điểm dừng mỗi ngày theo pace: relaxed 3 đến 4, moderate 4 đến 6, packed 6 đến 8.
@@ -28,6 +42,8 @@ Tương tự với 17:30-20:00.
 Chỉ trả về JSON đúng dạng sau, không thêm chữ nào khác:
 {"days":[{"date":"YYYY-MM-DD","stops":[{"place_id":"...","arrive":"HH:MM",\
 "depart":"HH:MM","note":null}]}]}"""
+
+SYSTEM_PROMPT = _PROMPT_TEMPLATE.replace("@@TRAVEL_TIME_RULE@@", TRAVEL_TIME_RULE)
 
 CANDIDATE_HEADER = "ĐỊA ĐIỂM (place_id | tên | loại | lat,lon | giờ mở cửa)"
 WEEKDAY_CODES = ("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")  # mã ngày của OSM opening_hours
