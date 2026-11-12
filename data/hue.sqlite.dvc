@@ -1,5 +1,5 @@
 outs:
-- md5: d0a3c97e656273d0ef66630391bdf9af
-  size: 1585152
+- md5: c7fa245031b1e8c4e31dfd4fcf77859e
+  size: 1929216
   hash: md5
   path: hue.sqlite
