@@ -10,8 +10,8 @@ stages:
     outs:
     - path: data/eval/hue_eval_v1.jsonl
       hash: md5
-      md5: b1bc815466560006ebcd1070b33fcff1
-      size: 22292
+      md5: 432ead148d5d7c6059f9fb62e56611d2
+      size: 22392
   baseline_eval:
     cmd: python -m travel_agent eval --db data/hue.sqlite --evalset 
       data/eval/hue_eval_v1.jsonl --split dev --model qwen3.5:4b --temperature 
@@ -20,45 +20,45 @@ stages:
     deps:
     - path: data/eval/hue_eval_v1.jsonl
       hash: md5
-      md5: b1bc815466560006ebcd1070b33fcff1
-      size: 22292
+      md5: 432ead148d5d7c6059f9fb62e56611d2
+      size: 22392
     - path: data/hue.sqlite
       hash: md5
       md5: c7fa245031b1e8c4e31dfd4fcf77859e
       size: 1929216
     - path: src/travel_agent/data/place_repository.py
       hash: md5
-      md5: e2bfecfdfb454078cb852cd541e583a2
-      size: 5259
+      md5: 457db209c0aff2e2e0688b6be8eb65cc
+      size: 5431
     - path: src/travel_agent/domain
       hash: md5
-      md5: 482a3cddbcd19494f0b6220d0b035372.dir
-      size: 6701
+      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
+      size: 6817
       nfiles: 3
     - path: src/travel_agent/planning
       hash: md5
-      md5: 1b823ea0f8bd858186b30c921c01e1e8.dir
-      size: 7645
-      nfiles: 3
+      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
+      size: 32616
+      nfiles: 4
     - path: src/travel_agent/review
       hash: md5
-      md5: 908a5ab10ff890116074bfdb7f42f0cd.dir
-      size: 47127
+      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
+      size: 47936
       nfiles: 6
     - path: src/travel_agent/routing
       hash: md5
-      md5: 75b82ed5e9bb095fc373c43cfbba574f.dir
-      size: 2173
+      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      size: 2238
       nfiles: 2
     - path: src/travel_agent/training
       hash: md5
-      md5: aeaa73eed58e33801b66877cdb40b9a4.dir
-      size: 25557
-      nfiles: 8
+      md5: f6b7d3143e018880d10c55090666dff9.dir
+      size: 71394
+      nfiles: 12
     - path: src/travel_agent/validation
       hash: md5
-      md5: f080cde7e7c0428bff39d11ee934ddff.dir
-      size: 10668
+      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
+      size: 11384
       nfiles: 3
     params:
       configs/eval.yaml:
@@ -72,9 +72,145 @@ stages:
     outs:
     - path: reports/eval/baseline_dev.json
       hash: md5
-      md5: 626bd399dd47f895a46cfb374f9b5bcf
-      size: 1097
+      md5: 2b72f539d5a16bf4bbf98aec60ec3a9d
+      size: 1102
     - path: reports/eval/baseline_dev.outcomes.jsonl
       hash: md5
-      md5: a5b77cf87e5b59cfed9e3128bc5a8246
-      size: 143694
+      md5: 1948c031ef702471283b3771b99fb4f4
+      size: 236795
+  build_dataset:
+    cmd: python -m travel_agent build-dataset --config configs/dataset.yaml --db
+      data/hue.sqlite --evalset data/eval/hue_eval_v1.jsonl --out 
+      data/sft/hue_sft_v1.jsonl --manifest data/sft/manifest.json
+    deps:
+    - path: data/eval/hue_eval_v1.jsonl
+      hash: md5
+      md5: 432ead148d5d7c6059f9fb62e56611d2
+      size: 22392
+    - path: data/hue.sqlite
+      hash: md5
+      md5: c7fa245031b1e8c4e31dfd4fcf77859e
+      size: 1929216
+    - path: src/travel_agent/data/place_repository.py
+      hash: md5
+      md5: 457db209c0aff2e2e0688b6be8eb65cc
+      size: 5431
+    - path: src/travel_agent/domain
+      hash: md5
+      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
+      size: 6817
+      nfiles: 3
+    - path: src/travel_agent/planning
+      hash: md5
+      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
+      size: 32616
+      nfiles: 4
+    - path: src/travel_agent/review
+      hash: md5
+      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
+      size: 47936
+      nfiles: 6
+    - path: src/travel_agent/routing
+      hash: md5
+      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      size: 2238
+      nfiles: 2
+    - path: src/travel_agent/training
+      hash: md5
+      md5: f6b7d3143e018880d10c55090666dff9.dir
+      size: 71394
+      nfiles: 12
+    - path: src/travel_agent/validation
+      hash: md5
+      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
+      size: 11384
+      nfiles: 3
+    params:
+      configs/dataset.yaml:
+        dataset:
+          name: hue_sft_v1
+          request_seed: 20261114
+          target_samples: 4000
+          repair_share: 0.15
+          max_requests: 6000
+          solver_time_limit_s: 10.0
+          corruption_kinds:
+          - unknown_place
+          - overlap
+          - closed
+          - travel_gap
+    outs:
+    - path: data/sft/hue_sft_v1.jsonl
+      hash: md5
+      md5: 0b9fa728c4ce200150b92fc445759f52
+      size: 21308405
+    - path: data/sft/manifest.json
+      hash: md5
+      md5: b7067fb23d617c3e9a7a6e50294e23fc
+      size: 1435
+  check_dataset:
+    cmd: python -m travel_agent check-dataset --config configs/dataset.yaml --db
+      data/hue.sqlite --evalset data/eval/hue_eval_v1.jsonl --dataset 
+      data/sft/hue_sft_v1.jsonl --out reports/dataset/check.json
+    deps:
+    - path: data/eval/hue_eval_v1.jsonl
+      hash: md5
+      md5: 432ead148d5d7c6059f9fb62e56611d2
+      size: 22392
+    - path: data/hue.sqlite
+      hash: md5
+      md5: c7fa245031b1e8c4e31dfd4fcf77859e
+      size: 1929216
+    - path: data/sft/hue_sft_v1.jsonl
+      hash: md5
+      md5: 0b9fa728c4ce200150b92fc445759f52
+      size: 21308405
+    - path: src/travel_agent/data/place_repository.py
+      hash: md5
+      md5: 457db209c0aff2e2e0688b6be8eb65cc
+      size: 5431
+    - path: src/travel_agent/domain
+      hash: md5
+      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
+      size: 6817
+      nfiles: 3
+    - path: src/travel_agent/planning
+      hash: md5
+      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
+      size: 32616
+      nfiles: 4
+    - path: src/travel_agent/review
+      hash: md5
+      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
+      size: 47936
+      nfiles: 6
+    - path: src/travel_agent/routing
+      hash: md5
+      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      size: 2238
+      nfiles: 2
+    - path: src/travel_agent/training
+      hash: md5
+      md5: f6b7d3143e018880d10c55090666dff9.dir
+      size: 71394
+      nfiles: 12
+    - path: src/travel_agent/validation
+      hash: md5
+      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
+      size: 11384
+      nfiles: 3
+    params:
+      configs/dataset.yaml:
+        check:
+          max_tokens: 4096
+          tokenizer:
+            repo: Qwen/Qwen3.5-4B
+            revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+          distribution:
+            min_share: 0.25
+            max_share: 0.42
+    outs:
+    - path: reports/dataset/check.json
+      hash: md5
+      md5: 07e654dbfbb94f28534a57b2c113e203
+      size: 617

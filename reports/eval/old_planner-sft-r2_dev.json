@@ -1,0 +1,37 @@
+{
+  "meta": {
+    "run_name": "old-planner-sft-r2",
+    "model": "planner-sft-r2",
+    "split": "dev",
+    "temperature": 0.0,
+    "seed": 0,
+    "num_predict": 2048,
+    "num_ctx": 8192,
+    "schema_format": true,
+    "limit": "all",
+    "host": "http://127.0.0.1:11434",
+    "git_commit": "8097840c269f1a8678101626d1c39036a1c83bb3",
+    "evalset_sha256": "624e86c1690c2daefe220794b3e218916849f2b731560ffbc15bb5317e02c545",
+    "db_sha256": "8f8eac2196f53260d45c4a31fc04980343ded9cb7f260fea5b7bebda92114d92"
+  },
+  "summary": {
+    "n": 70,
+    "first_pass_valid_rate": 0.0,
+    "parse_error_rate": 0.0,
+    "unknown_place_rate": 0.009242144177449169,
+    "avg_stops_per_day": 7.410958904109589,
+    "distinct_place_count": 641,
+    "latency_p50_s": 12.773853849999796,
+    "issue_code_distribution": {
+      "closed_during_visit": 42,
+      "day_count_mismatch": 1,
+      "duplicate_place": 27,
+      "missing_meal": 152,
+      "opening_hours_unknown": 64,
+      "overloaded_day": 61,
+      "stop_time_order": 15,
+      "travel_time_insufficient": 708,
+      "unknown_place": 10
+    }
+  }
+}

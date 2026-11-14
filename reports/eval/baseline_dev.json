@@ -10,27 +10,27 @@
     "schema_format": true,
     "limit": "all",
     "host": "http://127.0.0.1:11434",
-    "git_commit": "a7cd53840967491467ebd3607d80df7e3110b131",
-    "evalset_sha256": "da15d6d0752630db4e238dc5614cf656264aa3299d2dc1df38eb6af4a35319f4",
+    "git_commit": "c33a20e8d60a28ec7e14fff825f4aff3a7fb5524-dirty",
+    "evalset_sha256": "624e86c1690c2daefe220794b3e218916849f2b731560ffbc15bb5317e02c545",
     "db_sha256": "8f8eac2196f53260d45c4a31fc04980343ded9cb7f260fea5b7bebda92114d92"
   },
   "summary": {
     "n": 70,
-    "first_pass_valid_rate": 0.05714285714285714,
+    "first_pass_valid_rate": 0.08571428571428572,
     "parse_error_rate": 0.0,
-    "unknown_place_rate": 0.002824858757062147,
-    "avg_stops_per_day": 5.057142857142857,
-    "distinct_place_count": 250,
-    "latency_p50_s": 4.63225575000979,
+    "unknown_place_rate": 0.01008827238335435,
+    "avg_stops_per_day": 5.394557823129252,
+    "distinct_place_count": 423,
+    "latency_p50_s": 9.097925199997917,
     "issue_code_distribution": {
-      "closed_during_visit": 30,
-      "day_count_mismatch": 49,
-      "missing_meal": 86,
-      "opening_hours_unknown": 14,
-      "overloaded_day": 8,
-      "stop_time_order": 1,
-      "travel_time_insufficient": 160,
-      "unknown_place": 1
+      "closed_during_visit": 67,
+      "duplicate_place": 14,
+      "missing_meal": 171,
+      "opening_hours_unknown": 27,
+      "overloaded_day": 17,
+      "stop_time_order": 2,
+      "travel_time_insufficient": 221,
+      "unknown_place": 8
     }
   }
 }

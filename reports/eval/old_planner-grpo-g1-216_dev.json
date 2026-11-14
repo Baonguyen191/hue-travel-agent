@@ -1,0 +1,36 @@
+{
+  "meta": {
+    "run_name": "old-planner-grpo-g1-216",
+    "model": "planner-grpo-g1-216",
+    "split": "dev",
+    "temperature": 0.0,
+    "seed": 0,
+    "num_predict": 2048,
+    "num_ctx": 8192,
+    "schema_format": true,
+    "limit": "all",
+    "host": "http://127.0.0.1:11434",
+    "git_commit": "8097840c269f1a8678101626d1c39036a1c83bb3",
+    "evalset_sha256": "624e86c1690c2daefe220794b3e218916849f2b731560ffbc15bb5317e02c545",
+    "db_sha256": "8f8eac2196f53260d45c4a31fc04980343ded9cb7f260fea5b7bebda92114d92"
+  },
+  "summary": {
+    "n": 70,
+    "first_pass_valid_rate": 0.04285714285714286,
+    "parse_error_rate": 0.0,
+    "unknown_place_rate": 0.048736462093862815,
+    "avg_stops_per_day": 7.537414965986395,
+    "distinct_place_count": 659,
+    "latency_p50_s": 13.040956450000522,
+    "issue_code_distribution": {
+      "closed_during_visit": 43,
+      "duplicate_place": 54,
+      "missing_meal": 156,
+      "opening_hours_unknown": 56,
+      "overloaded_day": 64,
+      "stop_time_order": 1,
+      "travel_time_insufficient": 519,
+      "unknown_place": 54
+    }
+  }
+}
