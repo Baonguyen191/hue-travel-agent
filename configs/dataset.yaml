@@ -11,8 +11,12 @@ dataset:
   solver_time_limit_s: 10.0
   corruption_kinds: [unknown_place, overlap, closed, travel_gap]
 check:
-  # Bằng max_seq khởi điểm của SFT (spec mục 7). Đổi max_seq thì đổi cả ở đây.
-  max_tokens: 2048
+  # Phải bằng max_seq của SFT; đổi max_seq thì đổi cả ở đây. Spec mục 7 khởi điểm 2048, nhưng
+  # bản dựng thử 4.000 mẫu (2026-11-14) đo được: trung vị 1.694, p90 2.712, dài nhất 3.885 token
+  # (31% mẫu vượt 2048, gồm mọi plan 3 ngày moderate/packed). Cắt bớt không giảm được một nửa,
+  # còn bỏ mẫu dài thì mất hết plan dài, nên nâng lên 4096. Smoke test SFT phải xác nhận 4096
+  # vừa 8 GB VRAM của RTX 4060.
+  max_tokens: 4096
   # Tokenizer của model sẽ train, đọc từ cache Hugging Face đã tải sẵn (không gọi mạng).
   # Đã đối chiếu với GGUF của Ollama qwen3.5:4b: cùng số merges, cùng id token đặc biệt.
   tokenizer:
