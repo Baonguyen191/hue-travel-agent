@@ -14,7 +14,8 @@ gắn được vào từng ngày.
   tiêu mỗi ngày bốc ngẫu nhiên trong khoảng của pace, sàn của pace là cận dưới mềm. Sàn số điểm
   và việc đủ bữa được kiểm lại sau khi giải; thiếu thì trả INFEASIBLE.
 - Nhiễu có seed nằm trong chi phí vào mỗi node, nên seed khác cho plan khác.
-- Thời gian chờ giữa hai điểm bị phạt nhẹ, để lịch không có quãng ngồi chờ dài vô cớ.
+- Thời gian chờ giữa hai điểm bị phạt nhẹ, và mỗi phút đến muộn cũng bị phạt nhẹ, để buổi sáng
+  được dùng trước; quãng trống (nếu có) dồn về trước bữa tối hoặc cuối ngày.
 
 Giờ đến lấy từ cumul của dimension thời gian trong lời giải OR-Tools, rồi chạy
 `validate_itinerary`. Plan có ERROR bị trả về như một thất bại, không bao giờ trả plan dở hoặc sai.
@@ -79,6 +80,7 @@ TRAVEL_COST_PER_MINUTE = 10
 INTEREST_BONUS = 200  # tương đương 20 phút đi lại
 NOISE_MAX = 150  # tương đương 15 phút đi lại
 IDLE_COST_PER_MINUTE = 3  # 10 phút chờ tương đương 3 phút đi lại
+EARLY_COST_PER_MINUTE = 1  # mỗi phút giờ đến muộn hơn; nhỏ hơn mọi trọng số khác
 STOP_PENALTY = 100_000
 SHORT_DAY_PENALTY = 500_000  # mỗi điểm thiếu so với sàn của pace
 MEAL_PENALTY = 1_000_000
@@ -336,8 +338,9 @@ def _route(
     time_cb = routing.RegisterTransitMatrix(transit)
     routing.AddDimension(time_cb, MINUTES_PER_DAY, num_days * MINUTES_PER_DAY, False, "time")
     time_dim = routing.GetDimensionOrDie("time")
-    # Phạt thời gian chờ. Xe xuất phát đúng day_start nên quãng chờ trước điểm đầu tiên cũng bị
-    # tính: solver lấp buổi sáng và quãng giữa các bữa trước, phần trống dồn về cuối ngày.
+    # Phạt thời gian chờ; xe xuất phát đúng day_start. Khi ngày có bữa tối cố định, tổng thời gian
+    # chờ trước bữa tối không đổi theo thứ tự, nên cần thêm phạt giờ đến (dưới) để buổi sáng được
+    # dùng trước thay vì để trống rồi dồn điểm vào buổi chiều.
     time_dim.SetSlackCostCoefficientForAllVehicles(IDLE_COST_PER_MINUTE)
     for day in range(num_days):
         low, high = _day_bounds(request, day)
@@ -364,6 +367,7 @@ def _route(
         windows = [w for day in sorted(node.arrivals) for w in node.arrivals[day]]
         cumul = time_dim.CumulVar(index)
         cumul.SetRange(windows[0][0], windows[-1][1])
+        time_dim.SetCumulVarSoftUpperBound(index, 0, EARLY_COST_PER_MINUTE)  # chi phí = giờ đến
         for (_, prev_end), (next_start, _) in itertools.pairwise(windows):
             if next_start > prev_end + 1:
                 cumul.RemoveInterval(prev_end + 1, next_start - 1)
