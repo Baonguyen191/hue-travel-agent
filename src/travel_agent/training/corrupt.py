@@ -40,6 +40,8 @@ EXPECTED_CODE: dict[CorruptionKind, IssueCode] = {
 # Số phút dời giờ khi phá; heuristic, chỉ cần tạo lỗi trông giống lỗi model hay mắc.
 SHIFT_MINUTES = (10, 20, 45)
 MAX_OPTIONS = 40  # đủ để tìm phương án sạch, không tốn quá nhiều lần chạy validator
+# Một lượt thăm không bị kéo dài quá chừng này khi phá: bữa trưa 5 tiếng không giống lỗi model.
+MAX_STRETCH_MINUTES = 60
 _ID_DIGITS = re.compile(r"^(.*?)(\d+)$")
 
 
@@ -66,7 +68,11 @@ def corrupt(
     """Plan đã phá theo `kind`, hoặc None nếu kiểu phá này không áp dụng được cho plan."""
     rng = random.Random(f"{seed}:{kind.value}")
     by_id = {place.id: place for place in candidates}
-    options = list(_OPTION_MAKERS[kind](request, itinerary, by_id, travel, rng))
+    options = [
+        option
+        for option in _OPTION_MAKERS[kind](request, itinerary, by_id, travel, rng)
+        if _max_stretch(itinerary, option) <= MAX_STRETCH_MINUTES
+    ]
     rng.shuffle(options)
     lookup = InMemoryPlaceRepository(candidates)
     expected = EXPECTED_CODE[kind]
@@ -118,6 +124,17 @@ def _shift_block(itinerary: Itinerary, d_idx: int, indices: range, delta: int) -
         arrive, depart = _span(copy.days[d_idx].stops[s_idx])
         copy = _with_stop(copy, d_idx, s_idx, arrive + delta, depart + delta)
     return copy
+
+
+def _max_stretch(original: Itinerary, option: Itinerary) -> int:
+    """Số phút một lượt thăm dài thêm nhiều nhất so với plan gốc (cùng vị trí)."""
+    longest = 0
+    for before, after in zip(original.days, option.days, strict=True):
+        for old, new in zip(before.stops, after.stops, strict=True):
+            old_start, old_end = _span(old)
+            new_start, new_end = _span(new)
+            longest = max(longest, (new_end - new_start) - (old_end - old_start))
+    return longest
 
 
 def _span(stop: PlannedStop) -> tuple[int, int]:

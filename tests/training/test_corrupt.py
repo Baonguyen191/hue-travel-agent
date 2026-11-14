@@ -9,7 +9,12 @@ from travel_agent.domain.models import Itinerary, Pace, Place, PlanRequest, Trav
 from travel_agent.planning.candidates import select_candidates
 from travel_agent.planning.solver import solve
 from travel_agent.routing.travel_time import HaversineEstimator
-from travel_agent.training.corrupt import EXPECTED_CODE, CorruptionKind, corrupt
+from travel_agent.training.corrupt import (
+    EXPECTED_CODE,
+    MAX_STRETCH_MINUTES,
+    CorruptionKind,
+    corrupt,
+)
 from travel_agent.validation.validator import validate_itinerary
 
 TRAVEL = HaversineEstimator()
@@ -113,3 +118,19 @@ def test_shifts_stay_inside_the_clock() -> None:
         for day in result.itinerary.days:
             for stop in day.stops:
                 assert dt.time(0, 0) <= stop.arrive < stop.depart
+
+
+def test_corruption_never_stretches_a_visit_absurdly() -> None:
+    for index, (request, candidates, itinerary) in enumerate(PLANS):
+        for kind in CorruptionKind:
+            result = corrupt(request, itinerary, candidates, TRAVEL, kind, seed=index)
+            assert result is not None
+            for before, after in zip(itinerary.days, result.itinerary.days, strict=True):
+                for old, new in zip(before.stops, after.stops, strict=True):
+                    grown = minutes(new.depart) - minutes(new.arrive)
+                    grown -= minutes(old.depart) - minutes(old.arrive)
+                    assert grown <= MAX_STRETCH_MINUTES
+
+
+def minutes(value: dt.time) -> int:
+    return value.hour * 60 + value.minute
