@@ -49,11 +49,12 @@ def make_request(
     num_days: int = 1,
     pace: Pace = Pace.MODERATE,
     interests: Sequence[str] = (),
+    travel_mode: TravelMode = TravelMode.MOTORBIKE,
 ) -> PlanRequest:
     return PlanRequest(
         start_date=START,
         num_days=num_days,
         pace=pace,
-        travel_mode=TravelMode.MOTORBIKE,
+        travel_mode=travel_mode,
         interests=list(interests),
     )

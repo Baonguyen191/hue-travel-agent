@@ -1,12 +1,49 @@
 from collections import Counter
 
 from tests.planning.factories import make_place, make_pool, make_request
-from travel_agent.domain.models import Category, Pace
+from travel_agent.domain.models import Category, Pace, Place, TravelMode
 from travel_agent.planning.candidates import (
+    CITY_CENTER,
+    MAX_RADIUS_KM,
     candidate_limit,
     preferred_categories,
     select_candidates,
+    within_radius,
 )
+
+KM_PER_DEGREE_LAT = 111.0
+
+
+def place_north_of_center(pid: str, km: float) -> Place:
+    lat = CITY_CENTER.lat + km / KM_PER_DEGREE_LAT
+    return make_place(pid, Category.MUSEUM, lat=lat, lon=CITY_CENTER.lon)
+
+
+def test_radius_depends_on_travel_mode() -> None:
+    near, mid, far = (place_north_of_center(f"t:{km}", km) for km in (1.5, 8, 30))
+    assert MAX_RADIUS_KM[TravelMode.WALK] < MAX_RADIUS_KM[TravelMode.MOTORBIKE]
+    assert within_radius(near, TravelMode.WALK)
+    assert not within_radius(mid, TravelMode.WALK)
+    assert within_radius(mid, TravelMode.CAR)
+    assert within_radius(mid, TravelMode.MOTORBIKE)
+    assert not within_radius(far, TravelMode.CAR)
+
+
+def test_select_candidates_drops_places_outside_radius() -> None:
+    pool = [*make_pool(), place_north_of_center("t:mid", 8), place_north_of_center("t:far", 30)]
+    walk = {
+        place.id
+        for seed in range(30)
+        for place in select_candidates(make_request(travel_mode=TravelMode.WALK), pool, seed)
+    }
+    car = {
+        place.id
+        for seed in range(30)
+        for place in select_candidates(make_request(travel_mode=TravelMode.CAR), pool, seed)
+    }
+    assert not {"t:mid", "t:far"} & walk
+    assert "t:far" not in car
+    assert "t:mid" in car
 
 
 def test_limit_scales_with_pace_and_days() -> None:

@@ -1,6 +1,7 @@
 """Chọn candidate POI cho một PlanRequest. Hàm thuần, xác định theo seed.
 
 Bảng sở thích và các hằng số là heuristic sản phẩm, chưa kiểm chứng bằng dữ liệu người dùng.
+Chỉ lấy địa điểm trong bán kính quanh Đại Nội, bán kính tùy phương tiện.
 """
 
 from __future__ import annotations
@@ -8,7 +9,25 @@ from __future__ import annotations
 import random
 from collections.abc import Sequence
 
-from travel_agent.domain.models import Category, Pace, Place, PlanRequest
+from travel_agent.domain.models import (
+    Category,
+    Coordinates,
+    Pace,
+    Place,
+    PlanRequest,
+    TravelMode,
+)
+from travel_agent.routing.travel_time import haversine_m
+
+# Đại Nội. Bán kính chọn ngày 2026-11-14 từ số đo trên 70 request dev: không lọc thì 19% cặp
+# candidate đi xe và 47% cặp đi bộ cần hơn 60 phút di chuyển; với bán kính này còn khoảng 1%.
+# 12 km giữ được khu lăng (lăng Minh Mạng cách khoảng 11 km).
+CITY_CENTER = Coordinates(lat=16.4698, lon=107.5786)
+MAX_RADIUS_KM: dict[TravelMode, float] = {
+    TravelMode.WALK: 2.0,
+    TravelMode.MOTORBIKE: 12.0,
+    TravelMode.CAR: 12.0,
+}
 
 INTEREST_CATEGORIES: dict[str, tuple[Category, ...]] = {
     "history": (Category.HISTORIC, Category.MUSEUM),
@@ -38,6 +57,10 @@ def candidate_limit(request: PlanRequest) -> int:
     return max(MIN_CANDIDATES, min(MAX_CANDIDATES, wanted))
 
 
+def within_radius(place: Place, mode: TravelMode) -> bool:
+    return haversine_m(CITY_CENTER, place.coords) <= MAX_RADIUS_KM[mode] * 1000
+
+
 def preferred_categories(interests: Sequence[str]) -> set[Category]:
     found: set[Category] = set()
     for interest in interests:
@@ -53,7 +76,8 @@ def select_candidates(request: PlanRequest, places: Sequence[Place], seed: int) 
     """
     rng = random.Random(seed)
     queues: dict[Category, list[Place]] = {category: [] for category in Category}
-    for place in sorted(places, key=lambda item: item.id):
+    nearby = [place for place in places if within_radius(place, request.travel_mode)]
+    for place in sorted(nearby, key=lambda item: item.id):
         queues[place.category].append(place)
     for queue in queues.values():
         rng.shuffle(queue)
