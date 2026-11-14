@@ -1,5 +1,6 @@
 vars:
   - configs/eval.yaml
+  - configs/sft.yaml
 
 stages:
   make_evalset:
@@ -101,4 +102,85 @@ stages:
           - check
     metrics:
       - reports/dataset/check.json:
+          cache: false
+
+  sft:
+    # Chạy bằng venv train (sft.python trong configs/sft.yaml). Checkpoint nặng nằm ở
+    # sft.runs_dir, ngoài OneDrive; DVC chỉ theo dõi adapter của từng checkpoint.
+    cmd: ${sft.python} scripts/train/sft.py --config configs/sft.yaml
+    deps:
+      - data/sft/hue_sft_v1.jsonl
+      - reports/dataset/check.json
+      - scripts/train/sft.py
+      - src/travel_agent/planning
+      - src/travel_agent/training
+      - src/travel_agent/validation
+      - src/travel_agent/routing
+      - src/travel_agent/domain
+      - src/travel_agent/review
+      - src/travel_agent/data/place_repository.py
+    params:
+      - configs/sft.yaml:
+          - sft
+    outs:
+      - models/sft/${sft.run_name}/adapters
+    metrics:
+      - models/sft/${sft.run_name}/train_metrics.json:
+          cache: false
+
+  export_sft:
+    cmd: ${sft.python} scripts/train/export_gguf.py --config configs/sft.yaml --record
+    deps:
+      - models/sft/${sft.run_name}/adapters
+      - scripts/train/export_gguf.py
+      - src/travel_agent/training
+    params:
+      - configs/sft.yaml:
+          - export
+    metrics:
+      - models/sft/${sft.run_name}/export.json:
+          cache: false
+
+  eval_sft:
+    cmd:
+      - >-
+        python -m travel_agent eval
+        --db data/hue.sqlite
+        --evalset data/eval/hue_eval_v1.jsonl
+        --split dev
+        --model ${export.ollama_model}
+        --temperature ${generation.temperature}
+        --seed ${generation.seed}
+        --num-predict ${generation.num_predict}
+        --num-ctx ${generation.num_ctx}
+        --run-name sft
+        --mlflow
+        --baseline reports/eval/baseline_dev.json
+        --out reports/eval/sft_dev.json
+      - python scripts/train/write_model_card.py --config configs/sft.yaml
+    deps:
+      - models/sft/${sft.run_name}/export.json
+      - reports/eval/baseline_dev.json
+      - data/sft/manifest.json
+      - data/hue.sqlite
+      - data/eval/hue_eval_v1.jsonl
+      - scripts/train/write_model_card.py
+      - src/travel_agent/planning
+      - src/travel_agent/training
+      - src/travel_agent/validation
+      - src/travel_agent/routing
+      - src/travel_agent/domain
+      - src/travel_agent/review
+      - src/travel_agent/data/place_repository.py
+    params:
+      - configs/eval.yaml:
+          - generation
+      - configs/sft.yaml:
+          - export
+    outs:
+      - reports/eval/sft_dev.outcomes.jsonl
+    metrics:
+      - reports/eval/sft_dev.json:
+          cache: false
+      - models/sft/${sft.run_name}/model_card.json:
           cache: false
