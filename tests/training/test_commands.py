@@ -290,10 +290,15 @@ def test_eval_keeps_outcomes_written_before_a_generation_error(
     assert not out.exists()  # báo cáo tổng hợp chỉ ghi khi chạy xong
 
 
+REPO = Path(__file__).parents[2]
+NUL = "\0"
+
+
 def _fake_git(monkeypatch: pytest.MonkeyPatch, status: str) -> list[list[str]]:
     outputs = {
         ("git", "rev-parse", "HEAD"): "abc123\n",
-        ("git", "status", "--porcelain", "--untracked-files=no"): status,
+        ("git", "rev-parse", "--show-toplevel"): f"{REPO.as_posix()}\n",
+        ("git", "status", "--porcelain", "-z", "--untracked-files=no"): status,
     }
     calls: list[list[str]] = []
 
@@ -306,10 +311,47 @@ def _fake_git(monkeypatch: pytest.MonkeyPatch, status: str) -> list[list[str]]:
 
 
 def test_current_commit_marks_dirty_tree(monkeypatch: pytest.MonkeyPatch) -> None:
-    _fake_git(monkeypatch, " M src/x.py\n")
+    _fake_git(monkeypatch, " M src/x.py" + NUL)
     assert commands.current_commit() == "abc123-dirty"
 
 
 def test_current_commit_clean_tree(monkeypatch: pytest.MonkeyPatch) -> None:
     _fake_git(monkeypatch, "")
     assert commands.current_commit() == "abc123"
+
+
+def test_own_output_deleted_by_dvc_is_not_dirty(monkeypatch: pytest.MonkeyPatch) -> None:
+    """`dvc repro` xóa output đã track trước khi chạy lệnh: git thấy ` D` nhưng code không đổi."""
+    _fake_git(monkeypatch, " D reports/eval/new_run.json" + NUL)
+    own = [REPO / "reports" / "eval" / "new_run.json"]
+    assert commands.current_commit() == "abc123-dirty"
+    assert commands.current_commit(own) == "abc123"
+
+
+def test_pipeline_outputs_and_lock_are_not_dirty(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Stage sau thấy dvc.lock và output của stage trước đã đổi trong cùng lần `dvc repro`."""
+    _fake_git(monkeypatch, " M dvc.lock" + NUL + " M reports/eval/baseline_dev.json" + NUL)
+    assert commands.current_commit() == "abc123"
+
+
+def test_code_change_next_to_outputs_is_still_dirty(monkeypatch: pytest.MonkeyPatch) -> None:
+    _fake_git(monkeypatch, " M dvc.lock" + NUL + " M src/travel_agent/planning/solver.py" + NUL)
+    assert commands.current_commit() == "abc123-dirty"
+
+
+def test_renamed_file_counts_both_paths(monkeypatch: pytest.MonkeyPatch) -> None:
+    _fake_git(monkeypatch, "R  dvc.lock" + NUL + "src/old.py" + NUL)
+    assert commands.current_commit() == "abc123-dirty"
+
+
+def test_pipeline_outputs_read_dvc_yaml() -> None:
+    outputs = commands.pipeline_outputs(REPO / "dvc.yaml")
+    for path in (
+        "dvc.lock",
+        "reports/eval/baseline_dev.json",
+        "data/sft/hue_sft_v1.jsonl",
+        "data/sft/manifest.json",
+        "reports/dataset/check.json",
+    ):
+        assert path in outputs
+    assert commands.pipeline_outputs(REPO / "khong-co.yaml") == {"dvc.lock"}
