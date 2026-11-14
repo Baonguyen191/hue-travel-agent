@@ -1,3 +1,4 @@
+import datetime as dt
 import json
 import os
 from pathlib import Path
@@ -5,9 +6,18 @@ from pathlib import Path
 import pytest
 
 from tests.planning.factories import make_place, make_request
-from travel_agent.domain.models import Category, TravelMode
-from travel_agent.planning.prompt import SYSTEM_PROMPT, build_messages
+from travel_agent.data.place_repository import InMemoryPlaceRepository
+from travel_agent.domain.models import Category, Itinerary, PlannedDay, PlannedStop, TravelMode
+from travel_agent.planning.prompt import (
+    SYSTEM_PROMPT,
+    build_messages,
+    format_issue,
+    format_itinerary,
+)
 from travel_agent.routing.travel_time import HaversineEstimator
+from travel_agent.training.parsing import parse_itinerary
+from travel_agent.validation.report import Issue, IssueCode, Severity
+from travel_agent.validation.validator import validate_itinerary
 
 SNAPSHOT = Path(__file__).parent / "snapshots" / "generation_messages.json"
 
@@ -101,3 +111,74 @@ def test_rule_5_tracks_estimator_constants(monkeypatch: pytest.MonkeyPatch) -> N
     finally:
         monkeypatch.undo()
         importlib.reload(prompt)
+
+
+REPAIR_SNAPSHOT = Path(__file__).parent / "snapshots" / "repair_messages.json"
+BROKEN = Itinerary(
+    days=[
+        PlannedDay(
+            date=REQUEST.start_date,
+            stops=[
+                PlannedStop(place_id="t:a", arrive=dt.time(16, 0), depart=dt.time(17, 30)),
+                PlannedStop(place_id="t:x", arrive=dt.time(18, 0), depart=dt.time(19, 0)),
+                PlannedStop(place_id="t:b", arrive=dt.time(19, 15), depart=dt.time(20, 0)),
+            ],
+        )
+    ]
+)
+
+
+def broken_issues() -> list[Issue]:
+    report = validate_itinerary(
+        REQUEST, BROKEN, InMemoryPlaceRepository(CANDIDATES), HaversineEstimator()
+    )
+    return report.issues
+
+
+def test_format_itinerary_matches_the_system_prompt_example() -> None:
+    text = format_itinerary(BROKEN)
+    assert text.startswith(
+        '{"days":[{"date":"2026-12-01","stops":[{"place_id":"t:a","arrive":"16:00",'
+        '"depart":"17:30","note":null},'
+    )
+    assert parse_itinerary(text) == BROKEN
+
+
+def test_repair_prompt_extends_the_generation_prompt() -> None:
+    generation = build_messages(REQUEST, CANDIDATES)
+    repair = build_messages(REQUEST, CANDIDATES, broken=BROKEN, issues=broken_issues())
+    assert repair[0] == generation[0]
+    assert repair[1]["content"].startswith(generation[1]["content"] + "\n\n")
+    assert format_itinerary(BROKEN) in repair[1]["content"]
+
+
+def test_repair_prompt_lists_only_errors_with_position_and_message() -> None:
+    issues = broken_issues()
+    content = build_messages(REQUEST, CANDIDATES, broken=BROKEN, issues=issues)[1]["content"]
+    errors = [issue for issue in issues if issue.severity is Severity.ERROR]
+    warnings = [issue for issue in issues if issue.severity is Severity.WARNING]
+    assert errors and warnings
+    for issue in errors:
+        assert format_issue(issue) in content
+    for issue in warnings:
+        assert issue.message not in content
+    unknown = next(issue for issue in errors if issue.code is IssueCode.UNKNOWN_PLACE)
+    assert format_issue(unknown) == f"- unknown_place (ngày 1, điểm 2, t:x): {unknown.message}"
+
+
+def test_repair_prompt_needs_a_broken_plan_and_an_error() -> None:
+    warning_only = [issue for issue in broken_issues() if issue.severity is Severity.WARNING]
+    with pytest.raises(ValueError):
+        build_messages(REQUEST, CANDIDATES, broken=BROKEN, issues=warning_only)
+    with pytest.raises(ValueError):
+        build_messages(REQUEST, CANDIDATES, issues=broken_issues())
+
+
+def test_repair_messages_match_snapshot() -> None:
+    """Snapshot riêng cho prompt repair; snapshot sinh plan ở trên giữ nguyên."""
+    messages = build_messages(REQUEST, CANDIDATES, broken=BROKEN, issues=broken_issues())
+    if os.environ.get("UPDATE_SNAPSHOTS") == "1":
+        REPAIR_SNAPSHOT.write_text(
+            json.dumps(messages, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
+    assert messages == json.loads(REPAIR_SNAPSHOT.read_text(encoding="utf-8"))
