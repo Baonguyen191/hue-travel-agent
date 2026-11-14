@@ -71,15 +71,20 @@ def corrupt(
     lookup = InMemoryPlaceRepository(candidates)
     expected = EXPECTED_CODE[kind]
     fallback: Corruption | None = None
+    fallback_score = (0, 0)
     for option in options[:MAX_OPTIONS]:
         report = validate_itinerary(request, option, lookup, travel)
-        codes = {issue.code for issue in report.errors()}
+        errors = report.errors()
+        codes = {issue.code for issue in errors}
         if expected not in codes:
             continue
         result = Corruption(kind, option, report)
         if result.clean:
             return result
-        fallback = fallback or result
+        # Không có phương án sạch: lấy phương án ít lỗi lạ nhất, để plan hỏng vẫn giống lỗi thật.
+        score = (len(codes), len(errors))
+        if fallback is None or score < fallback_score:
+            fallback, fallback_score = result, score
     return fallback
 
 
