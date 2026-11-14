@@ -48,7 +48,8 @@ def validate_itinerary(
                 )
             else:
                 _check_opening_hours(day.date, stop, place, d_idx, s_idx, issues)
-            if stop.place_id in seen:
+            # Id lạ đã bị báo UNKNOWN_PLACE ở mỗi lần xuất hiện; không báo trùng thêm (phạt đôi).
+            if place is not None and stop.place_id in seen:
                 issues.append(
                     _issue(
                         Severity.ERROR,

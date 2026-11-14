@@ -40,6 +40,17 @@ def test_unknown_place_is_error_with_position() -> None:
     assert (issue.day_index, issue.stop_index, issue.place_id) == (0, 1, "osm:node/999")
 
 
+def test_repeated_unknown_place_is_reported_only_as_unknown() -> None:
+    """Id lạ lặp lại bị báo UNKNOWN_PLACE ở mỗi stop, không cộng thêm DUPLICATE_PLACE."""
+    stops = [*VALID_DAY]
+    stops[0] = ("osm:node/999", "08:30", "10:30")
+    stops[1] = ("osm:node/999", "10:45", "11:15")
+    report = run(make_itinerary(make_day(stops)))
+    codes = [issue.code for issue in report.issues]
+    assert codes.count(IssueCode.UNKNOWN_PLACE) == 2
+    assert IssueCode.DUPLICATE_PLACE not in codes
+
+
 def test_duplicate_place_across_days() -> None:
     day2 = make_day(VALID_DAY, date=DAY1 + dt.timedelta(days=1))
     report = run(make_itinerary(make_day(VALID_DAY), day2), make_request(num_days=2))

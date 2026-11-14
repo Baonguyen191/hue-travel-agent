@@ -53,6 +53,14 @@ def test_newline_in_name_does_not_break_the_row() -> None:
     assert "t:c | Cà phê C | cafe" in content
 
 
+def test_pipe_in_place_name_does_not_break_the_row() -> None:
+    place = make_place("t:p", Category.CAFE, name="Cà phê | Muối")
+    content = build_messages(REQUEST, [place])[1]["content"]
+    [row] = [line for line in content.splitlines() if line.startswith("t:p ")]
+    assert row.count("|") == 4
+    assert "t:p | Cà phê / Muối | cafe" in row
+
+
 def test_messages_match_snapshot() -> None:
     """Đổi prompt là đổi dữ liệu train. Test này vỡ có chủ đích khi prompt đổi."""
     messages = build_messages(REQUEST, CANDIDATES)

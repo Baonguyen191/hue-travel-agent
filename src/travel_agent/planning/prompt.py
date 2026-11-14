@@ -68,7 +68,7 @@ def format_request(request: PlanRequest) -> str:
 
 
 def format_candidate(place: Place) -> str:
-    name = " ".join(place.name.split())
+    name = " ".join(place.name.split()).replace("|", "/")  # "|" là ký tự ngăn cột
     hours = place.opening_hours_raw or "unknown"
     coords = f"{place.coords.lat:.4f},{place.coords.lon:.4f}"
     return f"{place.id} | {name} | {place.category.value} | {coords} | {hours}"
