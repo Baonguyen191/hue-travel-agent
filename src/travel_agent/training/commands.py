@@ -77,13 +77,24 @@ def file_sha256(path: Path) -> str:
 
 
 def current_commit() -> str:
+    """Commit đang chạy; thêm `-dirty` khi file đã track có thay đổi chưa commit.
+
+    File chưa track (ví dụ báo cáo eval mới sinh) không tính, vì không đổi code đang chạy.
+    """
     try:
-        result = subprocess.run(
+        head = subprocess.run(
             ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True
+        )
+        status = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            capture_output=True,
+            text=True,
+            check=True,
         )
     except (OSError, subprocess.CalledProcessError):
         return "unknown"
-    return result.stdout.strip()
+    commit = head.stdout.strip()
+    return f"{commit}-dirty" if status.stdout.strip() else commit
 
 
 def _load_baseline(path: Path) -> tuple[dict[str, object], EvalSummary] | None:

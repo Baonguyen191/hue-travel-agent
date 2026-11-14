@@ -1,6 +1,7 @@
 import hashlib
 import json
 import sqlite3
+import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -283,3 +284,28 @@ def test_eval_keeps_outcomes_written_before_a_generation_error(
     assert len(lines) == 2
     assert all(json.loads(line)["raw"] == "không phải json" for line in lines)
     assert not out.exists()  # báo cáo tổng hợp chỉ ghi khi chạy xong
+
+
+def _fake_git(monkeypatch: pytest.MonkeyPatch, status: str) -> list[list[str]]:
+    outputs = {
+        ("git", "rev-parse", "HEAD"): "abc123\n",
+        ("git", "status", "--porcelain", "--untracked-files=no"): status,
+    }
+    calls: list[list[str]] = []
+
+    def fake_run(cmd: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        calls.append(cmd)
+        return subprocess.CompletedProcess(cmd, 0, stdout=outputs[tuple(cmd)], stderr="")
+
+    monkeypatch.setattr(commands.subprocess, "run", fake_run)
+    return calls
+
+
+def test_current_commit_marks_dirty_tree(monkeypatch: pytest.MonkeyPatch) -> None:
+    _fake_git(monkeypatch, " M src/x.py\n")
+    assert commands.current_commit() == "abc123-dirty"
+
+
+def test_current_commit_clean_tree(monkeypatch: pytest.MonkeyPatch) -> None:
+    _fake_git(monkeypatch, "")
+    assert commands.current_commit() == "abc123"

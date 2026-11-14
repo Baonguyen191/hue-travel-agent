@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from tests.planning.factories import make_request
 from travel_agent.domain.models import Pace
 from travel_agent.planning.candidates import INTEREST_CATEGORIES
@@ -62,3 +64,8 @@ def test_write_then_read_roundtrip(tmp_path: Path) -> None:
     write_eval_set(entries, path)
     assert read_eval_set(path) == entries
     assert len(read_eval_set(path, Split.TEST)) == TEST_SIZE
+
+
+def test_generate_requests_refuses_impossible_count() -> None:
+    with pytest.raises(ValueError, match="không đủ request khác nhau"):
+        generate_requests(10**9, seed=1, max_attempts=1000)

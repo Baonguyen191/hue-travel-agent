@@ -55,10 +55,21 @@ def _random_request(rng: random.Random) -> PlanRequest:
     )
 
 
-def generate_requests(count: int, seed: int) -> list[PlanRequest]:
+ATTEMPTS_PER_REQUEST = 100
+
+
+def generate_requests(count: int, seed: int, max_attempts: int | None = None) -> list[PlanRequest]:
+    """`count` request khác nhau; báo lỗi thay vì lặp mãi khi không gian request không đủ lớn."""
     rng = random.Random(seed)
+    limit = count * ATTEMPTS_PER_REQUEST if max_attempts is None else max_attempts
     by_key: dict[str, PlanRequest] = {}
+    attempts = 0
     while len(by_key) < count:
+        if attempts >= limit:
+            raise ValueError(
+                f"không đủ request khác nhau: cần {count}, có {len(by_key)} sau {limit} lần thử"
+            )
+        attempts += 1
         request = _random_request(rng)
         by_key.setdefault(request_key(request), request)
     return list(by_key.values())
