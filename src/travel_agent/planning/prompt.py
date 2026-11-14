@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import unicodedata
 from collections.abc import Sequence
 
 from travel_agent.domain.models import Itinerary, Place, PlanRequest, TravelMode
@@ -71,7 +72,10 @@ def format_request(request: PlanRequest) -> str:
 
 
 def format_candidate(place: Place) -> str:
-    name = " ".join(place.name.split()).replace("|", "/")  # "|" là ký tự ngăn cột
+    # NFC: một số tên trong DB ở dạng dấu tách rời. Tokenizer Hugging Face chuẩn hóa NFC còn
+    # llama.cpp (Ollama) thì không, nên phải chuẩn hóa ở đây để lúc train và lúc chạy cùng ký tự.
+    name = unicodedata.normalize("NFC", " ".join(place.name.split()))
+    name = name.replace("|", "/")  # "|" là ký tự ngăn cột
     hours = place.opening_hours_raw or "unknown"
     coords = f"{place.coords.lat:.4f},{place.coords.lon:.4f}"
     return f"{place.id} | {name} | {place.category.value} | {coords} | {hours}"
@@ -124,7 +128,8 @@ def format_issue(issue: Issue) -> str:
     if issue.place_id is not None:
         position.append(issue.place_id)
     where = f" ({', '.join(position)})" if position else ""
-    return f"- {issue.code.value}{where}: {issue.message}"
+    # Message của validator chứa tên địa điểm: chuẩn hóa NFC như format_candidate.
+    return f"- {issue.code.value}{where}: {unicodedata.normalize('NFC', issue.message)}"
 
 
 def build_messages(

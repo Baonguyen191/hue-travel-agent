@@ -1,6 +1,7 @@
 import datetime as dt
 import json
 import os
+import unicodedata
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,7 @@ from travel_agent.domain.models import Category, Itinerary, PlannedDay, PlannedS
 from travel_agent.planning.prompt import (
     SYSTEM_PROMPT,
     build_messages,
+    format_candidate,
     format_issue,
     format_itinerary,
 )
@@ -182,3 +184,18 @@ def test_repair_messages_match_snapshot() -> None:
             json.dumps(messages, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
     assert messages == json.loads(REPAIR_SNAPSHOT.read_text(encoding="utf-8"))
+
+
+def test_candidate_names_are_nfc_normalised() -> None:
+    decomposed = unicodedata.normalize("NFD", "Chùa Bảo Lâm")
+    assert decomposed != "Chùa Bảo Lâm"
+    place = make_place("t:nfd", Category.RELIGIOUS, name=decomposed)
+    row = format_candidate(place)
+    assert "t:nfd | Chùa Bảo Lâm | religious" in row
+    assert unicodedata.is_normalized("NFC", row)
+
+
+def test_issue_messages_are_nfc_normalised() -> None:
+    message = unicodedata.normalize("NFD", "Chùa Bảo Lâm không mở cửa")
+    issue = Issue(code=IssueCode.CLOSED_DURING_VISIT, severity=Severity.ERROR, message=message)
+    assert format_issue(issue) == "- closed_during_visit: Chùa Bảo Lâm không mở cửa"
