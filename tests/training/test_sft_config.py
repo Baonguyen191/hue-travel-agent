@@ -40,6 +40,8 @@ def test_heavy_outputs_live_outside_the_repo() -> None:
         ("model.language_model.layers.3.self_attn.q_proj", True),
         ("model.language_model.layers.0.linear_attn.in_proj_qkv", True),
         ("model.language_model.layers.31.mlp.down_proj", True),
+        ("model.layers.7.self_attn.o_proj", True),
+        ("model.layers.0.linear_attn.out_proj", True),
         ("model.language_model.layers.0.linear_attn.in_proj_a", False),
         ("mtp.layers.0.self_attn.q_proj", False),
         ("model.visual.blocks.0.attn.qkv", False),

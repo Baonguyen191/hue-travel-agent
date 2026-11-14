@@ -23,9 +23,10 @@ sft:
     r: 16
     alpha: 32
     dropout: 0.0
-    # Chỉ lớp text. Regex đầy đủ của PEFT; không gắn vào model.visual.* và mtp.*.
+    # Chỉ lớp text. Regex đầy đủ của PEFT; không gắn vào model.visual.* và mtp.*. Tiền tố
+    # language_model. có khi nạp bản đa phương thức, không có khi nạp Qwen3_5ForCausalLM.
     target_modules: >-
-      model\.language_model\.layers\.\d+\.(self_attn\.(q_proj|k_proj|v_proj|o_proj)|linear_attn\.(in_proj_qkv|in_proj_z|out_proj)|mlp\.(gate_proj|up_proj|down_proj))
+      model\.(language_model\.)?layers\.\d+\.(self_attn\.(q_proj|k_proj|v_proj|o_proj)|linear_attn\.(in_proj_qkv|in_proj_z|out_proj)|mlp\.(gate_proj|up_proj|down_proj))
   quantization:
     load_in_4bit: true
     quant_type: nf4
