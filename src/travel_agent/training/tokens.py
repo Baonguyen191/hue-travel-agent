@@ -1,7 +1,8 @@
 """Đếm token của một mẫu chat theo đúng tokenizer và chat template của model sẽ train.
 
 Không có xấp xỉ: nếu không nạp được tokenizer thật thì báo `TokenizerUnavailable`, để bước kiểm
-dataset nói rõ là chưa kiểm độ dài thay vì đưa ra một con số đoán.
+dataset nói rõ là chưa kiểm độ dài thay vì đưa ra một con số đoán. Render và tokenize nằm ở
+`training/chat.py`, dùng chung với bước tokenize khi train.
 """
 
 from __future__ import annotations
@@ -9,16 +10,25 @@ from __future__ import annotations
 import os
 from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
-from typing import Any
+
+from travel_agent.training.chat import (
+    CHAT_TEMPLATE_FILE,
+    TOKENIZER_FILE,
+    ChatTokenizer,
+    TokenizerUnavailable,
+)
+
+__all__ = [
+    "CHAT_TEMPLATE_FILE",
+    "TOKENIZER_FILE",
+    "TokenCounter",
+    "TokenizerUnavailable",
+    "hf_hub_cache",
+    "hf_snapshot_dir",
+    "load_chat_token_counter",
+]
 
 TokenCounter = Callable[[Sequence[Mapping[str, str]]], int]
-
-TOKENIZER_FILE = "tokenizer.json"
-CHAT_TEMPLATE_FILE = "chat_template.jinja"
-
-
-class TokenizerUnavailable(RuntimeError):
-    """Không nạp được tokenizer thật (thiếu thư viện hoặc thiếu file)."""
 
 
 def hf_hub_cache() -> Path:
@@ -41,37 +51,4 @@ def load_chat_token_counter(model_dir: Path) -> TokenCounter:
 
     Đây là chuỗi mà bước SFT đưa vào model, nên số token so thẳng được với `max_seq`.
     """
-    try:
-        from jinja2.ext import loopcontrols
-        from jinja2.sandbox import ImmutableSandboxedEnvironment
-        from tokenizers import Tokenizer
-    except ImportError as exc:  # extra `dataset` chưa cài
-        raise TokenizerUnavailable(f"thiếu thư viện để đếm token: {exc.name}") from exc
-
-    tokenizer_path = model_dir / TOKENIZER_FILE
-    template_path = model_dir / CHAT_TEMPLATE_FILE
-    for path in (tokenizer_path, template_path):
-        if not path.is_file():
-            raise TokenizerUnavailable(f"không thấy {path}")
-    tokenizer = Tokenizer.from_file(str(tokenizer_path))
-
-    def raise_exception(message: str) -> None:
-        raise ValueError(f"chat template báo lỗi: {message}")
-
-    # Cùng thiết lập transformers dùng khi render chat template.
-    env = ImmutableSandboxedEnvironment(
-        trim_blocks=True, lstrip_blocks=True, extensions=[loopcontrols]
-    )
-    env.globals["raise_exception"] = raise_exception
-    template = env.from_string(template_path.read_text(encoding="utf-8"))
-
-    def count(messages: Sequence[Mapping[str, str]]) -> int:
-        context: dict[str, Any] = {
-            "messages": [dict(message) for message in messages],
-            "add_generation_prompt": False,
-            "enable_thinking": False,
-        }
-        text = template.render(**context)
-        return len(tokenizer.encode(text, add_special_tokens=False).ids)
-
-    return count
+    return ChatTokenizer.from_dir(model_dir).count
