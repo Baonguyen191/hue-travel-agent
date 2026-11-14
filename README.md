@@ -80,10 +80,10 @@ travel-agent links --db data\hue.sqlite --status new
 
 Thiết kế: `docs/superpowers/specs/2026-11-11-sft-rl-training-design.md`.
 
-Cài thêm công cụ MLOps:
+Cài thêm công cụ MLOps và thư viện đếm token cho bước kiểm dataset:
 
 ```powershell
-.venv\Scripts\python -m pip install -e ".[dev,mlops]"
+.venv\Scripts\python -m pip install -e ".[dev,mlops,dataset]"
 ```
 
 Cấu hình một lần trên mỗi máy (cache DVC, DVC remote và MLflow nằm ngoài OneDrive):
@@ -100,8 +100,29 @@ Chạy pipeline (cần Ollama đang chạy và đã pull model ghi trong `config
 .venv\Scripts\Activate.ps1
 $env:PYTHONPATH="src"
 dvc repro baseline_eval
+dvc repro check_dataset
 dvc metrics show
 ```
+
+Dataset SFT (stage `build_dataset` và `check_dataset`, tham số trong `configs/dataset.yaml`):
+
+```powershell
+python -m travel_agent build-dataset --config configs/dataset.yaml --db data/hue.sqlite --evalset data/eval/hue_eval_v1.jsonl --out data/sft/hue_sft_v1.jsonl --manifest data/sft/manifest.json
+python -m travel_agent check-dataset --config configs/dataset.yaml --db data/hue.sqlite --evalset data/eval/hue_eval_v1.jsonl --dataset data/sft/hue_sft_v1.jsonl --out reports/dataset/check.json
+```
+
+- `build-dataset` loại mọi request trùng bộ eval (cả dev và test). Cùng config cho ra cùng file đến từng byte.
+- `check-dataset` đếm token bằng tokenizer của `Qwen/Qwen3.5-4B` trong cache Hugging Face (repo và revision ghi trong config). Không nạp được tokenizer thì lệnh hỏng; `--allow-skip-tokens` cho qua nhưng báo cáo ghi `token_check: skipped`. `--tokenizer-dir` trỏ tới thư mục tokenizer khác.
+
+Exit code của `eval`, `build-dataset` và `check-dataset`:
+
+| Mã | Nghĩa |
+|---|---|
+| 0 | Chạy xong, qua cổng |
+| 1 | Crash (traceback của Python) |
+| 2 | Sai cách dùng, thiếu file, hoặc báo cáo mốc chạy khác điều kiện nên không so được |
+| 3 | `eval` không qua cổng so với mốc |
+| 4 | Dataset không đạt: `build-dataset` không đủ mẫu, hoặc `check-dataset` hỏng |
 
 - **Bộ eval:** `data/eval/hue_eval_v1.jsonl`, 70 dev và 30 test. Stage `make_evalset` đã đóng băng;
   không sinh lại. Lệnh `eval --split test` cần thêm `--allow-test` và chỉ dùng cho lần so sánh cuối.

@@ -47,11 +47,11 @@ Mục tiêu: xác định nguyên nhân model luôn trả 1 ngày (open-items m�
 
 **Files:** chỉ script tạm trong scratchpad; không commit.
 
-- [ ] **Step 1:** Chọn 5 request dev có `num_days` 2 hoặc 3 từ `data/eval/hue_eval_v1.jsonl`.
-- [ ] **Step 2:** Với mỗi request, gọi Ollama `qwen3.5:4b` hai lần qua `OllamaGenerator` với cùng `build_messages(request, select_candidates(request, places, candidate_seed(key)))`:
+- [x] **Step 1:** Chọn 5 request dev có `num_days` 2 hoặc 3 từ `data/eval/hue_eval_v1.jsonl`.
+- [x] **Step 2:** Với mỗi request, gọi Ollama `qwen3.5:4b` hai lần qua `OllamaGenerator` với cùng `build_messages(request, select_candidates(request, places, candidate_seed(key)))`:
   - lần A: `ITINERARY_FORMAT_SCHEMA` hiện tại;
   - lần B: bản sao của schema, với `days.minItems = days.maxItems = num_days`.
-- [ ] **Step 3:** Ghi số ngày trả về của từng lần vào bảng.
+- [x] **Step 3:** Ghi số ngày trả về của từng lần vào bảng.
 
 **Điều kiện xong:**
 - Lần B trả đúng số ngày ở cả 5 request: nguyên nhân là schema. Làm tiếp Task 2.
@@ -68,7 +68,7 @@ Mục tiêu: xác định nguyên nhân model luôn trả 1 ngày (open-items m�
 - Produces: `itinerary_format_schema(num_days: int | None) -> dict[str, Any]`; `PlanGenerator.generate(messages, format_schema: dict[str, Any] | None = None) -> Generation`.
 - `ITINERARY_FORMAT_SCHEMA = itinerary_format_schema(None)`. Giữ tên này để test đối chiếu schema với `Itinerary` vẫn chạy.
 
-- [ ] **Step 1: Test viết trước** (thêm vào `tests/training/test_generator.py`):
+- [x] **Step 1: Test viết trước** (thêm vào `tests/training/test_generator.py`):
 
 ```python
 from travel_agent.training.generator import ITINERARY_FORMAT_SCHEMA, itinerary_format_schema
@@ -110,9 +110,9 @@ def test_no_schema_mode_ignores_per_call_schema() -> None:
 
 Thêm vào `tests/training/test_runner.py` một test: generator giả ghi lại `format_schema` nhận được; với entry `num_days=2`, `format_schema["properties"]["days"]["maxItems"] == 2`.
 
-- [ ] **Step 2:** `python -m pytest tests/training/test_generator.py tests/training/test_runner.py -v`. Mong đợi: FAIL vì `itinerary_format_schema` chưa có.
+- [x] **Step 2:** `python -m pytest tests/training/test_generator.py tests/training/test_runner.py -v`. Mong đợi: FAIL vì `itinerary_format_schema` chưa có.
 
-- [ ] **Step 3: Code.** Trong `generator.py`, đổi hằng số thành hàm:
+- [x] **Step 3: Code.** Trong `generator.py`, đổi hằng số thành hàm:
 
 ```python
 def itinerary_format_schema(num_days: int | None) -> dict[str, Any]:
@@ -135,8 +135,8 @@ ITINERARY_FORMAT_SCHEMA: dict[str, Any] = itinerary_format_schema(None)
 
 Trong `runner.py`: `generator.generate(messages, format_schema=itinerary_format_schema(entry.request.num_days))`. Cập nhật mọi generator giả trong test cho khớp chữ ký mới.
 
-- [ ] **Step 4:** Chạy lại test ở Step 2. Mong đợi: PASS. Chạy `check.ps1`.
-- [ ] **Step 5:** Commit `feat: pin itinerary day count in the per-request output schema`.
+- [x] **Step 4:** Chạy lại test ở Step 2. Mong đợi: PASS. Chạy `check.ps1`.
+- [x] **Step 5:** Commit `feat: pin itinerary day count in the per-request output schema`.
 
 ### Task 3: Lọc candidate theo bán kính
 
@@ -147,7 +147,7 @@ Trong `runner.py`: `generator.generate(messages, format_schema=itinerary_format_
 **Interfaces:**
 - Produces: `CITY_CENTER: Coordinates`, `MAX_RADIUS_KM: dict[TravelMode, float]`, `within_radius(place, mode) -> bool`. `select_candidates` giữ nguyên chữ ký.
 
-- [ ] **Step 1: Test viết trước.** Trong `factories.py`, `make_request` nhận thêm `travel_mode: TravelMode = TravelMode.MOTORBIKE`. Thêm vào `test_candidates.py`:
+- [x] **Step 1: Test viết trước.** Trong `factories.py`, `make_request` nhận thêm `travel_mode: TravelMode = TravelMode.MOTORBIKE`. Thêm vào `test_candidates.py`:
 
 ```python
 from travel_agent.domain.models import TravelMode
@@ -180,9 +180,9 @@ def test_select_candidates_drops_places_outside_radius() -> None:
     assert "t:mid" in car
 ```
 
-- [ ] **Step 2:** `python -m pytest tests/planning/test_candidates.py -v`. Mong đợi: FAIL vì `within_radius` chưa có.
+- [x] **Step 2:** `python -m pytest tests/planning/test_candidates.py -v`. Mong đợi: FAIL vì `within_radius` chưa có.
 
-- [ ] **Step 3: Code** trong `candidates.py`:
+- [x] **Step 3: Code** trong `candidates.py`:
 
 ```python
 from travel_agent.domain.models import Category, Coordinates, Pace, Place, PlanRequest, TravelMode
@@ -204,8 +204,8 @@ def within_radius(place: Place, mode: TravelMode) -> bool:
 
 Dòng đầu của `select_candidates`: `places = [p for p in places if within_radius(p, request.travel_mode)]`. Cập nhật docstring của module.
 
-- [ ] **Step 4:** Chạy lại test. Mong đợi: PASS. Các test cũ vẫn pass vì `make_place` mặc định cách tâm khoảng 0,2 km. Chạy `check.ps1`.
-- [ ] **Step 5:** Commit `feat: limit candidates to a travel-mode radius around the citadel`.
+- [x] **Step 4:** Chạy lại test. Mong đợi: PASS. Các test cũ vẫn pass vì `make_place` mặc định cách tâm khoảng 0,2 km. Chạy `check.ps1`.
+- [x] **Step 5:** Commit `feat: limit candidates to a travel-mode radius around the citadel`.
 
 ### Task 4: Validator không phạt đôi, escape `|` trong tên
 
@@ -214,7 +214,7 @@ Dòng đầu của `select_candidates`: `places = [p for p in places if within_r
 - Modify: `src/travel_agent/planning/prompt.py` (`format_candidate`)
 - Test: `tests/validation/test_validator_structure.py`, `tests/planning/test_prompt.py`
 
-- [ ] **Step 1: Test viết trước.**
+- [x] **Step 1: Test viết trước.**
 
 ```python
 # tests/validation/test_validator_structure.py
@@ -236,12 +236,12 @@ def test_pipe_in_place_name_does_not_break_candidate_row() -> None:
     assert "Cà phê / Muối" in row
 ```
 
-- [ ] **Step 2:** Chạy hai file test. Mong đợi: FAIL.
-- [ ] **Step 3: Code.**
+- [x] **Step 2:** Chạy hai file test. Mong đợi: FAIL.
+- [x] **Step 3: Code.**
   - `validator.py`: chỉ kiểm `DUPLICATE_PLACE` khi `place is not None`. Thêm comment một dòng: id lạ đã bị báo `UNKNOWN_PLACE` ở mỗi lần xuất hiện, nên không báo trùng thêm (tránh phạt đôi trong reward, spec mục 8.1).
   - `prompt.py`: `name = " ".join(place.name.split()).replace("|", "/")`.
-- [ ] **Step 4:** Chạy lại test. Snapshot prompt phải giữ nguyên (không tên nào trong snapshot có `|`). Chạy `check.ps1`.
-- [ ] **Step 5:** Commit `fix: report a repeated unknown place once per stop and escape pipes in candidate names`.
+- [x] **Step 4:** Chạy lại test. Snapshot prompt phải giữ nguyên (không tên nào trong snapshot có `|`). Chạy `check.ps1`.
+- [x] **Step 5:** Commit `fix: report a repeated unknown place once per stop and escape pipes in candidate names`.
 
 ### Task 5: Cổng thăng hạng
 
@@ -253,7 +253,7 @@ def test_pipe_in_place_name_does_not_break_candidate_row() -> None:
 **Interfaces:**
 - Produces: `COMPARABLE_META_KEYS = ("split", "evalset_sha256", "db_sha256", "limit", "schema_format")`; `incomparable(current_meta, previous_meta) -> list[str]`; `EXIT_REGRESSION = 3`.
 
-- [ ] **Step 1: Test viết trước.**
+- [x] **Step 1: Test viết trước.**
 
 ```python
 # tests/training/test_metrics.py
@@ -288,8 +288,8 @@ Trong `tests/training/test_commands.py`:
 - Đổi kỳ vọng của test regression ở dòng 131 từ `== 1` thành `== 3`.
 - Thêm test: file mốc có `meta.db_sha256` khác DB đang dùng thì lệnh trả `2` và stderr có tên trường `db_sha256`.
 
-- [ ] **Step 2:** Chạy hai file test. Mong đợi: FAIL.
-- [ ] **Step 3: Code.**
+- [x] **Step 2:** Chạy hai file test. Mong đợi: FAIL.
+- [x] **Step 3: Code.**
   - `metrics.py`: trong `regressions`, thêm điều kiện `current.parse_error_rate > previous.parse_error_rate`, cùng định dạng thông báo với điều kiện đang có. Thêm `COMPARABLE_META_KEYS` và:
 
 ```python
@@ -302,8 +302,8 @@ def incomparable(current: Mapping[str, object], previous: Mapping[str, object]) 
     - `EXIT_REGRESSION = 3`, thêm comment: exit 1 dành cho crash.
     - `_load_baseline` trả `tuple[dict[str, object], EvalSummary] | None`, đọc cả `data["meta"]`.
     - Sau khi tính `meta`, nếu `incomparable(meta, baseline_meta)` khác rỗng: in `Không so được với mốc: khác <danh sách>` ra stderr và trả `EXIT_USAGE`. Bước này chạy trước bước so metric. Báo cáo của lần chạy vẫn được ghi ra đĩa.
-- [ ] **Step 4:** Chạy lại test. Chạy `check.ps1`.
-- [ ] **Step 5:** Commit `feat: gate on parse errors, refuse incomparable baselines, split regression exit code`.
+- [x] **Step 4:** Chạy lại test. Chạy `check.ps1`.
+- [x] **Step 5:** Commit `feat: gate on parse errors, refuse incomparable baselines, split regression exit code`.
 
 ### Task 6: Ghi cây dirty, chặn vòng lặp vô hạn
 
@@ -312,7 +312,7 @@ def incomparable(current: Mapping[str, object], previous: Mapping[str, object]) 
 - Modify: `src/travel_agent/training/requests.py` (`generate_requests`)
 - Test: `tests/training/test_commands.py`, `tests/training/test_requests.py`
 
-- [ ] **Step 1: Test viết trước.**
+- [x] **Step 1: Test viết trước.**
 
 ```python
 # tests/training/test_requests.py
@@ -345,12 +345,12 @@ def test_current_commit_clean_tree(monkeypatch: pytest.MonkeyPatch) -> None:
     assert commands.current_commit() == "abc123"
 ```
 
-- [ ] **Step 2:** Chạy test. Mong đợi: FAIL.
-- [ ] **Step 3: Code.**
+- [x] **Step 2:** Chạy test. Mong đợi: FAIL.
+- [x] **Step 3: Code.**
   - `current_commit`: sau `rev-parse`, chạy `git status --porcelain`. Có output thì thêm hậu tố `-dirty`. Lỗi khi gọi git vẫn trả `"unknown"`.
   - `generate_requests(count, seed, max_attempts=None)`: mặc định `max_attempts = count * 100`. Hết số lần thử mà chưa đủ thì `raise ValueError(f"không đủ request khác nhau: cần {count}, có {len(by_key)} sau {max_attempts} lần thử")`. Với seed của bộ eval, kết quả phải giữ nguyên: test `test_evalset_file.py` kiểm điều này.
-- [ ] **Step 4:** Chạy lại test. Chạy `check.ps1`.
-- [ ] **Step 5:** Commit `fix: mark dirty trees in run metadata and bound request generation`.
+- [x] **Step 4:** Chạy lại test. Chạy `check.ps1`.
+- [x] **Step 5:** Commit `fix: mark dirty trees in run metadata and bound request generation`.
 
 ### Task 7: Đo token, chạy lại baseline, cập nhật tài liệu
 
@@ -359,18 +359,20 @@ def test_current_commit_clean_tree(monkeypatch: pytest.MonkeyPatch) -> None:
 - Modify: `docs/superpowers/plans/2026-11-12-open-items-before-sft.md`
 - Modify: `docs/superpowers/specs/2026-11-11-sft-rl-training-design.md` (mục 2, số candidate)
 
-- [ ] **Step 1: Chạy baseline.** `dvc repro baseline_eval`. Stage chạy lại vì code trong `deps` đã đổi.
-- [ ] **Step 2: Đo token.**
+- [x] **Step 1: Chạy baseline.** `dvc repro baseline_eval`. Stage chạy lại vì code trong `deps` đã đổi.
+- [x] **Step 2: Đo token.**
   - Prompt dài nhất: lấy `max(prompt_tokens)` trong `reports/eval/baseline_dev.outcomes.jsonl`. Đây là số token thật do tokenizer Qwen của Ollama đếm.
   - Output dài nhất có thể có: dựng một itinerary 3 ngày, 8 stop mỗi ngày, dùng `place_id` thật dài nhất trong DB, `note` là null. Gửi chuỗi JSON đó làm nội dung user message tới `qwen3.5:4b` với `num_predict: 1`. Lấy `prompt_eval_count`, trừ đi số token của message rỗng gửi cùng cách.
   - Ghi hai số và tổng vào open-items mục 3. Tổng vượt 2048 thì ghi: "chặng 3 phải chọn giữa `max_seq` lớn hơn và giảm `MAX_CANDIDATES`; smoke test đo VRAM cho cả hai."
-- [ ] **Step 3: Cập nhật `reports/eval/README.md`.**
+  - Đã làm khác đi: `prompt_tokens` lớn nhất là 1.936. Độ dài output không đo qua Ollama mà đo cả mẫu bằng tokenizer và chat template thật của Qwen3.5-4B trên dataset thử 4.000 mẫu (`984b7ab`): dài nhất 3.885 token. Đã chọn `max_seq` 4096 (`c33a20e`), smoke test còn phải xác nhận VRAM.
+- [x] **Step 3: Cập nhật `reports/eval/README.md`.**
   - Thêm nhãn "trước khi sửa candidate và schema" vào dòng baseline cũ.
   - Thêm dòng baseline mới.
   - Thêm ghi chú: phân bố lỗi mới; số request nhiều ngày đạt; `prompt_tokens` lớn nhất.
-- [ ] **Step 4: Cập nhật open-items.** Ghi trạng thái cho mỗi mục 1–10: "đã sửa ở `<commit>`", hoặc "bỏ qua: lý do". Các mục nhỏ để nguyên.
-- [ ] **Step 5: Cập nhật spec mục 2,** dòng "Số candidate trong prompt": thay "Tối đa 20" bằng công thức đang dùng, kèm lý do.
-- [ ] **Step 6:** `check.ps1`, `dvc push`, commit `chore: record baseline after candidate radius and per-request schema`.
+- [x] **Step 4: Cập nhật open-items.** Ghi trạng thái cho mỗi mục 1–10: "đã sửa ở `<commit>`", hoặc "bỏ qua: lý do". Các mục nhỏ để nguyên.
+- [x] **Step 5: Cập nhật spec mục 2,** dòng "Số candidate trong prompt": thay "Tối đa 20" bằng công thức đang dùng, kèm lý do.
+- [x] **Step 6:** `check.ps1`, `dvc push`, commit `chore: record baseline after candidate radius and per-request schema`.
+  - Đã làm với commit `ce89b59` (output của lần chạy) và một commit `docs:` riêng cho tài liệu.
 
 **Điều kiện xong của plan:**
 - 10 mục đều có trạng thái.

@@ -26,7 +26,8 @@ Kết quả cuối là bảng so sánh ba mốc trên cùng một bộ eval: bas
 | Nguồn nhãn SFT | Teacher `Qwen3.8-27B` trên A100 thuê | Solver (chọn điểm theo luật + OR-Tools), lọc bằng validator. Miễn phí. |
 | Phương pháp finetune | LoRA bf16 trên GPU thuê | QLoRA 4-bit trên RTX 4060 Laptop 8GB. |
 | RL | Ngoài phạm vi (brief mục 2.2) | Thêm giai đoạn GRPO, có fallback best-of-N. |
-| Số candidate trong prompt | Tối đa 40 | Tối đa 20, để chuỗi vừa 8GB. |
+| Số candidate trong prompt | Tối đa 40 | `max(12, min(30, số stop tối đa của pace × num_days + 4))`. Validator cấm lặp `place_id`, nên 20 cố định không đủ cho plan 3 ngày packed (cần tới 24 điểm khác nhau). |
+| Khu vực candidate | Không nêu | Chỉ lấy điểm trong bán kính quanh Đại Nội, tùy phương tiện: car và motorbike 12 km, walk 2 km. |
 
 **Đánh đổi đã chấp nhận:**
 
@@ -47,7 +48,7 @@ Kết quả cuối là bảng so sánh ba mốc trên cùng một bộ eval: bas
 
 ```text
 PlanRequest
-  -> select_candidates()   tối đa 20 Place từ SQLite
+  -> select_candidates()   12–30 Place từ SQLite (công thức ở mục 2)
   -> build_messages()      prompt chat duy nhất, dùng chung mọi giai đoạn
   -> [model sinh Itinerary JSON | solver sinh nhãn]
   -> validate_itinerary()  -> ValidationReport
@@ -59,7 +60,7 @@ PlanRequest
 | Module | Trách nhiệm | Phụ thuộc |
 |---|---|---|
 | `travel_agent/validation/` | `validate_itinerary()` theo Plan 1 Task 6–7 | domain, routing |
-| `travel_agent/planning/candidates.py` | `select_candidates(request, repo, seed)`: lọc theo `interests`, giữ đa dạng `Category`, tối đa 20 | domain, `place_repository` |
+| `travel_agent/planning/candidates.py` | `select_candidates(request, repo, seed)`: lọc theo `interests` và bán kính, giữ đa dạng `Category`, số lượng theo công thức ở mục 2 | domain, `place_repository` |
 | `travel_agent/planning/prompt.py` | `build_messages(request, candidates, issues=None)`: prompt cho cả baseline, SFT, RL và runtime | domain |
 | `travel_agent/planning/solver.py` | `solve(request, candidates, travel, seed)`: chọn điểm và xếp giờ | OR-Tools, domain, routing |
 | `travel_agent/training/requests.py` | Sinh `PlanRequest` đa dạng; chia train/dev/test theo hash | domain |
@@ -108,7 +109,8 @@ Mỗi script đọc một file config YAML và không chứa logic nghiệp vụ
 ## 7. SFT
 
 - **Stack:** Unsloth, QLoRA 4-bit. Loss chỉ tính trên token của assistant.
-- **Siêu tham số khởi điểm (cần tinh chỉnh):** r=16, alpha=32, lr=2e-4, 2 epoch, `max_seq` 2048, batch 1 với gradient accumulation 8.
+- **Siêu tham số khởi điểm (cần tinh chỉnh):** r=16, alpha=32, lr=2e-4, 2 epoch, `max_seq` 4096, batch 1 với gradient accumulation 8.
+- **`max_seq` 4096:** dataset thử 4.000 mẫu đo bằng tokenizer thật có trung vị 1.694, p90 2.712, dài nhất 3.885 token; 2048 cắt mất 31% mẫu, gồm mọi plan 3 ngày moderate và packed. Smoke test phải xác nhận 4096 vừa 8 GB VRAM. `check.max_tokens` trong `configs/dataset.yaml` phải bằng giá trị này.
 - **Smoke test trước run đầy đủ:** load model 4-bit, train 20 step, đo VRAM đỉnh, merge, convert GGUF, chạy được trong Ollama.
 - **Run đầy đủ:** eval trên dev ở mỗi checkpoint. Giữ checkpoint có `first_pass_valid_rate` cao nhất.
 
@@ -242,7 +244,7 @@ build_dataset -> check_dataset -> sft -> eval_sft -> rl -> eval_rl -> export
 
 TDD cho mọi module logic thuần:
 
-- **`candidates`:** không vượt 20; có đa dạng `Category`; cùng seed cho cùng kết quả.
+- **`candidates`:** không vượt giới hạn theo công thức ở mục 2; có đa dạng `Category`; cùng seed cho cùng kết quả.
 - **`prompt`:** snapshot test. Đổi prompt thì test vỡ có chủ đích.
 - **`solver`:** mọi plan sinh ra qua validator không có ERROR; ca không khả thi trả trạng thái rõ ràng; cùng seed cho cùng plan.
 - **`reward`:** một test cho mỗi dòng trong bảng reward; JSON hỏng; kẹp dưới.
