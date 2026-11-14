@@ -48,3 +48,57 @@ stages:
     metrics:
       - reports/eval/baseline_dev.json:
           cache: false
+
+  build_dataset:
+    cmd: >-
+      python -m travel_agent build-dataset
+      --config configs/dataset.yaml
+      --db data/hue.sqlite
+      --evalset data/eval/hue_eval_v1.jsonl
+      --out data/sft/hue_sft_v1.jsonl
+      --manifest data/sft/manifest.json
+    deps:
+      - data/hue.sqlite
+      - data/eval/hue_eval_v1.jsonl
+      - src/travel_agent/planning
+      - src/travel_agent/training
+      - src/travel_agent/validation
+      - src/travel_agent/routing
+      - src/travel_agent/domain
+      - src/travel_agent/review
+      - src/travel_agent/data/place_repository.py
+    params:
+      - configs/dataset.yaml:
+          - dataset
+    outs:
+      - data/sft/hue_sft_v1.jsonl
+    metrics:
+      - data/sft/manifest.json:
+          cache: false
+
+  check_dataset:
+    # Không có cờ --allow-skip-tokens: thiếu tokenizer thật thì stage hỏng và chặn train.
+    cmd: >-
+      python -m travel_agent check-dataset
+      --config configs/dataset.yaml
+      --db data/hue.sqlite
+      --evalset data/eval/hue_eval_v1.jsonl
+      --dataset data/sft/hue_sft_v1.jsonl
+      --out reports/dataset/check.json
+    deps:
+      - data/sft/hue_sft_v1.jsonl
+      - data/hue.sqlite
+      - data/eval/hue_eval_v1.jsonl
+      - src/travel_agent/planning
+      - src/travel_agent/training
+      - src/travel_agent/validation
+      - src/travel_agent/routing
+      - src/travel_agent/domain
+      - src/travel_agent/review
+      - src/travel_agent/data/place_repository.py
+    params:
+      - configs/dataset.yaml:
+          - check
+    metrics:
+      - reports/dataset/check.json:
+          cache: false
