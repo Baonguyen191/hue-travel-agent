@@ -367,7 +367,10 @@ def _route(
         windows = [w for day in sorted(node.arrivals) for w in node.arrivals[day]]
         cumul = time_dim.CumulVar(index)
         cumul.SetRange(windows[0][0], windows[-1][1])
-        time_dim.SetCumulVarSoftUpperBound(index, 0, EARLY_COST_PER_MINUTE)  # chi phí = giờ đến
+        if node.slot is None:
+            # Chi phí = giờ đến. Không áp cho bữa ăn, để giờ ăn theo lịch tham quan quanh nó thay
+            # vì luôn dính vào đầu khung bữa (11:00, 17:30).
+            time_dim.SetCumulVarSoftUpperBound(index, 0, EARLY_COST_PER_MINUTE)
         for (_, prev_end), (next_start, _) in itertools.pairwise(windows):
             if next_start > prev_end + 1:
                 cumul.RemoveInterval(prev_end + 1, next_start - 1)
