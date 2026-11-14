@@ -5,6 +5,7 @@ from tests.validation.factories import FixedTravelTime
 from travel_agent.training.metrics import (
     EvalSummary,
     PlanOutcome,
+    incomparable,
     regressions,
     score_output,
     summarize,
@@ -144,6 +145,35 @@ def test_regression_when_valid_rate_drops() -> None:
     problems = regressions(_summary(0.4), _summary(0.5))
     assert len(problems) == 1
     assert "first_pass_valid_rate" in problems[0]
+
+
+def test_regression_when_parse_error_rate_rises() -> None:
+    worse = _summary(0.5).model_copy(update={"parse_error_rate": 0.2})
+    problems = regressions(worse, _summary(0.5))
+    assert len(problems) == 1
+    assert "parse_error_rate" in problems[0]
+
+
+BASE_META: dict[str, object] = {
+    "split": "dev",
+    "evalset_sha256": "a",
+    "db_sha256": "b",
+    "limit": "all",
+    "schema_format": True,
+    "model": "m1",
+}
+
+
+def test_incomparable_lists_each_differing_condition() -> None:
+    assert incomparable(BASE_META, dict(BASE_META)) == []
+    assert incomparable({**BASE_META, "model": "m2"}, BASE_META) == []  # model được phép khác
+    changed = {**BASE_META, "db_sha256": "c", "limit": 5}
+    assert incomparable(changed, BASE_META) == ["db_sha256", "limit"]
+
+
+def test_incomparable_treats_missing_condition_as_different() -> None:
+    old = {key: value for key, value in BASE_META.items() if key != "schema_format"}
+    assert incomparable(BASE_META, old) == ["schema_format"]
 
 
 def test_no_regression_when_equal_or_better() -> None:

@@ -15,14 +15,21 @@ from travel_agent.review.models import ReviewStatus
 from travel_agent.review.store import ReviewStore
 from travel_agent.routing.travel_time import HaversineEstimator
 from travel_agent.training.generator import DEFAULT_HOST, OllamaGenerator
-from travel_agent.training.metrics import EvalSummary, PlanOutcome, regressions, summarize
+from travel_agent.training.metrics import (
+    EvalSummary,
+    PlanOutcome,
+    incomparable,
+    regressions,
+    summarize,
+)
 from travel_agent.training.requests import Split, build_eval_set, read_eval_set, write_eval_set
 from travel_agent.training.runner import run_eval
 from travel_agent.training.tracking import log_eval_run
 
 EXIT_OK = 0
-EXIT_REGRESSION = 1
-EXIT_USAGE = 2
+# 1 là exit code mặc định của Python khi crash; không dùng cho kết quả của cổng.
+EXIT_USAGE = 2  # sai cách dùng, hoặc báo cáo mốc chạy khác điều kiện
+EXIT_REGRESSION = 3
 
 
 def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -47,7 +54,11 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     run.add_argument("--no-schema", action="store_true", help='Dùng format "json" thay schema')
     run.add_argument("--run-name", default="eval")
     run.add_argument("--mlflow", action="store_true", help="Ghi tham số và metric vào MLflow")
-    run.add_argument("--baseline", type=Path, help="File kết quả mốc trước; kém hơn thì exit 1")
+    run.add_argument(
+        "--baseline",
+        type=Path,
+        help="File kết quả mốc trước; khác điều kiện chạy thì exit 2, kém hơn thì exit 3",
+    )
     run.set_defaults(func=_cmd_eval)
 
 
@@ -75,11 +86,14 @@ def current_commit() -> str:
     return result.stdout.strip()
 
 
-def _load_baseline(path: Path) -> EvalSummary | None:
-    """Đọc phần summary của file mốc; in lỗi tiếng Việt và trả None nếu thiếu hoặc sai dạng."""
+def _load_baseline(path: Path) -> tuple[dict[str, object], EvalSummary] | None:
+    """Đọc meta và summary của file mốc; in lỗi tiếng Việt và trả None nếu thiếu hoặc sai dạng."""
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
-        return EvalSummary.model_validate(data["summary"])
+        meta = data["meta"]
+        if not isinstance(meta, dict):
+            raise TypeError("meta không phải object")
+        return meta, EvalSummary.model_validate(data["summary"])
     except OSError:
         print(f"Không đọc được file mốc {path}.", file=sys.stderr)
     except (ValueError, KeyError, TypeError) as exc:
@@ -110,7 +124,7 @@ def _cmd_eval(args: argparse.Namespace) -> int:
         print("Bộ test đóng băng. Thêm --allow-test khi chạy so sánh cuối.", file=sys.stderr)
         return EXIT_USAGE
 
-    baseline: EvalSummary | None = None
+    baseline: tuple[dict[str, object], EvalSummary] | None = None
     if args.baseline is not None:
         baseline = _load_baseline(args.baseline)
         if baseline is None:
@@ -172,7 +186,12 @@ def _cmd_eval(args: argparse.Namespace) -> int:
     if args.mlflow:
         log_eval_run(args.run_name, meta, summary)
     if baseline is not None:
-        problems = regressions(summary, baseline)
+        baseline_meta, baseline_summary = baseline
+        differing = incomparable(meta, baseline_meta)
+        if differing:
+            print(f"Không so được với mốc: khác {', '.join(differing)}.", file=sys.stderr)
+            return EXIT_USAGE
+        problems = regressions(summary, baseline_summary)
         for problem in problems:
             print(f"KHÔNG QUA CỔNG: {problem}", file=sys.stderr)
         if problems:

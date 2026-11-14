@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import statistics
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 
 from pydantic import BaseModel, Field
 
@@ -114,4 +114,18 @@ def regressions(current: EvalSummary, previous: EvalSummary) -> list[str]:
             f"first_pass_valid_rate giảm: {current.first_pass_valid_rate:.3f} "
             f"< {previous.first_pass_valid_rate:.3f}"
         )
+    if current.parse_error_rate > previous.parse_error_rate:
+        problems.append(
+            f"parse_error_rate tăng: {current.parse_error_rate:.3f} "
+            f"> {previous.parse_error_rate:.3f}"
+        )
     return problems
+
+
+# Điều kiện chạy phải giống nhau thì hai báo cáo mới so được. Model và run_name được phép khác.
+COMPARABLE_META_KEYS = ("split", "evalset_sha256", "db_sha256", "limit", "schema_format")
+
+
+def incomparable(current: Mapping[str, object], previous: Mapping[str, object]) -> list[str]:
+    """Tên các điều kiện chạy khác nhau; thiếu ở một bên cũng tính là khác."""
+    return [key for key in COMPARABLE_META_KEYS if current.get(key) != previous.get(key)]

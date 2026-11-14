@@ -128,7 +128,28 @@ def test_eval_fails_gate_against_better_baseline(
     better["summary"]["first_pass_valid_rate"] = 0.5
     baseline = tmp_path / "baseline.json"
     baseline.write_text(json.dumps(better), encoding="utf-8")
-    assert run_eval_cmd(db, evalset, tmp_path / "second.json", "--baseline", str(baseline)) == 1
+    assert run_eval_cmd(db, evalset, tmp_path / "second.json", "--baseline", str(baseline)) == 3
+
+
+def test_eval_refuses_baseline_run_under_other_conditions(
+    db: Path,
+    evalset: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    monkeypatch.setattr(commands, "OllamaGenerator", FakeGenerator)
+    first = tmp_path / "first.json"
+    assert run_eval_cmd(db, evalset, first) == 0
+    other = json.loads(first.read_text(encoding="utf-8"))
+    other["meta"]["db_sha256"] = "0" * 64
+    baseline = tmp_path / "baseline.json"
+    baseline.write_text(json.dumps(other), encoding="utf-8")
+    capsys.readouterr()
+    second = tmp_path / "second.json"
+    assert run_eval_cmd(db, evalset, second, "--baseline", str(baseline)) == 2
+    assert "db_sha256" in capsys.readouterr().err
+    assert second.exists()  # báo cáo của lần chạy vẫn được ghi
 
 
 def test_eval_refuses_test_split_without_flag(
