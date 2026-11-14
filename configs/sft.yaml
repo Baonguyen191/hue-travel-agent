@@ -1,0 +1,55 @@
+# Tham số SFT (spec mục 7, plan 4). Script scripts/train/*.py đọc file này; DVC theo dõi mục
+# `sft` và `export`. Output nặng nằm ngoài OneDrive, dưới runs_dir/<run_name>/.
+sft:
+  run_name: sft-v1
+  # Python của venv train (torch, transformers, peft, trl). Đường dẫn theo máy.
+  python: C:/dev/venvs/travel/Scripts/python.exe
+  runs_dir: C:/dev/travelagent-runs/sft
+  dataset: data/sft/hue_sft_v1.jsonl
+  base_model:
+    repo: Qwen/Qwen3.5-4B
+    # Cùng revision với configs/dataset.yaml: check.tokenizer, để số token đếm lúc kiểm dataset
+    # đúng với lúc train.
+    revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+    license: Apache-2.0
+    # Snapshot trong cache không có file LICENSE (chỉ tải trọng số, tokenizer, config). Danh sách
+    # file của repo có LICENSE 11.544 byte. Giá trị trên lấy từ `ollama show qwen3.5:4b`; plan 4
+    # Task 1 tải LICENSE để xác nhận.
+    license_source: ollama show qwen3.5:4b, LICENSE chưa có trong snapshot
+  seed: 3407
+  # Bằng configs/dataset.yaml: check.max_tokens. Mẫu dài nhất 3.885 token.
+  max_seq: 4096
+  lora:
+    r: 16
+    alpha: 32
+    dropout: 0.0
+    # Chỉ lớp text. Regex đầy đủ của PEFT; không gắn vào model.visual.* và mtp.*.
+    target_modules: >-
+      model\.language_model\.layers\.\d+\.(self_attn\.(q_proj|k_proj|v_proj|o_proj)|linear_attn\.(in_proj_qkv|in_proj_z|out_proj)|mlp\.(gate_proj|up_proj|down_proj))
+  quantization:
+    load_in_4bit: true
+    quant_type: nf4
+    double_quant: true
+    compute_dtype: bfloat16
+  train:
+    epochs: 2
+    learning_rate: 2.0e-4
+    per_device_batch_size: 1
+    gradient_accumulation_steps: 8
+    lr_scheduler: cosine
+    warmup_ratio: 0.03
+    weight_decay: 0.0
+    optimizer: paged_adamw_8bit
+    gradient_checkpointing: true
+    logging_steps: 10
+    save_steps: 250
+  smoke:
+    max_steps: 20
+export:
+  # Step của checkpoint thắng (plan 4 mục 2). null cho tới khi đã eval các checkpoint.
+  checkpoint: null
+  quantization: Q4_K_M
+  llama_cpp_dir: C:/dev/llama.cpp
+  # Model Ollama làm mẫu: Modelfile của SFT chép từ đây, chỉ thay FROM của trọng số text.
+  template_model: qwen3.5:4b
+  ollama_model: travel-sft-v1
