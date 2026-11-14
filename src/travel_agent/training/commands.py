@@ -1,4 +1,4 @@
-"""Lệnh CLI cho eval: make-evalset, eval."""
+"""Lệnh CLI cho eval và dataset: make-evalset, eval, build-dataset, check-dataset."""
 
 from __future__ import annotations
 
@@ -7,13 +7,25 @@ import hashlib
 import json
 import subprocess
 import sys
+import time
+from collections.abc import Sequence
 from pathlib import Path
 from typing import TextIO
 
+from travel_agent.data.place_repository import InMemoryPlaceRepository
 from travel_agent.domain.models import Place
 from travel_agent.review.models import ReviewStatus
 from travel_agent.review.store import ReviewStore
 from travel_agent.routing.travel_time import HaversineEstimator
+from travel_agent.training.dataset import (
+    CheckParams,
+    build_manifest,
+    build_samples,
+    eval_keys,
+    load_config,
+    write_samples,
+)
+from travel_agent.training.dataset_check import check_dataset
 from travel_agent.training.generator import DEFAULT_HOST, OllamaGenerator
 from travel_agent.training.metrics import (
     EvalSummary,
@@ -24,12 +36,19 @@ from travel_agent.training.metrics import (
 )
 from travel_agent.training.requests import Split, build_eval_set, read_eval_set, write_eval_set
 from travel_agent.training.runner import run_eval
+from travel_agent.training.tokens import (
+    TokenCounter,
+    TokenizerUnavailable,
+    hf_snapshot_dir,
+    load_chat_token_counter,
+)
 from travel_agent.training.tracking import log_eval_run
 
 EXIT_OK = 0
 # 1 là exit code mặc định của Python khi crash; không dùng cho kết quả của cổng.
 EXIT_USAGE = 2  # sai cách dùng, hoặc báo cáo mốc chạy khác điều kiện
 EXIT_REGRESSION = 3
+EXIT_DATASET_INVALID = 4  # dataset không đạt (build không đủ mẫu, hoặc check-dataset hỏng)
 
 
 def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -60,6 +79,35 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
         help="File kết quả mốc trước; khác điều kiện chạy thì exit 2, kém hơn thì exit 3",
     )
     run.set_defaults(func=_cmd_eval)
+
+    build = sub.add_parser(
+        "build-dataset", help="Dựng dataset SFT từ solver (configs/dataset.yaml)"
+    )
+    build.add_argument("--config", type=Path, required=True)
+    build.add_argument("--db", type=Path, required=True)
+    build.add_argument("--evalset", type=Path, required=True, help="Bộ eval; request trùng bị loại")
+    build.add_argument("--out", type=Path, required=True, help="File JSONL dataset")
+    build.add_argument("--manifest", type=Path, required=True)
+    build.set_defaults(func=_cmd_build_dataset)
+
+    check = sub.add_parser("check-dataset", help="Kiểm dataset SFT; hỏng thì exit 4")
+    check.add_argument("--config", type=Path, required=True)
+    check.add_argument("--db", type=Path, required=True)
+    check.add_argument("--evalset", type=Path, required=True)
+    check.add_argument("--dataset", type=Path, required=True)
+    check.add_argument("--out", type=Path, required=True, help="File JSON báo cáo kiểm tra")
+    check.add_argument(
+        "--tokenizer-dir",
+        type=Path,
+        help="Thư mục có tokenizer.json và chat_template.jinja; mặc định lấy theo config từ "
+        "cache Hugging Face",
+    )
+    check.add_argument(
+        "--allow-skip-tokens",
+        action="store_true",
+        help="Cho qua khi không nạp được tokenizer (báo cáo ghi token_check=skipped)",
+    )
+    check.set_defaults(func=_cmd_check_dataset)
 
 
 def load_usable_places(db: Path) -> list[Place]:
@@ -207,4 +255,97 @@ def _cmd_eval(args: argparse.Namespace) -> int:
             print(f"KHÔNG QUA CỔNG: {problem}", file=sys.stderr)
         if problems:
             return EXIT_REGRESSION
+    return EXIT_OK
+
+
+def _missing(paths: Sequence[Path]) -> bool:
+    for path in paths:
+        if not path.exists():
+            print(f"Không tìm thấy {path}.", file=sys.stderr)
+            return True
+    return False
+
+
+def _cmd_build_dataset(args: argparse.Namespace) -> int:
+    if _missing([args.config, args.db, args.evalset]):
+        return EXIT_USAGE
+    params = load_config(args.config).dataset
+    started = time.perf_counter()
+    result = build_samples(
+        params, load_usable_places(args.db), eval_keys(args.evalset), HaversineEstimator()
+    )
+    elapsed = time.perf_counter() - started
+    stats = result.stats
+    if len(result.samples) < params.target_samples:
+        print(
+            f"Chỉ dựng được {len(result.samples)}/{params.target_samples} mẫu sau "
+            f"{stats.requests_used} request; tăng max_requests. Không ghi file.",
+            file=sys.stderr,
+        )
+        return EXIT_DATASET_INVALID
+    write_samples(result.samples, args.out)
+    manifest = build_manifest(
+        params,
+        result,
+        jsonl_sha256=file_sha256(args.out),
+        db_sha256=file_sha256(args.db),
+        evalset_sha256=file_sha256(args.evalset),
+        git_commit=current_commit(),
+    )
+    args.manifest.parent.mkdir(parents=True, exist_ok=True)
+    args.manifest.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    print(f"Đã ghi {manifest['samples']} mẫu vào {args.out} ({elapsed:.0f} giây).")
+    print(f"  theo loại: {manifest['samples_by_kind']}")
+    print(f"  repair theo kiểu phá: {manifest['repair_by_corruption']}")
+    print(f"  request dùng: {stats.requests_used}, solver bỏ: {manifest['solver_dropped']}")
+    print(f"  request trùng bộ eval đã loại: {stats.eval_collisions_removed}")
+    return EXIT_OK
+
+
+def _token_counter(args: argparse.Namespace, params: CheckParams) -> TokenCounter | None:
+    model_dir = args.tokenizer_dir or hf_snapshot_dir(
+        params.tokenizer.repo, params.tokenizer.revision
+    )
+    try:
+        return load_chat_token_counter(model_dir)
+    except TokenizerUnavailable as exc:
+        print(f"Không nạp được tokenizer ({exc}).", file=sys.stderr)
+        return None
+
+
+def _cmd_check_dataset(args: argparse.Namespace) -> int:
+    if _missing([args.config, args.db, args.evalset, args.dataset]):
+        return EXIT_USAGE
+    params = load_config(args.config).check
+    counter = _token_counter(args, params)
+    places = InMemoryPlaceRepository(load_usable_places(args.db))
+    with args.dataset.open(encoding="utf-8") as handle:
+        report = check_dataset(
+            handle,
+            places,
+            eval_keys(args.evalset),
+            params,
+            HaversineEstimator(),
+            counter,
+            allow_skip_tokens=args.allow_skip_tokens,
+        )
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(report.model_dump_json(indent=2) + "\n", encoding="utf-8")
+
+    print(f"{report.samples} mẫu {report.samples_by_kind}; token_check: {report.token_check}")
+    if report.max_tokens_seen is not None:
+        print(
+            f"  mẫu dài nhất {report.max_tokens_seen} token (giới hạn {report.max_tokens_allowed})"
+        )
+    if report.token_check == "skipped":
+        print("  CẢNH BÁO: chưa kiểm độ dài token (--allow-skip-tokens).")
+    for failure in report.failures[:20]:
+        where = f"dòng {failure.line}: " if failure.line is not None else ""
+        print(f"  HỎNG {failure.check.value}: {where}{failure.message}", file=sys.stderr)
+    if not report.passed:
+        print(f"Dataset KHÔNG ĐẠT: {report.failure_counts}", file=sys.stderr)
+        return EXIT_DATASET_INVALID
+    print("Dataset đạt mọi kiểm tra.")
     return EXIT_OK
