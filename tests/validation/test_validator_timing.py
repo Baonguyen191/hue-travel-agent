@@ -41,6 +41,15 @@ def test_travel_time_insufficient() -> None:
     assert [error.stop_index for error in errors] == [1, 2]
 
 
+def test_travel_message_rounds_the_need_up_and_the_gap_down() -> None:
+    """Thiếu 0,3 phút vẫn phải đọc là thiếu: "có 15 phút, cần khoảng 16 phút"."""
+    report = run(make_itinerary(make_day(VALID_DAY)), travel=FixedTravelTime(minutes=15.3))
+    messages = [error.message for error in report.errors()]
+    assert messages
+    assert all("Chỉ có 15 phút" in message for message in messages)
+    assert all("cần khoảng 16 phút" in message for message in messages)
+
+
 def test_overlapping_stops() -> None:
     stops = [*VALID_DAY]
     stops[1] = ("t:cafe", "10:00", "11:15")

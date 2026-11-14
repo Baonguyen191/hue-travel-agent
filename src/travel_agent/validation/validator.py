@@ -6,6 +6,7 @@ Mỗi Issue có vị trí (day_index, stop_index) để vòng repair chỉ đún
 from __future__ import annotations
 
 import datetime as dt
+import math
 
 from travel_agent.data.place_repository import PlaceLookup
 from travel_agent.domain.models import Category, Itinerary, Pace, Place, PlannedStop, PlanRequest
@@ -210,12 +211,14 @@ def _check_travel(
             estimated += 1
         if gap < leg.minutes:
             label = "ước tính" if leg.estimated else "theo routing"
+            # Làm tròn khoảng trống xuống và thời gian cần lên: message không bao giờ ghi một
+            # khoảng trống trông như đủ (ví dụ "có 4 phút, cần khoảng 4 phút" khi cần 4,3).
             issues.append(
                 _issue(
                     Severity.ERROR,
                     IssueCode.TRAVEL_TIME_INSUFFICIENT,
-                    f"Chỉ có {gap:.0f} phút để đi từ {origin.name}, cần khoảng "
-                    f"{leg.minutes:.0f} phút ({label}, nguồn {leg.source})",
+                    f"Chỉ có {math.floor(gap)} phút để đi từ {origin.name}, cần khoảng "
+                    f"{math.ceil(leg.minutes)} phút ({label}, nguồn {leg.source})",
                     d_idx,
                     s_idx,
                     cur.place_id,
