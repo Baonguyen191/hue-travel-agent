@@ -9,7 +9,7 @@ from travel_agent.domain.models import Place
 from travel_agent.planning.candidates import select_candidates
 from travel_agent.planning.prompt import build_messages
 from travel_agent.routing.travel_time import TravelTimeProvider
-from travel_agent.training.generator import PlanGenerator
+from travel_agent.training.generator import PlanGenerator, itinerary_format_schema
 from travel_agent.training.metrics import PlanOutcome, score_output
 from travel_agent.training.requests import EvalEntry
 
@@ -34,8 +34,9 @@ def run_eval(
     for entry in entries:
         candidates = select_candidates(entry.request, places, candidate_seed(entry.key))
         messages = build_messages(entry.request, candidates)
+        schema = itinerary_format_schema(entry.request.num_days)
         started = clock()
-        generation = generator.generate(messages)
+        generation = generator.generate(messages, format_schema=schema)
         latency_s = clock() - started
         outcome = score_output(
             entry.key,

@@ -26,7 +26,9 @@ class FakeGenerator:
         self.model = model
         FakeGenerator.created.append(kwargs)
 
-    def generate(self, messages: list[dict[str, str]]) -> Generation:
+    def generate(
+        self, messages: list[dict[str, str]], format_schema: dict[str, Any] | None = None
+    ) -> Generation:
         return Generation(content="không phải json", done_reason="stop")
 
 
@@ -270,11 +272,13 @@ def test_eval_keeps_outcomes_written_before_a_generation_error(
     class FailsOnThird(FakeGenerator):
         calls = 0
 
-        def generate(self, messages: list[dict[str, str]]) -> Generation:
+        def generate(
+            self, messages: list[dict[str, str]], format_schema: dict[str, Any] | None = None
+        ) -> Generation:
             FailsOnThird.calls += 1
             if FailsOnThird.calls == 3:
                 raise GenerationError("Ollama chết")
-            return super().generate(messages)
+            return super().generate(messages, format_schema)
 
     monkeypatch.setattr(commands, "OllamaGenerator", FailsOnThird)
     out = tmp_path / "reports" / "run.json"

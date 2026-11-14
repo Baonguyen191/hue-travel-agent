@@ -16,40 +16,47 @@ DEFAULT_HOST = "http://127.0.0.1:11434"
 _TIME_PATTERN = "^([01][0-9]|2[0-3]):[0-5][0-9]$"
 _DATE_PATTERN = "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
 
-# Schema viết tay, cùng hình dạng với `Itinerary`. Không dùng `Itinerary.model_json_schema()`:
-# nó sinh `format: time`, mà grammar của llama.cpp (Ollama) có thể đòi hậu tố múi giờ.
-# Test giữ hai bên khớp nhau. Giờ và ngày chỉ ràng buộc bằng pattern, không có từ khóa `format`.
-ITINERARY_FORMAT_SCHEMA: dict[str, Any] = {
-    "type": "object",
-    "properties": {
-        "days": {
-            "type": "array",
-            "minItems": 1,
-            "items": {
-                "type": "object",
-                "properties": {
-                    "date": {"type": "string", "pattern": _DATE_PATTERN},
-                    "stops": {
-                        "type": "array",
-                        "minItems": 1,
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "place_id": {"type": "string", "minLength": 1},
-                                "arrive": {"type": "string", "pattern": _TIME_PATTERN},
-                                "depart": {"type": "string", "pattern": _TIME_PATTERN},
-                                "note": {"type": ["string", "null"]},
-                            },
-                            "required": ["place_id", "arrive", "depart"],
+
+def itinerary_format_schema(num_days: int | None) -> dict[str, Any]:
+    """Schema viết tay, cùng hình dạng với `Itinerary`; `num_days` ép đúng số phần tử của `days`.
+
+    Không dùng `Itinerary.model_json_schema()`: nó sinh `format: time`, mà grammar của llama.cpp
+    (Ollama) có thể đòi hậu tố múi giờ. Test giữ hai bên khớp nhau. Giờ và ngày chỉ ràng buộc
+    bằng pattern, không có từ khóa `format`.
+    """
+    days: dict[str, Any] = {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+            "type": "object",
+            "properties": {
+                "date": {"type": "string", "pattern": _DATE_PATTERN},
+                "stops": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "place_id": {"type": "string", "minLength": 1},
+                            "arrive": {"type": "string", "pattern": _TIME_PATTERN},
+                            "depart": {"type": "string", "pattern": _TIME_PATTERN},
+                            "note": {"type": ["string", "null"]},
                         },
+                        "required": ["place_id", "arrive", "depart"],
                     },
                 },
-                "required": ["date", "stops"],
             },
-        }
-    },
-    "required": ["days"],
-}
+            "required": ["date", "stops"],
+        },
+    }
+    if num_days is not None:
+        days["minItems"] = num_days
+        days["maxItems"] = num_days
+    return {"type": "object", "properties": {"days": days}, "required": ["days"]}
+
+
+# Schema không ràng buộc số ngày; dùng khi caller không truyền schema riêng.
+ITINERARY_FORMAT_SCHEMA: dict[str, Any] = itinerary_format_schema(None)
 
 _T = TypeVar("_T")
 
@@ -70,7 +77,9 @@ class Generation(BaseModel):
 
 
 class PlanGenerator(Protocol):
-    def generate(self, messages: list[dict[str, str]]) -> Generation: ...
+    def generate(
+        self, messages: list[dict[str, str]], format_schema: dict[str, Any] | None = None
+    ) -> Generation: ...
 
 
 def http_post_json(url: str, payload: dict[str, Any], timeout_s: float) -> dict[str, Any]:
@@ -126,16 +135,22 @@ class OllamaGenerator:
             "num_ctx": num_ctx,
         }
         self._timeout_s = timeout_s
-        self._format: dict[str, Any] | str = ITINERARY_FORMAT_SCHEMA if schema_format else "json"
+        self._schema_format = schema_format
         self._transport = transport or http_post_json
 
-    def generate(self, messages: list[dict[str, str]]) -> Generation:
+    def generate(
+        self, messages: list[dict[str, str]], format_schema: dict[str, Any] | None = None
+    ) -> Generation:
+        """`format_schema` thay schema mặc định cho lần gọi này (trừ khi `schema_format=False`)."""
+        output_format: dict[str, Any] | str = "json"
+        if self._schema_format:
+            output_format = format_schema or ITINERARY_FORMAT_SCHEMA
         payload = {
             "model": self._model,
             "messages": messages,
             "stream": False,
             "think": False,
-            "format": self._format,
+            "format": output_format,
             "options": self._options,
         }
         response = self._transport(self._url, payload, self._timeout_s)

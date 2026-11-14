@@ -15,6 +15,7 @@ from travel_agent.training.generator import (
     GenerationError,
     OllamaGenerator,
     http_post_json,
+    itinerary_format_schema,
 )
 from travel_agent.training.parsing import parse_itinerary
 
@@ -56,6 +57,41 @@ def test_plain_json_format_when_schema_disabled() -> None:
     assert transport.calls[0][1]["format"] == "json"
 
 
+def test_schema_pins_day_count() -> None:
+    days = itinerary_format_schema(3)["properties"]["days"]
+    assert (days["minItems"], days["maxItems"]) == (3, 3)
+
+
+def test_schema_without_day_count_is_the_default() -> None:
+    assert itinerary_format_schema(None) == ITINERARY_FORMAT_SCHEMA
+    days = ITINERARY_FORMAT_SCHEMA["properties"]["days"]
+    assert days["minItems"] == 1
+    assert "maxItems" not in days
+
+
+def test_pinned_schema_rejects_wrong_day_count() -> None:
+    stop = {"place_id": "t:a", "arrive": "09:00", "depart": "10:00"}
+    one_day = {"days": [{"date": "2026-12-01", "stops": [stop]}]}
+    two_days = {"days": [*one_day["days"], {"date": "2026-12-02", "stops": [stop]}]}
+    assert _conforms(itinerary_format_schema(1), one_day)
+    assert not _conforms(itinerary_format_schema(2), one_day)
+    assert not _conforms(itinerary_format_schema(1), two_days)
+
+
+def test_generate_sends_per_call_schema() -> None:
+    transport = FakeTransport({"message": {"content": "{}"}})
+    generator = OllamaGenerator("model-x", transport=transport)
+    generator.generate(MESSAGES, format_schema=itinerary_format_schema(2))
+    assert transport.calls[0][1]["format"]["properties"]["days"]["maxItems"] == 2
+
+
+def test_plain_json_mode_ignores_per_call_schema() -> None:
+    transport = FakeTransport({"message": {"content": "{}"}})
+    generator = OllamaGenerator("model-x", schema_format=False, transport=transport)
+    generator.generate(MESSAGES, format_schema=itinerary_format_schema(2))
+    assert transport.calls[0][1]["format"] == "json"
+
+
 def test_missing_content_raises() -> None:
     transport = FakeTransport({"error": "model not found"})
     with pytest.raises(GenerationError, match="model not found"):
@@ -86,6 +122,7 @@ def _conforms(schema: dict[str, Any], value: Any) -> bool:
         return (
             isinstance(value, list)
             and len(value) >= schema.get("minItems", 0)
+            and len(value) <= schema.get("maxItems", len(value))
             and all(_conforms(items, item) for item in value)
         )
     assert kind == "object"

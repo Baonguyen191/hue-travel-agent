@@ -1,3 +1,5 @@
+from typing import Any
+
 import pytest
 
 from tests.training.factories import PLACES, REQUEST, VALID_RAW
@@ -12,9 +14,13 @@ class FakeGenerator:
     def __init__(self, raw: str) -> None:
         self.raw = raw
         self.seen: list[list[dict[str, str]]] = []
+        self.schemas: list[dict[str, Any] | None] = []
 
-    def generate(self, messages: list[dict[str, str]]) -> Generation:
+    def generate(
+        self, messages: list[dict[str, str]], format_schema: dict[str, Any] | None = None
+    ) -> Generation:
         self.seen.append(messages)
+        self.schemas.append(format_schema)
         return Generation(
             content=self.raw, done_reason="stop", prompt_tokens=120, completion_tokens=80
         )
@@ -30,6 +36,17 @@ class FakeClock:
 
 
 ENTRY = EvalEntry(key=request_key(REQUEST), split=Split.DEV, request=REQUEST)
+
+
+def test_each_request_gets_a_schema_pinned_to_its_day_count() -> None:
+    two_days = REQUEST.model_copy(update={"num_days": 2})
+    entry = EvalEntry(key=request_key(two_days), split=Split.DEV, request=two_days)
+    generator = FakeGenerator(VALID_RAW)
+    run_eval([entry], PLACES, generator, FixedTravelTime(), clock=FakeClock())
+    [schema] = generator.schemas
+    assert schema is not None
+    days = schema["properties"]["days"]
+    assert (days["minItems"], days["maxItems"]) == (2, 2)
 
 
 def test_candidate_seed_is_stable_per_key() -> None:
@@ -75,10 +92,12 @@ def test_on_outcome_is_called_after_each_request_in_order() -> None:
 
 def test_outcomes_before_a_generation_error_were_already_reported() -> None:
     class FailsOnThird(FakeGenerator):
-        def generate(self, messages: list[dict[str, str]]) -> Generation:
+        def generate(
+            self, messages: list[dict[str, str]], format_schema: dict[str, Any] | None = None
+        ) -> Generation:
             if len(self.seen) == 2:
                 raise GenerationError("Ollama chết")
-            return super().generate(messages)
+            return super().generate(messages, format_schema)
 
     seen: list[PlanOutcome] = []
     with pytest.raises(GenerationError):
