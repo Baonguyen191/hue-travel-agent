@@ -1,0 +1,24 @@
+# Tham số dựng và kiểm dataset SFT (spec mục 6, 10.1, 10.6). Lệnh build-dataset và check-dataset
+# đọc file này; DVC theo dõi hai mục `dataset` và `check`.
+dataset:
+  name: hue_sft_v1
+  # Khác evalset.seed trong configs/eval.yaml. Request trùng bộ eval vẫn bị loại theo key.
+  request_seed: 20261114
+  target_samples: 4000
+  repair_share: 0.15
+  # Trần số request sinh ra; solver bỏ một ít request, nên cần dư so với target.
+  max_requests: 6000
+  solver_time_limit_s: 10.0
+  corruption_kinds: [unknown_place, overlap, closed, travel_gap]
+check:
+  # Bằng max_seq khởi điểm của SFT (spec mục 7). Đổi max_seq thì đổi cả ở đây.
+  max_tokens: 2048
+  # Tokenizer của model sẽ train, đọc từ cache Hugging Face đã tải sẵn (không gọi mạng).
+  # Đã đối chiếu với GGUF của Ollama qwen3.5:4b: cùng số merges, cùng id token đặc biệt.
+  tokenizer:
+    repo: Qwen/Qwen3.5-4B
+    revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+  # Mỗi số ngày, mỗi pace, mỗi travel_mode chiếm tỉ lệ trong khoảng này (đều nhau là 1/3).
+  distribution:
+    min_share: 0.25
+    max_share: 0.42
