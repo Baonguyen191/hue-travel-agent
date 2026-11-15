@@ -12,10 +12,11 @@ sft:
     # đúng với lúc train.
     revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
     license: Apache-2.0
-    # Snapshot trong cache không có file LICENSE (chỉ tải trọng số, tokenizer, config). Danh sách
-    # file của repo có LICENSE 11.544 byte. Giá trị trên lấy từ `ollama show qwen3.5:4b`; plan 4
-    # Task 1 tải LICENSE để xác nhận.
-    license_source: ollama show qwen3.5:4b, LICENSE chưa có trong snapshot
+    # Đã tải LICENSE của đúng revision này (2026-11-15): Apache License 2.0 nguyên văn, chỉ thêm
+    # dòng "Copyright 2026 Alibaba Cloud", không có điều khoản riêng.
+    license_source: >-
+      LICENSE tại revision 851bf6e8, 11544 byte,
+      sha256 bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a
   seed: 3407
   # Bằng configs/dataset.yaml: check.max_tokens. Mẫu dài nhất 3.885 token.
   max_seq: 4096
