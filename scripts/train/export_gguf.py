@@ -2,6 +2,11 @@
 
     python scripts/train/export_gguf.py --config configs/sft.yaml --checkpoint 250
     python scripts/train/export_gguf.py --config configs/sft.yaml --record     # stage export_sft
+    python scripts/train/export_gguf.py --config configs/sft.yaml --smoke
+
+`--smoke` export adapter của lần chạy smoke (`<run_dir>/smoke/final`) thành model
+`<ollama_model>-smoke` để kiểm tra đường export; không ghi export.json và không đi cùng
+`--record` hoặc `--checkpoint`.
 
 Các bước: merge adapter vào base bf16 trên CPU, `convert_hf_to_gguf.py` ra GGUF bf16,
 `llama-quantize` ra Q4_K_M, chép Modelfile của model mẫu (`qwen3.5:4b`) và chỉ thay `FROM` của
@@ -43,6 +48,9 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     )
     parser.add_argument("--record", action="store_true", help="Ghi export.json cho stage DVC")
     parser.add_argument("--skip-ollama", action="store_true", help="Dừng sau khi có GGUF")
+    parser.add_argument(
+        "--smoke", action="store_true", help="Export adapter của smoke test (<run_dir>/smoke/final)"
+    )
     return parser.parse_args(argv)
 
 
@@ -95,6 +103,8 @@ def text_weights(modelfile: str) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.smoke and (args.record or args.checkpoint is not None):
+        raise SystemExit("--smoke không đi cùng --record hoặc --checkpoint.")
     config = load_sft_config(args.config)
     if args.record and config.export.checkpoint is None:
         raise SystemExit(
@@ -102,10 +112,22 @@ def main(argv: list[str] | None = None) -> int:
             "(plan 4 Task 6 Step 3)."
         )
     sft, export = config.sft, config.export
-    step = pick_step(config, None if args.record else args.checkpoint)
+    if args.smoke:
+        adapter = sft.run_dir / "smoke" / "final"
+        if not (adapter / "adapter_model.safetensors").exists():
+            raise SystemExit(
+                f"Không có adapter smoke trong {adapter}. Chạy scripts/train/sft.py --smoke trước."
+            )
+        checkpoint: int | str = "smoke"
+        work = sft.run_dir / "export" / "smoke"
+        name = f"{export.ollama_model}-smoke"
+    else:
+        step = pick_step(config, None if args.record else args.checkpoint)
+        checkpoint = step
+        adapter = repo_artifacts_dir(sft.run_name) / "adapters" / f"step-{step}"
+        work = sft.run_dir / "export" / f"step-{step}"
+        name = export.ollama_model if args.record else f"{export.ollama_model}-step-{step}"
     snapshot = hf_snapshot_dir(sft.base_model.repo, sft.base_model.revision)
-    adapter = repo_artifacts_dir(sft.run_name) / "adapters" / f"step-{step}"
-    work = sft.run_dir / "export" / f"step-{step}"
     merged_dir, bf16_gguf = work / "merged", work / "model-bf16.gguf"
     final_gguf = work / f"model-{export.quantization}.gguf"
     work.mkdir(parents=True, exist_ok=True)
@@ -115,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
     run(quantize_command(export.llama_cpp_dir, bf16_gguf, final_gguf, export.quantization))
     bf16_gguf.unlink()  # chỉ giữ bản đã quantize
     record: dict[str, Any] = {
-        "checkpoint": step,
+        "checkpoint": checkpoint,
         "adapter_sha256": sha256_file(adapter / "adapter_model.safetensors"),
         "quantization": export.quantization,
         "gguf": str(final_gguf),
@@ -126,7 +148,6 @@ def main(argv: list[str] | None = None) -> int:
         "template_model": export.template_model,
     }
     if not args.skip_ollama:
-        name = export.ollama_model if args.record else f"{export.ollama_model}-step-{step}"
         template = run(["ollama", "show", "--modelfile", export.template_model])
         modelfile = swap_model_from(template, text_weights(template), final_gguf)
         modelfile_path = work / "Modelfile"

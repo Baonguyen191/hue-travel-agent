@@ -245,3 +245,50 @@ def test_skip_ollama_runs_no_ollama_command(
     printed = json.loads(capsys.readouterr().out)
     assert printed["checkpoint"] == 250
     assert "ollama_model" not in printed
+
+
+# --- --smoke -----------------------------------------------------------------
+
+
+def _make_smoke_adapter(pipeline: Pipeline) -> Path:
+    smoke = pipeline.run_dir / "smoke" / "final"
+    smoke.mkdir(parents=True)
+    (smoke / "adapter_model.safetensors").write_bytes(b"smoke adapter")
+    return smoke
+
+
+def test_smoke_exports_from_smoke_adapter(
+    pipeline: Pipeline, capsys: pytest.CaptureFixture[str]
+) -> None:
+    smoke = _make_smoke_adapter(pipeline)
+
+    assert export_gguf.main(["--smoke"]) == 0
+
+    assert pipeline.merged_from == [smoke]
+    work = pipeline.run_dir / "export" / "smoke"
+    final = work / f"model-{pipeline.config.export.quantization}.gguf"
+    assert final.exists()
+    assert _ollama_create_names(pipeline.calls) == [f"{pipeline.config.export.ollama_model}-smoke"]
+    printed = json.loads(capsys.readouterr().out)
+    assert printed["checkpoint"] == "smoke"
+    assert not (pipeline.artifacts / "export.json").exists()
+
+
+def test_smoke_without_adapter_stops_before_any_work(pipeline: Pipeline) -> None:
+    with pytest.raises(SystemExit, match="--smoke"):
+        export_gguf.main(["--smoke"])
+
+    assert pipeline.merged_from == []
+    assert pipeline.calls == []
+
+
+@pytest.mark.parametrize("extra", [["--record"], ["--checkpoint", "250"]])
+def test_smoke_conflicts_stop_before_any_work(pipeline: Pipeline, extra: list[str]) -> None:
+    _make_smoke_adapter(pipeline)
+
+    with pytest.raises(SystemExit, match="--smoke"):
+        export_gguf.main(["--smoke", *extra])
+
+    assert pipeline.merged_from == []
+    assert pipeline.calls == []
+    assert not (pipeline.artifacts / "export.json").exists()
