@@ -6,8 +6,8 @@
 Các bước: merge adapter vào base bf16 trên CPU, `convert_hf_to_gguf.py` ra GGUF bf16,
 `llama-quantize` ra Q4_K_M, chép Modelfile của model mẫu (`qwen3.5:4b`) và chỉ thay `FROM` của
 trọng số text, rồi `ollama create`. File nặng nằm ở `<run_dir>/export/step-<N>/`.
-`--record` dùng checkpoint ghi trong config, đặt tên model theo `export.ollama_model` và ghi
-`models/sft/<run_name>/export.json`; không có cờ này thì tên model có hậu tố `-step-<N>`.
+`--record` bắt buộc `export.checkpoint` trong config, đặt tên model theo `export.ollama_model` và
+ghi `models/sft/<run_name>/export.json`; không có cờ này thì tên model có hậu tố `-step-<N>`.
 """
 
 from __future__ import annotations
@@ -96,6 +96,11 @@ def text_weights(modelfile: str) -> str:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     config = load_sft_config(args.config)
+    if args.record and config.export.checkpoint is None:
+        raise SystemExit(
+            "--record cần export.checkpoint trong config: chọn checkpoint thắng trước "
+            "(plan 4 Task 6 Step 3)."
+        )
     sft, export = config.sft, config.export
     step = pick_step(config, None if args.record else args.checkpoint)
     snapshot = hf_snapshot_dir(sft.base_model.repo, sft.base_model.revision)

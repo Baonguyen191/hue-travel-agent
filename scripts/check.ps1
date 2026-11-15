@@ -2,9 +2,9 @@
 $ErrorActionPreference = "Stop"
 $py = ".venv\Scripts\python"
 
-& $py -m ruff format --check src tests
+& $py -m ruff format --check src tests scripts
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-& $py -m ruff check src tests
+& $py -m ruff check src tests scripts
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 & $py -m mypy src
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
