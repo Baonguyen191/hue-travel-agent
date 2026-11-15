@@ -132,8 +132,11 @@ def main(argv: list[str] | None = None) -> int:
     final_gguf = work / f"model-{export.quantization}.gguf"
     work.mkdir(parents=True, exist_ok=True)
 
+    if merged_dir.exists():  # merge dở của lần chạy trước: không để shard cũ lẫn shard mới
+        shutil.rmtree(merged_dir)
     merge(snapshot, adapter, merged_dir)
     run(convert_command(Path(sys.executable), export.llama_cpp_dir, merged_dir, bf16_gguf))
+    shutil.rmtree(merged_dir)  # ~8 GB bf16; GGUF đã có, không cần giữ
     run(quantize_command(export.llama_cpp_dir, bf16_gguf, final_gguf, export.quantization))
     bf16_gguf.unlink()  # chỉ giữ bản đã quantize
     record: dict[str, Any] = {

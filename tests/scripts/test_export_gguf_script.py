@@ -6,6 +6,7 @@ Không chạy llama.cpp, ollama hay torch: `run`, `merge` và `gguf` được th
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 import types
 from collections.abc import Iterator
@@ -245,6 +246,53 @@ def test_skip_ollama_runs_no_ollama_command(
     printed = json.loads(capsys.readouterr().out)
     assert printed["checkpoint"] == 250
     assert "ollama_model" not in printed
+
+
+def test_merged_dir_is_removed_after_convert_and_gguf_kept(pipeline: Pipeline) -> None:
+    assert export_gguf.main(["--checkpoint", "250"]) == 0
+
+    step_dir = pipeline.run_dir / "export" / "step-250"
+    assert not (step_dir / "merged").exists()
+    assert (step_dir / f"model-{pipeline.config.export.quantization}.gguf").exists()
+
+
+def test_convert_failure_keeps_merged_dir_for_debugging(
+    pipeline: Pipeline, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    fake_run = export_gguf.run
+
+    def failing_convert(command: list[str]) -> str:
+        if command[1].endswith("convert_hf_to_gguf.py"):
+            raise subprocess.CalledProcessError(1, command)
+        return fake_run(command)
+
+    monkeypatch.setattr(export_gguf, "run", failing_convert)
+
+    with pytest.raises(subprocess.CalledProcessError):
+        export_gguf.main(["--checkpoint", "250"])
+
+    assert (pipeline.run_dir / "export" / "step-250" / "merged").exists()
+
+
+def test_stale_merged_dir_is_cleared_before_merge(
+    pipeline: Pipeline, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    stale = pipeline.run_dir / "export" / "step-250" / "merged"
+    stale.mkdir(parents=True)
+    (stale / "old-shard.safetensors").write_bytes(b"old")
+    seen_at_merge: list[bool] = []
+    fake_merge = export_gguf.merge
+
+    def spy_merge(snapshot_dir: Path, adapter: Path, out: Path) -> None:
+        seen_at_merge.append((out / "old-shard.safetensors").exists())
+        fake_merge(snapshot_dir, adapter, out)
+
+    monkeypatch.setattr(export_gguf, "merge", spy_merge)
+
+    assert export_gguf.main(["--checkpoint", "250"]) == 0
+
+    assert seen_at_merge == [False]
+    assert not (stale / "old-shard.safetensors").exists()
 
 
 # --- --smoke -----------------------------------------------------------------
