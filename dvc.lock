@@ -30,36 +30,70 @@ stages:
       hash: md5
       md5: 457db209c0aff2e2e0688b6be8eb65cc
       size: 5431
-    - path: src/travel_agent/domain
+    - path: src/travel_agent/domain/models.py
       hash: md5
-      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
-      size: 6817
-      nfiles: 3
-    - path: src/travel_agent/planning
+      md5: 641105590483b2f22b85751b784a1eb4
+      size: 2931
+    - path: src/travel_agent/domain/opening_hours.py
       hash: md5
-      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
-      size: 32616
-      nfiles: 4
-    - path: src/travel_agent/review
+      md5: 4708429aa1514918f43daec8a6e0588b
+      size: 3886
+    - path: src/travel_agent/planning/candidates.py
       hash: md5
-      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
-      size: 47936
-      nfiles: 6
-    - path: src/travel_agent/routing
+      md5: 014d1e7adbc686c76047b5216d5865e3
+      size: 4636
+    - path: src/travel_agent/planning/prompt.py
       hash: md5
-      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      md5: 13c22815822952d2c75ac8bc58bb0c1d
+      size: 7447
+    - path: src/travel_agent/review/models.py
+      hash: md5
+      md5: ccda54fb9361a5d3c897d84ebfb7acce
+      size: 3123
+    - path: src/travel_agent/review/store.py
+      hash: md5
+      md5: f018dbeaac6c449bcc001803b623edae
+      size: 8039
+    - path: src/travel_agent/routing/travel_time.py
+      hash: md5
+      md5: 179a6fcf15295ea63284e4f9354e5d49
       size: 2238
-      nfiles: 2
-    - path: src/travel_agent/training
+    - path: src/travel_agent/training/commands.py
       hash: md5
-      md5: f6b7d3143e018880d10c55090666dff9.dir
-      size: 71394
-      nfiles: 12
-    - path: src/travel_agent/validation
+      md5: 11e818187bb9d6863b8c50b10a23fa7a
+      size: 16961
+    - path: src/travel_agent/training/generator.py
       hash: md5
-      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
-      size: 11384
-      nfiles: 3
+      md5: eb0d6c56a9c4079857025214505de01b
+      size: 6893
+    - path: src/travel_agent/training/metrics.py
+      hash: md5
+      md5: a7bbb35b5c19a3b4cc292f642552695a
+      size: 5307
+    - path: src/travel_agent/training/parsing.py
+      hash: md5
+      md5: f644cb8be8b2537c24e0a9cc4cfae2ad
+      size: 602
+    - path: src/travel_agent/training/requests.py
+      hash: md5
+      md5: d5c0db65f42e90b5e7c9d8c81bf5b77b
+      size: 3465
+    - path: src/travel_agent/training/runner.py
+      hash: md5
+      md5: 11bfc242bed351520b5b33c9f5907925
+      size: 2132
+    - path: src/travel_agent/training/tracking.py
+      hash: md5
+      md5: ed85998a82ce7420ea1c342f4a15ae3d
+      size: 1466
+    - path: src/travel_agent/validation/report.py
+      hash: md5
+      md5: bc9c1ddbf5d75e28972c0816057c360a
+      size: 1323
+    - path: src/travel_agent/validation/validator.py
+      hash: md5
+      md5: bb0d88d12ca4f8c1f1dabc7e06b59b21
+      size: 10061
     params:
       configs/eval.yaml:
         baseline:
@@ -95,36 +129,62 @@ stages:
       hash: md5
       md5: 457db209c0aff2e2e0688b6be8eb65cc
       size: 5431
-    - path: src/travel_agent/domain
+    - path: src/travel_agent/domain/models.py
       hash: md5
-      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
-      size: 6817
-      nfiles: 3
-    - path: src/travel_agent/planning
+      md5: 641105590483b2f22b85751b784a1eb4
+      size: 2931
+    - path: src/travel_agent/domain/opening_hours.py
       hash: md5
-      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
-      size: 32616
-      nfiles: 4
-    - path: src/travel_agent/review
+      md5: 4708429aa1514918f43daec8a6e0588b
+      size: 3886
+    - path: src/travel_agent/planning/candidates.py
       hash: md5
-      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
-      size: 47936
-      nfiles: 6
-    - path: src/travel_agent/routing
+      md5: 014d1e7adbc686c76047b5216d5865e3
+      size: 4636
+    - path: src/travel_agent/planning/prompt.py
       hash: md5
-      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      md5: 13c22815822952d2c75ac8bc58bb0c1d
+      size: 7447
+    - path: src/travel_agent/planning/solver.py
+      hash: md5
+      md5: 5edd083221cfd27dc4601437bba411aa
+      size: 20533
+    - path: src/travel_agent/review/models.py
+      hash: md5
+      md5: ccda54fb9361a5d3c897d84ebfb7acce
+      size: 3123
+    - path: src/travel_agent/review/store.py
+      hash: md5
+      md5: f018dbeaac6c449bcc001803b623edae
+      size: 8039
+    - path: src/travel_agent/routing/travel_time.py
+      hash: md5
+      md5: 179a6fcf15295ea63284e4f9354e5d49
       size: 2238
-      nfiles: 2
-    - path: src/travel_agent/training
+    - path: src/travel_agent/training/commands.py
       hash: md5
-      md5: f6b7d3143e018880d10c55090666dff9.dir
-      size: 71394
-      nfiles: 12
-    - path: src/travel_agent/validation
+      md5: 11e818187bb9d6863b8c50b10a23fa7a
+      size: 16961
+    - path: src/travel_agent/training/corrupt.py
       hash: md5
-      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
-      size: 11384
-      nfiles: 3
+      md5: b0f7b653ac3ccdb69149fc396144a2ed
+      size: 12022
+    - path: src/travel_agent/training/dataset.py
+      hash: md5
+      md5: 20f5214c3ee748810c93f02f96bc1bcd
+      size: 11202
+    - path: src/travel_agent/training/requests.py
+      hash: md5
+      md5: d5c0db65f42e90b5e7c9d8c81bf5b77b
+      size: 3465
+    - path: src/travel_agent/validation/report.py
+      hash: md5
+      md5: bc9c1ddbf5d75e28972c0816057c360a
+      size: 1323
+    - path: src/travel_agent/validation/validator.py
+      hash: md5
+      md5: bb0d88d12ca4f8c1f1dabc7e06b59b21
+      size: 10061
     params:
       configs/dataset.yaml:
         dataset:
@@ -169,36 +229,78 @@ stages:
       hash: md5
       md5: 457db209c0aff2e2e0688b6be8eb65cc
       size: 5431
-    - path: src/travel_agent/domain
+    - path: src/travel_agent/domain/models.py
       hash: md5
-      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
-      size: 6817
-      nfiles: 3
-    - path: src/travel_agent/planning
+      md5: 641105590483b2f22b85751b784a1eb4
+      size: 2931
+    - path: src/travel_agent/domain/opening_hours.py
       hash: md5
-      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
-      size: 32616
-      nfiles: 4
-    - path: src/travel_agent/review
+      md5: 4708429aa1514918f43daec8a6e0588b
+      size: 3886
+    - path: src/travel_agent/planning/candidates.py
       hash: md5
-      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
-      size: 47936
-      nfiles: 6
-    - path: src/travel_agent/routing
+      md5: 014d1e7adbc686c76047b5216d5865e3
+      size: 4636
+    - path: src/travel_agent/planning/prompt.py
       hash: md5
-      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      md5: 13c22815822952d2c75ac8bc58bb0c1d
+      size: 7447
+    - path: src/travel_agent/planning/solver.py
+      hash: md5
+      md5: 5edd083221cfd27dc4601437bba411aa
+      size: 20533
+    - path: src/travel_agent/review/models.py
+      hash: md5
+      md5: ccda54fb9361a5d3c897d84ebfb7acce
+      size: 3123
+    - path: src/travel_agent/review/store.py
+      hash: md5
+      md5: f018dbeaac6c449bcc001803b623edae
+      size: 8039
+    - path: src/travel_agent/routing/travel_time.py
+      hash: md5
+      md5: 179a6fcf15295ea63284e4f9354e5d49
       size: 2238
-      nfiles: 2
-    - path: src/travel_agent/training
+    - path: src/travel_agent/training/chat.py
       hash: md5
-      md5: f6b7d3143e018880d10c55090666dff9.dir
-      size: 71394
-      nfiles: 12
-    - path: src/travel_agent/validation
+      md5: b7e1edfe30f229814de7077675af9ebc
+      size: 3614
+    - path: src/travel_agent/training/commands.py
       hash: md5
-      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
-      size: 11384
-      nfiles: 3
+      md5: 11e818187bb9d6863b8c50b10a23fa7a
+      size: 16961
+    - path: src/travel_agent/training/corrupt.py
+      hash: md5
+      md5: b0f7b653ac3ccdb69149fc396144a2ed
+      size: 12022
+    - path: src/travel_agent/training/dataset.py
+      hash: md5
+      md5: 20f5214c3ee748810c93f02f96bc1bcd
+      size: 11202
+    - path: src/travel_agent/training/dataset_check.py
+      hash: md5
+      md5: 6e487f6233aeba0fc717778aedffabb7
+      size: 10033
+    - path: src/travel_agent/training/parsing.py
+      hash: md5
+      md5: f644cb8be8b2537c24e0a9cc4cfae2ad
+      size: 602
+    - path: src/travel_agent/training/requests.py
+      hash: md5
+      md5: d5c0db65f42e90b5e7c9d8c81bf5b77b
+      size: 3465
+    - path: src/travel_agent/training/tokens.py
+      hash: md5
+      md5: 5e9f3b1d1e7eb81992e85c0a516ed4f8
+      size: 1951
+    - path: src/travel_agent/validation/report.py
+      hash: md5
+      md5: bc9c1ddbf5d75e28972c0816057c360a
+      size: 1323
+    - path: src/travel_agent/validation/validator.py
+      hash: md5
+      md5: bb0d88d12ca4f8c1f1dabc7e06b59b21
+      size: 10061
     params:
       configs/dataset.yaml:
         check:

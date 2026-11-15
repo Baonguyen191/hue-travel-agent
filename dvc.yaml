@@ -33,13 +33,23 @@ stages:
     deps:
       - data/hue.sqlite
       - data/eval/hue_eval_v1.jsonl
-      - src/travel_agent/planning
-      - src/travel_agent/training
-      - src/travel_agent/validation
-      - src/travel_agent/routing
-      - src/travel_agent/domain
-      - src/travel_agent/review
       - src/travel_agent/data/place_repository.py
+      - src/travel_agent/domain/models.py
+      - src/travel_agent/domain/opening_hours.py
+      - src/travel_agent/planning/candidates.py
+      - src/travel_agent/planning/prompt.py
+      - src/travel_agent/review/models.py
+      - src/travel_agent/review/store.py
+      - src/travel_agent/routing/travel_time.py
+      - src/travel_agent/training/commands.py
+      - src/travel_agent/training/generator.py
+      - src/travel_agent/training/metrics.py
+      - src/travel_agent/training/parsing.py
+      - src/travel_agent/training/requests.py
+      - src/travel_agent/training/runner.py
+      - src/travel_agent/training/tracking.py
+      - src/travel_agent/validation/report.py
+      - src/travel_agent/validation/validator.py
     params:
       - configs/eval.yaml:
           - baseline
@@ -61,13 +71,21 @@ stages:
     deps:
       - data/hue.sqlite
       - data/eval/hue_eval_v1.jsonl
-      - src/travel_agent/planning
-      - src/travel_agent/training
-      - src/travel_agent/validation
-      - src/travel_agent/routing
-      - src/travel_agent/domain
-      - src/travel_agent/review
       - src/travel_agent/data/place_repository.py
+      - src/travel_agent/domain/models.py
+      - src/travel_agent/domain/opening_hours.py
+      - src/travel_agent/planning/candidates.py
+      - src/travel_agent/planning/prompt.py
+      - src/travel_agent/planning/solver.py
+      - src/travel_agent/review/models.py
+      - src/travel_agent/review/store.py
+      - src/travel_agent/routing/travel_time.py
+      - src/travel_agent/training/commands.py
+      - src/travel_agent/training/corrupt.py
+      - src/travel_agent/training/dataset.py
+      - src/travel_agent/training/requests.py
+      - src/travel_agent/validation/report.py
+      - src/travel_agent/validation/validator.py
     params:
       - configs/dataset.yaml:
           - dataset
@@ -90,13 +108,25 @@ stages:
       - data/sft/hue_sft_v1.jsonl
       - data/hue.sqlite
       - data/eval/hue_eval_v1.jsonl
-      - src/travel_agent/planning
-      - src/travel_agent/training
-      - src/travel_agent/validation
-      - src/travel_agent/routing
-      - src/travel_agent/domain
-      - src/travel_agent/review
       - src/travel_agent/data/place_repository.py
+      - src/travel_agent/domain/models.py
+      - src/travel_agent/domain/opening_hours.py
+      - src/travel_agent/planning/candidates.py
+      - src/travel_agent/planning/prompt.py
+      - src/travel_agent/planning/solver.py
+      - src/travel_agent/review/models.py
+      - src/travel_agent/review/store.py
+      - src/travel_agent/routing/travel_time.py
+      - src/travel_agent/training/chat.py
+      - src/travel_agent/training/commands.py
+      - src/travel_agent/training/corrupt.py
+      - src/travel_agent/training/dataset.py
+      - src/travel_agent/training/dataset_check.py
+      - src/travel_agent/training/parsing.py
+      - src/travel_agent/training/requests.py
+      - src/travel_agent/training/tokens.py
+      - src/travel_agent/validation/report.py
+      - src/travel_agent/validation/validator.py
     params:
       - configs/dataset.yaml:
           - check
