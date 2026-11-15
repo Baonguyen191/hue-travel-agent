@@ -98,7 +98,8 @@ def build_trainer(
         gradient_accumulation_steps=train.gradient_accumulation_steps,
         learning_rate=train.learning_rate,
         lr_scheduler_type=train.lr_scheduler,
-        warmup_ratio=train.warmup_ratio,
+        # transformers 5 bỏ warmup_ratio: warmup_steps kiểu float trong [0, 1) là tỷ lệ số step.
+        warmup_steps=train.warmup_ratio,
         weight_decay=train.weight_decay,
         optim=train.optimizer,
         gradient_checkpointing=train.gradient_checkpointing,
