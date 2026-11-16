@@ -43,7 +43,10 @@ sft:
     weight_decay: 0.0
     optimizer: paged_adamw_8bit
     gradient_checkpointing: true
-    logging_steps: 10
+    # Loss từng step cho dashboard.
+    logging_steps: 1
+    # Nơi gửi metrics khi train (wandb: xem loss từng step trên web).
+    report_to: wandb
     # Checkpoint để chạy tiếp sau khi đứt: máy tắt đột ngột ở step 241 khi save_steps 250 làm
     # mất 7 giờ.
     save_steps: 50
@@ -51,6 +54,9 @@ sft:
     adapter_every: 250
   smoke:
     max_steps: 20
+  tracking:
+    # Project W&B (private). Chỉ gửi metrics và config, không gửi dataset hay trọng số.
+    project: travel-agent-sft
 export:
   # Step của checkpoint thắng (plan 4 mục 2). null cho tới khi đã eval các checkpoint.
   checkpoint: null

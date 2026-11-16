@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -56,6 +57,8 @@ class TrainParams(_Strict):
     # Khoảng step của adapter được chép vào repo (DVC) để eval. Phải là bội số của save_steps
     # vì adapter chỉ lấy từ checkpoint.
     adapter_every: int = Field(gt=0)
+    # Nơi gửi metrics khi train (wandb: xem loss từng step trên web).
+    report_to: Literal["none", "wandb"]
 
     @model_validator(mode="after")
     def _adapter_every_multiple_of_save_steps(self) -> TrainParams:
@@ -66,6 +69,11 @@ class TrainParams(_Strict):
 
 class SmokeParams(_Strict):
     max_steps: int = Field(gt=0)
+
+
+class TrackingParams(_Strict):
+    # Project W&B (private): chỉ gửi metrics và config, không gửi dataset hay trọng số.
+    project: str = Field(min_length=1)
 
 
 class SftParams(_Strict):
@@ -80,6 +88,7 @@ class SftParams(_Strict):
     quantization: QuantizationParams
     train: TrainParams
     smoke: SmokeParams
+    tracking: TrackingParams
 
     @property
     def run_dir(self) -> Path:

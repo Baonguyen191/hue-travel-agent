@@ -34,6 +34,20 @@ def test_repo_config_resume_and_adapter_intervals() -> None:
     assert train.adapter_every == 250
 
 
+def test_repo_config_reporting_and_tracking() -> None:
+    sft = load_sft_config(SFT_YAML).sft
+    assert sft.train.report_to == "wandb"
+    assert sft.train.logging_steps == 1
+    assert sft.tracking.project == "travel-agent-sft"
+
+
+def test_report_to_rejects_unknown_backend() -> None:
+    raw = yaml.safe_load(SFT_YAML.read_text(encoding="utf-8"))
+    raw["sft"]["train"]["report_to"] = "tensorboard"
+    with pytest.raises(ValidationError):
+        SftConfig.model_validate(raw)
+
+
 def test_adapter_every_must_be_a_multiple_of_save_steps() -> None:
     raw = yaml.safe_load(SFT_YAML.read_text(encoding="utf-8"))
     raw["sft"]["train"]["save_steps"] = 50

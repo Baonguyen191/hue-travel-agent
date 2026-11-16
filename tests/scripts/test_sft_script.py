@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from scripts.train import sft
+from travel_agent.training.sft_config import load_sft_config
 
+REPO = Path(__file__).parents[2]
+SFT_YAML = REPO / "configs" / "sft.yaml"
 ADAPTER_FILES = ("adapter_config.json", "adapter_model.safetensors")
 
 
@@ -31,6 +35,33 @@ def test_parse_args_smoke_and_resume() -> None:
     args = sft.parse_args(["--smoke", "--resume"])
     assert args.smoke is True
     assert args.resume is True
+
+
+def test_report_target_smoke_is_always_none() -> None:
+    config = load_sft_config(SFT_YAML)
+    assert sft.report_target(config, smoke=True) == "none"
+
+
+def test_report_target_full_run_uses_config() -> None:
+    config = load_sft_config(SFT_YAML)
+    assert config.sft.train.report_to == "wandb"
+    assert sft.report_target(config, smoke=False) == "wandb"
+
+    train = config.sft.train.model_copy(update={"report_to": "none"})
+    off = config.model_copy(update={"sft": config.sft.model_copy(update={"train": train})})
+    assert sft.report_target(off, smoke=False) == "none"
+
+
+def test_interval_callback_reapplies_config_on_train_begin() -> None:
+    pytest.importorskip("transformers")
+    callback = sft.make_interval_callback()
+    args = SimpleNamespace(logging_steps=1, save_steps=50)
+    state = SimpleNamespace(logging_steps=10, save_steps=250)  # state cũ từ checkpoint
+
+    callback.on_train_begin(args, state, SimpleNamespace())
+
+    assert state.logging_steps == 1
+    assert state.save_steps == 50
 
 
 def test_copy_adapters_copies_in_numeric_order(tmp_path: Path) -> None:

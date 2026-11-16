@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import platform
 import shutil
 import sys
@@ -50,8 +51,35 @@ def load_samples(config: SftConfig) -> tuple[Path, list[EncodedSample]]:
     return snapshot, encode_lines(lines, chat, sft.max_seq)
 
 
+def report_target(config: SftConfig, smoke: bool) -> str:
+    """Nơi gửi metrics: smoke test luôn tắt, run đầy đủ theo `sft.train.report_to`."""
+    return "none" if smoke else config.sft.train.report_to
+
+
+def make_interval_callback() -> Any:
+    """Callback đặt lại khoảng log và save theo config khi bắt đầu train.
+
+    Khi resume, Trainer tính các khoảng step từ args rồi nạp state cũ từ checkpoint (ghi đè).
+    Nếu không đặt lại, run resume từ checkpoint cũ vẫn dùng logging_steps/save_steps cũ.
+    """
+    import transformers
+
+    class ReapplyIntervals(transformers.TrainerCallback):
+        def on_train_begin(self, args: Any, state: Any, control: Any, **kwargs: Any) -> Any:
+            state.logging_steps = args.logging_steps
+            state.save_steps = args.save_steps
+            return control
+
+    return ReapplyIntervals()
+
+
 def build_trainer(
-    config: SftConfig, snapshot: Path, samples: list[EncodedSample], out: Path, max_steps: int
+    config: SftConfig,
+    snapshot: Path,
+    samples: list[EncodedSample],
+    out: Path,
+    max_steps: int,
+    report_to: str,
 ) -> Any:
     import datasets
     import peft
@@ -114,7 +142,8 @@ def build_trainer(
         data_seed=sft.seed,
         max_length=sft.max_seq,  # mọi mẫu đã được kiểm <= max_seq, TRL không cắt gì
         packing=False,
-        report_to="none",
+        report_to=report_to,
+        run_name=sft.run_name,
     )
     # Dataset đã tokenize, có sẵn `labels` (-100 ngoài đáp án): TRL dùng nguyên như vậy.
     dataset = datasets.Dataset.from_dict(
@@ -123,7 +152,13 @@ def build_trainer(
             "labels": [sample.labels for sample in samples],
         }
     )
-    return trl.SFTTrainer(model=model, args=args, train_dataset=dataset, processing_class=tokenizer)
+    return trl.SFTTrainer(
+        model=model,
+        args=args,
+        train_dataset=dataset,
+        processing_class=tokenizer,
+        callbacks=[make_interval_callback()],
+    )
 
 
 def copy_adapters(checkpoints: Path, target: Path, every: int, last: int) -> list[int]:
@@ -165,8 +200,13 @@ def main(argv: list[str] | None = None) -> int:
 
     torch.manual_seed(sft.seed)
     torch.cuda.reset_peak_memory_stats()
+    target = report_target(config, args.smoke)
+    if target == "wandb":
+        # Chỉ gửi metrics và config; không tải trọng số lên W&B.
+        os.environ.setdefault("WANDB_PROJECT", sft.tracking.project)
+        os.environ.setdefault("WANDB_LOG_MODEL", "false")
     trainer = build_trainer(
-        config, snapshot, samples, out, sft.smoke.max_steps if args.smoke else -1
+        config, snapshot, samples, out, sft.smoke.max_steps if args.smoke else -1, target
     )
     train_started = time.perf_counter()
     result = trainer.train(resume_from_checkpoint=True if args.resume else None)
