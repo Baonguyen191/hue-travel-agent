@@ -39,7 +39,7 @@ def test_copy_adapters_copies_in_numeric_order(tmp_path: Path) -> None:
         _checkpoint(checkpoints, step)
     target = tmp_path / "adapters"
 
-    assert sft.copy_adapters(checkpoints, target) == [2, 10, 100]
+    assert sft.copy_adapters(checkpoints, target, every=1, last=100) == [2, 10, 100]
 
     step_dir = target / "step-10"
     assert sorted(path.name for path in step_dir.iterdir()) == sorted(ADAPTER_FILES)
@@ -53,8 +53,8 @@ def test_copy_adapters_is_repeatable(tmp_path: Path) -> None:
         _checkpoint(checkpoints, step)
     target = tmp_path / "adapters"
 
-    first = sft.copy_adapters(checkpoints, target)
-    second = sft.copy_adapters(checkpoints, target)
+    first = sft.copy_adapters(checkpoints, target, every=1, last=10)
+    second = sft.copy_adapters(checkpoints, target, every=1, last=10)
 
     assert first == second == [2, 10]
 
@@ -65,4 +65,18 @@ def test_copy_adapters_fails_without_adapter_weights(tmp_path: Path) -> None:
     (checkpoint / "adapter_model.safetensors").unlink()
 
     with pytest.raises(FileNotFoundError):
-        sft.copy_adapters(checkpoints, tmp_path / "adapters")
+        sft.copy_adapters(checkpoints, tmp_path / "adapters", every=5, last=5)
+
+
+def test_copy_adapters_keeps_only_interval_and_final_step(tmp_path: Path) -> None:
+    checkpoints = tmp_path / "checkpoints"
+    for step in (*range(50, 501, 50), 520):
+        _checkpoint(checkpoints, step)
+    target = tmp_path / "adapters"
+
+    assert sft.copy_adapters(checkpoints, target, every=250, last=520) == [250, 500, 520]
+    assert sorted(path.name for path in target.iterdir()) == [
+        "step-250",
+        "step-500",
+        "step-520",
+    ]

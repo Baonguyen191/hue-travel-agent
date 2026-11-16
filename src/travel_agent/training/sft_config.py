@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class _Strict(BaseModel):
@@ -51,7 +51,17 @@ class TrainParams(_Strict):
     optimizer: str
     gradient_checkpointing: bool
     logging_steps: int = Field(gt=0)
+    # Checkpoint đầy đủ (adapter + optimizer) để chạy tiếp sau khi đứt; không vào repo.
     save_steps: int = Field(gt=0)
+    # Khoảng step của adapter được chép vào repo (DVC) để eval. Phải là bội số của save_steps
+    # vì adapter chỉ lấy từ checkpoint.
+    adapter_every: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def _adapter_every_multiple_of_save_steps(self) -> TrainParams:
+        if self.adapter_every % self.save_steps != 0:
+            raise ValueError("adapter_every phải là bội số của save_steps")
+        return self
 
 
 class SmokeParams(_Strict):

@@ -7,8 +7,9 @@ chat template với lúc kiểm dataset và lúc chạy), gắn LoRA lên base 4
     python scripts/train/sft.py --config configs/sft.yaml --smoke        # smoke test 20 step
     python scripts/train/sft.py --config configs/sft.yaml --resume       # chạy tiếp sau khi đứt
 
-Checkpoint (adapter + optimizer) nằm ở `<runs_dir>/<run_name>/checkpoints/`. Adapter của từng
-checkpoint được chép vào `models/sft/<run_name>/adapters/step-<N>/` (DVC theo dõi). Số đo ghi ở
+Checkpoint (adapter + optimizer) nằm ở `<runs_dir>/<run_name>/checkpoints/`, mỗi `save_steps` step.
+Adapter của các step là bội số của `adapter_every` và step cuối được chép vào
+`models/sft/<run_name>/adapters/step-<N>/` (DVC theo dõi). Số đo ghi ở
 `models/sft/<run_name>/train_metrics.json`; smoke test ghi ở `<run_dir>/smoke/` và không đụng repo.
 """
 
@@ -125,13 +126,20 @@ def build_trainer(
     return trl.SFTTrainer(model=model, args=args, train_dataset=dataset, processing_class=tokenizer)
 
 
-def copy_adapters(checkpoints: Path, target: Path) -> list[int]:
-    """Chép adapter (không kèm optimizer) của mọi checkpoint vào repo cho DVC theo dõi."""
+def copy_adapters(checkpoints: Path, target: Path, every: int, last: int) -> list[int]:
+    """Chép adapter (không kèm optimizer) vào repo cho DVC theo dõi.
+
+    Chỉ chép checkpoint có step là bội số của `every` hoặc bằng `last` (step cuối). Checkpoint
+    khác vẫn nằm trong `checkpoints` để chạy tiếp, không vào repo. Trả về các step đã chép,
+    tăng dần.
+    """
     steps: list[int] = []
     for checkpoint in sorted(
         checkpoints.glob("checkpoint-*"), key=lambda p: int(p.name.split("-")[1])
     ):
         step = int(checkpoint.name.split("-")[1])
+        if step % every != 0 and step != last:
+            continue
         destination = target / f"step-{step}"
         destination.mkdir(parents=True, exist_ok=True)
         for name in ADAPTER_FILES:
@@ -189,7 +197,9 @@ def main(argv: list[str] | None = None) -> int:
         if not last.is_dir():  # step cuối không rơi vào bội số của save_steps
             trainer.save_model(str(last))
         artifacts = repo_artifacts_dir(sft.run_name)
-        metrics["adapter_steps"] = copy_adapters(out, artifacts / "adapters")
+        metrics["adapter_steps"] = copy_adapters(
+            out, artifacts / "adapters", sft.train.adapter_every, steps
+        )
         metrics_path = artifacts / "train_metrics.json"
     metrics_path.parent.mkdir(parents=True, exist_ok=True)
     metrics_path.write_text(

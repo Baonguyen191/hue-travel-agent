@@ -44,7 +44,11 @@ sft:
     optimizer: paged_adamw_8bit
     gradient_checkpointing: true
     logging_steps: 10
-    save_steps: 250
+    # Checkpoint để chạy tiếp sau khi đứt: máy tắt đột ngột ở step 241 khi save_steps 250 làm
+    # mất 7 giờ.
+    save_steps: 50
+    # Adapter được chép vào repo để eval (plan 4 Task 6). Phải là bội số của save_steps.
+    adapter_every: 250
   smoke:
     max_steps: 20
 export:

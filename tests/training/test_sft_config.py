@@ -28,6 +28,20 @@ def test_max_seq_and_tokenizer_match_the_dataset_check() -> None:
     )
 
 
+def test_repo_config_resume_and_adapter_intervals() -> None:
+    train = load_sft_config(SFT_YAML).sft.train
+    assert train.save_steps == 50
+    assert train.adapter_every == 250
+
+
+def test_adapter_every_must_be_a_multiple_of_save_steps() -> None:
+    raw = yaml.safe_load(SFT_YAML.read_text(encoding="utf-8"))
+    raw["sft"]["train"]["save_steps"] = 50
+    raw["sft"]["train"]["adapter_every"] = 260
+    with pytest.raises(ValidationError, match="bội số của save_steps"):
+        SftConfig.model_validate(raw)
+
+
 def test_heavy_outputs_live_outside_the_repo() -> None:
     runs_dir = load_sft_config(SFT_YAML).sft.runs_dir.resolve()
     assert REPO.resolve() not in runs_dir.parents
