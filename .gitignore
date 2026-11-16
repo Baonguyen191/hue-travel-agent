@@ -8,3 +8,5 @@ data/raw/
 data/*.sqlite
 *.gguf
 .env
+# W&B ghi run local ở đây nếu không đặt WANDB_DIR
+wandb/
