@@ -1,4 +1,4 @@
-"""Lệnh CLI cho eval và dataset: make-evalset, eval, build-dataset, check-dataset."""
+"""Lệnh CLI cho eval, dataset và kiểm reward: make-evalset, eval, ..., reward-report."""
 
 from __future__ import annotations
 
@@ -37,6 +37,13 @@ from travel_agent.training.metrics import (
     summarize,
 )
 from travel_agent.training.requests import Split, build_eval_set, read_eval_set, write_eval_set
+from travel_agent.training.reward_report import (
+    RewardSummary,
+    check_report,
+    load_outcomes,
+    score_outcomes,
+    summarize_rewards,
+)
 from travel_agent.training.runner import run_eval
 from travel_agent.training.tokens import (
     TokenCounter,
@@ -51,6 +58,7 @@ EXIT_OK = 0
 EXIT_USAGE = 2  # sai cách dùng, hoặc báo cáo mốc chạy khác điều kiện
 EXIT_REGRESSION = 3
 EXIT_DATASET_INVALID = 4  # dataset không đạt (build không đủ mẫu, hoặc check-dataset hỏng)
+EXIT_REWARD_FAILED = 4  # reward không qua kiểm tra (reward-report); trùng số với dataset hỏng
 
 
 def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -110,6 +118,24 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
         help="Cho qua khi không nạp được tokenizer (báo cáo ghi token_check=skipped)",
     )
     check.set_defaults(func=_cmd_check_dataset)
+
+    reward = sub.add_parser(
+        "reward-report", help="Chấm reward trên output dev đã có; không qua kiểm tra thì exit 4"
+    )
+    reward.add_argument("--db", type=Path, default=Path("data/hue.sqlite"))
+    reward.add_argument("--evalset", type=Path, default=Path("data/eval/hue_eval_v1.jsonl"))
+    reward.add_argument(
+        "--outcomes",
+        type=_named_path,
+        action="append",
+        required=True,
+        metavar="NAME=PATH",
+        help="File *.outcomes.jsonl của một mốc; lặp lại cho nhiều mốc",
+    )
+    reward.add_argument("--better", required=True, help="Tên mốc được kỳ vọng tốt hơn")
+    reward.add_argument("--worse", required=True, help="Tên mốc được kỳ vọng kém hơn")
+    reward.add_argument("--out", type=Path, required=True, help="File JSON báo cáo")
+    reward.set_defaults(func=_cmd_reward_report)
 
 
 def load_usable_places(db: Path) -> list[Place]:
@@ -215,6 +241,13 @@ def _load_baseline(path: Path) -> tuple[dict[str, object], EvalSummary] | None:
     except (ValueError, KeyError, TypeError) as exc:
         print(f"File mốc {path} không hợp lệ: {exc}", file=sys.stderr)
     return None
+
+
+def _named_path(text: str) -> tuple[str, Path]:
+    name, sep, path = text.partition("=")
+    if not sep or not name or not path:
+        raise argparse.ArgumentTypeError("cần dạng NAME=PATH")
+    return name, Path(path)
 
 
 def _append_outcome(handle: TextIO, outcome: PlanOutcome) -> None:
@@ -405,4 +438,65 @@ def _cmd_check_dataset(args: argparse.Namespace) -> int:
         print(f"Dataset KHÔNG ĐẠT: {report.failure_counts}", file=sys.stderr)
         return EXIT_DATASET_INVALID
     print("Dataset đạt mọi kiểm tra.")
+    return EXIT_OK
+
+
+def _fmt(value: float | None) -> str:
+    return "-" if value is None else f"{value:.3f}"
+
+
+def _print_reward_table(summaries: dict[str, RewardSummary]) -> None:
+    header = (
+        f"{'mốc':<14}{'n':>4}{'mean':>9}{'valid':>9}{'invalid':>9}"
+        f"{'n_valid':>9}{'n_inv':>7}{'mismatch':>10}{'floor_days':>12}"
+    )
+    print(header)
+    for name, summary in summaries.items():
+        print(
+            f"{name:<14}{summary.n:>4}{summary.mean_reward:>9.3f}"
+            f"{_fmt(summary.mean_reward_valid):>9}{_fmt(summary.mean_reward_invalid):>9}"
+            f"{summary.n_valid:>9}{summary.n_invalid:>7}{summary.valid_mismatch:>10}"
+            f"{summary.below_floor_days:>12}"
+        )
+
+
+def _cmd_reward_report(args: argparse.Namespace) -> int:
+    outcome_paths = [path for _, path in args.outcomes]
+    if _missing([args.db, args.evalset, *outcome_paths]):
+        return EXIT_USAGE
+    names = [name for name, _ in args.outcomes]
+    if len(set(names)) != len(names):
+        print("Tên mốc trong --outcomes bị trùng.", file=sys.stderr)
+        return EXIT_USAGE
+    unknown = [name for name in (args.better, args.worse) if name not in names]
+    if unknown:
+        print(f"Không có --outcomes cho: {', '.join(unknown)}.", file=sys.stderr)
+        return EXIT_USAGE
+
+    entries = read_eval_set(args.evalset, Split.DEV)
+    places = load_usable_places(args.db)
+    travel = HaversineEstimator()
+    summaries: dict[str, RewardSummary] = {}
+    try:
+        for name, path in args.outcomes:
+            scored = score_outcomes(entries, load_outcomes(path), places, travel)
+            summaries[name] = summarize_rewards(scored)
+    except ValueError as exc:
+        print(f"Không chấm được reward: {exc}", file=sys.stderr)
+        return EXIT_USAGE
+
+    failures = check_report(summaries, args.better, args.worse)
+    report = {
+        "summaries": {name: summary.model_dump(mode="json") for name, summary in summaries.items()},
+        "failures": failures,
+    }
+    args.out.parent.mkdir(parents=True, exist_ok=True)
+    args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    _print_reward_table(summaries)
+    for failure in failures:
+        print(f"KHÔNG QUA KIỂM TRA: {failure}", file=sys.stderr)
+    if failures:
+        return EXIT_REWARD_FAILED
+    print("Reward qua mọi kiểm tra.")
     return EXIT_OK
