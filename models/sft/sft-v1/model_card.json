@@ -1,0 +1,155 @@
+{
+  "card_version": 1,
+  "run_name": "sft-v1",
+  "stage": "sft",
+  "parent": null,
+  "git_commit": "5670d32173b2275f497d7feadfa03eeedefcf580-dirty",
+  "base_model": {
+    "repo": "Qwen/Qwen3.5-4B",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "license": "Apache-2.0",
+    "license_source": "LICENSE tại revision 851bf6e8, 11544 byte, sha256 bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a",
+    "tokenizer_sha256": "5f9e4d4901a92b997e463c1f46055088b6cca5ca61a6522d1b9f64c4bb81cb42",
+    "chat_template_sha256": "a4aee8afcf2e0711942cf848899be66016f8d14a889ff9ede07bca099c28f715"
+  },
+  "dataset": {
+    "path": "data/sft/hue_sft_v1.jsonl",
+    "name": "hue_sft_v1",
+    "jsonl_sha256": "168195e9c9aea83f22e6922575bcd9202940574353c44474646bf98a1e5451c4",
+    "db_sha256": "8f8eac2196f53260d45c4a31fc04980343ded9cb7f260fea5b7bebda92114d92",
+    "samples": 4000,
+    "samples_by_kind": {
+      "generate": 3400,
+      "repair": 600
+    },
+    "git_commit": "c33a20e8d60a28ec7e14fff825f4aff3a7fb5524-dirty"
+  },
+  "config": {
+    "path": "configs/sft.yaml",
+    "sha256": "4bdbe44beb1b2f9beaadb8e9d6ccc57a94ce4a2d9824c7bce245678d282f53a7",
+    "values": {
+      "sft": {
+        "run_name": "sft-v1",
+        "python": "C:\\dev\\venvs\\travel\\Scripts\\python.exe",
+        "runs_dir": "C:\\dev\\travelagent-runs\\sft",
+        "dataset": "data\\sft\\hue_sft_v1.jsonl",
+        "base_model": {
+          "repo": "Qwen/Qwen3.5-4B",
+          "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+          "license": "Apache-2.0",
+          "license_source": "LICENSE tại revision 851bf6e8, 11544 byte, sha256 bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a"
+        },
+        "seed": 3407,
+        "max_seq": 4096,
+        "lora": {
+          "r": 16,
+          "alpha": 32,
+          "dropout": 0.0,
+          "target_modules": "model\\.(language_model\\.)?layers\\.\\d+\\.(self_attn\\.(q_proj|k_proj|v_proj|o_proj)|linear_attn\\.(in_proj_qkv|in_proj_z|out_proj)|mlp\\.(gate_proj|up_proj|down_proj))"
+        },
+        "quantization": {
+          "load_in_4bit": true,
+          "quant_type": "nf4",
+          "double_quant": true,
+          "compute_dtype": "bfloat16"
+        },
+        "train": {
+          "epochs": 2,
+          "learning_rate": 0.0002,
+          "per_device_batch_size": 1,
+          "gradient_accumulation_steps": 8,
+          "lr_scheduler": "cosine",
+          "warmup_ratio": 0.03,
+          "weight_decay": 0.0,
+          "optimizer": "paged_adamw_8bit",
+          "gradient_checkpointing": true,
+          "logging_steps": 1,
+          "save_steps": 50,
+          "adapter_every": 250,
+          "report_to": "wandb"
+        },
+        "smoke": {
+          "max_steps": 20
+        },
+        "tracking": {
+          "project": "travel-agent-sft"
+        }
+      },
+      "export": {
+        "checkpoint": 250,
+        "quantization": "Q4_K_M",
+        "llama_cpp_dir": "C:\\dev\\llama.cpp",
+        "template_model": "qwen3.5:4b",
+        "ollama_model": "travel-sft-v1"
+      }
+    }
+  },
+  "train": {
+    "optimizer_steps": 1000,
+    "train_loss": 0.04809736081212759,
+    "train_seconds": 59473.1,
+    "seconds_per_step": 59.47,
+    "peak_vram_allocated_gb": 7.09,
+    "peak_vram_reserved_gb": 7.81,
+    "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+    "python": "3.14.6",
+    "packages": {
+      "torch": "2.14.1+cu130",
+      "transformers": "5.17.0",
+      "peft": "0.21.2",
+      "trl": "1.16.0",
+      "bitsandbytes": "0.50.2",
+      "accelerate": "1.15.0",
+      "datasets": "5.1.0"
+    },
+    "trained_tokens": 1671435
+  },
+  "checkpoint": {
+    "step": 250
+  },
+  "export": {
+    "checkpoint": 250,
+    "adapter_sha256": "5a5e75d13d735e5a205cd9616371144518c9e2c018e13fe8ff2a0f485f658dc8",
+    "quantization": "Q4_K_M",
+    "gguf": "C:\\dev\\travelagent-runs\\sft\\sft-v1\\export\\step-250\\model-Q4_K_M.gguf",
+    "gguf_sha256": "f9bf4bc00b3f022c963dbc0201c250976cf7a6d62843efe010936fee39d478d5",
+    "llama_cpp_commit": "48c9f08b7b25766324282b7605177e2f2be755bb",
+    "template_model": "qwen3.5:4b",
+    "ollama_model": "travel-sft-v1",
+    "modelfile_sha256": "c25c2956aaaf85cecee589e38daec690d67c35cac276b8dabcaf043efcc3e98d"
+  },
+  "metrics_dev": {
+    "meta": {
+      "run_name": "sft",
+      "model": "travel-sft-v1",
+      "split": "dev",
+      "temperature": 0.0,
+      "seed": 0,
+      "num_predict": 2048,
+      "num_ctx": 8192,
+      "schema_format": true,
+      "limit": "all",
+      "host": "http://127.0.0.1:11434",
+      "git_commit": "5670d32173b2275f497d7feadfa03eeedefcf580-dirty",
+      "evalset_sha256": "624e86c1690c2daefe220794b3e218916849f2b731560ffbc15bb5317e02c545",
+      "db_sha256": "8f8eac2196f53260d45c4a31fc04980343ded9cb7f260fea5b7bebda92114d92"
+    },
+    "summary": {
+      "n": 70,
+      "first_pass_valid_rate": 0.22857142857142856,
+      "parse_error_rate": 0.0,
+      "unknown_place_rate": 0.0,
+      "avg_stops_per_day": 5.5646258503401365,
+      "distinct_place_count": 470,
+      "latency_p50_s": 7.555021949992806,
+      "issue_code_distribution": {
+        "closed_during_visit": 10,
+        "duplicate_place": 8,
+        "missing_meal": 3,
+        "opening_hours_unknown": 45,
+        "overloaded_day": 2,
+        "travel_time_insufficient": 181
+      }
+    }
+  }
+}

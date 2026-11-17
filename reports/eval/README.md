@@ -7,6 +7,31 @@ Số liệu gốc nằm trong file JSON cùng thư mục. Kết quả từng req
 |---|---|---|---|---|---|---|---|---|
 | baseline, trước khi sửa candidate và schema | qwen3.5:4b (Q4_K_M) | 2026-11-12 | 0.057 (4/70) | 0.000 | 0.003 | 5.06 | 250 | 4.6 |
 | baseline | qwen3.5:4b (Q4_K_M) | 2026-11-14 | 0.086 (6/70) | 0.000 | 0.010 | 5.39 | 423 | 9.1 |
+| SFT sft-v1, checkpoint 250 | travel-sft-v1 (Qwen3.5-4B + LoRA r16, Q4_K_M) | 2026-11-17 | 0.229 (16/70) | 0.000 | 0.000 | 5.56 | 470 | 7.6 |
+
+## Ghi chú SFT 2026-11-17
+
+- **Chạy bằng** `dvc repro export_sft eval_sft`, cùng tham số sinh với baseline. Qua cổng so với baseline (exit 0). Model card ở `models/sft/sft-v1/model_card.json`.
+- **Meta ghi `5670d32…-dirty`:** lúc chạy, `configs/sft.yaml` mới đổi `export.checkpoint` từ null sang 250 và chưa commit.
+- **Chọn checkpoint** (dev, cùng tham số; chỉ 250 được eval qua DVC, ba cái còn lại chạy tay rồi xóa GGUF):
+
+  | checkpoint | first_pass_valid_rate | lần `travel_time_insufficient` |
+  |---|---|---|
+  | 250 | 0.229 (16/70) | 181 |
+  | 500 | 0.229 (16/70) | 219 |
+  | 750 | 0.071 (5/70) | 302 |
+  | 1000 | 0.129 (9/70) | 329 |
+
+  250 và 500 hòa, lấy step sớm hơn (plan 4 mục 2). Loss train vẫn giảm đều tới step 1000 (khoảng 0.084 ở step 100, 0.040 ở step 1000), nhưng lỗi thời gian di chuyển tăng dần từ sau step 500: train lâu hơn làm model kém đi.
+- **Theo số ngày:** 1 ngày đạt 8/21, 2 ngày đạt 6/21, 3 ngày đạt 2/28.
+- **Lỗi nhiều nhất** (số request có ít nhất một ERROR loại đó, trên 70; baseline trong ngoặc):
+  - `travel_time_insufficient`: 51 (59)
+  - `closed_during_visit`: 8 (40)
+  - `duplicate_place`: 7 (8)
+  - `unknown_place`: 0 (4)
+  - `stop_time_order`: 0 (1)
+- **Cảnh báo `missing_meal`** (không phải ERROR) giảm từ 171 lần xuống 3.
+- **Độ dài:** prompt dài nhất 1.936 token, output dài nhất 858 token. `done_reason` là `stop` ở cả 70 request.
 
 ## Ghi chú baseline 2026-11-14
 

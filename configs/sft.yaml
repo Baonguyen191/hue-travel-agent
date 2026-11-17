@@ -59,7 +59,9 @@ sft:
     project: travel-agent-sft
 export:
   # Step của checkpoint thắng (plan 4 mục 2). null cho tới khi đã eval các checkpoint.
-  checkpoint: null
+  # 2026-11-17, first_pass_valid_rate trên dev: 250 = 0,229; 500 = 0,229; 750 = 0,071;
+  # 1000 = 0,129 (baseline 0,086). 250 và 500 hòa, lấy step sớm hơn.
+  checkpoint: 250
   quantization: Q4_K_M
   llama_cpp_dir: C:/dev/llama.cpp
   # Model Ollama làm mẫu: Modelfile của SFT chép từ đây, chỉ thay FROM của trọng số text.

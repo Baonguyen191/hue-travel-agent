@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "run_name": "sft",
+    "model": "travel-sft-v1",
+    "split": "dev",
+    "temperature": 0.0,
+    "seed": 0,
+    "num_predict": 2048,
+    "num_ctx": 8192,
+    "schema_format": true,
+    "limit": "all",
+    "host": "http://127.0.0.1:11434",
+    "git_commit": "5670d32173b2275f497d7feadfa03eeedefcf580-dirty",
+    "evalset_sha256": "624e86c1690c2daefe220794b3e218916849f2b731560ffbc15bb5317e02c545",
+    "db_sha256": "8f8eac2196f53260d45c4a31fc04980343ded9cb7f260fea5b7bebda92114d92"
+  },
+  "summary": {
+    "n": 70,
+    "first_pass_valid_rate": 0.22857142857142856,
+    "parse_error_rate": 0.0,
+    "unknown_place_rate": 0.0,
+    "avg_stops_per_day": 5.5646258503401365,
+    "distinct_place_count": 470,
+    "latency_p50_s": 7.555021949992806,
+    "issue_code_distribution": {
+      "closed_during_visit": 10,
+      "duplicate_place": 8,
+      "missing_meal": 3,
+      "opening_hours_unknown": 45,
+      "overloaded_day": 2,
+      "travel_time_insufficient": 181
+    }
+  }
+}

@@ -420,3 +420,128 @@ stages:
       hash: md5
       md5: 4151aa387b5f3bedf928e233f3f90d76
       size: 276996
+  export_sft:
+    cmd: C:/dev/venvs/travel/Scripts/python.exe scripts/train/export_gguf.py 
+      --config configs/sft.yaml --record
+    deps:
+    - path: models/sft/sft-v1/adapters
+      hash: md5
+      md5: 7a14e3c4fa7a11f62d0aae0aa776235c.dir
+      size: 487809556
+      nfiles: 8
+    - path: scripts/train/export_gguf.py
+      hash: md5
+      md5: c2a46990d6cc7dbca4cb6c807773008c
+      size: 7743
+    - path: src/travel_agent/training
+      hash: md5
+      md5: 02cea13ee224c0846a072fc2a48751da.dir
+      size: 88640
+      nfiles: 17
+    params:
+      configs/sft.yaml:
+        export:
+          checkpoint: 250
+          quantization: Q4_K_M
+          llama_cpp_dir: C:/dev/llama.cpp
+          template_model: qwen3.5:4b
+          ollama_model: travel-sft-v1
+    outs:
+    - path: models/sft/sft-v1/export.json
+      hash: md5
+      md5: 8e5727a23b68224ba71301e1145955ff
+      size: 550
+  eval_sft:
+    cmd:
+    - python -m travel_agent eval --db data/hue.sqlite --evalset 
+      data/eval/hue_eval_v1.jsonl --split dev --model travel-sft-v1 
+      --temperature 0.0 --seed 0 --num-predict 2048 --num-ctx 8192 --run-name 
+      sft --mlflow --baseline reports/eval/baseline_dev.json --out 
+      reports/eval/sft_dev.json
+    - python scripts/train/write_model_card.py --config configs/sft.yaml
+    deps:
+    - path: data/eval/hue_eval_v1.jsonl
+      hash: md5
+      md5: 432ead148d5d7c6059f9fb62e56611d2
+      size: 22392
+    - path: data/hue.sqlite
+      hash: md5
+      md5: c7fa245031b1e8c4e31dfd4fcf77859e
+      size: 1929216
+    - path: data/sft/manifest.json
+      hash: md5
+      md5: b7067fb23d617c3e9a7a6e50294e23fc
+      size: 1435
+    - path: models/sft/sft-v1/export.json
+      hash: md5
+      md5: 8e5727a23b68224ba71301e1145955ff
+      size: 550
+    - path: reports/eval/baseline_dev.json
+      hash: md5
+      md5: 2b72f539d5a16bf4bbf98aec60ec3a9d
+      size: 1102
+    - path: scripts/train/write_model_card.py
+      hash: md5
+      md5: 17c016d1c3c780653aabd3c2e64d95db
+      size: 2947
+    - path: src/travel_agent/data/place_repository.py
+      hash: md5
+      md5: 457db209c0aff2e2e0688b6be8eb65cc
+      size: 5431
+    - path: src/travel_agent/domain
+      hash: md5
+      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
+      size: 6817
+      nfiles: 3
+    - path: src/travel_agent/planning
+      hash: md5
+      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
+      size: 32616
+      nfiles: 4
+    - path: src/travel_agent/review
+      hash: md5
+      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
+      size: 47936
+      nfiles: 6
+    - path: src/travel_agent/routing
+      hash: md5
+      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      size: 2238
+      nfiles: 2
+    - path: src/travel_agent/training
+      hash: md5
+      md5: 02cea13ee224c0846a072fc2a48751da.dir
+      size: 88640
+      nfiles: 17
+    - path: src/travel_agent/validation
+      hash: md5
+      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
+      size: 11384
+      nfiles: 3
+    params:
+      configs/eval.yaml:
+        generation:
+          temperature: 0.0
+          seed: 0
+          num_predict: 2048
+          num_ctx: 8192
+      configs/sft.yaml:
+        export:
+          checkpoint: 250
+          quantization: Q4_K_M
+          llama_cpp_dir: C:/dev/llama.cpp
+          template_model: qwen3.5:4b
+          ollama_model: travel-sft-v1
+    outs:
+    - path: models/sft/sft-v1/model_card.json
+      hash: md5
+      md5: d8c8b02aeb679bdd739eec85e7bd047d
+      size: 5306
+    - path: reports/eval/sft_dev.json
+      hash: md5
+      md5: 112a21eb3474ea734b71bc10c5595ed5
+      size: 1025
+    - path: reports/eval/sft_dev.outcomes.jsonl
+      hash: md5
+      md5: b1a889d69e2923e2f9c5016b3b67a638
+      size: 180718
