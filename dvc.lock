@@ -316,3 +316,107 @@ stages:
       hash: md5
       md5: 07e654dbfbb94f28534a57b2c113e203
       size: 617
+  sft:
+    cmd: C:/dev/venvs/travel/Scripts/python.exe scripts/train/sft.py --config 
+      configs/sft.yaml
+    deps:
+    - path: data/sft/hue_sft_v1.jsonl
+      hash: md5
+      md5: 0b9fa728c4ce200150b92fc445759f52
+      size: 21308405
+    - path: reports/dataset/check.json
+      hash: md5
+      md5: 07e654dbfbb94f28534a57b2c113e203
+      size: 617
+    - path: scripts/train/sft.py
+      hash: md5
+      md5: f7c7254fca18251070e9ab4d8a66ce19
+      size: 10194
+    - path: src/travel_agent/data/place_repository.py
+      hash: md5
+      md5: 457db209c0aff2e2e0688b6be8eb65cc
+      size: 5431
+    - path: src/travel_agent/domain
+      hash: md5
+      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
+      size: 6817
+      nfiles: 3
+    - path: src/travel_agent/planning
+      hash: md5
+      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
+      size: 32616
+      nfiles: 4
+    - path: src/travel_agent/review
+      hash: md5
+      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
+      size: 47936
+      nfiles: 6
+    - path: src/travel_agent/routing
+      hash: md5
+      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      size: 2238
+      nfiles: 2
+    - path: src/travel_agent/training
+      hash: md5
+      md5: 02cea13ee224c0846a072fc2a48751da.dir
+      size: 88640
+      nfiles: 17
+    - path: src/travel_agent/validation
+      hash: md5
+      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
+      size: 11384
+      nfiles: 3
+    params:
+      configs/sft.yaml:
+        sft:
+          run_name: sft-v1
+          python: C:/dev/venvs/travel/Scripts/python.exe
+          runs_dir: C:/dev/travelagent-runs/sft
+          dataset: data/sft/hue_sft_v1.jsonl
+          base_model:
+            repo: Qwen/Qwen3.5-4B
+            revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+            license: Apache-2.0
+            license_source: LICENSE tại revision 851bf6e8, 11544 byte, sha256 
+              bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a
+          seed: 3407
+          max_seq: 4096
+          lora:
+            r: 16
+            alpha: 32
+            dropout: 0.0
+            target_modules: 
+              model\.(language_model\.)?layers\.\d+\.(self_attn\.(q_proj|k_proj|v_proj|o_proj)|linear_attn\.(in_proj_qkv|in_proj_z|out_proj)|mlp\.(gate_proj|up_proj|down_proj))
+          quantization:
+            load_in_4bit: true
+            quant_type: nf4
+            double_quant: true
+            compute_dtype: bfloat16
+          train:
+            epochs: 2
+            learning_rate: 0.0002
+            per_device_batch_size: 1
+            gradient_accumulation_steps: 8
+            lr_scheduler: cosine
+            warmup_ratio: 0.03
+            weight_decay: 0.0
+            optimizer: paged_adamw_8bit
+            gradient_checkpointing: true
+            logging_steps: 1
+            report_to: wandb
+            save_steps: 50
+            adapter_every: 250
+          smoke:
+            max_steps: 20
+          tracking:
+            project: travel-agent-sft
+    outs:
+    - path: models/sft/sft-v1/adapters
+      hash: md5
+      md5: 7a14e3c4fa7a11f62d0aae0aa776235c.dir
+      size: 487809556
+      nfiles: 8
+    - path: models/sft/sft-v1/train_metrics.json
+      hash: md5
+      md5: 4151aa387b5f3bedf928e233f3f90d76
+      size: 276996
