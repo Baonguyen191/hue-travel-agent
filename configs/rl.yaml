@@ -16,8 +16,9 @@ rl:
   # Dataset SFT: mọi request của nó bị loại khỏi tập train RL để không trùng dữ liệu đã học.
   sft_dataset: data/sft/hue_sft_v1.jsonl
   seed: 4242
-  # Số request train RL (sau khi đã loại request trùng eval và SFT).
-  requests: 2000
+  # Số request train RL (sau khi đã loại request trùng eval và SFT). Đủ cho best_of_n:
+  # requests_per_round × max_rounds = 500 × 5.
+  requests: 2500
   # Nơi gửi metrics khi train (wandb: xem reward và các chỉ số theo step trên web).
   report_to: wandb
   tracking:

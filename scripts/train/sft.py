@@ -7,6 +7,15 @@ chat template với lúc kiểm dataset và lúc chạy), gắn LoRA lên base 4
     python scripts/train/sft.py --config configs/sft.yaml --smoke        # smoke test 20 step
     python scripts/train/sft.py --config configs/sft.yaml --resume       # chạy tiếp sau khi đứt
 
+Các cờ ghi đè dùng cho vòng best-of-N (không có cờ nào thì chạy y như cũ):
+
+    python scripts/train/sft.py --config configs/sft.yaml --init-adapter <adapter> \\
+        --dataset <jsonl> --run-dir <dir> --learning-rate 1e-4 --epochs 1 --run-name <name>
+
+`--run-dir` đổi thư mục run thành `<run-dir>` (checkpoint ở `<run-dir>/checkpoints/`, metrics ở
+`<run-dir>/train_metrics.json`) và không chép gì vào repo. `--init-adapter` nạp LoRA có sẵn và
+train tiếp thay vì gắn LoRA mới.
+
 Checkpoint (adapter + optimizer) nằm ở `<runs_dir>/<run_name>/checkpoints/`, mỗi `save_steps` step.
 Adapter của các step là bội số của `adapter_every` và step cuối được chép vào
 `models/sft/<run_name>/adapters/step-<N>/` (DVC theo dõi). Số đo ghi ở
@@ -22,6 +31,7 @@ import platform
 import shutil
 import sys
 import time
+from dataclasses import dataclass
 from importlib import metadata
 from pathlib import Path
 from typing import Any
@@ -35,19 +45,92 @@ PACKAGES = ("torch", "transformers", "peft", "trl", "bitsandbytes", "accelerate"
 ADAPTER_FILES = ("adapter_config.json", "adapter_model.safetensors")
 
 
+@dataclass(frozen=True)
+class RunPlan:
+    """Cấu hình thực tế của một lần train, sau khi áp cờ ghi đè lên config."""
+
+    dataset: Path
+    out: Path  # nơi checkpoint được ghi
+    learning_rate: float
+    epochs: int
+    run_name: str  # tên W&B và run_name trong metrics; không đổi đường dẫn trong repo
+    init_adapter: Path | None  # adapter có sẵn để train tiếp; None là gắn LoRA mới
+    copy_to_repo: bool  # có chép adapter vào models/sft/<run_name>/ không
+    metrics_path: Path
+
+
 def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--config", type=Path, default=Path("configs/sft.yaml"))
     parser.add_argument("--smoke", action="store_true", help="Chỉ train sft.smoke.max_steps step")
     parser.add_argument("--resume", action="store_true", help="Chạy tiếp từ checkpoint gần nhất")
+    parser.add_argument(
+        "--init-adapter",
+        type=Path,
+        default=None,
+        help="Nạp LoRA có sẵn (thư mục adapter) và train tiếp, thay vì gắn LoRA mới",
+    )
+    parser.add_argument("--dataset", type=Path, default=None, help="Ghi đè sft.dataset")
+    parser.add_argument(
+        "--run-dir",
+        type=Path,
+        default=None,
+        help="Ghi đè thư mục run; không chép adapter vào repo",
+    )
+    parser.add_argument(
+        "--learning-rate", type=float, default=None, help="Ghi đè train.learning_rate"
+    )
+    parser.add_argument("--epochs", type=int, default=None, help="Ghi đè train.epochs")
+    parser.add_argument("--run-name", type=str, default=None, help="Tên run trên W&B và metrics")
     return parser.parse_args(argv)
 
 
-def load_samples(config: SftConfig) -> tuple[Path, list[EncodedSample]]:
+def resolve_run(args: argparse.Namespace, config: SftConfig) -> RunPlan:
+    """Áp cờ ghi đè lên config. Không có cờ mới thì đường dẫn và tham số y như trước.
+
+    `--run-dir` thay thư mục run (checkpoint và metrics nằm dưới đó) và tắt việc chép adapter vào
+    repo. `--smoke` luôn ghi dưới `<run_dir>/smoke` và không chép vào repo.
+    """
+    sft = config.sft
+    if args.learning_rate is not None and args.learning_rate <= 0:
+        raise SystemExit("--learning-rate phải dương.")
+    if args.epochs is not None and args.epochs <= 0:
+        raise SystemExit("--epochs phải dương.")
+    if (
+        args.init_adapter is not None
+        and not (args.init_adapter / "adapter_model.safetensors").exists()
+    ):
+        raise SystemExit(f"Không có adapter để train tiếp trong {args.init_adapter}.")
+
+    base = sft.run_dir if args.run_dir is None else args.run_dir
+    out = base / ("smoke" if args.smoke else "checkpoints")
+    if args.smoke:
+        metrics_path, copy_to_repo = out / "train_metrics.json", False
+    elif args.run_dir is not None:
+        metrics_path, copy_to_repo = args.run_dir / "train_metrics.json", False
+    else:
+        metrics_path = repo_artifacts_dir(sft.run_name) / "train_metrics.json"
+        copy_to_repo = True
+    return RunPlan(
+        dataset=sft.dataset if args.dataset is None else args.dataset,
+        out=out,
+        learning_rate=sft.train.learning_rate if args.learning_rate is None else args.learning_rate,
+        epochs=sft.train.epochs if args.epochs is None else args.epochs,
+        run_name=sft.run_name if args.run_name is None else args.run_name,
+        init_adapter=args.init_adapter,
+        copy_to_repo=copy_to_repo,
+        metrics_path=metrics_path,
+    )
+
+
+def load_samples(
+    config: SftConfig, dataset: Path | None = None
+) -> tuple[Path, list[EncodedSample]]:
     sft = config.sft
     snapshot = hf_snapshot_dir(sft.base_model.repo, sft.base_model.revision)
     chat = ChatTokenizer.from_dir(snapshot)
-    lines = sft.dataset.read_text(encoding="utf-8").splitlines()
+    path = sft.dataset if dataset is None else dataset
+    lines = path.read_text(encoding="utf-8").splitlines()
     return snapshot, encode_lines(lines, chat, sft.max_seq)
 
 
@@ -80,6 +163,11 @@ def build_trainer(
     out: Path,
     max_steps: int,
     report_to: str,
+    *,
+    learning_rate: float | None = None,
+    epochs: int | None = None,
+    run_name: str | None = None,
+    init_adapter: Path | None = None,
 ) -> Any:
     import datasets
     import peft
@@ -115,17 +203,21 @@ def build_trainer(
         target_modules=sft.lora.target_modules,
         task_type="CAUSAL_LM",
     )
-    model = peft.get_peft_model(model, lora)
+    if init_adapter is None:
+        model = peft.get_peft_model(model, lora)
+    else:
+        # Train tiếp từ adapter có sẵn: trọng số LoRA được nạp lại và vẫn train được.
+        model = peft.PeftModel.from_pretrained(model, str(init_adapter), is_trainable=True)
     model.print_trainable_parameters()
 
     train = sft.train
     args = trl.SFTConfig(
         output_dir=str(out),
-        num_train_epochs=train.epochs,
+        num_train_epochs=train.epochs if epochs is None else epochs,
         max_steps=max_steps,
         per_device_train_batch_size=train.per_device_batch_size,
         gradient_accumulation_steps=train.gradient_accumulation_steps,
-        learning_rate=train.learning_rate,
+        learning_rate=train.learning_rate if learning_rate is None else learning_rate,
         lr_scheduler_type=train.lr_scheduler,
         # transformers 5 bỏ warmup_ratio: warmup_steps kiểu float trong [0, 1) là tỷ lệ số step.
         warmup_steps=train.warmup_ratio,
@@ -143,7 +235,7 @@ def build_trainer(
         max_length=sft.max_seq,  # mọi mẫu đã được kiểm <= max_seq, TRL không cắt gì
         packing=False,
         report_to=report_to,
-        run_name=sft.run_name,
+        run_name=sft.run_name if run_name is None else run_name,
     )
     # Dataset đã tokenize, có sẵn `labels` (-100 ngoài đáp án): TRL dùng nguyên như vậy.
     dataset = datasets.Dataset.from_dict(
@@ -187,11 +279,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     config = load_sft_config(args.config)
     sft = config.sft
-    out = sft.run_dir / ("smoke" if args.smoke else "checkpoints")
+    plan = resolve_run(args, config)
+    out = plan.out
     out.mkdir(parents=True, exist_ok=True)
 
     started = time.perf_counter()
-    snapshot, samples = load_samples(config)
+    snapshot, samples = load_samples(config, plan.dataset)
     print(
         f"Đã tokenize {len(samples)} mẫu, dài nhất {max(len(s.input_ids) for s in samples)} token."
     )
@@ -206,14 +299,23 @@ def main(argv: list[str] | None = None) -> int:
         os.environ.setdefault("WANDB_PROJECT", sft.tracking.project)
         os.environ.setdefault("WANDB_LOG_MODEL", "false")
     trainer = build_trainer(
-        config, snapshot, samples, out, sft.smoke.max_steps if args.smoke else -1, target
+        config,
+        snapshot,
+        samples,
+        out,
+        sft.smoke.max_steps if args.smoke else -1,
+        target,
+        learning_rate=plan.learning_rate,
+        epochs=plan.epochs,
+        run_name=plan.run_name,
+        init_adapter=plan.init_adapter,
     )
     train_started = time.perf_counter()
     result = trainer.train(resume_from_checkpoint=True if args.resume else None)
     train_seconds = time.perf_counter() - train_started
     steps = int(trainer.state.global_step)
     metrics: dict[str, Any] = {
-        "run_name": sft.run_name,
+        "run_name": plan.run_name,
         "smoke": args.smoke,
         "samples": len(samples),
         "trained_tokens": sum(sample.trained_tokens for sample in samples),
@@ -231,16 +333,15 @@ def main(argv: list[str] | None = None) -> int:
     }
     if args.smoke:
         trainer.save_model(str(out / "final"))
-        metrics_path = out / "train_metrics.json"
     else:
         last = out / f"checkpoint-{steps}"
         if not last.is_dir():  # step cuối không rơi vào bội số của save_steps
             trainer.save_model(str(last))
-        artifacts = repo_artifacts_dir(sft.run_name)
-        metrics["adapter_steps"] = copy_adapters(
-            out, artifacts / "adapters", sft.train.adapter_every, steps
-        )
-        metrics_path = artifacts / "train_metrics.json"
+        if plan.copy_to_repo:
+            metrics["adapter_steps"] = copy_adapters(
+                out, repo_artifacts_dir(sft.run_name) / "adapters", sft.train.adapter_every, steps
+            )
+    metrics_path = plan.metrics_path
     metrics_path.parent.mkdir(parents=True, exist_ok=True)
     metrics_path.write_text(
         json.dumps(metrics, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

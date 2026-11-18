@@ -340,3 +340,133 @@ def test_smoke_conflicts_stop_before_any_work(pipeline: Pipeline, extra: list[st
     assert pipeline.merged_from == []
     assert pipeline.calls == []
     assert not (pipeline.artifacts / "export.json").exists()
+
+
+# --- --adapter / --name / --work ---------------------------------------------
+
+
+def _make_custom_adapter(root: Path) -> Path:
+    adapter = root / "bon" / "round-1" / "adapter"
+    adapter.mkdir(parents=True)
+    (adapter / "adapter_model.safetensors").write_bytes(b"custom adapter")
+    return adapter
+
+
+def _custom_argv(adapter: Path, work: Path, name: str = "travel-bon-1") -> list[str]:
+    return ["--adapter", str(adapter), "--name", name, "--work", str(work)]
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["--adapter", "a", "--name", "n"],
+        ["--adapter", "a", "--work", "w"],
+        ["--name", "n", "--work", "w"],
+        ["--adapter", "a"],
+        ["--name", "n"],
+        ["--work", "w"],
+    ],
+)
+def test_check_args_requires_all_three_custom_flags(argv: list[str]) -> None:
+    with pytest.raises(SystemExit, match="phải đi cùng nhau"):
+        export_gguf.check_args(export_gguf.parse_args(argv))
+
+
+def test_check_args_rejects_empty_name() -> None:
+    with pytest.raises(SystemExit, match="--name"):
+        export_gguf.check_args(
+            export_gguf.parse_args(["--adapter", "a", "--name", " ", "--work", "w"])
+        )
+
+
+@pytest.mark.parametrize("extra", [["--record"], ["--checkpoint", "250"], ["--smoke"]])
+def test_check_args_rejects_custom_with_other_modes(extra: list[str]) -> None:
+    argv = ["--adapter", "a", "--name", "n", "--work", "w", *extra]
+    with pytest.raises(SystemExit, match="--adapter không đi cùng"):
+        export_gguf.check_args(export_gguf.parse_args(argv))
+
+
+@pytest.mark.parametrize("argv", [[], ["--record"], ["--checkpoint", "250"], ["--smoke"]])
+def test_check_args_accepts_existing_modes(argv: list[str]) -> None:
+    export_gguf.check_args(export_gguf.parse_args(argv))
+
+
+def test_resolve_target_without_flags_matches_pick_step(
+    tmp_path: Path, adapters_in_tmp: Path
+) -> None:
+    config = make_config(tmp_path, None)
+
+    target = export_gguf.resolve_target(export_gguf.parse_args(["--checkpoint", "250"]), config)
+
+    assert target == export_gguf.ExportTarget(
+        adapter=repo_artifacts_dir(config.sft.run_name) / "adapters" / "step-250",
+        work=config.sft.run_dir / "export" / "step-250",
+        name=f"{config.export.ollama_model}-step-250",
+        checkpoint=250,
+    )
+
+
+def test_resolve_target_custom_adapter_uses_given_paths(tmp_path: Path) -> None:
+    config = make_config(tmp_path, None)
+    adapter = _make_custom_adapter(tmp_path)
+    work = tmp_path / "work"
+
+    target = export_gguf.resolve_target(export_gguf.parse_args(_custom_argv(adapter, work)), config)
+
+    assert target == export_gguf.ExportTarget(
+        adapter=adapter, work=work, name="travel-bon-1", checkpoint=str(adapter)
+    )
+
+
+def test_resolve_target_custom_adapter_without_weights_stops(tmp_path: Path) -> None:
+    config = make_config(tmp_path, None)
+    empty = tmp_path / "empty"
+    empty.mkdir()
+
+    with pytest.raises(SystemExit, match="adapter_model.safetensors"):
+        export_gguf.resolve_target(
+            export_gguf.parse_args(_custom_argv(empty, tmp_path / "work")), config
+        )
+
+
+def test_custom_adapter_exports_to_work_dir_under_given_name(
+    pipeline: Pipeline, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    adapter = _make_custom_adapter(tmp_path)
+    work = tmp_path / "work"
+
+    assert export_gguf.main(_custom_argv(adapter, work)) == 0
+
+    assert pipeline.merged_from == [adapter]
+    final = work / f"model-{pipeline.config.export.quantization}.gguf"
+    assert final.exists()
+    assert not (work / "merged").exists()
+    assert _ollama_create_names(pipeline.calls) == ["travel-bon-1"]
+    printed = json.loads(capsys.readouterr().out)
+    assert printed["checkpoint"] == str(adapter)
+    assert printed["ollama_model"] == "travel-bon-1"
+    assert not (pipeline.artifacts / "export.json").exists()
+    assert not (pipeline.run_dir / "export").exists()
+
+
+def test_custom_adapter_with_skip_ollama_runs_no_ollama_create(
+    pipeline: Pipeline, tmp_path: Path
+) -> None:
+    adapter = _make_custom_adapter(tmp_path)
+
+    assert export_gguf.main(_custom_argv(adapter, tmp_path / "work") + ["--skip-ollama"]) == 0
+
+    assert not any(command[0] == "ollama" for command in pipeline.calls)
+
+
+@pytest.mark.parametrize("extra", [["--record"], ["--checkpoint", "250"], ["--smoke"]])
+def test_custom_adapter_conflicts_stop_before_any_work(
+    pipeline: Pipeline, tmp_path: Path, extra: list[str]
+) -> None:
+    adapter = _make_custom_adapter(tmp_path)
+
+    with pytest.raises(SystemExit):
+        export_gguf.main(_custom_argv(adapter, tmp_path / "work") + extra)
+
+    assert pipeline.merged_from == []
+    assert pipeline.calls == []

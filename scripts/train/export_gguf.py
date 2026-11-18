@@ -13,6 +13,13 @@ Các bước: merge adapter vào base bf16 trên CPU, `convert_hf_to_gguf.py` ra
 trọng số text, rồi `ollama create`. File nặng nằm ở `<run_dir>/export/step-<N>/`.
 `--record` bắt buộc `export.checkpoint` trong config, đặt tên model theo `export.ollama_model` và
 ghi `models/sft/<run_name>/export.json`; không có cờ này thì tên model có hậu tố `-step-<N>`.
+
+`--adapter`, `--name` và `--work` đi cùng nhau để export một adapter bất kỳ (ví dụ adapter của
+vòng best-of-N) thành model Ollama `--name`, với file nặng ghi vào `--work`. Không đi cùng
+`--record`, `--checkpoint` hoặc `--smoke`; không ghi export.json.
+
+    python scripts/train/export_gguf.py --config configs/sft.yaml \\
+        --adapter <dir> --name <ollama-name> --work <dir>
 """
 
 from __future__ import annotations
@@ -22,6 +29,7 @@ import json
 import shutil
 import subprocess
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -51,7 +59,67 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument(
         "--smoke", action="store_true", help="Export adapter của smoke test (<run_dir>/smoke/final)"
     )
+    parser.add_argument("--adapter", type=Path, help="Thư mục adapter bất kỳ cần export")
+    parser.add_argument("--name", type=str, help="Tên model Ollama cho --adapter")
+    parser.add_argument("--work", type=Path, help="Thư mục chứa file nặng của --adapter")
     return parser.parse_args(argv)
+
+
+@dataclass(frozen=True)
+class ExportTarget:
+    """Adapter cần export, nơi làm việc, tên model Ollama và `checkpoint` ghi vào record."""
+
+    adapter: Path
+    work: Path
+    name: str
+    checkpoint: int | str
+
+
+def check_args(args: argparse.Namespace) -> None:
+    """Từ chối tổ hợp cờ sai trước khi đọc config hay chạy bất kỳ bước nặng nào."""
+    custom = (args.adapter, args.name, args.work)
+    if any(value is not None for value in custom):
+        if any(value is None for value in custom):
+            raise SystemExit("--adapter, --name và --work phải đi cùng nhau.")
+        if not args.name.strip():
+            raise SystemExit("--name không được rỗng.")
+        if args.record or args.checkpoint is not None or args.smoke:
+            raise SystemExit("--adapter không đi cùng --record, --checkpoint hoặc --smoke.")
+    if args.smoke and (args.record or args.checkpoint is not None):
+        raise SystemExit("--smoke không đi cùng --record hoặc --checkpoint.")
+
+
+def resolve_target(args: argparse.Namespace, config: SftConfig) -> ExportTarget:
+    """Chọn adapter và đường dẫn đầu ra theo cờ. Không có cờ mới thì y như trước đây."""
+    sft, export = config.sft, config.export
+    if args.adapter is not None:
+        if not (args.adapter / "adapter_model.safetensors").exists():
+            raise SystemExit(f"Không có adapter_model.safetensors trong {args.adapter}.")
+        return ExportTarget(
+            adapter=args.adapter,
+            work=args.work,
+            name=args.name,
+            checkpoint=str(args.adapter),
+        )
+    if args.smoke:
+        adapter = sft.run_dir / "smoke" / "final"
+        if not (adapter / "adapter_model.safetensors").exists():
+            raise SystemExit(
+                f"Không có adapter smoke trong {adapter}. Chạy scripts/train/sft.py --smoke trước."
+            )
+        return ExportTarget(
+            adapter=adapter,
+            work=sft.run_dir / "export" / "smoke",
+            name=f"{export.ollama_model}-smoke",
+            checkpoint="smoke",
+        )
+    step = pick_step(config, None if args.record else args.checkpoint)
+    return ExportTarget(
+        adapter=repo_artifacts_dir(sft.run_name) / "adapters" / f"step-{step}",
+        work=sft.run_dir / "export" / f"step-{step}",
+        name=export.ollama_model if args.record else f"{export.ollama_model}-step-{step}",
+        checkpoint=step,
+    )
 
 
 def run(command: list[str]) -> str:
@@ -103,8 +171,7 @@ def text_weights(modelfile: str) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
-    if args.smoke and (args.record or args.checkpoint is not None):
-        raise SystemExit("--smoke không đi cùng --record hoặc --checkpoint.")
+    check_args(args)
     config = load_sft_config(args.config)
     if args.record and config.export.checkpoint is None:
         raise SystemExit(
@@ -112,21 +179,8 @@ def main(argv: list[str] | None = None) -> int:
             "(plan 4 Task 6 Step 3)."
         )
     sft, export = config.sft, config.export
-    if args.smoke:
-        adapter = sft.run_dir / "smoke" / "final"
-        if not (adapter / "adapter_model.safetensors").exists():
-            raise SystemExit(
-                f"Không có adapter smoke trong {adapter}. Chạy scripts/train/sft.py --smoke trước."
-            )
-        checkpoint: int | str = "smoke"
-        work = sft.run_dir / "export" / "smoke"
-        name = f"{export.ollama_model}-smoke"
-    else:
-        step = pick_step(config, None if args.record else args.checkpoint)
-        checkpoint = step
-        adapter = repo_artifacts_dir(sft.run_name) / "adapters" / f"step-{step}"
-        work = sft.run_dir / "export" / f"step-{step}"
-        name = export.ollama_model if args.record else f"{export.ollama_model}-step-{step}"
+    target = resolve_target(args, config)
+    adapter, work, name, checkpoint = target.adapter, target.work, target.name, target.checkpoint
     snapshot = hf_snapshot_dir(sft.base_model.repo, sft.base_model.revision)
     merged_dir, bf16_gguf = work / "merged", work / "model-bf16.gguf"
     final_gguf = work / f"model-{export.quantization}.gguf"
