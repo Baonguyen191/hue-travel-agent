@@ -34,16 +34,17 @@ STAGE_ROOTS = {
         "travel_agent.training.dataset",
     ),
 }
-# Stage train/export/eval_sft vẫn theo dõi cả thư mục mã.
-SFT_CODE_DEPS = (
-    "src/travel_agent/planning",
-    "src/travel_agent/training",
-    "src/travel_agent/validation",
-    "src/travel_agent/routing",
-    "src/travel_agent/domain",
-    "src/travel_agent/review",
-    "src/travel_agent/data/place_repository.py",
-)
+# Stage train/export có gốc là một file script: quét import travel_agent trong AST của script.
+SCRIPT_ROOTS = {
+    "sft": ("scripts/train/sft.py",),
+    "export_sft": ("scripts/train/export_gguf.py",),
+    "rl": ("scripts/train/sft.py",),
+    "export_rl": ("scripts/train/export_gguf.py",),
+}
+CARD_SCRIPT = "scripts/train/write_model_card.py"
+# Eval SFT/RL chạy đúng lệnh eval của baseline (cộng commands.py), rồi ghi model card.
+EVAL_STAGES = ("eval_sft", "eval_rl")
+COMMAND_FILE = "src/travel_agent/training/commands.py"
 
 
 def _module_file(module: str) -> Path | None:
@@ -63,10 +64,21 @@ def _imported_modules(path: Path) -> set[str]:
     return found
 
 
+def _root_modules(roots: tuple[str, ...]) -> list[str]:
+    """Gốc là tên module (travel_agent.a.b) hoặc đường dẫn script (scripts/.../x.py)."""
+    modules: list[str] = []
+    for root in roots:
+        if root.endswith(".py"):
+            modules.extend(_imported_modules(SRC.parent / root))
+        else:
+            modules.append(root)
+    return modules
+
+
 def _import_closure(roots: tuple[str, ...]) -> set[str]:
-    """Đường dẫn (tương đối gốc repo) của mọi file nguồn mà các module gốc import tới."""
+    """Đường dẫn (tương đối gốc repo) của mọi file nguồn mà các gốc import tới."""
     seen: set[str] = set()
-    todo = list(roots)
+    todo = _root_modules(roots)
     while todo:
         module = todo.pop()
         path = _module_file(module)
@@ -78,8 +90,13 @@ def _import_closure(roots: tuple[str, ...]) -> set[str]:
 
 
 def _stage_code_deps(stage: str) -> set[str]:
+    if stage in SCRIPT_ROOTS:
+        return _import_closure(SCRIPT_ROOTS[stage])
+    if stage in EVAL_STAGES:
+        baseline = _import_closure((*STAGE_ROOTS["baseline_eval"], *SHARED_ROOTS))
+        return baseline | {COMMAND_FILE} | _import_closure((CARD_SCRIPT,))
     deps = _import_closure((*STAGE_ROOTS[stage], *SHARED_ROOTS))
-    return deps | {"src/travel_agent/training/commands.py"}
+    return deps | {COMMAND_FILE}
 
 
 def _code_deps(stage: dict[str, Any]) -> set[str]:
@@ -147,6 +164,36 @@ def test_check_dataset_stage_never_skips_the_token_check() -> None:
     assert "--allow-skip-tokens" not in _stages()["check_dataset"]["cmd"]
 
 
+def test_script_stages_depend_on_exactly_the_files_their_script_imports() -> None:
+    """sft/rl chạy scripts/train/sft.py; export_* chạy scripts/train/export_gguf.py.
+
+    Không được liệt kê thư mục: thêm một module không liên quan không làm SFT bị tính lại.
+    """
+    stages = _stages()
+    for name in SCRIPT_ROOTS:
+        assert _code_deps(stages[name]) == _stage_code_deps(name), name
+        assert not any((SRC.parent / dep).is_dir() for dep in _code_deps(stages[name])), name
+
+
+def test_eval_stages_depend_on_eval_path_and_model_card_files() -> None:
+    """Eval SFT/RL: đường eval của baseline (cộng commands.py) và closure của write_model_card."""
+    stages = _stages()
+    for name in EVAL_STAGES:
+        assert _code_deps(stages[name]) == _stage_code_deps(name), name
+        assert CARD_SCRIPT in stages[name]["deps"], name
+        assert not any((SRC.parent / dep).is_dir() for dep in _code_deps(stages[name])), name
+    assert _stage_code_deps("eval_sft") == _stage_code_deps("eval_rl")
+
+
+def test_eval_stages_include_the_model_card_closure() -> None:
+    """write_model_card import commands.current_commit, nên closure của commands nằm trong eval."""
+    deps = _code_deps(_stages()["eval_sft"])
+    assert COMMAND_FILE in deps
+    assert "src/travel_agent/training/model_card.py" in deps
+    assert "src/travel_agent/training/rl_config.py" in deps
+    assert "src/travel_agent/training/reward_report.py" in deps
+
+
 def _eval_flags(cmd: str) -> dict[str, str]:
     tokens = cmd.split()
     return {
@@ -167,8 +214,6 @@ def test_sft_stages_chain_dataset_check_training_export_and_eval() -> None:
     assert "models/sft/${sft.run_name}/adapters" in export["deps"]
     assert "--record" in export["cmd"]
     assert "models/sft/${sft.run_name}/export.json" in evaluate["deps"]
-    for dep in SFT_CODE_DEPS:
-        assert dep in sft["deps"] and dep in evaluate["deps"], dep
 
 
 def test_sft_eval_runs_like_the_baseline_except_model_and_gate() -> None:
@@ -222,8 +267,6 @@ def test_rl_stage_chains_dataset_adapter_and_trains_from_step_250() -> None:
     assert "--run-name rl-v1-final" in rl["cmd"]
     assert "--adapter-out models/rl/${rl.run_name}/adapter" in rl["cmd"]
     assert {"configs/rl.yaml": ["final"]} in rl["params"]
-    for dep in SFT_CODE_DEPS:
-        assert dep in rl["deps"], dep
 
 
 def test_rl_export_reads_the_rl_adapter_and_records_it() -> None:

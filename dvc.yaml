@@ -143,13 +143,22 @@ stages:
       - data/sft/hue_sft_v1.jsonl
       - reports/dataset/check.json
       - scripts/train/sft.py
-      - src/travel_agent/planning
-      - src/travel_agent/training
-      - src/travel_agent/validation
-      - src/travel_agent/routing
-      - src/travel_agent/domain
-      - src/travel_agent/review
       - src/travel_agent/data/place_repository.py
+      - src/travel_agent/domain/models.py
+      - src/travel_agent/domain/opening_hours.py
+      - src/travel_agent/planning/candidates.py
+      - src/travel_agent/planning/prompt.py
+      - src/travel_agent/planning/solver.py
+      - src/travel_agent/routing/travel_time.py
+      - src/travel_agent/training/chat.py
+      - src/travel_agent/training/corrupt.py
+      - src/travel_agent/training/dataset.py
+      - src/travel_agent/training/requests.py
+      - src/travel_agent/training/sft_config.py
+      - src/travel_agent/training/sft_data.py
+      - src/travel_agent/training/tokens.py
+      - src/travel_agent/validation/report.py
+      - src/travel_agent/validation/validator.py
     params:
       - configs/sft.yaml:
           - sft
@@ -164,7 +173,12 @@ stages:
     deps:
       - models/sft/${sft.run_name}/adapters
       - scripts/train/export_gguf.py
-      - src/travel_agent/training
+      - src/travel_agent/training/chat.py
+      - src/travel_agent/training/export.py
+      - src/travel_agent/training/model_card.py
+      - src/travel_agent/training/rl_config.py
+      - src/travel_agent/training/sft_config.py
+      - src/travel_agent/training/tokens.py
     params:
       - configs/sft.yaml:
           - export
@@ -196,13 +210,34 @@ stages:
       - data/hue.sqlite
       - data/eval/hue_eval_v1.jsonl
       - scripts/train/write_model_card.py
-      - src/travel_agent/planning
-      - src/travel_agent/training
-      - src/travel_agent/validation
-      - src/travel_agent/routing
-      - src/travel_agent/domain
-      - src/travel_agent/review
       - src/travel_agent/data/place_repository.py
+      - src/travel_agent/domain/models.py
+      - src/travel_agent/domain/opening_hours.py
+      - src/travel_agent/planning/candidates.py
+      - src/travel_agent/planning/prompt.py
+      - src/travel_agent/planning/solver.py
+      - src/travel_agent/review/models.py
+      - src/travel_agent/review/store.py
+      - src/travel_agent/routing/travel_time.py
+      - src/travel_agent/training/chat.py
+      - src/travel_agent/training/commands.py
+      - src/travel_agent/training/corrupt.py
+      - src/travel_agent/training/dataset.py
+      - src/travel_agent/training/dataset_check.py
+      - src/travel_agent/training/generator.py
+      - src/travel_agent/training/metrics.py
+      - src/travel_agent/training/model_card.py
+      - src/travel_agent/training/parsing.py
+      - src/travel_agent/training/requests.py
+      - src/travel_agent/training/reward.py
+      - src/travel_agent/training/reward_report.py
+      - src/travel_agent/training/rl_config.py
+      - src/travel_agent/training/runner.py
+      - src/travel_agent/training/sft_config.py
+      - src/travel_agent/training/tokens.py
+      - src/travel_agent/training/tracking.py
+      - src/travel_agent/validation/report.py
+      - src/travel_agent/validation/validator.py
     params:
       - configs/eval.yaml:
           - generation
@@ -233,13 +268,22 @@ stages:
       - data/rl/rl-v1/round-1.jsonl
       - models/sft/sft-v1/adapters/step-250
       - scripts/train/sft.py
-      - src/travel_agent/planning
-      - src/travel_agent/training
-      - src/travel_agent/validation
-      - src/travel_agent/routing
-      - src/travel_agent/domain
-      - src/travel_agent/review
       - src/travel_agent/data/place_repository.py
+      - src/travel_agent/domain/models.py
+      - src/travel_agent/domain/opening_hours.py
+      - src/travel_agent/planning/candidates.py
+      - src/travel_agent/planning/prompt.py
+      - src/travel_agent/planning/solver.py
+      - src/travel_agent/routing/travel_time.py
+      - src/travel_agent/training/chat.py
+      - src/travel_agent/training/corrupt.py
+      - src/travel_agent/training/dataset.py
+      - src/travel_agent/training/requests.py
+      - src/travel_agent/training/sft_config.py
+      - src/travel_agent/training/sft_data.py
+      - src/travel_agent/training/tokens.py
+      - src/travel_agent/validation/report.py
+      - src/travel_agent/validation/validator.py
     params:
       - configs/rl.yaml:
           - final
@@ -258,7 +302,12 @@ stages:
     deps:
       - models/rl/${rl.run_name}/adapter
       - scripts/train/export_gguf.py
-      - src/travel_agent/training
+      - src/travel_agent/training/chat.py
+      - src/travel_agent/training/export.py
+      - src/travel_agent/training/model_card.py
+      - src/travel_agent/training/rl_config.py
+      - src/travel_agent/training/sft_config.py
+      - src/travel_agent/training/tokens.py
     params:
       - configs/rl.yaml:
           - final
@@ -295,13 +344,34 @@ stages:
       - data/hue.sqlite
       - data/eval/hue_eval_v1.jsonl
       - scripts/train/write_model_card.py
-      - src/travel_agent/planning
-      - src/travel_agent/training
-      - src/travel_agent/validation
-      - src/travel_agent/routing
-      - src/travel_agent/domain
-      - src/travel_agent/review
       - src/travel_agent/data/place_repository.py
+      - src/travel_agent/domain/models.py
+      - src/travel_agent/domain/opening_hours.py
+      - src/travel_agent/planning/candidates.py
+      - src/travel_agent/planning/prompt.py
+      - src/travel_agent/planning/solver.py
+      - src/travel_agent/review/models.py
+      - src/travel_agent/review/store.py
+      - src/travel_agent/routing/travel_time.py
+      - src/travel_agent/training/chat.py
+      - src/travel_agent/training/commands.py
+      - src/travel_agent/training/corrupt.py
+      - src/travel_agent/training/dataset.py
+      - src/travel_agent/training/dataset_check.py
+      - src/travel_agent/training/generator.py
+      - src/travel_agent/training/metrics.py
+      - src/travel_agent/training/model_card.py
+      - src/travel_agent/training/parsing.py
+      - src/travel_agent/training/requests.py
+      - src/travel_agent/training/reward.py
+      - src/travel_agent/training/reward_report.py
+      - src/travel_agent/training/rl_config.py
+      - src/travel_agent/training/runner.py
+      - src/travel_agent/training/sft_config.py
+      - src/travel_agent/training/tokens.py
+      - src/travel_agent/training/tracking.py
+      - src/travel_agent/validation/report.py
+      - src/travel_agent/validation/validator.py
     params:
       - configs/eval.yaml:
           - generation
