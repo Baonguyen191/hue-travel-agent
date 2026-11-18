@@ -111,7 +111,7 @@ python -m travel_agent build-dataset --config configs/dataset.yaml --db data/hue
 python -m travel_agent check-dataset --config configs/dataset.yaml --db data/hue.sqlite --evalset data/eval/hue_eval_v1.jsonl --dataset data/sft/hue_sft_v1.jsonl --out reports/dataset/check.json
 ```
 
-- `build-dataset` loại mọi request trùng bộ eval (cả dev và test). Cùng config cho ra cùng file đến từng byte.
+- `build-dataset` loại mọi request trùng bộ eval (cả dev và test). Cùng config cho ra cùng file đến từng byte **chỉ khi solver không hết giờ** (`solver_time_limit_s`, 10 giây mỗi request). Máy bận làm vài request hết giờ và bị bỏ, nên danh sách request dùng và cả file đổi theo: lần build lại ngày 2026-11-18 có 19 request hết giờ (bản gốc 0) và md5 khác. Kiểm `timed_out` trong `data/sft/manifest.json`.
 - `check-dataset` đếm token bằng tokenizer của `Qwen/Qwen3.5-4B` trong cache Hugging Face (repo và revision ghi trong config). Không nạp được tokenizer thì lệnh hỏng; `--allow-skip-tokens` cho qua nhưng báo cáo ghi `token_check: skipped`. `--tokenizer-dir` trỏ tới thư mục tokenizer khác.
 
 Exit code của `eval`, `build-dataset` và `check-dataset`:
@@ -122,7 +122,7 @@ Exit code của `eval`, `build-dataset` và `check-dataset`:
 | 1 | Crash (traceback của Python) |
 | 2 | Sai cách dùng, thiếu file, hoặc báo cáo mốc chạy khác điều kiện nên không so được |
 | 3 | `eval` không qua cổng so với mốc |
-| 4 | Dataset không đạt: `build-dataset` không đủ mẫu, hoặc `check-dataset` hỏng |
+| 4 | Dataset không đạt: `build-dataset` không đủ mẫu, hoặc `check-dataset` hỏng; hoặc `reward-report` không qua kiểm tra |
 
 - **Bộ eval:** `data/eval/hue_eval_v1.jsonl`, 70 dev và 30 test. Stage `make_evalset` đã đóng băng;
   không sinh lại. Lệnh `eval --split test` cần thêm `--allow-test` và chỉ dùng cho lần so sánh cuối.
@@ -130,6 +130,52 @@ Exit code của `eval`, `build-dataset` và `check-dataset`:
 - **MLflow:** `.venv\Scripts\mlflow ui --backend-store-uri sqlite:///C:/dev/travelagent-runs/mlflow.db`.
 - **Lưu ý:** duyệt tay địa điểm làm đổi `data/hue.sqlite`, nên `dvc repro` sẽ chạy lại eval.
   Chạy `dvc add data/hue.sqlite` sau mỗi đợt duyệt để ghi version dữ liệu mới.
+
+## Model đã train và cách train lại
+
+Kết quả của baseline, SFT và SFT+RL trên dev và test nằm ở `reports/eval/README.md`. Model cuối là
+`travel-rl-v1` trong Ollama: 27/70 plan hợp lệ ngay lần đầu trên dev và 16/30 trên test, so với
+baseline `qwen3.5:4b` (6/70, 2/30). Model card: `models/sft/sft-v1/model_card.json` và
+`models/rl/rl-v1/model_card.json` (`parent` của RL là SFT step 250).
+
+**Chạy model cuối.** Model chỉ cho kết quả đúng khi nhận prompt dựng bằng `build_messages()` và JSON
+schema ép số ngày, như lệnh `eval`. Chưa có lệnh lập lịch cho một request đơn lẻ; cách chạy hiện có
+là lệnh `eval` với `--model travel-rl-v1` (tham số sinh trong `configs/eval.yaml`).
+
+**Môi trường train** (Windows, GPU 8 GB): venv riêng `C:\dev\venvs\travel` (Python 3.14), cài torch bản
+CUDA 13.0 từ `https://download.pytorch.org/whl/cu130` trước, rồi extra `train` trong `pyproject.toml`.
+Venv này không cài `travel_agent`: mọi script train chạy với `$env:PYTHONPATH="src"`. Export cần
+llama.cpp ở `C:/dev/llama.cpp` (commit ghi trong `models/*/export.json`). Metrics train gửi lên W&B
+nếu đã `wandb login` (project trong `configs/sft.yaml: sft.tracking`).
+
+**Stage DVC của phần train** (luôn dùng `--single-item`: không có cờ này, DVC chạy lại mọi stage phía
+trên có dep đổi, kể cả train SFT khoảng 30 giờ):
+
+```powershell
+$env:PYTHONPATH="src"; $env:PATH="$PWD\.venv\Scripts;$env:PATH"
+dvc repro --single-item sft          # SFT QLoRA, configs/sft.yaml (khoảng 17–30 giờ)
+dvc repro --single-item export_sft   # GGUF Q4_K_M + model Ollama travel-sft-v1
+dvc repro --single-item eval_sft     # eval dev, cổng so với baseline, model card
+dvc repro --single-item rl           # train tiếp từ SFT step 250 trên data/rl/rl-v1/round-1.jsonl
+dvc repro --single-item export_rl
+dvc repro --single-item eval_rl      # cổng so với SFT
+```
+
+- **Chọn checkpoint SFT** là việc tay: export và eval từng checkpoint (`export_gguf.py --checkpoint N`),
+  ghi step thắng vào `configs/sft.yaml: export.checkpoint`. Xem plan 4.
+- **RL bằng best-of-N** (GRPO không vừa GPU 8 GB, xem plan 5): mỗi vòng sinh 4 plan/request qua Ollama
+  (`scripts/train/best_of_n.py generate`), giữ plan tốt nhất có reward ≥ 0,9 (`select`), rồi train tiếp
+  bằng `sft.py --init-adapter ... --dataset ... --run-dir ...`. Dataset của vòng đã chọn được DVC theo dõi
+  ở `data/rl/rl-v1/`, nên stage `rl` không cần sinh lại.
+- **Kiểm reward** trên output dev đã có: `python -m travel_agent reward-report --outcomes
+  baseline=reports/eval/baseline_dev.outcomes.jsonl --outcomes sft=reports/eval/sft_dev.outcomes.jsonl
+  --better sft --worse baseline --out reports/reward/dev_check.json` (exit 4 nếu reward xếp hạng sai).
+- **Tái lập:** train trên GPU không tất định hoàn toàn (train lại RL cho 27/70, lần đầu 28/70). Dataset
+  SFT phụ thuộc solver có giới hạn thời gian (xem trên). Ngày 2026-11-18 `dvc.lock` được ghi lại bằng
+  `dvc commit` sau khi kiểm rằng code đổi không chạm đường chạy mặc định; mọi output dữ liệu và model
+  giữ nguyên hash.
+- **Run dài** nên chạy qua Task Scheduler (cửa sổ ẩn) để không phụ thuộc VS Code, và cài gói vào venv
+  train chỉ khi không có process train nào đang chạy.
 
 ## Kiểm thử
 
