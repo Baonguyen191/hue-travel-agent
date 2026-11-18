@@ -43,8 +43,16 @@ from travel_agent.domain.models import (
     PlannedStop,
     PlanRequest,
 )
-from travel_agent.domain.opening_hours import parse_opening_hours
 from travel_agent.planning.candidates import preferred_categories
+from travel_agent.planning.hours import (
+    MINUTES_PER_DAY,
+    Interval,
+    day_bounds,
+    minute_ceil,
+    minute_floor,
+    open_ranges,
+    time_of,
+)
 from travel_agent.routing.travel_time import TravelTimeProvider
 from travel_agent.validation.report import ValidationReport
 from travel_agent.validation.validator import MEAL_CATEGORIES, MEAL_WINDOWS, validate_itinerary
@@ -73,7 +81,6 @@ VISIT_MINUTES: dict[Category, int] = {
 
 DEFAULT_TIME_LIMIT_S = 10.0
 
-MINUTES_PER_DAY = 24 * 60
 # Trọng số hàm mục tiêu (đơn vị chi phí nguyên). Phạt bỏ điểm lớn hơn mọi chi phí đi lại để
 # solver luôn lấp đủ mục tiêu số điểm khi khả thi; phạt thiếu bữa còn lớn hơn nữa.
 TRAVEL_COST_PER_MINUTE = 10
@@ -105,9 +112,6 @@ class SolveResult:
     @property
     def ok(self) -> bool:
         return self.status is SolveStatus.SOLVED
-
-
-Interval = tuple[int, int]  # [sớm nhất, muộn nhất] cho giờ đến, phút tuyệt đối, đóng hai đầu
 
 
 @dataclass(frozen=True)
@@ -190,22 +194,9 @@ def _unique(candidates: Sequence[Place]) -> list[Place]:
     return unique
 
 
-def _minute_ceil(value: dt.time) -> int:
-    return value.hour * 60 + value.minute + (1 if value.second or value.microsecond else 0)
-
-
-def _minute_floor(value: dt.time) -> int:
-    return value.hour * 60 + value.minute
-
-
 def _clock(absolute: int) -> str:
     minute = absolute % MINUTES_PER_DAY
     return f"{minute // 60:02d}:{minute % 60:02d}"
-
-
-def _day_bounds(request: PlanRequest, day: int) -> Interval:
-    base = day * MINUTES_PER_DAY
-    return base + _minute_ceil(request.day_start), base + _minute_floor(request.day_end)
 
 
 def _meal_slots(request: PlanRequest) -> list[_Slot]:
@@ -215,21 +206,8 @@ def _meal_slots(request: PlanRequest) -> list[_Slot]:
         base = day * MINUTES_PER_DAY
         for _, start, end in MEAL_WINDOWS:
             if request.day_start <= start and request.day_end >= end:
-                slots.append(_Slot(day, base + _minute_ceil(start), base + _minute_floor(end)))
+                slots.append(_Slot(day, base + minute_ceil(start), base + minute_floor(end)))
     return slots
-
-
-def _open_ranges(request: PlanRequest, place: Place, day: int) -> list[Interval]:
-    """Khoảng mở cửa (phút tuyệt đối) trong ngày `day`; giờ chưa rõ thì là cả khung ngày."""
-    hours = parse_opening_hours(place.opening_hours_raw)
-    if hours is None:
-        return [_day_bounds(request, day)]
-    weekday = (request.start_date + dt.timedelta(days=day)).weekday()
-    base = day * MINUTES_PER_DAY
-    return [
-        (base + _minute_ceil(r.start), base + _minute_floor(r.end))
-        for r in hours.by_weekday.get(weekday, ())
-    ]
 
 
 def _arrivals(ranges: Sequence[Interval], bound: Interval, visit: int) -> list[Interval]:
@@ -250,8 +228,8 @@ def _build_nodes(
         visit = VISIT_MINUTES[place.category]
         if place.category in MEAL_CATEGORIES:
             for slot_index, slot in enumerate(slots):
-                ranges = _open_ranges(request, place, slot.day)
-                day_start, day_end = _day_bounds(request, slot.day)
+                ranges = open_ranges(request, place, slot.day)
+                day_start, day_end = day_bounds(request, slot.day)
                 bound = (max(slot.start, day_start), min(slot.end, day_end))
                 found = _arrivals(ranges, bound, visit)
                 if found:
@@ -262,7 +240,7 @@ def _build_nodes(
             for day in range(request.num_days)
             if (
                 found := _arrivals(
-                    _open_ranges(request, place, day), _day_bounds(request, day), visit
+                    open_ranges(request, place, day), day_bounds(request, day), visit
                 )
             )
         }
@@ -343,7 +321,7 @@ def _route(
     # dùng trước thay vì để trống rồi dồn điểm vào buổi chiều.
     time_dim.SetSlackCostCoefficientForAllVehicles(IDLE_COST_PER_MINUTE)
     for day in range(num_days):
-        low, high = _day_bounds(request, day)
+        low, high = day_bounds(request, day)
         time_dim.CumulVar(routing.Start(day)).SetRange(low, low)
         time_dim.CumulVar(routing.End(day)).SetRange(low, high)
 
@@ -452,8 +430,8 @@ def _schedule(
             stops.append(
                 PlannedStop(
                     place_id=place.id,
-                    arrive=_time_of(visit.arrive),
-                    depart=_time_of(visit.arrive + VISIT_MINUTES[place.category]),
+                    arrive=time_of(visit.arrive),
+                    depart=time_of(visit.arrive + VISIT_MINUTES[place.category]),
                     note=None,
                 )
             )
@@ -461,8 +439,3 @@ def _schedule(
             return None
         days.append(PlannedDay(date=request.start_date + dt.timedelta(days=day), stops=stops))
     return Itinerary(days=days)
-
-
-def _time_of(absolute: int) -> dt.time:
-    minute = absolute % MINUTES_PER_DAY
-    return dt.time(minute // 60, minute % 60)
