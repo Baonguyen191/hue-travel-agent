@@ -141,14 +141,18 @@ stages:
       hash: md5
       md5: 014d1e7adbc686c76047b5216d5865e3
       size: 4636
+    - path: src/travel_agent/planning/hours.py
+      hash: md5
+      md5: 839d852158ae3e037d50c89a2223b6c4
+      size: 2174
     - path: src/travel_agent/planning/prompt.py
       hash: md5
       md5: 13c22815822952d2c75ac8bc58bb0c1d
       size: 7447
     - path: src/travel_agent/planning/solver.py
       hash: md5
-      md5: 5edd083221cfd27dc4601437bba411aa
-      size: 20533
+      md5: 3db991ef75589d194d3bfaf47a86a574
+      size: 19349
     - path: src/travel_agent/review/models.py
       hash: md5
       md5: ccda54fb9361a5d3c897d84ebfb7acce
@@ -241,14 +245,18 @@ stages:
       hash: md5
       md5: 014d1e7adbc686c76047b5216d5865e3
       size: 4636
+    - path: src/travel_agent/planning/hours.py
+      hash: md5
+      md5: 839d852158ae3e037d50c89a2223b6c4
+      size: 2174
     - path: src/travel_agent/planning/prompt.py
       hash: md5
       md5: 13c22815822952d2c75ac8bc58bb0c1d
       size: 7447
     - path: src/travel_agent/planning/solver.py
       hash: md5
-      md5: 5edd083221cfd27dc4601437bba411aa
-      size: 20533
+      md5: 3db991ef75589d194d3bfaf47a86a574
+      size: 19349
     - path: src/travel_agent/review/models.py
       hash: md5
       md5: ccda54fb9361a5d3c897d84ebfb7acce
@@ -348,14 +356,18 @@ stages:
       hash: md5
       md5: 014d1e7adbc686c76047b5216d5865e3
       size: 4636
+    - path: src/travel_agent/planning/hours.py
+      hash: md5
+      md5: 839d852158ae3e037d50c89a2223b6c4
+      size: 2174
     - path: src/travel_agent/planning/prompt.py
       hash: md5
       md5: 13c22815822952d2c75ac8bc58bb0c1d
       size: 7447
     - path: src/travel_agent/planning/solver.py
       hash: md5
-      md5: 5edd083221cfd27dc4601437bba411aa
-      size: 20533
+      md5: 3db991ef75589d194d3bfaf47a86a574
+      size: 19349
     - path: src/travel_agent/routing/travel_time.py
       hash: md5
       md5: 179a6fcf15295ea63284e4f9354e5d49
@@ -549,14 +561,18 @@ stages:
       hash: md5
       md5: 014d1e7adbc686c76047b5216d5865e3
       size: 4636
+    - path: src/travel_agent/planning/hours.py
+      hash: md5
+      md5: 839d852158ae3e037d50c89a2223b6c4
+      size: 2174
     - path: src/travel_agent/planning/prompt.py
       hash: md5
       md5: 13c22815822952d2c75ac8bc58bb0c1d
       size: 7447
     - path: src/travel_agent/planning/solver.py
       hash: md5
-      md5: 5edd083221cfd27dc4601437bba411aa
-      size: 20533
+      md5: 3db991ef75589d194d3bfaf47a86a574
+      size: 19349
     - path: src/travel_agent/review/models.py
       hash: md5
       md5: ccda54fb9361a5d3c897d84ebfb7acce
@@ -708,14 +724,18 @@ stages:
       hash: md5
       md5: 014d1e7adbc686c76047b5216d5865e3
       size: 4636
+    - path: src/travel_agent/planning/hours.py
+      hash: md5
+      md5: 839d852158ae3e037d50c89a2223b6c4
+      size: 2174
     - path: src/travel_agent/planning/prompt.py
       hash: md5
       md5: 13c22815822952d2c75ac8bc58bb0c1d
       size: 7447
     - path: src/travel_agent/planning/solver.py
       hash: md5
-      md5: 5edd083221cfd27dc4601437bba411aa
-      size: 20533
+      md5: 3db991ef75589d194d3bfaf47a86a574
+      size: 19349
     - path: src/travel_agent/routing/travel_time.py
       hash: md5
       md5: 179a6fcf15295ea63284e4f9354e5d49
@@ -927,14 +947,18 @@ stages:
       hash: md5
       md5: 014d1e7adbc686c76047b5216d5865e3
       size: 4636
+    - path: src/travel_agent/planning/hours.py
+      hash: md5
+      md5: 839d852158ae3e037d50c89a2223b6c4
+      size: 2174
     - path: src/travel_agent/planning/prompt.py
       hash: md5
       md5: 13c22815822952d2c75ac8bc58bb0c1d
       size: 7447
     - path: src/travel_agent/planning/solver.py
       hash: md5
-      md5: 5edd083221cfd27dc4601437bba411aa
-      size: 20533
+      md5: 3db991ef75589d194d3bfaf47a86a574
+      size: 19349
     - path: src/travel_agent/review/models.py
       hash: md5
       md5: ccda54fb9361a5d3c897d84ebfb7acce
