@@ -4,7 +4,8 @@
 rl:
   run_name: rl-v1
   # `grpo` (TRL GRPOTrainer, mục `grpo`) hoặc `best_of_n` (mục `best_of_n`, plan 5 Task 4).
-  method: grpo
+  # Smoke GRPO 2026-11-18: 8,8 phút/step, VRAM đỉnh 9,43 GB > 8 GB: không qua cổng spec 8.3.
+  method: best_of_n
   # Python của venv train (torch, transformers, peft, trl). Đường dẫn theo máy.
   python: C:/dev/venvs/travel/Scripts/python.exe
   runs_dir: C:/dev/travelagent-runs/rl

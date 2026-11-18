@@ -17,7 +17,7 @@ def _raw() -> dict:
 
 def test_repo_config_loads() -> None:
     config = load_rl_config(RL_YAML)
-    assert config.rl.method == "grpo"
+    assert config.rl.method == "best_of_n"  # smoke GRPO không qua cổng spec 8.3
     assert config.rl.run_dir == config.rl.runs_dir / "rl-v1"
 
 
