@@ -414,7 +414,7 @@ def test_resolve_target_custom_adapter_uses_given_paths(tmp_path: Path) -> None:
     target = export_gguf.resolve_target(export_gguf.parse_args(_custom_argv(adapter, work)), config)
 
     assert target == export_gguf.ExportTarget(
-        adapter=adapter, work=work, name="travel-bon-1", checkpoint=str(adapter)
+        adapter=adapter, work=work, name="travel-bon-1", checkpoint=adapter.as_posix()
     )
 
 
@@ -443,7 +443,7 @@ def test_custom_adapter_exports_to_work_dir_under_given_name(
     assert not (work / "merged").exists()
     assert _ollama_create_names(pipeline.calls) == ["travel-bon-1"]
     printed = json.loads(capsys.readouterr().out)
-    assert printed["checkpoint"] == str(adapter)
+    assert printed["checkpoint"] == adapter.as_posix()
     assert printed["ollama_model"] == "travel-bon-1"
     assert not (pipeline.artifacts / "export.json").exists()
     assert not (pipeline.run_dir / "export").exists()
@@ -470,3 +470,57 @@ def test_custom_adapter_conflicts_stop_before_any_work(
 
     assert pipeline.merged_from == []
     assert pipeline.calls == []
+
+
+# --- --record-out -----------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "argv",
+    [
+        ["--record-out", "r.json"],
+        ["--record-out", "r.json", "--checkpoint", "250"],
+        ["--record-out", "r.json", "--smoke"],
+    ],
+)
+def test_record_out_requires_adapter_mode(argv: list[str]) -> None:
+    with pytest.raises(SystemExit, match="--record-out chỉ đi cùng --adapter"):
+        export_gguf.check_args(export_gguf.parse_args(argv))
+
+
+def test_record_out_conflicts_with_record() -> None:
+    argv = ["--adapter", "a", "--name", "n", "--work", "w", "--record-out", "r.json", "--record"]
+    with pytest.raises(SystemExit, match="--adapter không đi cùng --record"):
+        export_gguf.check_args(export_gguf.parse_args(argv))
+
+
+def test_record_out_is_accepted_with_adapter_mode() -> None:
+    argv = [*_custom_argv(Path("a"), Path("w")), "--record-out", "r.json"]
+    export_gguf.check_args(export_gguf.parse_args(argv))
+
+
+def test_custom_adapter_writes_record_to_record_out(
+    pipeline: Pipeline, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    adapter = _make_custom_adapter(tmp_path)
+    record_out = tmp_path / "models" / "rl" / "rl-v1" / "export.json"
+
+    argv = _custom_argv(adapter, tmp_path / "work") + ["--record-out", str(record_out)]
+    assert export_gguf.main(argv) == 0
+
+    written = json.loads(record_out.read_text(encoding="utf-8"))
+    printed = json.loads(capsys.readouterr().out)
+    assert written == printed
+    assert written["checkpoint"] == adapter.as_posix()
+    assert written["ollama_model"] == "travel-bon-1"
+    assert not (pipeline.artifacts / "export.json").exists()
+
+
+def test_custom_adapter_without_record_out_writes_no_record(
+    pipeline: Pipeline, tmp_path: Path
+) -> None:
+    adapter = _make_custom_adapter(tmp_path)
+
+    assert export_gguf.main(_custom_argv(adapter, tmp_path / "work")) == 0
+
+    assert not list(tmp_path.glob("**/export.json"))

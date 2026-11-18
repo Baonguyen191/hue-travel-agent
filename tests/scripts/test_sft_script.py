@@ -354,3 +354,63 @@ def test_build_trainer_without_init_adapter_attaches_new_lora(
     assert trainer["args"]["learning_rate"] == train.learning_rate
     assert trainer["args"]["num_train_epochs"] == train.epochs
     assert trainer["args"]["run_name"] == config.sft.run_name
+
+
+# --- --adapter-out -----------------------------------------------------------
+
+
+def test_parse_args_adapter_out_defaults_to_none() -> None:
+    assert sft.parse_args([]).adapter_out is None
+    assert sft.parse_args(["--adapter-out", "a"]).adapter_out == Path("a")
+
+
+def test_resolve_run_adapter_out_needs_run_dir(tmp_path: Path) -> None:
+    config = _config_at(tmp_path)
+    with pytest.raises(SystemExit, match="--run-dir"):
+        sft.resolve_run(sft.parse_args(["--adapter-out", str(tmp_path / "out")]), config)
+
+
+def test_resolve_run_adapter_out_rejects_smoke(tmp_path: Path) -> None:
+    config = _config_at(tmp_path)
+    argv = ["--smoke", "--run-dir", str(tmp_path / "r"), "--adapter-out", str(tmp_path / "out")]
+    with pytest.raises(SystemExit, match="--smoke"):
+        sft.resolve_run(sft.parse_args(argv), config)
+
+
+def test_resolve_run_with_run_dir_and_adapter_out_keeps_repo_untouched(tmp_path: Path) -> None:
+    config = _config_at(tmp_path)
+    out = tmp_path / "adapter"
+    argv = ["--run-dir", str(tmp_path / "round"), "--adapter-out", str(out)]
+
+    plan = sft.resolve_run(sft.parse_args(argv), config)
+
+    assert plan.adapter_out == out
+    assert plan.copy_to_repo is False
+
+
+def test_resolve_run_without_adapter_out_has_none(tmp_path: Path) -> None:
+    config = _config_at(tmp_path)
+    plan = sft.resolve_run(sft.parse_args(["--run-dir", str(tmp_path / "round")]), config)
+    assert plan.adapter_out is None
+
+
+def test_copy_final_adapter_copies_only_adapter_files(tmp_path: Path) -> None:
+    checkpoint = _checkpoint(tmp_path / "checkpoints", 6)
+    target = tmp_path / "models" / "rl" / "rl-v1" / "adapter"
+
+    sft.copy_final_adapter(checkpoint, target)
+
+    assert sorted(path.name for path in target.iterdir()) == sorted(ADAPTER_FILES)
+    for name in ADAPTER_FILES:
+        assert (target / name).read_bytes() == (checkpoint / name).read_bytes()
+
+
+def test_copy_final_adapter_overwrites_previous_copy(tmp_path: Path) -> None:
+    target = tmp_path / "adapter"
+    sft.copy_final_adapter(_checkpoint(tmp_path / "first", 6), target)
+    newer = _checkpoint(tmp_path / "second", 7)
+
+    sft.copy_final_adapter(newer, target)
+
+    assert (target / "adapter_model.safetensors").read_bytes() == b"weights 7"
+    assert (target / "adapter_config.json").read_text(encoding="utf-8") == "config 7"

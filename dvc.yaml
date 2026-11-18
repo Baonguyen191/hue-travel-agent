@@ -1,6 +1,7 @@
 vars:
   - configs/eval.yaml
   - configs/sft.yaml
+  - configs/rl.yaml
 
 stages:
   make_evalset:
@@ -213,4 +214,103 @@ stages:
       - reports/eval/sft_dev.json:
           cache: false
       - models/sft/${sft.run_name}/model_card.json:
+          cache: false
+
+  rl:
+    # Vòng best-of-N đã chọn (plan 5 Task 6): train tiếp adapter SFT step 250 trên dataset của vòng
+    # đó bằng đúng cấu hình train của SFT, chỉ khác learning rate và số epoch. Checkpoint nằm ở
+    # rl.runs_dir, ngoài repo; chỉ adapter cuối được chép vào models/rl/<run_name>/adapter.
+    cmd: >-
+      ${sft.python} scripts/train/sft.py --config configs/sft.yaml
+      --init-adapter models/sft/sft-v1/adapters/step-250
+      --dataset ${final.dataset}
+      --run-dir ${rl.runs_dir}/${rl.run_name}/final
+      --learning-rate ${final.learning_rate}
+      --epochs ${final.epochs}
+      --run-name rl-v1-final
+      --adapter-out models/rl/${rl.run_name}/adapter
+    deps:
+      - data/rl/rl-v1/round-1.jsonl
+      - models/sft/sft-v1/adapters/step-250
+      - scripts/train/sft.py
+      - src/travel_agent/planning
+      - src/travel_agent/training
+      - src/travel_agent/validation
+      - src/travel_agent/routing
+      - src/travel_agent/domain
+      - src/travel_agent/review
+      - src/travel_agent/data/place_repository.py
+    params:
+      - configs/rl.yaml:
+          - final
+      - configs/sft.yaml:
+          - sft
+    outs:
+      - models/rl/${rl.run_name}/adapter
+
+  export_rl:
+    cmd: >-
+      ${sft.python} scripts/train/export_gguf.py --config configs/sft.yaml
+      --adapter models/rl/${rl.run_name}/adapter
+      --name ${final.ollama_model}
+      --work ${rl.runs_dir}/${rl.run_name}/export-final
+      --record-out models/rl/${rl.run_name}/export.json
+    deps:
+      - models/rl/${rl.run_name}/adapter
+      - scripts/train/export_gguf.py
+      - src/travel_agent/training
+    params:
+      - configs/rl.yaml:
+          - final
+      - configs/sft.yaml:
+          - export
+    metrics:
+      - models/rl/${rl.run_name}/export.json:
+          cache: false
+
+  eval_rl:
+    # Cùng lệnh eval với eval_sft (cùng sinh, cùng evalset), chỉ khác model, tên run và baseline
+    # là SFT. Model card RL ghi ngay sau eval.
+    cmd:
+      - >-
+        python -m travel_agent eval
+        --db data/hue.sqlite
+        --evalset data/eval/hue_eval_v1.jsonl
+        --split dev
+        --model ${final.ollama_model}
+        --temperature ${generation.temperature}
+        --seed ${generation.seed}
+        --num-predict ${generation.num_predict}
+        --num-ctx ${generation.num_ctx}
+        --run-name rl
+        --mlflow
+        --baseline reports/eval/sft_dev.json
+        --out reports/eval/rl_dev.json
+      - python scripts/train/write_model_card.py --stage rl --rl-config configs/rl.yaml
+    deps:
+      - models/rl/${rl.run_name}/export.json
+      - reports/eval/sft_dev.json
+      - data/rl/rl-v1/round-1.jsonl
+      - data/rl/rl-v1/round-1.stats.json
+      - data/hue.sqlite
+      - data/eval/hue_eval_v1.jsonl
+      - scripts/train/write_model_card.py
+      - src/travel_agent/planning
+      - src/travel_agent/training
+      - src/travel_agent/validation
+      - src/travel_agent/routing
+      - src/travel_agent/domain
+      - src/travel_agent/review
+      - src/travel_agent/data/place_repository.py
+    params:
+      - configs/eval.yaml:
+          - generation
+      - configs/rl.yaml:
+          - final
+    outs:
+      - reports/eval/rl_dev.outcomes.jsonl
+    metrics:
+      - reports/eval/rl_dev.json:
+          cache: false
+      - models/rl/${rl.run_name}/model_card.json:
           cache: false

@@ -4,7 +4,7 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from travel_agent.training.rl_config import RlConfig, load_rl_config
+from travel_agent.training.rl_config import RlConfig, load_rl_config, repo_rl_artifacts_dir
 from travel_agent.training.sft_config import load_sft_config
 
 REPO = Path(__file__).parents[2]
@@ -104,3 +104,31 @@ def test_heavy_outputs_live_outside_the_repo() -> None:
     runs_dir = load_rl_config(RL_YAML).rl.runs_dir.resolve()
     assert REPO.resolve() not in runs_dir.parents
     assert "OneDrive" not in runs_dir.parts
+
+
+def test_final_round_is_the_chosen_round_one() -> None:
+    final = load_rl_config(RL_YAML).final
+    assert final.round == 1
+    assert final.dataset == Path("data/rl/rl-v1/round-1.jsonl")
+    assert final.stats == Path("data/rl/rl-v1/round-1.stats.json")
+    assert final.ollama_model == "travel-rl-v1"
+    assert final.learning_rate == pytest.approx(5e-5)
+    assert final.epochs == 1
+
+
+def test_final_stats_must_sit_next_to_the_dataset() -> None:
+    raw = _raw()
+    raw["final"]["stats"] = "data/rl/rl-v1/other.json"
+    with pytest.raises(ValidationError, match="stats"):
+        RlConfig.model_validate(raw)
+
+
+def test_final_rejects_non_positive_learning_rate() -> None:
+    raw = _raw()
+    raw["final"]["learning_rate"] = 0
+    with pytest.raises(ValidationError):
+        RlConfig.model_validate(raw)
+
+
+def test_rl_artifacts_live_under_models_rl() -> None:
+    assert repo_rl_artifacts_dir("rl-v1") == Path("models") / "rl" / "rl-v1"

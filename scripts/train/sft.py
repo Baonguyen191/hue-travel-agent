@@ -14,7 +14,8 @@ Các cờ ghi đè dùng cho vòng best-of-N (không có cờ nào thì chạy y
 
 `--run-dir` đổi thư mục run thành `<run-dir>` (checkpoint ở `<run-dir>/checkpoints/`, metrics ở
 `<run-dir>/train_metrics.json`) và không chép gì vào repo. `--init-adapter` nạp LoRA có sẵn và
-train tiếp thay vì gắn LoRA mới.
+train tiếp thay vì gắn LoRA mới. `--adapter-out <dir>` (chỉ đi cùng `--run-dir`) chép adapter của
+checkpoint cuối (`<run-dir>/checkpoints/checkpoint-<steps>`) vào `<dir>`, ghi đè nếu đã có.
 
 Checkpoint (adapter + optimizer) nằm ở `<runs_dir>/<run_name>/checkpoints/`, mỗi `save_steps` step.
 Adapter của các step là bội số của `adapter_every` và step cuối được chép vào
@@ -57,6 +58,7 @@ class RunPlan:
     init_adapter: Path | None  # adapter có sẵn để train tiếp; None là gắn LoRA mới
     copy_to_repo: bool  # có chép adapter vào models/sft/<run_name>/ không
     metrics_path: Path
+    adapter_out: Path | None = None  # chép adapter cuối vào đây; None là không chép
 
 
 def parse_args(argv: list[str] | None) -> argparse.Namespace:
@@ -82,6 +84,12 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     )
     parser.add_argument("--epochs", type=int, default=None, help="Ghi đè train.epochs")
     parser.add_argument("--run-name", type=str, default=None, help="Tên run trên W&B và metrics")
+    parser.add_argument(
+        "--adapter-out",
+        type=Path,
+        default=None,
+        help="Chép adapter của checkpoint cuối vào thư mục này; chỉ đi cùng --run-dir",
+    )
     return parser.parse_args(argv)
 
 
@@ -101,6 +109,8 @@ def resolve_run(args: argparse.Namespace, config: SftConfig) -> RunPlan:
         and not (args.init_adapter / "adapter_model.safetensors").exists()
     ):
         raise SystemExit(f"Không có adapter để train tiếp trong {args.init_adapter}.")
+    if args.adapter_out is not None and (args.run_dir is None or args.smoke):
+        raise SystemExit("--adapter-out chỉ đi cùng --run-dir, không đi cùng --smoke.")
 
     base = sft.run_dir if args.run_dir is None else args.run_dir
     out = base / ("smoke" if args.smoke else "checkpoints")
@@ -120,6 +130,7 @@ def resolve_run(args: argparse.Namespace, config: SftConfig) -> RunPlan:
         init_adapter=args.init_adapter,
         copy_to_repo=copy_to_repo,
         metrics_path=metrics_path,
+        adapter_out=args.adapter_out,
     )
 
 
@@ -275,6 +286,13 @@ def copy_adapters(checkpoints: Path, target: Path, every: int, last: int) -> lis
     return steps
 
 
+def copy_final_adapter(checkpoint: Path, target: Path) -> None:
+    """Chép adapter (không kèm optimizer) của checkpoint cuối vào `target`, ghi đè nếu đã có."""
+    target.mkdir(parents=True, exist_ok=True)
+    for name in ADAPTER_FILES:
+        shutil.copy2(checkpoint / name, target / name)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     config = load_sft_config(args.config)
@@ -337,6 +355,8 @@ def main(argv: list[str] | None = None) -> int:
         last = out / f"checkpoint-{steps}"
         if not last.is_dir():  # step cuối không rơi vào bội số của save_steps
             trainer.save_model(str(last))
+        if plan.adapter_out is not None:
+            copy_final_adapter(last, plan.adapter_out)
         if plan.copy_to_repo:
             metrics["adapter_steps"] = copy_adapters(
                 out, repo_artifacts_dir(sft.run_name) / "adapters", sft.train.adapter_every, steps

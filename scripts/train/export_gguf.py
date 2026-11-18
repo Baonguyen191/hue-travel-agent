@@ -19,7 +19,10 @@ vòng best-of-N) thành model Ollama `--name`, với file nặng ghi vào `--wor
 `--record`, `--checkpoint` hoặc `--smoke`; không ghi export.json.
 
     python scripts/train/export_gguf.py --config configs/sft.yaml \\
-        --adapter <dir> --name <ollama-name> --work <dir>
+        --adapter <dir> --name <ollama-name> --work <dir> --record-out <json>
+
+`--record-out <json>` (chỉ đi cùng `--adapter`) ghi record in ra stdout vào file đó, cùng dạng
+với export.json của SFT; `checkpoint` là đường dẫn posix của adapter. Không đi cùng `--record`.
 """
 
 from __future__ import annotations
@@ -62,6 +65,9 @@ def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser.add_argument("--adapter", type=Path, help="Thư mục adapter bất kỳ cần export")
     parser.add_argument("--name", type=str, help="Tên model Ollama cho --adapter")
     parser.add_argument("--work", type=Path, help="Thư mục chứa file nặng của --adapter")
+    parser.add_argument(
+        "--record-out", type=Path, help="Ghi record JSON của --adapter vào file này"
+    )
     return parser.parse_args(argv)
 
 
@@ -87,6 +93,8 @@ def check_args(args: argparse.Namespace) -> None:
             raise SystemExit("--adapter không đi cùng --record, --checkpoint hoặc --smoke.")
     if args.smoke and (args.record or args.checkpoint is not None):
         raise SystemExit("--smoke không đi cùng --record hoặc --checkpoint.")
+    if args.record_out is not None and args.adapter is None:
+        raise SystemExit("--record-out chỉ đi cùng --adapter.")
 
 
 def resolve_target(args: argparse.Namespace, config: SftConfig) -> ExportTarget:
@@ -99,7 +107,7 @@ def resolve_target(args: argparse.Namespace, config: SftConfig) -> ExportTarget:
             adapter=args.adapter,
             work=args.work,
             name=args.name,
-            checkpoint=str(args.adapter),
+            checkpoint=args.adapter.as_posix(),
         )
     if args.smoke:
         adapter = sft.run_dir / "smoke" / "final"
@@ -214,6 +222,11 @@ def main(argv: list[str] | None = None) -> int:
     if args.record:
         path = repo_artifacts_dir(sft.run_name) / "export.json"
         path.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    if args.record_out is not None:
+        args.record_out.parent.mkdir(parents=True, exist_ok=True)
+        args.record_out.write_text(
+            json.dumps(record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+        )
     print(json.dumps(record, ensure_ascii=False, indent=2))
     return 0
 

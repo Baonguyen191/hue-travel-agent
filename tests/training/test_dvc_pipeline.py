@@ -182,3 +182,102 @@ def test_sft_eval_runs_like_the_baseline_except_model_and_gate() -> None:
     }
     assert sft["--baseline"] == "reports/eval/baseline_dev.json"
     assert sft["--model"] == "${export.ollama_model}"
+
+
+RL_YAML = Path(__file__).parents[2] / "configs" / "rl.yaml"
+SFT_YAML = Path(__file__).parents[2] / "configs" / "sft.yaml"
+EVAL_YAML = Path(__file__).parents[2] / "configs" / "eval.yaml"
+RL_DATASET = "data/rl/rl-v1/round-1.jsonl"
+RL_INIT_ADAPTER = "models/sft/sft-v1/adapters/step-250"
+
+
+def test_rl_vars_do_not_clash_with_sft_or_eval_vars() -> None:
+    """DVC gộp các file vars vào một namespace: khóa trùng sẽ làm stage đọc sai giá trị."""
+    raw = yaml.safe_load(RL_YAML.read_text(encoding="utf-8"))
+    others: set[str] = set()
+    for path in (SFT_YAML, EVAL_YAML):
+        others |= set(yaml.safe_load(path.read_text(encoding="utf-8")))
+    assert set(raw) == {"rl", "grpo", "best_of_n", "final"}
+    assert set(raw) & others == set()
+    assert "configs/rl.yaml" in DVC_YAML.read_text(encoding="utf-8").split("stages:")[0]
+
+
+def test_rl_stage_chains_dataset_adapter_and_trains_from_step_250() -> None:
+    from travel_agent.training.rl_config import load_rl_config
+
+    stages = _stages()
+    rl = stages["rl"]
+    config = load_rl_config(RL_YAML)
+    # Đường dẫn trong deps là chữ, phải khớp config: DVC không nội suy deps trong test này.
+    assert config.final.dataset.as_posix() == RL_DATASET
+    assert config.rl.init_adapter.as_posix() == RL_INIT_ADAPTER
+    assert {RL_DATASET, RL_INIT_ADAPTER} <= set(rl["deps"])
+    assert rl["outs"] == ["models/rl/${rl.run_name}/adapter"]
+    assert rl["cmd"].startswith("${sft.python} scripts/train/sft.py --config configs/sft.yaml")
+    assert f"--init-adapter {RL_INIT_ADAPTER}" in rl["cmd"]
+    assert "--dataset ${final.dataset}" in rl["cmd"]
+    assert "--run-dir ${rl.runs_dir}/${rl.run_name}/final" in rl["cmd"]
+    assert "--learning-rate ${final.learning_rate}" in rl["cmd"]
+    assert "--epochs ${final.epochs}" in rl["cmd"]
+    assert "--run-name rl-v1-final" in rl["cmd"]
+    assert "--adapter-out models/rl/${rl.run_name}/adapter" in rl["cmd"]
+    assert {"configs/rl.yaml": ["final"]} in rl["params"]
+    for dep in SFT_CODE_DEPS:
+        assert dep in rl["deps"], dep
+
+
+def test_rl_export_reads_the_rl_adapter_and_records_it() -> None:
+    export = _stages()["export_rl"]
+    assert "models/rl/${rl.run_name}/adapter" in export["deps"]
+    assert "scripts/train/export_gguf.py" in export["deps"]
+    assert "--adapter models/rl/${rl.run_name}/adapter" in export["cmd"]
+    assert "--name ${final.ollama_model}" in export["cmd"]
+    assert "--record-out models/rl/${rl.run_name}/export.json" in export["cmd"]
+    assert "--record" not in export["cmd"].replace("--record-out", "")
+    assert export["metrics"] == [{"models/rl/${rl.run_name}/export.json": {"cache": False}}]
+    assert {"configs/sft.yaml": ["export"]} in export["params"]
+
+
+def test_rl_eval_runs_like_sft_except_model_run_name_baseline_and_out() -> None:
+    """RL và SFT chỉ khác trọng số: sinh và dữ liệu eval phải giống hệt nhau."""
+    stages = _stages()
+    sft = _eval_flags(stages["eval_sft"]["cmd"][0])
+    rl = _eval_flags(stages["eval_rl"]["cmd"][0])
+    differing = {"--model", "--run-name", "--out", "--baseline"}
+    assert {k: v for k, v in sft.items() if k not in differing} == {
+        k: v for k, v in rl.items() if k not in differing
+    }
+    assert rl["--model"] == "${final.ollama_model}"
+    assert rl["--run-name"] == "rl"
+    assert rl["--out"] == "reports/eval/rl_dev.json"
+
+
+def test_rl_eval_generation_matches_the_baseline() -> None:
+    stages = _stages()
+    baseline = _eval_flags(stages["baseline_eval"]["cmd"])
+    rl = _eval_flags(stages["eval_rl"]["cmd"][0])
+    differing = {"--model", "--run-name", "--out", "--baseline"}
+    assert {k: v for k, v in baseline.items() if k not in differing} == {
+        k: v for k, v in rl.items() if k not in differing
+    }
+
+
+def test_rl_eval_gates_against_the_sft_report() -> None:
+    evaluate = _stages()["eval_rl"]
+    assert _eval_flags(evaluate["cmd"][0])["--baseline"] == "reports/eval/sft_dev.json"
+    assert "reports/eval/sft_dev.json" in evaluate["deps"]
+    assert evaluate["metrics"] == [
+        {"reports/eval/rl_dev.json": {"cache": False}},
+        {"models/rl/${rl.run_name}/model_card.json": {"cache": False}},
+    ]
+    assert evaluate["outs"] == ["reports/eval/rl_dev.outcomes.jsonl"]
+
+
+def test_rl_eval_writes_the_rl_model_card_from_stats_and_export() -> None:
+    evaluate = _stages()["eval_rl"]
+    card = evaluate["cmd"][1]
+    assert card == "python scripts/train/write_model_card.py --stage rl --rl-config configs/rl.yaml"
+    assert "models/rl/${rl.run_name}/export.json" in evaluate["deps"]
+    assert "data/rl/rl-v1/round-1.stats.json" in evaluate["deps"]
+    assert "scripts/train/write_model_card.py" in evaluate["deps"]
+    assert {"configs/rl.yaml": ["final"]} in evaluate["params"]

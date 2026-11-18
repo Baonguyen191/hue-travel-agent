@@ -72,11 +72,34 @@ class BestOfNParams(_Strict):
     temperature: float = Field(gt=0)
 
 
+class FinalParams(_Strict):
+    """Vòng best-of-N được chọn để chạy thật (plan 5 Task 6). Đường dẫn tương đối gốc repo."""
+
+    dataset: Path  # jsonl DatasetSample của vòng đã chọn
+    stats: Path  # số đo sinh dữ liệu của vòng đó, đi cùng dataset
+    round: int = Field(gt=0)
+    ollama_model: str = Field(min_length=1)
+    learning_rate: float = Field(gt=0)
+    epochs: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def _stats_belongs_to_dataset(self) -> FinalParams:
+        if self.stats != self.dataset.with_suffix(".stats.json"):
+            raise ValueError("stats phải nằm cạnh dataset, cùng tên với đuôi .stats.json")
+        return self
+
+
 class RlConfig(_Strict):
     rl: RlParams
     grpo: GrpoParams
     best_of_n: BestOfNParams
+    final: FinalParams
 
 
 def load_rl_config(path: Path) -> RlConfig:
     return RlConfig.model_validate(yaml.safe_load(path.read_text(encoding="utf-8")))
+
+
+def repo_rl_artifacts_dir(run_name: str) -> Path:
+    """Thư mục trong repo cho output nhỏ của run RL: adapter cuối (DVC), export, model card."""
+    return Path("models") / "rl" / run_name

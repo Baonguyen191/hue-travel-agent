@@ -58,3 +58,13 @@ best_of_n:
   epochs: 1
   max_rounds: 5
   temperature: 1.0
+final:
+  # Người dùng chọn vòng 1 ngày 2026-11-18: vòng 2 chỉ hơn 1/70 request nhưng số stop mỗi ngày
+  # giảm 9,9% so với SFT, sát ngưỡng lách reward.
+  dataset: data/rl/rl-v1/round-1.jsonl
+  stats: data/rl/rl-v1/round-1.stats.json
+  round: 1
+  # Model Ollama của adapter RL sau khi export.
+  ollama_model: travel-rl-v1
+  learning_rate: 5.0e-5
+  epochs: 1
