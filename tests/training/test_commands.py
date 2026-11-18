@@ -13,7 +13,7 @@ from travel_agent.cli import main
 from travel_agent.data.place_repository import SqlitePlaceRepository
 from travel_agent.review.models import ReviewInput, ReviewStatus
 from travel_agent.review.store import ReviewStore
-from travel_agent.training import commands
+from travel_agent.training import commands, gitinfo
 from travel_agent.training.commands import load_usable_places
 from travel_agent.training.generator import Generation, GenerationError
 from travel_agent.training.requests import EVAL_SIZE, TEST_SIZE, read_eval_set
@@ -306,7 +306,7 @@ def _fake_git(monkeypatch: pytest.MonkeyPatch, status: str) -> list[list[str]]:
         calls.append(cmd)
         return subprocess.CompletedProcess(cmd, 0, stdout=outputs[tuple(cmd)], stderr="")
 
-    monkeypatch.setattr(commands.subprocess, "run", fake_run)
+    monkeypatch.setattr(gitinfo.subprocess, "run", fake_run)
     return calls
 
 
@@ -345,7 +345,7 @@ def test_renamed_file_counts_both_paths(monkeypatch: pytest.MonkeyPatch) -> None
 
 
 def test_pipeline_outputs_read_dvc_yaml() -> None:
-    outputs = commands.pipeline_outputs(REPO / "dvc.yaml")
+    outputs = gitinfo.pipeline_outputs(REPO / "dvc.yaml")
     for path in (
         "dvc.lock",
         "reports/eval/baseline_dev.json",
@@ -354,4 +354,4 @@ def test_pipeline_outputs_read_dvc_yaml() -> None:
         "reports/dataset/check.json",
     ):
         assert path in outputs
-    assert commands.pipeline_outputs(REPO / "khong-co.yaml") == {"dvc.lock"}
+    assert gitinfo.pipeline_outputs(REPO / "khong-co.yaml") == {"dvc.lock"}

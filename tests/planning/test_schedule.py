@@ -329,3 +329,56 @@ def test_retime_is_deterministic() -> None:
     model = _model_like(random.Random(5), request, pool)
     lookup = InMemoryPlaceRepository(pool)
     assert retime(request, model, lookup, TRAVEL) == retime(request, model, lookup, TRAVEL)
+
+
+def _missing_meal_count(request, plan, lookup) -> int:
+    report = check(request, plan, lookup, TEN_MINUTES)
+    return sum(1 for issue in report.issues if issue.code is IssueCode.MISSING_MEAL)
+
+
+def test_compacted_day_keeps_lunch_inside_the_lunch_window() -> None:
+    request = request_for(Pace.MODERATE, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(
+        open_place("t:a"),
+        open_place("t:b"),
+        open_place("t:lunch", category=Category.RESTAURANT),
+    )
+    model = itinerary(
+        [
+            stop("t:a", "08:00", "09:00"),
+            stop("t:b", "09:00", "10:00"),
+            stop("t:lunch", "11:30", "12:30"),
+        ]
+    )
+    result = retime(request, model, lookup, TEN_MINUTES)
+    # Không có khung này thì bữa trưa sẽ bị kéo về 09:50, ngoài khung 11:00-13:30.
+    assert times(result)[-1] == ("t:lunch", "11:00", "12:00")
+    assert _missing_meal_count(request, result.itinerary, lookup) <= _missing_meal_count(
+        request, model, lookup
+    )
+
+
+def test_compacted_day_keeps_dinner_inside_the_dinner_window() -> None:
+    request = request_for(Pace.MODERATE, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(open_place("t:a"), open_place("t:dinner", category=Category.RESTAURANT))
+    model = itinerary([stop("t:a", "08:00", "09:00"), stop("t:dinner", "18:00", "19:00")])
+    result = retime(request, model, lookup, TEN_MINUTES)
+    assert times(result)[-1] == ("t:dinner", "17:30", "18:30")
+
+
+def test_meal_window_is_not_applied_when_day_does_not_cover_it() -> None:
+    # Khung 09:00-18:00 không bao trọn bữa tối 17:30-20:00: nhà hàng tối không bị neo.
+    request = request_for(Pace.MODERATE, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[2])
+    lookup = repo(open_place("t:a"), open_place("t:dinner", category=Category.RESTAURANT))
+    model = itinerary([stop("t:a", "09:00", "10:00"), stop("t:dinner", "17:45", "18:00")])
+    result = retime(request, model, lookup, TEN_MINUTES)
+    assert times(result)[-1][1] == "10:10"
+
+
+def test_non_restaurant_in_a_meal_window_is_still_compacted() -> None:
+    request = request_for(Pace.MODERATE, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(open_place("t:a"), open_place("t:cafe", category=Category.CAFE))
+    model = itinerary([stop("t:a", "08:00", "09:00"), stop("t:cafe", "11:30", "12:00")])
+    result = retime(request, model, lookup, TEN_MINUTES)
+    # Ngày bắt đầu 07:30: bảo tàng 07:30-08:30, quán cà phê đến 08:40 (không bị neo vào 11:30).
+    assert times(result)[-1][1] == "08:40"

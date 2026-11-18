@@ -3,19 +3,21 @@
 from __future__ import annotations
 
 import argparse
+import dataclasses
+import datetime as dt
 import hashlib
 import json
-import subprocess
 import sys
 import time
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 from pathlib import Path
-from typing import TextIO
+from typing import Any, TextIO
 
 import yaml
 
 from travel_agent.data.place_repository import InMemoryPlaceRepository
-from travel_agent.domain.models import Place
+from travel_agent.domain.models import Pace, Place, PlanRequest, TravelMode
+from travel_agent.planning.pipeline import PlanResult, plan_trip
 from travel_agent.review.models import ReviewStatus
 from travel_agent.review.store import ReviewStore
 from travel_agent.routing.travel_time import HaversineEstimator
@@ -29,6 +31,7 @@ from travel_agent.training.dataset import (
 )
 from travel_agent.training.dataset_check import check_dataset
 from travel_agent.training.generator import DEFAULT_HOST, OllamaGenerator
+from travel_agent.training.gitinfo import current_commit
 from travel_agent.training.metrics import (
     EvalSummary,
     PlanOutcome,
@@ -59,6 +62,13 @@ EXIT_USAGE = 2  # sai cách dùng, hoặc báo cáo mốc chạy khác điều k
 EXIT_REGRESSION = 3
 EXIT_DATASET_INVALID = 4  # dataset không đạt (build không đủ mẫu, hoặc check-dataset hỏng)
 EXIT_REWARD_FAILED = 4  # reward không qua kiểm tra (reward-report); trùng số với dataset hỏng
+EXIT_PLAN_INVALID = (
+    EXIT_REGRESSION  # lệnh plan còn lỗi ERROR; cùng số 3 nhưng là kết quả, không phải cổng
+)
+
+RL_CONFIG = Path("configs/rl.yaml")  # final.ollama_model: model mặc định của lệnh plan
+EVAL_CONFIG = Path("configs/eval.yaml")  # mục generation: tham số sinh, cùng bộ DVC dùng cho eval
+GENERATION_KEYS = ("temperature", "seed", "num_predict", "num_ctx")
 
 
 def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
@@ -137,6 +147,148 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     reward.add_argument("--out", type=Path, required=True, help="File JSON báo cáo")
     reward.set_defaults(func=_cmd_reward_report)
 
+    plan = sub.add_parser(
+        "plan", help="Lập lịch một chuyến đi qua Ollama (xếp giờ, sửa lỗi); in JSON"
+    )
+    plan.add_argument("--model", help="Tag Ollama; mặc định là final.ollama_model trong rl.yaml")
+    plan.add_argument("--request", type=Path, help="File JSON PlanRequest (thay cho các cờ dưới)")
+    plan.add_argument("--days", type=int, help="Số ngày, 1 đến 7")
+    plan.add_argument("--start-date", type=_date_arg, help="Ngày đầu, dạng YYYY-MM-DD")
+    plan.add_argument("--pace", type=Pace, choices=list(Pace))
+    plan.add_argument("--interests", type=_csv_arg, help="Sở thích, cách nhau bằng dấu phẩy")
+    plan.add_argument("--travel-mode", type=TravelMode, choices=list(TravelMode))
+    plan.add_argument("--day-start", type=_clock_arg, help="Giờ bắt đầu ngày, HH:MM")
+    plan.add_argument("--day-end", type=_clock_arg, help="Giờ kết thúc ngày, HH:MM")
+    plan.add_argument("--no-retime", action="store_true", help="Giữ giờ của model, không xếp lại")
+    plan.add_argument("--max-repairs", type=int, default=2, help="Số lượt sửa tối đa")
+    plan.add_argument("--db", type=Path, default=Path("data/hue.sqlite"))
+    plan.add_argument("--host", default=DEFAULT_HOST)
+    plan.set_defaults(func=_cmd_plan)
+
+
+_PLAN_FLAGS = {
+    "days": "num_days",
+    "start_date": "start_date",
+    "pace": "pace",
+    "interests": "interests",
+    "travel_mode": "travel_mode",
+    "day_start": "day_start",
+    "day_end": "day_end",
+}
+
+
+def _date_arg(text: str) -> dt.date:
+    try:
+        return dt.date.fromisoformat(text)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("cần ngày dạng YYYY-MM-DD") from exc
+
+
+def _clock_arg(text: str) -> dt.time:
+    try:
+        return dt.time.fromisoformat(text)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("cần giờ dạng HH:MM") from exc
+
+
+def _csv_arg(text: str) -> list[str]:
+    return [item.strip() for item in text.split(",") if item.strip()]
+
+
+def _plan_request(args: argparse.Namespace) -> PlanRequest:
+    """Từ file JSON hoặc từ các cờ; ném ValueError (kèm lý do tiếng Việt) nếu thiếu hoặc sai."""
+    flags = {dest: getattr(args, dest) for dest in _PLAN_FLAGS}
+    given = {dest: value for dest, value in flags.items() if value is not None}
+    if args.request is not None:
+        if given:
+            raise ValueError("--request không đi cùng các cờ yêu cầu (--days, --pace, ...)")
+        return PlanRequest.model_validate_json(args.request.read_text(encoding="utf-8"))
+    if args.days is None or args.start_date is None:
+        raise ValueError("cần --request, hoặc tối thiểu --days và --start-date")
+    return PlanRequest.model_validate({_PLAN_FLAGS[dest]: value for dest, value in given.items()})
+
+
+def _rl_final_model(path: Path) -> str | None:
+    if not path.is_file():
+        return None
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    final = data.get("final") if isinstance(data, dict) else None
+    model = final.get("ollama_model") if isinstance(final, dict) else None
+    return model if isinstance(model, str) and model else None
+
+
+def _generation_params(path: Path) -> dict[str, Any]:
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    generation = data.get("generation") if isinstance(data, dict) else None
+    if not isinstance(generation, dict):
+        raise ValueError(f"{path} thiếu mục generation")
+    missing = [key for key in GENERATION_KEYS if key not in generation]
+    if missing:
+        raise ValueError(f"{path} thiếu {', '.join(missing)} trong generation")
+    return {key: generation[key] for key in GENERATION_KEYS}
+
+
+def _plan_payload(result: PlanResult) -> dict[str, Any]:
+    issues = result.report.issues if result.report is not None else []
+    return {
+        "valid": result.valid,
+        "itinerary": (
+            result.itinerary.model_dump(mode="json") if result.itinerary is not None else None
+        ),
+        "issues": [
+            {"code": issue.code.value, "severity": issue.severity.value, "message": issue.message}
+            for issue in issues
+        ],
+        "dropped": [dataclasses.asdict(stop) for stop in result.dropped],
+        "attempts": [
+            {
+                "kind": attempt.kind,
+                "parsed": attempt.parsed,
+                "error_count": attempt.error_count,
+                "latency_s": round(attempt.latency_s, 2),
+            }
+            for attempt in result.attempts
+        ],
+    }
+
+
+def _cmd_plan(args: argparse.Namespace) -> int:
+    if not args.db.exists():
+        print(f"Không tìm thấy {args.db}.", file=sys.stderr)
+        return EXIT_USAGE
+    if args.max_repairs < 0:
+        print("--max-repairs không được âm.", file=sys.stderr)
+        return EXIT_USAGE
+    model = args.model or _rl_final_model(RL_CONFIG)
+    if model is None:
+        print("Thiếu --model và configs/rl.yaml không có final.ollama_model.", file=sys.stderr)
+        return EXIT_USAGE
+    try:
+        request = _plan_request(args)
+        generation = _generation_params(EVAL_CONFIG)
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        print(f"Yêu cầu không hợp lệ: {exc}", file=sys.stderr)
+        return EXIT_USAGE
+
+    generator = OllamaGenerator(
+        model,
+        host=args.host,
+        temperature=generation["temperature"],
+        seed=generation["seed"],
+        num_predict=generation["num_predict"],
+        num_ctx=generation["num_ctx"],
+    )
+    result = plan_trip(
+        request,
+        load_usable_places(args.db),
+        generator,
+        HaversineEstimator(),
+        retime=not args.no_retime,
+        max_repairs=args.max_repairs,
+    )
+    print(json.dumps(_plan_payload(result), ensure_ascii=False, indent=2))
+    return EXIT_OK if result.valid else EXIT_PLAN_INVALID
+
 
 def load_usable_places(db: Path) -> list[Place]:
     """Mọi địa điểm trừ loại người duyệt đã loại; đã áp override của người duyệt."""
@@ -150,82 +302,6 @@ def load_usable_places(db: Path) -> list[Place]:
 
 def file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
-
-
-DVC_LOCK = "dvc.lock"
-DVC_PIPELINE = "dvc.yaml"
-
-
-def pipeline_outputs(dvc_yaml: Path) -> set[str]:
-    """Path (tương đối gốc repo) mà pipeline DVC tự ghi: outs, metrics, plots, và dvc.lock.
-
-    `dvc repro` xóa output của stage trước khi chạy và ghi lại dvc.lock sau mỗi stage, nên các
-    file này đổi giữa chừng một lần chạy mà code không đổi.
-    """
-    found = {DVC_LOCK}
-    if not dvc_yaml.is_file():
-        return found
-    stages = (yaml.safe_load(dvc_yaml.read_text(encoding="utf-8")) or {}).get("stages") or {}
-    for stage in stages.values():
-        for key in ("outs", "metrics", "plots"):
-            for entry in stage.get(key) or []:
-                found.add(entry if isinstance(entry, str) else next(iter(entry)))
-    return found
-
-
-def _changed_paths(porcelain_z: str) -> list[str]:
-    """Path trong output `git status --porcelain -z`; đổi tên thì lấy cả path cũ."""
-    entries = porcelain_z.split("\0")
-    paths: list[str] = []
-    index = 0
-    while index < len(entries):
-        entry = entries[index]
-        index += 1
-        if len(entry) < 4:
-            continue
-        paths.append(entry[3:])
-        if entry[0] in "RC" or entry[1] in "RC":
-            paths.append(entries[index])  # path gốc đứng ngay sau
-            index += 1
-    return paths
-
-
-def _ignored(path: str, ignored: set[str]) -> bool:
-    return any(path == item or path.startswith(item.rstrip("/") + "/") for item in ignored)
-
-
-def current_commit(own_outputs: Iterable[Path] = ()) -> str:
-    """Commit đang chạy; thêm `-dirty` khi file đã track có thay đổi chưa commit.
-
-    Không tính: file chưa track, output của pipeline DVC (kể cả dvc.lock) và `own_outputs` là các
-    file lệnh này sắp ghi. Những file đó là dữ liệu do lần chạy sinh ra, không phải code đang chạy.
-    """
-    try:
-        head = subprocess.run(
-            ["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True
-        )
-        top = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True
-        )
-        status = subprocess.run(
-            ["git", "status", "--porcelain", "-z", "--untracked-files=no"],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            check=True,
-        )
-    except (OSError, subprocess.CalledProcessError):
-        return "unknown"
-    commit = head.stdout.strip()
-    root = Path(top.stdout.strip()).resolve()
-    ignored = pipeline_outputs(root / DVC_PIPELINE)
-    for path in own_outputs:
-        try:
-            ignored.add(path.resolve().relative_to(root).as_posix())
-        except ValueError:
-            continue  # file nằm ngoài repo: git không theo dõi
-    dirty = [path for path in _changed_paths(status.stdout) if not _ignored(path, ignored)]
-    return f"{commit}-dirty" if dirty else commit
 
 
 def _load_baseline(path: Path) -> tuple[dict[str, object], EvalSummary] | None:

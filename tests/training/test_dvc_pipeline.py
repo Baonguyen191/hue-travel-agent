@@ -186,12 +186,14 @@ def test_eval_stages_depend_on_eval_path_and_model_card_files() -> None:
 
 
 def test_eval_stages_include_the_model_card_closure() -> None:
-    """write_model_card import commands.current_commit, nên closure của commands nằm trong eval."""
+    """write_model_card import current_commit từ gitinfo, nên eval không kéo theo commands."""
     deps = _code_deps(_stages()["eval_sft"])
     assert COMMAND_FILE in deps
+    assert "src/travel_agent/training/gitinfo.py" in deps
     assert "src/travel_agent/training/model_card.py" in deps
     assert "src/travel_agent/training/rl_config.py" in deps
-    assert "src/travel_agent/training/reward_report.py" in deps
+    assert "src/travel_agent/training/reward_report.py" not in deps
+    assert "src/travel_agent/planning/pipeline.py" not in deps
 
 
 def _eval_flags(cmd: str) -> dict[str, str]:

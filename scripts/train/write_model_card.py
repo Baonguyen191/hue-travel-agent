@@ -22,7 +22,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from travel_agent.training.commands import current_commit
+from travel_agent.training.gitinfo import current_commit
 from travel_agent.training.model_card import (
     build_model_card,
     build_rl_model_card,
