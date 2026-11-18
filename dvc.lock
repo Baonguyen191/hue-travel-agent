@@ -60,8 +60,8 @@ stages:
       size: 2238
     - path: src/travel_agent/training/commands.py
       hash: md5
-      md5: a5503134812de7a7ddf79ced6bfa1868
-      size: 20743
+      md5: 6e49a50f4110057948b6973692e857e6
+      size: 24863
     - path: src/travel_agent/training/generator.py
       hash: md5
       md5: eb0d6c56a9c4079857025214505de01b
@@ -167,8 +167,8 @@ stages:
       size: 2238
     - path: src/travel_agent/training/commands.py
       hash: md5
-      md5: a5503134812de7a7ddf79ced6bfa1868
-      size: 20743
+      md5: 6e49a50f4110057948b6973692e857e6
+      size: 24863
     - path: src/travel_agent/training/corrupt.py
       hash: md5
       md5: b0f7b653ac3ccdb69149fc396144a2ed
@@ -275,8 +275,8 @@ stages:
       size: 3614
     - path: src/travel_agent/training/commands.py
       hash: md5
-      md5: a5503134812de7a7ddf79ced6bfa1868
-      size: 20743
+      md5: 6e49a50f4110057948b6973692e857e6
+      size: 24863
     - path: src/travel_agent/training/corrupt.py
       hash: md5
       md5: b0f7b653ac3ccdb69149fc396144a2ed
@@ -543,8 +543,8 @@ stages:
       size: 1102
     - path: scripts/train/write_model_card.py
       hash: md5
-      md5: b7c9075c2bab195f44b69338f65d5fda
-      size: 6222
+      md5: 121e00b01fb827236bdb7feec1d5b8b8
+      size: 6388
     - path: src/travel_agent/data/place_repository.py
       hash: md5
       md5: 457db209c0aff2e2e0688b6be8eb65cc
@@ -561,18 +561,10 @@ stages:
       hash: md5
       md5: 014d1e7adbc686c76047b5216d5865e3
       size: 4636
-    - path: src/travel_agent/planning/hours.py
-      hash: md5
-      md5: 839d852158ae3e037d50c89a2223b6c4
-      size: 2174
     - path: src/travel_agent/planning/prompt.py
       hash: md5
       md5: 13c22815822952d2c75ac8bc58bb0c1d
       size: 7447
-    - path: src/travel_agent/planning/solver.py
-      hash: md5
-      md5: 3db991ef75589d194d3bfaf47a86a574
-      size: 19349
     - path: src/travel_agent/review/models.py
       hash: md5
       md5: ccda54fb9361a5d3c897d84ebfb7acce
@@ -591,24 +583,16 @@ stages:
       size: 3614
     - path: src/travel_agent/training/commands.py
       hash: md5
-      md5: a5503134812de7a7ddf79ced6bfa1868
-      size: 20743
-    - path: src/travel_agent/training/corrupt.py
-      hash: md5
-      md5: b0f7b653ac3ccdb69149fc396144a2ed
-      size: 12022
-    - path: src/travel_agent/training/dataset.py
-      hash: md5
-      md5: 20f5214c3ee748810c93f02f96bc1bcd
-      size: 11202
-    - path: src/travel_agent/training/dataset_check.py
-      hash: md5
-      md5: 6e487f6233aeba0fc717778aedffabb7
-      size: 10033
+      md5: 6e49a50f4110057948b6973692e857e6
+      size: 24863
     - path: src/travel_agent/training/generator.py
       hash: md5
       md5: eb0d6c56a9c4079857025214505de01b
       size: 6893
+    - path: src/travel_agent/training/gitinfo.py
+      hash: md5
+      md5: 918b4cd18ede561034c0fab81ee2d2d7
+      size: 3466
     - path: src/travel_agent/training/metrics.py
       hash: md5
       md5: a7bbb35b5c19a3b4cc292f642552695a
@@ -625,14 +609,6 @@ stages:
       hash: md5
       md5: d5c0db65f42e90b5e7c9d8c81bf5b77b
       size: 3465
-    - path: src/travel_agent/training/reward.py
-      hash: md5
-      md5: 9ac33de34f18a2dcfe0f048b6e75fd53
-      size: 3415
-    - path: src/travel_agent/training/reward_report.py
-      hash: md5
-      md5: 58b208b8c6807616dd2792a60ea7713a
-      size: 5512
     - path: src/travel_agent/training/rl_config.py
       hash: md5
       md5: e069902ec6abc5e842b5a7c33f3dbd14
@@ -929,8 +905,8 @@ stages:
       size: 1025
     - path: scripts/train/write_model_card.py
       hash: md5
-      md5: b7c9075c2bab195f44b69338f65d5fda
-      size: 6222
+      md5: 121e00b01fb827236bdb7feec1d5b8b8
+      size: 6388
     - path: src/travel_agent/data/place_repository.py
       hash: md5
       md5: 457db209c0aff2e2e0688b6be8eb65cc
@@ -947,18 +923,10 @@ stages:
       hash: md5
       md5: 014d1e7adbc686c76047b5216d5865e3
       size: 4636
-    - path: src/travel_agent/planning/hours.py
-      hash: md5
-      md5: 839d852158ae3e037d50c89a2223b6c4
-      size: 2174
     - path: src/travel_agent/planning/prompt.py
       hash: md5
       md5: 13c22815822952d2c75ac8bc58bb0c1d
       size: 7447
-    - path: src/travel_agent/planning/solver.py
-      hash: md5
-      md5: 3db991ef75589d194d3bfaf47a86a574
-      size: 19349
     - path: src/travel_agent/review/models.py
       hash: md5
       md5: ccda54fb9361a5d3c897d84ebfb7acce
@@ -977,24 +945,16 @@ stages:
       size: 3614
     - path: src/travel_agent/training/commands.py
       hash: md5
-      md5: a5503134812de7a7ddf79ced6bfa1868
-      size: 20743
-    - path: src/travel_agent/training/corrupt.py
-      hash: md5
-      md5: b0f7b653ac3ccdb69149fc396144a2ed
-      size: 12022
-    - path: src/travel_agent/training/dataset.py
-      hash: md5
-      md5: 20f5214c3ee748810c93f02f96bc1bcd
-      size: 11202
-    - path: src/travel_agent/training/dataset_check.py
-      hash: md5
-      md5: 6e487f6233aeba0fc717778aedffabb7
-      size: 10033
+      md5: 6e49a50f4110057948b6973692e857e6
+      size: 24863
     - path: src/travel_agent/training/generator.py
       hash: md5
       md5: eb0d6c56a9c4079857025214505de01b
       size: 6893
+    - path: src/travel_agent/training/gitinfo.py
+      hash: md5
+      md5: 918b4cd18ede561034c0fab81ee2d2d7
+      size: 3466
     - path: src/travel_agent/training/metrics.py
       hash: md5
       md5: a7bbb35b5c19a3b4cc292f642552695a
@@ -1011,14 +971,6 @@ stages:
       hash: md5
       md5: d5c0db65f42e90b5e7c9d8c81bf5b77b
       size: 3465
-    - path: src/travel_agent/training/reward.py
-      hash: md5
-      md5: 9ac33de34f18a2dcfe0f048b6e75fd53
-      size: 3415
-    - path: src/travel_agent/training/reward_report.py
-      hash: md5
-      md5: 58b208b8c6807616dd2792a60ea7713a
-      size: 5512
     - path: src/travel_agent/training/rl_config.py
       hash: md5
       md5: e069902ec6abc5e842b5a7c33f3dbd14
