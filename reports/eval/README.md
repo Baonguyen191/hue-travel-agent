@@ -10,6 +10,26 @@ Số liệu gốc nằm trong file JSON cùng thư mục. Kết quả từng req
 | SFT sft-v1, checkpoint 250 | travel-sft-v1 (Qwen3.5-4B + LoRA r16, Q4_K_M) | 2026-11-17 | 0.229 (16/70) | 0.000 | 0.000 | 5.56 | 470 | 7.6 |
 | RL rl-v1 (best-of-N, vòng 1) | travel-rl-v1 (SFT step 250 + 1 epoch trên 42 plan tự sinh, Q4_K_M) | 2026-11-18 | 0.386 (27/70) | 0.000 | 0.000 | 5.34 | 465 | 8.1 |
 
+## So sánh cuối trên bộ test (2026-11-18, chạy đúng một lần)
+
+Bộ test 30 request, đóng băng từ chặng 1, chạy một lần cho cả ba mốc bằng `eval --split test --allow-test`, cùng tham số sinh với dev. Số liệu gốc ở `{baseline,sft,rl}_test.json` và `*_test.outcomes.jsonl`.
+
+| Mốc | Model | first_pass_valid_rate | parse_error_rate | unknown_place_rate | avg_stops_per_day | distinct_place_count | latency_p50_s |
+|---|---|---|---|---|---|---|---|
+| baseline | qwen3.5:4b | 0.067 (2/30) | 0.000 | 0.033 | 5.68 | 215 | 7.4 |
+| SFT | travel-sft-v1 | 0.467 (14/30) | 0.000 | 0.000 | 4.75 | 202 | 5.5 |
+| SFT+RL | travel-rl-v1 | 0.533 (16/30) | 0.000 | 0.000 | 4.58 | 196 | 5.5 |
+
+- **Đọc kết quả:** SFT hơn baseline 12 request, rõ ràng vượt nhiễu. RL hơn SFT 2 request: với 30 request, chênh 1–2 request nằm trong nhiễu, nên trên test RL **chưa chứng minh được** là tốt hơn SFT. Trên dev (70 request) RL hơn SFT 11 request (27 so với 16).
+- **Bộ test dễ hơn dev:** 15/30 request chỉ 1 ngày (dev 21/70) và 5/30 là pace packed (dev 29/70). Vì vậy tỉ lệ trên test cao hơn dev ở cả ba mốc; chỉ so được giữa các mốc trên cùng một bộ.
+- **Theo số ngày** (đạt / tổng): baseline 1/15, 0/7, 1/8; SFT 9/15, 2/7, 3/8; RL 12/15, 2/7, 2/8.
+- **Request có ít nhất một ERROR:**
+  - baseline: `travel_time_insufficient` 26, `closed_during_visit` 11, `unknown_place` 4, `duplicate_place` 4;
+  - SFT: `travel_time_insufficient` 16, `closed_during_visit` 1;
+  - RL: `travel_time_insufficient` 14.
+- **Model cuối:** `travel-rl-v1`. Cả hai mô hình đã train đều không bịa `place_id` và không lỗi parse. Lỗi còn lại gần như chỉ là thiếu thời gian di chuyển giữa hai điểm.
+- **Giới hạn:** giờ mở cửa giả định "mọi ngày" cho 1.447/1.587 điểm; thời gian di chuyển là ước tính Haversine, chưa phải đường thật. Plan qua validator vẫn có thể sai ngoài thực tế.
+
 ## Ghi chú RL 2026-11-18
 
 - **Phương pháp:** best-of-N (spec 8.4). Smoke GRPO không qua cổng spec 8.3: 8,8 phút mỗi step, VRAM đỉnh 9,43 GB trên GPU 8 GB. Chi tiết ở plan 5.

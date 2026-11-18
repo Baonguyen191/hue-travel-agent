@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "run_name": "baseline-test",
+    "model": "qwen3.5:4b",
+    "split": "test",
+    "temperature": 0.0,
+    "seed": 0,
+    "num_predict": 2048,
+    "num_ctx": 8192,
+    "schema_format": true,
+    "limit": "all",
+    "host": "http://127.0.0.1:11434",
+    "git_commit": "78a28665077fd23621a2054c5e9198cde149bbe1",
+    "evalset_sha256": "624e86c1690c2daefe220794b3e218916849f2b731560ffbc15bb5317e02c545",
+    "db_sha256": "8f8eac2196f53260d45c4a31fc04980343ded9cb7f260fea5b7bebda92114d92"
+  },
+  "summary": {
+    "n": 30,
+    "first_pass_valid_rate": 0.06666666666666667,
+    "parse_error_rate": 0.0,
+    "unknown_place_rate": 0.03322259136212625,
+    "avg_stops_per_day": 5.679245283018868,
+    "distinct_place_count": 215,
+    "latency_p50_s": 7.408101799999713,
+    "issue_code_distribution": {
+      "closed_during_visit": 16,
+      "duplicate_place": 17,
+      "missing_meal": 63,
+      "opening_hours_unknown": 8,
+      "overloaded_day": 17,
+      "travel_time_insufficient": 107,
+      "unknown_place": 10
+    }
+  }
+}
