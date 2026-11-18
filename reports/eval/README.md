@@ -8,6 +8,16 @@ Số liệu gốc nằm trong file JSON cùng thư mục. Kết quả từng req
 | baseline, trước khi sửa candidate và schema | qwen3.5:4b (Q4_K_M) | 2026-11-12 | 0.057 (4/70) | 0.000 | 0.003 | 5.06 | 250 | 4.6 |
 | baseline | qwen3.5:4b (Q4_K_M) | 2026-11-14 | 0.086 (6/70) | 0.000 | 0.010 | 5.39 | 423 | 9.1 |
 | SFT sft-v1, checkpoint 250 | travel-sft-v1 (Qwen3.5-4B + LoRA r16, Q4_K_M) | 2026-11-17 | 0.229 (16/70) | 0.000 | 0.000 | 5.56 | 470 | 7.6 |
+| RL rl-v1 (best-of-N, vòng 1) | travel-rl-v1 (SFT step 250 + 1 epoch trên 42 plan tự sinh, Q4_K_M) | 2026-11-18 | 0.386 (27/70) | 0.000 | 0.000 | 5.34 | 465 | 8.1 |
+
+## Ghi chú RL 2026-11-18
+
+- **Phương pháp:** best-of-N (spec 8.4). Smoke GRPO không qua cổng spec 8.3: 8,8 phút mỗi step, VRAM đỉnh 9,43 GB trên GPU 8 GB. Chi tiết ở plan 5.
+- **Vòng 1:** `travel-sft-v1` sinh 4 plan cho mỗi request trong 100 request RL (temperature 1,0, cùng JSON schema như eval). Chấm bằng `training/reward.py`, giữ plan tốt nhất nếu reward ≥ 0,9: được 42/100. Train tiếp 1 epoch từ adapter SFT step 250, lr 5e-5.
+- **Vòng 2** (500 request, sinh bằng model vòng 1, giữ 318): dev 0,414 (29/70), chỉ hơn vòng 1 đúng 1 request. Số stop mỗi ngày giảm còn 5,01 (-9,9% so với SFT), sát ngưỡng 10% của spec 8.5: model bắt đầu chọn lịch thưa để dễ đủ thời gian di chuyển. Người dùng chọn vòng 1 và dừng RL.
+- **Chạy bằng** `dvc repro --single-item` cho `rl`, `export_rl`, `eval_rl` (train lại vòng 1 từ dataset đã lưu ở `data/rl/rl-v1/round-1.jsonl`). Qua cổng so với SFT (exit 0). Lần chạy tay của cùng vòng được 0,400 (28/70); train lại cho 27/70, lệch 1 request do train trên GPU không tất định hoàn toàn.
+- **So với SFT** (số lần lỗi): `travel_time_insufficient` 181 xuống 108, `closed_during_visit` 10 xuống 7, `duplicate_place` 8 xuống 2. Số stop mỗi ngày -4,0%, số địa điểm khác nhau -1,1%, trong ngưỡng 10%.
+- Model card ở `models/rl/rl-v1/model_card.json`, `parent` là `sft-v1` step 250 (sha256 adapter khớp `models/sft/sft-v1/export.json`).
 
 ## Ghi chú SFT 2026-11-17
 

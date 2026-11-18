@@ -545,3 +545,255 @@ stages:
       hash: md5
       md5: b1a889d69e2923e2f9c5016b3b67a638
       size: 180718
+  rl:
+    cmd: C:/dev/venvs/travel/Scripts/python.exe scripts/train/sft.py --config 
+      configs/sft.yaml --init-adapter models/sft/sft-v1/adapters/step-250 
+      --dataset data/rl/rl-v1/round-1.jsonl --run-dir 
+      C:/dev/travelagent-runs/rl/rl-v1/final --learning-rate 5e-05 --epochs 1 
+      --run-name rl-v1-final --adapter-out models/rl/rl-v1/adapter
+    deps:
+    - path: data/rl/rl-v1/round-1.jsonl
+      hash: md5
+      md5: ea9b3dff08d36917abc22f3af0635613
+      size: 174169
+    - path: models/sft/sft-v1/adapters/step-250
+      hash: md5
+      md5: a187efabe397f1ee52f90d20623f8030.dir
+      size: 121952389
+      nfiles: 2
+    - path: scripts/train/sft.py
+      hash: md5
+      md5: d318c11b38e95832d07894ccfe8a17fb
+      size: 16033
+    - path: src/travel_agent/data/place_repository.py
+      hash: md5
+      md5: 457db209c0aff2e2e0688b6be8eb65cc
+      size: 5431
+    - path: src/travel_agent/domain
+      hash: md5
+      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
+      size: 6817
+      nfiles: 3
+    - path: src/travel_agent/planning
+      hash: md5
+      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
+      size: 32616
+      nfiles: 4
+    - path: src/travel_agent/review
+      hash: md5
+      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
+      size: 47936
+      nfiles: 6
+    - path: src/travel_agent/routing
+      hash: md5
+      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      size: 2238
+      nfiles: 2
+    - path: src/travel_agent/training
+      hash: md5
+      md5: e79b7b2b122d044cf5a5d4972bbec3bf.dir
+      size: 115860
+      nfiles: 22
+    - path: src/travel_agent/validation
+      hash: md5
+      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
+      size: 11384
+      nfiles: 3
+    params:
+      configs/rl.yaml:
+        final:
+          dataset: data/rl/rl-v1/round-1.jsonl
+          stats: data/rl/rl-v1/round-1.stats.json
+          round: 1
+          ollama_model: travel-rl-v1
+          learning_rate: 5e-05
+          epochs: 1
+      configs/sft.yaml:
+        sft:
+          run_name: sft-v1
+          python: C:/dev/venvs/travel/Scripts/python.exe
+          runs_dir: C:/dev/travelagent-runs/sft
+          dataset: data/sft/hue_sft_v1.jsonl
+          base_model:
+            repo: Qwen/Qwen3.5-4B
+            revision: 851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a
+            license: Apache-2.0
+            license_source: LICENSE tại revision 851bf6e8, 11544 byte, sha256 
+              bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a
+          seed: 3407
+          max_seq: 4096
+          lora:
+            r: 16
+            alpha: 32
+            dropout: 0.0
+            target_modules: 
+              model\.(language_model\.)?layers\.\d+\.(self_attn\.(q_proj|k_proj|v_proj|o_proj)|linear_attn\.(in_proj_qkv|in_proj_z|out_proj)|mlp\.(gate_proj|up_proj|down_proj))
+          quantization:
+            load_in_4bit: true
+            quant_type: nf4
+            double_quant: true
+            compute_dtype: bfloat16
+          train:
+            epochs: 2
+            learning_rate: 0.0002
+            per_device_batch_size: 1
+            gradient_accumulation_steps: 8
+            lr_scheduler: cosine
+            warmup_ratio: 0.03
+            weight_decay: 0.0
+            optimizer: paged_adamw_8bit
+            gradient_checkpointing: true
+            logging_steps: 1
+            report_to: wandb
+            save_steps: 50
+            adapter_every: 250
+          smoke:
+            max_steps: 20
+          tracking:
+            project: travel-agent-sft
+    outs:
+    - path: models/rl/rl-v1/adapter
+      hash: md5
+      md5: 5029a50e1e2e5a82716f14d196ecc126.dir
+      size: 61004093
+      nfiles: 2
+  export_rl:
+    cmd: C:/dev/venvs/travel/Scripts/python.exe scripts/train/export_gguf.py 
+      --config configs/sft.yaml --adapter models/rl/rl-v1/adapter --name 
+      travel-rl-v1 --work C:/dev/travelagent-runs/rl/rl-v1/export-final 
+      --record-out models/rl/rl-v1/export.json
+    deps:
+    - path: models/rl/rl-v1/adapter
+      hash: md5
+      md5: 5029a50e1e2e5a82716f14d196ecc126.dir
+      size: 61004093
+      nfiles: 2
+    - path: scripts/train/export_gguf.py
+      hash: md5
+      md5: 59d3aa126e28f45208e8f3c0147a59b3
+      size: 10932
+    - path: src/travel_agent/training
+      hash: md5
+      md5: e79b7b2b122d044cf5a5d4972bbec3bf.dir
+      size: 115860
+      nfiles: 22
+    params:
+      configs/rl.yaml:
+        final:
+          dataset: data/rl/rl-v1/round-1.jsonl
+          stats: data/rl/rl-v1/round-1.stats.json
+          round: 1
+          ollama_model: travel-rl-v1
+          learning_rate: 5e-05
+          epochs: 1
+      configs/sft.yaml:
+        export:
+          checkpoint: 250
+          quantization: Q4_K_M
+          llama_cpp_dir: C:/dev/llama.cpp
+          template_model: qwen3.5:4b
+          ollama_model: travel-sft-v1
+    outs:
+    - path: models/rl/rl-v1/export.json
+      hash: md5
+      md5: 8c49e0868045468d287b6d2bf4a34198
+      size: 565
+  eval_rl:
+    cmd:
+    - python -m travel_agent eval --db data/hue.sqlite --evalset 
+      data/eval/hue_eval_v1.jsonl --split dev --model travel-rl-v1 --temperature
+      0.0 --seed 0 --num-predict 2048 --num-ctx 8192 --run-name rl --mlflow 
+      --baseline reports/eval/sft_dev.json --out reports/eval/rl_dev.json
+    - python scripts/train/write_model_card.py --stage rl --rl-config 
+      configs/rl.yaml
+    deps:
+    - path: data/eval/hue_eval_v1.jsonl
+      hash: md5
+      md5: 432ead148d5d7c6059f9fb62e56611d2
+      size: 22392
+    - path: data/hue.sqlite
+      hash: md5
+      md5: c7fa245031b1e8c4e31dfd4fcf77859e
+      size: 1929216
+    - path: data/rl/rl-v1/round-1.jsonl
+      hash: md5
+      md5: ea9b3dff08d36917abc22f3af0635613
+      size: 174169
+    - path: data/rl/rl-v1/round-1.stats.json
+      hash: md5
+      md5: fde06a3306d0de04dab744c2148f2a26
+      size: 547
+    - path: models/rl/rl-v1/export.json
+      hash: md5
+      md5: 8c49e0868045468d287b6d2bf4a34198
+      size: 565
+    - path: reports/eval/sft_dev.json
+      hash: md5
+      md5: 112a21eb3474ea734b71bc10c5595ed5
+      size: 1025
+    - path: scripts/train/write_model_card.py
+      hash: md5
+      md5: b7c9075c2bab195f44b69338f65d5fda
+      size: 6222
+    - path: src/travel_agent/data/place_repository.py
+      hash: md5
+      md5: 457db209c0aff2e2e0688b6be8eb65cc
+      size: 5431
+    - path: src/travel_agent/domain
+      hash: md5
+      md5: 8f4c37e3d039bdef1aaf8d75ed7e5938.dir
+      size: 6817
+      nfiles: 3
+    - path: src/travel_agent/planning
+      hash: md5
+      md5: 1aae85e2154c4eebafce1033cb0eebe1.dir
+      size: 32616
+      nfiles: 4
+    - path: src/travel_agent/review
+      hash: md5
+      md5: 55c3d445f4b86b474fe32f6fa166a0e3.dir
+      size: 47936
+      nfiles: 6
+    - path: src/travel_agent/routing
+      hash: md5
+      md5: 559620bf6f60bc2dc8633d5872403dab.dir
+      size: 2238
+      nfiles: 2
+    - path: src/travel_agent/training
+      hash: md5
+      md5: e79b7b2b122d044cf5a5d4972bbec3bf.dir
+      size: 115860
+      nfiles: 22
+    - path: src/travel_agent/validation
+      hash: md5
+      md5: 08655d8edf3d91699a9b830f3a6ec1d9.dir
+      size: 11384
+      nfiles: 3
+    params:
+      configs/eval.yaml:
+        generation:
+          temperature: 0.0
+          seed: 0
+          num_predict: 2048
+          num_ctx: 8192
+      configs/rl.yaml:
+        final:
+          dataset: data/rl/rl-v1/round-1.jsonl
+          stats: data/rl/rl-v1/round-1.stats.json
+          round: 1
+          ollama_model: travel-rl-v1
+          learning_rate: 5e-05
+          epochs: 1
+    outs:
+    - path: models/rl/rl-v1/model_card.json
+      hash: md5
+      md5: bb5055d3217ef38dfe2bdc348bb080da
+      size: 4067
+    - path: reports/eval/rl_dev.json
+      hash: md5
+      md5: b1f4e4d30cc707fe7d1d39f5db1cdd33
+      size: 1019
+    - path: reports/eval/rl_dev.outcomes.jsonl
+      hash: md5
+      md5: 7f5bea9ee3735f33c3520f11c146eb2d
+      size: 155529
