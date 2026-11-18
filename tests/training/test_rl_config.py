@@ -34,9 +34,14 @@ def test_rl_starts_from_the_chosen_sft_checkpoint() -> None:
     rl = load_rl_config(RL_YAML).rl
     assert rl.init_adapter == Path("models/sft/sft-v1/adapters/step-250")
     assert rl.seed == 4242
-    assert rl.requests == 2000
     assert rl.tracking.project == "travel-agent-sft"
     assert rl.smoke.max_steps == 5
+
+
+def test_rl_requests_cover_every_best_of_n_round() -> None:
+    config = load_rl_config(RL_YAML)
+    best = config.best_of_n
+    assert config.rl.requests >= best.requests_per_round * best.max_rounds
 
 
 def test_grpo_values_match_the_plan() -> None:
