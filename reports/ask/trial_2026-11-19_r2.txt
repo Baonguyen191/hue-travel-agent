@@ -1,0 +1,191 @@
+################ Câu 1: Cuối tuần này mình đi Huế 2 ngày với bố mẹ, đi ô tô, thích chùa và lăng, đừng xếp dày quá
+Lịch trình Huế 2 ngày, bắt đầu thứ Bảy 21/11/2026.
+Mình giả định: khung giờ 08:00–21:00.
+Sở thích đã dùng để chọn điểm: history, spiritual.
+Chưa dùng để chọn điểm (yêu cầu mềm): bố mẹ.
+
+Ngày 1 — thứ Bảy 21/11/2026
+  08:00–09:00 Kinh Thành Huế (di tích)
+  09:23–10:38 Bảo tàng Thiên nhiên Duyên hải miền Trung (bảo tàng)
+  11:00–12:00 Nhà hàng Shino (nhà hàng)
+  17:30–18:30 Nhà hàng Hot Tuna (nhà hàng)
+
+Ngày 2 — Chủ nhật 22/11/2026
+  08:00–09:00 Điện Kiến Trung (di tích)
+  09:11–10:11 Quảng trường Ngọ Môn (di tích)
+  11:00–12:00 Bánh canh Nam Phổ (nhà hàng)
+  12:28–13:28 Duyệt Thị Đường (di tích)
+  15:50–16:50 Làng Cổ Phước Tích (di tích)
+  19:19–20:19 Nhà hàng Shino (nhà hàng)
+
+Cảnh báo:
+  - Ngày 2 có 6 điểm, vượt mức 4 cho nhịp độ relaxed
+Lỗi còn lại, lịch này chưa dùng được:
+  - Địa điểm huetripo:467517 đã xuất hiện trước đó trong lịch trình
+Đã gọi model 3 lần, trong đó sửa 2 lần.
+[exit=3 39s]
+################ Câu 2: di hue 1 ngay thu 7 toi, xe may, muon an bun bo va uong cafe
+Lịch trình Huế 1 ngày, bắt đầu thứ Bảy 21/11/2026.
+Mình giả định: nhịp vừa phải, khung giờ 08:00–21:00.
+Sở thích đã dùng để chọn điểm: coffee, food.
+
+Ngày 1 — thứ Bảy 21/11/2026
+  08:00–08:45 Đặc sản Cung đình Thiên Hương (chợ)
+  08:53–09:38 Chợ Đông Ba Huế (chợ)
+  09:51–10:36 P'Lao Trà Ô Long Đậm Vị (quán cà phê)
+  10:44–11:29 Vincom Plaza Huế (chợ)
+  11:45–12:45 Chè Cung Đình (nhà hàng)
+  17:30–18:30 Cháo dinh dưỡng SHUSHI (nhà hàng)
+
+Đã gọi model 1 lần, trong đó sửa 0 lần.
+[exit=0 7s]
+################ Câu 3: Lên lịch Huế 3 ngày từ 12/12, thích chụp ảnh, phải có Đại Nội và cầu ngói Thanh Toàn, không đi chợ
+Lịch trình Huế 3 ngày, bắt đầu thứ Bảy 12/12/2026.
+Mình giả định: đi xe máy, nhịp vừa phải, khung giờ 08:00–21:00.
+Sở thích đã dùng để chọn điểm: history, photography.
+
+Ngày 1 — thứ Bảy 12/12/2026
+  08:00–09:00 Điện Kiến Trung (di tích)
+  09:07–10:07 Duyệt Thị Đường (di tích)
+  10:14–11:14 Đại Nội Huế (di tích)
+  11:23–12:23 CHOSUN Tiệm ăn Hàn Quốc (nhà hàng)
+  17:30–18:30 Nhà hàng Baga (nhà hàng)
+
+Ngày 2 — Chủ nhật 13/12/2026
+  08:00–08:45 Cầu gỗ lim (công viên)
+  08:52–09:52 Không gian trải nghiệm nghề truyền thống Huế (điểm tham quan)
+  10:06–11:21 Bảo tàng Thiên nhiên Duyên hải miền Trung (bảo tàng)
+  11:32–12:32 Quán Hít hà (nhà hàng)
+  17:30–18:30 Cơm Hẻm (nhà hàng)
+
+Ngày 3 — thứ Hai 14/12/2026
+  08:00–09:00 Kinh Thành Huế (di tích)
+  09:09–10:24 Bảo tàng Đồ Sứ Ký kiểu Thời Nguyễn (bảo tàng)
+  10:53–11:53 Điểm du lịch Cầu ngói Thanh Toàn (điểm tham quan)
+  12:15–13:15 Chả cá Hàng Sơn AEON MALL Huế (nhà hàng)
+  13:46–14:46 Lăng Cơ Thánh (di tích)
+  17:30–18:30 Quán bánh Chi (nhà hàng)
+
+Cảnh báo:
+  - Chưa có giờ mở cửa đã xác minh cho Quán bánh Chi
+Đã gọi model 2 lần, trong đó sửa 1 lần.
+[exit=0 26s]
+################ Câu 4: Mình đi Huế 1 ngày ngày mai, đi bộ quanh trung tâm, thích bảo tàng
+Lịch trình Huế 1 ngày, bắt đầu thứ Sáu 20/11/2026.
+Mình giả định: nhịp vừa phải, khung giờ 08:00–21:00.
+Sở thích đã dùng để chọn điểm: culture.
+
+Ngày 1 — thứ Sáu 20/11/2026
+  08:00–09:00 Vườn Thiệu Phương (di tích)
+  09:09–10:09 Quảng trường Ngọ Môn (di tích)
+  10:35–11:50 Bảo tàng Hồ Chí Minh (bảo tàng)
+  12:30–13:30 Gà Trường Trinh (nhà hàng)
+  17:30–18:30 Ốc Tẹo (nhà hàng)
+
+Đã gọi model 1 lần, trong đó sửa 0 lần.
+[exit=0 6s]
+################ Câu 5: Đi Huế 2 ngày từ 20/12, xe máy, mê lăng tẩm, bỏ qua chùa Thiên Mụ vì đi rồi
+Lịch trình Huế 2 ngày, bắt đầu Chủ nhật 20/12/2026.
+Mình giả định: nhịp vừa phải, khung giờ 08:00–21:00.
+Sở thích đã dùng để chọn điểm: history.
+
+Ngày 1 — Chủ nhật 20/12/2026
+  08:00–09:00 Điện Kiến Trung (di tích)
+  09:07–10:07 Duyệt Thị Đường (di tích)
+  10:15–11:15 Điện Thái Hòa (di tích)
+  11:26–12:26 Cơm bình dân Hoa Châu (nhà hàng)
+  17:30–18:30 Chân Đồi 1 - Đặc sản Gà kiến & Thịt rừng (nhà hàng)
+
+Ngày 2 — thứ Hai 21/12/2026
+  08:00–09:00 Lăng vua Tự Đức (di tích)
+  09:20–10:05 Cafe Dốc Mơ (quán cà phê)
+  10:23–11:23 Kinh Thành Huế (di tích)
+  11:32–12:32 Lẩu Phố (nhà hàng)
+  17:30–18:30 Bún bò Loan (nhà hàng)
+
+Cảnh báo:
+  - Chưa có giờ mở cửa đã xác minh cho Cafe Dốc Mơ
+Đã gọi model 1 lần, trong đó sửa 0 lần.
+[exit=0 10s]
+################ Câu 6: Đi Huế 3 hôm tuần sau, lịch càng dày càng tốt, đi taxi, thích ẩm thực và di tích
+Lịch trình Huế 3 ngày, bắt đầu thứ Hai 23/11/2026.
+Mình giả định: khung giờ 08:00–21:00.
+Sở thích đã dùng để chọn điểm: food, history.
+
+Ngày 1 — thứ Hai 23/11/2026
+  08:00–08:45 Kẹo Đậu phộng Thiên Thanh Hoàng (chợ)
+  09:07–10:07 Thổ Công Từ (di tích)
+  10:17–11:17 Điện Kiến Trung (di tích)
+  11:27–12:27 Duyệt Thị Đường (di tích)
+  12:50–13:50 Nhà hàng Ruộng Rau Răm (nhà hàng)
+  14:05–15:20 Bảo tàng Hồ Chí Minh (bảo tàng)
+  17:30–18:30 Bánh Canh Nam Phổ + Bèo Nậm Lọc - Quán Hằng (nhà hàng)
+
+Ngày 2 — thứ Ba 24/11/2026
+  08:00–08:45 Cầu gỗ lim (công viên)
+  08:56–09:56 Toà Khâm sứ Trung Kỳ (di tích)
+  10:12–11:27 Bảo tàng Thiên nhiên Duyên hải miền Trung (bảo tàng)
+  11:40–12:40 BarLab (nhà hàng)
+  12:52–13:52 Quán nhậu Dzo Dzo (nhà hàng)
+  14:04–15:04 Hồ Trái Tim (điểm tham quan)
+  17:30–18:30 Nhà hàng Phước Thạnh (nhà hàng)
+
+Ngày 3 — thứ Tư 25/11/2026
+  08:00–08:45 Chợ  Tuần (chợ)
+  09:31–10:31 Trụ sở Xứ ủy Trung Kỳ (1938-1939) (di tích)
+  10:42–11:27 Chợ Đông Ba Huế (chợ)
+  11:27–12:12 Chợ Đông Ba (chợ)
+  12:26–13:26 Cầy Tơ 7 món Nhật Tân Hà Nội (nhà hàng)
+  13:48–14:48 Kinh Thành Huế (di tích)
+  17:30–18:30 Chè Cầm (nhà hàng)
+
+Cảnh báo:
+  - Chưa có giờ mở cửa đã xác minh cho BarLab
+  - Chưa có giờ mở cửa đã xác minh cho Chè Cầm
+Đã gọi model 1 lần, trong đó sửa 0 lần.
+[exit=0 18s]
+################ Câu 7: Gợi ý lịch Huế cho mình với
+Bạn muốn đi Huế từ ngày nào và đi mấy ngày?
+[exit=4 2s]
+################ Câu 8: Lịch Huế 2 ngày từ 5/1 có con nhỏ, ô tô, thích thiên nhiên, muốn đi biển Thuận An
+Lịch trình Huế 2 ngày, bắt đầu thứ Ba 05/01/2027.
+Mình giả định: nhịp vừa phải, khung giờ 08:00–21:00.
+Sở thích đã dùng để chọn điểm: nature.
+Chưa dùng để chọn điểm (yêu cầu mềm): con nhỏ.
+
+Ngày 1 — thứ Ba 05/01/2027
+  08:00–08:45 Cầu An Hòa (công viên)
+  09:22–10:07 Menas Zone Vỹ Dạ (công viên)
+  10:19–11:04 Cầu Đập Đá (công viên)
+  11:14–12:14 Nhà hàng Gecko (nhà hàng)
+  17:30–18:30 Quán Càng Ghẹ (nhà hàng)
+
+Ngày 2 — thứ Tư 06/01/2027
+  08:00–08:45 Cầu Dã Viên (công viên)
+  09:07–09:52 Cầu Trường Tiền (công viên)
+  10:02–11:17 Bảo tàng Nghệ thuật Điềm Phùng Thị (bảo tàng)
+  11:34–12:34 Cơm hến Bà Mừng (nhà hàng)
+  17:30–18:30 Lẩu dê Tài Ký (nhà hàng)
+
+Cảnh báo:
+  - Chưa có giờ mở cửa đã xác minh cho Quán Càng Ghẹ
+Đã gọi model 1 lần, trong đó sửa 0 lần.
+[exit=0 10s]
+################ Câu 9: Lên lịch Sài Gòn 2 ngày
+Mình chỉ lập lịch trình du lịch Huế thôi, nên chưa giúp được việc này. Bạn thử nói ngày đi, số ngày và sở thích để mình lên lịch nhé.
+[exit=0 2s]
+################ Câu 10: Huế 1 ngày noel, đi bộ, thích nhà thờ và cà phê, từ 9h sáng đến 8h tối
+Lịch trình Huế 1 ngày, bắt đầu thứ Năm 24/12/2026.
+Mình giả định: nhịp vừa phải.
+Sở thích đã dùng để chọn điểm: coffee, spiritual.
+
+Ngày 1 — thứ Năm 24/12/2026
+  09:00–09:45 LAPH Cafe (quán cà phê)
+  10:00–10:45 Nhà Thờ Giáo Xứ Phanxico Xavie Huế (cơ sở tôn giáo)
+  11:00–12:00 MÉW Secret (nhà hàng)
+  17:30–18:30 Ngọc chè bưởi (nhà hàng)
+
+Cảnh báo:
+  - Chưa có giờ mở cửa đã xác minh cho MÉW Secret
+Đã gọi model 1 lần, trong đó sửa 0 lần.
+[exit=0 6s]
