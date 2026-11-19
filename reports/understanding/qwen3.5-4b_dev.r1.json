@@ -1,0 +1,7662 @@
+{
+  "meta": {
+    "model": "qwen3.5:4b",
+    "split": "dev",
+    "ref_date": "2026-11-18",
+    "temperature": 0.0,
+    "seed": 0,
+    "num_predict": 512,
+    "num_ctx": 4096,
+    "limit": "all",
+    "host": "http://127.0.0.1:11434",
+    "evalset_sha256": "7b8d4d1c7f9ae95629ebcd1b0fd85a256df7addb87698f9a498e469618833204",
+    "db_sha256": "8f8eac2196f53260d45c4a31fc04980343ded9cb7f260fea5b7bebda92114d92",
+    "git_commit": "2c9f0536195c218c1121f5ba431e1724e3bb08d1"
+  },
+  "summary": {
+    "n": 100,
+    "errors": 0,
+    "intent_acc": 0.97,
+    "clarify_precision": 1.0,
+    "clarify_recall": 0.9375,
+    "n_planned": 91,
+    "field_acc": {
+      "start_date": 1.0,
+      "num_days": 1.0,
+      "travel_mode": 0.989010989010989,
+      "pace": 0.989010989010989,
+      "day_start": 1.0,
+      "day_end": 1.0
+    },
+    "interests_exact_acc": 0.8681318681318682,
+    "interests_micro_f1": 0.9139784946236559,
+    "must_include_exact_acc": 0.95,
+    "exclude_exact_acc": 1.0,
+    "exclude_categories_exact_acc": 1.0,
+    "soft_recall": 0.7,
+    "full_match_rate": 0.8,
+    "latency_p50_s": 2.199,
+    "per_group": {
+      "full": {
+        "n": 17,
+        "intent_acc": 1.0,
+        "full_match_rate": 0.7058823529411765
+      },
+      "missing": {
+        "n": 16,
+        "intent_acc": 0.9375,
+        "full_match_rate": 0.9375
+      },
+      "must_exclude": {
+        "n": 11,
+        "intent_acc": 1.0,
+        "full_match_rate": 0.7272727272727273
+      },
+      "no_diacritics": {
+        "n": 15,
+        "intent_acc": 1.0,
+        "full_match_rate": 0.6666666666666666
+      },
+      "other_intent": {
+        "n": 9,
+        "intent_acc": 0.7777777777777778,
+        "full_match_rate": 0.6666666666666666
+      },
+      "relative_date": {
+        "n": 21,
+        "intent_acc": 1.0,
+        "full_match_rate": 1.0
+      },
+      "soft": {
+        "n": 11,
+        "intent_acc": 1.0,
+        "full_match_rate": 0.7272727272727273
+      }
+    }
+  },
+  "items": [
+    {
+      "id": "q001",
+      "group": "full",
+      "text": "Lên lịch đi Huế 2 ngày từ 20/12, đi xe máy, thích lăng tẩm và ẩm thực, đi vừa phải",
+      "gold": {
+        "start_date": "2026-12-20",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "pace": "moderate",
+        "interests": [
+          "food",
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-20",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "food",
+            "history"
+          ]
+        },
+        "date_text": "20/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food",
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-20",
+          "num_days": 2,
+          "travel_mode": "motorbike",
+          "pace": "moderate"
+        }
+      },
+      "error": null,
+      "latency_s": 2.477,
+      "score": {
+        "id": "q001",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food",
+          "history"
+        ],
+        "interests_pred": [
+          "food",
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q003",
+      "group": "full",
+      "text": "Đi Huế 1 ngày ngày 25/11, đi bộ thôi, thong thả, muốn uống cà phê và ngắm cảnh",
+      "gold": {
+        "start_date": "2026-11-25",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "pace": "relaxed",
+        "interests": [
+          "coffee",
+          "sightseeing"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-25",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "relaxed",
+          "interests": [
+            "coffee",
+            "sightseeing"
+          ]
+        },
+        "date_text": "ngày 25/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee",
+            "sightseeing"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-25",
+          "num_days": 1,
+          "travel_mode": "walk",
+          "pace": "relaxed"
+        }
+      },
+      "error": null,
+      "latency_s": 2.58,
+      "score": {
+        "id": "q003",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee",
+          "sightseeing"
+        ],
+        "interests_pred": [
+          "coffee",
+          "sightseeing"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q004",
+      "group": "full",
+      "text": "Cho tôi lịch trình Huế 2 ngày 1 đêm từ ngày 12 tháng 12, thuê xe máy, quan tâm lịch sử và bảo tàng",
+      "gold": {
+        "start_date": "2026-12-12",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "culture",
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-12",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "culture",
+            "history"
+          ]
+        },
+        "date_text": "ngày 12 tháng 12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture",
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-12",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.403,
+      "score": {
+        "id": "q004",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "culture",
+          "history"
+        ],
+        "interests_pred": [
+          "culture",
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q005",
+      "group": "full",
+      "text": "Lịch đi Huế 3 ngày từ 1/12, đi taxi, thích thiên nhiên, biển và đồ ăn địa phương, đi nhẹ nhàng",
+      "gold": {
+        "start_date": "2026-12-01",
+        "num_days": 3,
+        "travel_mode": "car",
+        "pace": "relaxed",
+        "interests": [
+          "food",
+          "nature"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-01",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "relaxed",
+          "interests": [
+            "nature"
+          ]
+        },
+        "date_text": "1/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "đồ ăn địa phương"
+        ],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "nature"
+          ],
+          "soft_preferences": [
+            "đồ ăn địa phương"
+          ],
+          "start_date": "2026-12-01",
+          "num_days": 3,
+          "travel_mode": "car",
+          "pace": "relaxed"
+        }
+      },
+      "error": null,
+      "latency_s": 2.311,
+      "score": {
+        "id": "q005",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "food",
+          "nature"
+        ],
+        "interests_pred": [
+          "nature"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q006",
+      "group": "full",
+      "text": "Tôi đi Huế 4 ngày từ 10/1, xe máy, muốn đi được càng nhiều chỗ càng tốt, thích di tích và chợ",
+      "gold": {
+        "start_date": "2027-01-10",
+        "num_days": 4,
+        "travel_mode": "motorbike",
+        "pace": "packed",
+        "interests": [
+          "history",
+          "shopping"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2027-01-10",
+          "num_days": 4,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "packed",
+          "interests": [
+            "history",
+            "shopping"
+          ]
+        },
+        "date_text": "10/1",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history",
+            "shopping"
+          ],
+          "soft_preferences": [],
+          "start_date": "2027-01-10",
+          "num_days": 4,
+          "travel_mode": "motorbike",
+          "pace": "packed"
+        }
+      },
+      "error": null,
+      "latency_s": 2.262,
+      "score": {
+        "id": "q006",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history",
+          "shopping"
+        ],
+        "interests_pred": [
+          "history",
+          "shopping"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q007",
+      "group": "full",
+      "text": "Lên kế hoạch 1 ngày ở Huế ngày 30/11, đi từ 7h sáng đến 6h chiều, đi ô tô, thích lăng vua",
+      "gold": {
+        "start_date": "2026-11-30",
+        "num_days": 1,
+        "travel_mode": "car",
+        "day_start": "07:00",
+        "day_end": "18:00",
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-30",
+          "num_days": 1,
+          "day_start": "07:00:00",
+          "day_end": "18:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "ngày 30/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-30",
+          "num_days": 1,
+          "travel_mode": "car",
+          "day_start": "07:00",
+          "day_end": "18:00"
+        }
+      },
+      "error": null,
+      "latency_s": 2.301,
+      "score": {
+        "id": "q007",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q009",
+      "group": "full",
+      "text": "Xếp giúp lịch Huế 3 ngày 2 đêm, ngày 8/12 bắt đầu, đi xe hơi, nhịp vừa, thích văn hóa và tâm linh",
+      "gold": {
+        "start_date": "2026-12-08",
+        "num_days": 3,
+        "travel_mode": "car",
+        "pace": "moderate",
+        "interests": [
+          "culture",
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-08",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "culture",
+            "spiritual"
+          ]
+        },
+        "date_text": "ngày 8/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture",
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-08",
+          "num_days": 3,
+          "travel_mode": "car",
+          "pace": "moderate"
+        }
+      },
+      "error": null,
+      "latency_s": 2.183,
+      "score": {
+        "id": "q009",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "culture",
+          "spiritual"
+        ],
+        "interests_pred": [
+          "culture",
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q010",
+      "group": "full",
+      "text": "Đi Huế 1 ngày 22/11 bằng xe máy, muốn tham quan Đại Nội và ăn đặc sản",
+      "gold": {
+        "start_date": "2026-11-22",
+        "num_days": 1,
+        "travel_mode": "motorbike",
+        "interests": [
+          "food",
+          "history"
+        ],
+        "must_include": [
+          "huetripo:531787"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "food",
+            "history",
+            "sightseeing"
+          ]
+        },
+        "date_text": "22/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food",
+            "history",
+            "sightseeing"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.058,
+      "score": {
+        "id": "q010",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "food",
+          "history"
+        ],
+        "interests_pred": [
+          "food",
+          "history",
+          "sightseeing"
+        ],
+        "must_ok": false,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q015",
+      "group": "full",
+      "text": "Đi Huế 3 ngày từ 19/12, đi xe máy, thích ăn uống, cà phê và ngắm cảnh sông Hương",
+      "gold": {
+        "start_date": "2026-12-19",
+        "num_days": 3,
+        "travel_mode": "motorbike",
+        "interests": [
+          "coffee",
+          "food",
+          "nature",
+          "sightseeing"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-19",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "coffee",
+            "food",
+            "nature",
+            "sightseeing"
+          ]
+        },
+        "date_text": "19/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee",
+            "food",
+            "nature",
+            "sightseeing"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-19",
+          "num_days": 3,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.238,
+      "score": {
+        "id": "q015",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee",
+          "food",
+          "nature",
+          "sightseeing"
+        ],
+        "interests_pred": [
+          "coffee",
+          "food",
+          "nature",
+          "sightseeing"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q016",
+      "group": "full",
+      "text": "Lịch Huế 1 ngày ngày 2/12, đi từ 8 giờ đến 5 giờ chiều, đi ô tô, xem di tích cung đình",
+      "gold": {
+        "start_date": "2026-12-02",
+        "num_days": 1,
+        "travel_mode": "car",
+        "day_start": "08:00",
+        "day_end": "17:00",
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-02",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "17:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "ngày 2/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-02",
+          "num_days": 1,
+          "travel_mode": "car",
+          "day_start": "08:00",
+          "day_end": "17:00"
+        }
+      },
+      "error": null,
+      "latency_s": 2.206,
+      "score": {
+        "id": "q016",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q017",
+      "group": "full",
+      "text": "Mình có 2 ngày ở Huế từ 27/11, thuê xe máy, đi vừa phải, thích văn hóa và đồ ăn",
+      "gold": {
+        "start_date": "2026-11-27",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "pace": "moderate",
+        "interests": [
+          "culture",
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-27",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "culture"
+          ]
+        },
+        "date_text": "27/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "đồ ăn"
+        ],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture"
+          ],
+          "soft_preferences": [
+            "đồ ăn"
+          ],
+          "start_date": "2026-11-27",
+          "num_days": 2,
+          "travel_mode": "motorbike",
+          "pace": "moderate"
+        }
+      },
+      "error": null,
+      "latency_s": 2.289,
+      "score": {
+        "id": "q017",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "culture",
+          "food"
+        ],
+        "interests_pred": [
+          "culture"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q019",
+      "group": "full",
+      "text": "Đi Huế 2 ngày từ 9/12 bằng xe máy, muốn ghé Đại Nội, chùa Thiên Mụ và chợ Đông Ba",
+      "gold": {
+        "start_date": "2026-12-09",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history",
+          "shopping",
+          "spiritual"
+        ],
+        "must_include": [
+          "huetripo:531787",
+          "huetripo:197559",
+          "huetripo:193028"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-09",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "9/12",
+        "must_include": [
+          {
+            "text": "Đại Nội",
+            "place_id": "huetripo:531787",
+            "score": 0.85
+          },
+          {
+            "text": "chùa Thiên Mụ",
+            "place_id": "huetripo:197559",
+            "score": 1.0
+          },
+          {
+            "text": "chợ Đông Ba",
+            "place_id": "huetripo:193028",
+            "score": 1.0
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-09",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.195,
+      "score": {
+        "id": "q019",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "history",
+          "shopping",
+          "spiritual"
+        ],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q023",
+      "group": "full",
+      "text": "Đi Huế 3 ngày từ 26/12, đi ô tô, thích biển, thiên nhiên và hải sản",
+      "gold": {
+        "start_date": "2026-12-26",
+        "num_days": 3,
+        "travel_mode": "car",
+        "interests": [
+          "food",
+          "nature"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-26",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "nature"
+          ]
+        },
+        "date_text": "26/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "hải sản"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "nature"
+          ],
+          "soft_preferences": [
+            "hải sản"
+          ],
+          "start_date": "2026-12-26",
+          "num_days": 3,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.085,
+      "score": {
+        "id": "q023",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "food",
+          "nature"
+        ],
+        "interests_pred": [
+          "nature"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q024",
+      "group": "full",
+      "text": "Lịch trình Huế 1 ngày ngày 4/12 từ 6h sáng tới 8h tối, xe máy, càng nhiều điểm càng tốt",
+      "gold": {
+        "start_date": "2026-12-04",
+        "num_days": 1,
+        "travel_mode": "motorbike",
+        "pace": "packed",
+        "day_start": "06:00",
+        "day_end": "20:00"
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-04",
+          "num_days": 1,
+          "day_start": "06:00:00",
+          "day_end": "20:00:00",
+          "travel_mode": "motorbike",
+          "pace": "packed",
+          "interests": []
+        },
+        "date_text": "ngày 4/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-04",
+          "num_days": 1,
+          "travel_mode": "motorbike",
+          "pace": "packed",
+          "day_start": "06:00",
+          "day_end": "20:00"
+        }
+      },
+      "error": null,
+      "latency_s": 2.407,
+      "score": {
+        "id": "q024",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q026",
+      "group": "full",
+      "text": "Mình đi Huế 3 ngày từ 2/1, thuê xe máy, thích lăng tẩm, chợ và đặc sản",
+      "gold": {
+        "start_date": "2027-01-02",
+        "num_days": 3,
+        "travel_mode": "motorbike",
+        "interests": [
+          "food",
+          "history",
+          "shopping"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2027-01-02",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "food",
+            "history",
+            "shopping"
+          ]
+        },
+        "date_text": "2/1",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food",
+            "history",
+            "shopping"
+          ],
+          "soft_preferences": [],
+          "start_date": "2027-01-02",
+          "num_days": 3,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.372,
+      "score": {
+        "id": "q026",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food",
+          "history",
+          "shopping"
+        ],
+        "interests_pred": [
+          "food",
+          "history",
+          "shopping"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q028",
+      "group": "full",
+      "text": "Lên lịch 1 ngày Huế ngày 29/11, đi bộ, thích bảo tàng và cà phê",
+      "gold": {
+        "start_date": "2026-11-29",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "coffee",
+          "culture"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-29",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "coffee",
+            "culture"
+          ]
+        },
+        "date_text": "ngày 29/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee",
+            "culture"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-29",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.023,
+      "score": {
+        "id": "q028",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee",
+          "culture"
+        ],
+        "interests_pred": [
+          "coffee",
+          "culture"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q030",
+      "group": "full",
+      "text": "Lịch Huế 2 ngày từ 13/12, xe máy, đi dày, thích ẩm thực đường phố và mua sắm",
+      "gold": {
+        "start_date": "2026-12-13",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "pace": "packed",
+        "interests": [
+          "food",
+          "shopping"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-13",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "packed",
+          "interests": [
+            "food",
+            "shopping"
+          ]
+        },
+        "date_text": "13/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food",
+            "shopping"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-13",
+          "num_days": 2,
+          "travel_mode": "motorbike",
+          "pace": "packed"
+        }
+      },
+      "error": null,
+      "latency_s": 2.251,
+      "score": {
+        "id": "q030",
+        "group": "full",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food",
+          "shopping"
+        ],
+        "interests_pred": [
+          "food",
+          "shopping"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q031",
+      "group": "missing",
+      "text": "Đi Huế 2 ngày, thích lăng tẩm",
+      "gold": {
+        "clarify": true,
+        "num_days": 2,
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "num_days": 2
+        }
+      },
+      "error": null,
+      "latency_s": 2.186,
+      "score": {
+        "id": "q031",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q032",
+      "group": "missing",
+      "text": "Lên lịch đi Huế cho mình với",
+      "gold": {
+        "clarify": true
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "partial": {
+          "interests": [],
+          "soft_preferences": []
+        }
+      },
+      "error": null,
+      "latency_s": 1.898,
+      "score": {
+        "id": "q032",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q035",
+      "group": "missing",
+      "text": "Có lịch nào đi Huế hay không?",
+      "gold": {
+        "clarify": true
+      },
+      "pred": {
+        "intent": "out_of_scope",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {}
+      },
+      "error": null,
+      "latency_s": 1.599,
+      "score": {
+        "id": "q035",
+        "group": "missing",
+        "intent_ok": false,
+        "clarify_gold": true,
+        "clarify_pred": false,
+        "clarify_ok": false,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q037",
+      "group": "missing",
+      "text": "Đi Huế ngày 5/12, đi ô tô",
+      "gold": {
+        "clarify": true,
+        "start_date": "2026-12-05",
+        "travel_mode": "car"
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": "ngày 5/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-05",
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.25,
+      "score": {
+        "id": "q037",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q038",
+      "group": "missing",
+      "text": "Lịch trình Huế ngắn ngày cho người mê lịch sử",
+      "gold": {
+        "clarify": true,
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": []
+        }
+      },
+      "error": null,
+      "latency_s": 2.005,
+      "score": {
+        "id": "q038",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q039",
+      "group": "missing",
+      "text": "Mình có vài ngày rảnh, muốn đi Huế",
+      "gold": {
+        "clarify": true
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "partial": {
+          "interests": [],
+          "soft_preferences": []
+        }
+      },
+      "error": null,
+      "latency_s": 1.877,
+      "score": {
+        "id": "q039",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q040",
+      "group": "missing",
+      "text": "Đi Huế 2 ngày 1 đêm, đi bộ, thích cà phê",
+      "gold": {
+        "clarify": true,
+        "num_days": 2,
+        "travel_mode": "walk",
+        "interests": [
+          "coffee"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "partial": {
+          "interests": [
+            "coffee"
+          ],
+          "soft_preferences": [],
+          "num_days": 2,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.358,
+      "score": {
+        "id": "q040",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee"
+        ],
+        "interests_pred": [
+          "coffee"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q041",
+      "group": "missing",
+      "text": "Gợi ý lịch Huế từ 10/12 cho gia đình",
+      "gold": {
+        "clarify": true,
+        "start_date": "2026-12-10",
+        "soft_preferences": [
+          "gia đình"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": "10/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "gia đình"
+        ],
+        "defaulted": [],
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "partial": {
+          "interests": [],
+          "soft_preferences": [
+            "gia đình"
+          ],
+          "start_date": "2026-12-10"
+        }
+      },
+      "error": null,
+      "latency_s": 2.185,
+      "score": {
+        "id": "q041",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 1,
+        "soft_found": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q044",
+      "group": "missing",
+      "text": "Đi Huế 4 ngày, lịch dày, ô tô",
+      "gold": {
+        "clarify": true,
+        "num_days": 4,
+        "pace": "packed",
+        "travel_mode": "car"
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "num_days": 4,
+          "travel_mode": "car",
+          "pace": "packed"
+        }
+      },
+      "error": null,
+      "latency_s": 1.977,
+      "score": {
+        "id": "q044",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q045",
+      "group": "missing",
+      "text": "Cho xin lịch Huế bắt đầu ngày 1/12",
+      "gold": {
+        "clarify": true,
+        "start_date": "2026-12-01"
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": "ngày 1/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-01"
+        }
+      },
+      "error": null,
+      "latency_s": 2.0,
+      "score": {
+        "id": "q045",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q046",
+      "group": "missing",
+      "text": "Đi Huế, thích thiên nhiên và chụp ảnh",
+      "gold": {
+        "clarify": true,
+        "interests": [
+          "nature",
+          "photography"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "partial": {
+          "interests": [
+            "nature",
+            "photography"
+          ],
+          "soft_preferences": []
+        }
+      },
+      "error": null,
+      "latency_s": 2.005,
+      "score": {
+        "id": "q046",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "nature",
+          "photography"
+        ],
+        "interests_pred": [
+          "nature",
+          "photography"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q047",
+      "group": "missing",
+      "text": "Mình đi Huế ngày 15/12 bằng xe máy, thích ăn uống",
+      "gold": {
+        "clarify": true,
+        "start_date": "2026-12-15",
+        "travel_mode": "motorbike",
+        "interests": [
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": "ngày 15/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "partial": {
+          "interests": [
+            "food"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-15",
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 1.99,
+      "score": {
+        "id": "q047",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food"
+        ],
+        "interests_pred": [
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q048",
+      "group": "missing",
+      "text": "Đi Huế 3 hôm, thong thả thôi",
+      "gold": {
+        "clarify": true,
+        "num_days": 3,
+        "pace": "relaxed"
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "num_days": 3,
+          "pace": "relaxed"
+        }
+      },
+      "error": null,
+      "latency_s": 1.94,
+      "score": {
+        "id": "q048",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q050",
+      "group": "missing",
+      "text": "Huế 2 ngày, chùa và lăng",
+      "gold": {
+        "clarify": true,
+        "num_days": 2,
+        "interests": [
+          "history",
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "partial": {
+          "interests": [
+            "history",
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "num_days": 2
+        }
+      },
+      "error": null,
+      "latency_s": 1.985,
+      "score": {
+        "id": "q050",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history",
+          "spiritual"
+        ],
+        "interests_pred": [
+          "history",
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q052",
+      "group": "missing",
+      "text": "Lịch Huế 1 ngày đi bộ",
+      "gold": {
+        "clarify": true,
+        "num_days": 1,
+        "travel_mode": "walk"
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.276,
+      "score": {
+        "id": "q052",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q055",
+      "group": "missing",
+      "text": "Lịch trình Huế 5 ngày cho người thích ẩm thực",
+      "gold": {
+        "clarify": true,
+        "num_days": 5,
+        "interests": [
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "partial": {
+          "interests": [
+            "food"
+          ],
+          "soft_preferences": [],
+          "num_days": 5
+        }
+      },
+      "error": null,
+      "latency_s": 2.055,
+      "score": {
+        "id": "q055",
+        "group": "missing",
+        "intent_ok": true,
+        "clarify_gold": true,
+        "clarify_pred": true,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food"
+        ],
+        "interests_pred": [
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q056",
+      "group": "relative_date",
+      "text": "Cuối tuần này mình đi Huế 2 ngày, xe máy, thích lăng tẩm",
+      "gold": {
+        "start_date": "2026-11-21",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-21",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "Cuối tuần này",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-21",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.119,
+      "score": {
+        "id": "q056",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q057",
+      "group": "relative_date",
+      "text": "Mai đi Huế 1 ngày, đi bộ, thích cà phê",
+      "gold": {
+        "start_date": "2026-11-19",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "coffee"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-19",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "coffee"
+          ]
+        },
+        "date_text": "Mai",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-19",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.14,
+      "score": {
+        "id": "q057",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee"
+        ],
+        "interests_pred": [
+          "coffee"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q058",
+      "group": "relative_date",
+      "text": "Thứ 7 tới đi Huế 2 ngày bằng ô tô, thích chùa",
+      "gold": {
+        "start_date": "2026-11-21",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-21",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "spiritual"
+          ]
+        },
+        "date_text": "Thứ 7 tới",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-21",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.083,
+      "score": {
+        "id": "q058",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "spiritual"
+        ],
+        "interests_pred": [
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q059",
+      "group": "relative_date",
+      "text": "Tuần sau mình đi Huế 3 ngày, đi xe máy, thích ăn uống",
+      "gold": {
+        "start_date": "2026-11-23",
+        "num_days": 3,
+        "travel_mode": "motorbike",
+        "interests": [
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-23",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "food"
+          ]
+        },
+        "date_text": "Tuần sau",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-23",
+          "num_days": 3,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.071,
+      "score": {
+        "id": "q059",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food"
+        ],
+        "interests_pred": [
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q061",
+      "group": "relative_date",
+      "text": "Hôm nay đi Huế 1 ngày luôn, đi bộ, thích bảo tàng",
+      "gold": {
+        "start_date": "2026-11-18",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "culture"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-18",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "culture"
+          ]
+        },
+        "date_text": "hom nay",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-18",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.086,
+      "score": {
+        "id": "q061",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "culture"
+        ],
+        "interests_pred": [
+          "culture"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q062",
+      "group": "relative_date",
+      "text": "Cuối tuần sau đi Huế 2 ngày, ô tô, thích thiên nhiên",
+      "gold": {
+        "start_date": "2026-11-28",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "nature"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-28",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "nature"
+          ]
+        },
+        "date_text": "Cuối tuần sau",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "nature"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-28",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.134,
+      "score": {
+        "id": "q062",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "nature"
+        ],
+        "interests_pred": [
+          "nature"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q063",
+      "group": "relative_date",
+      "text": "Chủ nhật này đi Huế 1 ngày, đi bộ, thích chùa và cà phê",
+      "gold": {
+        "start_date": "2026-11-22",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "coffee",
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "coffee",
+            "spiritual"
+          ]
+        },
+        "date_text": "Chủ nhật này",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee",
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.207,
+      "score": {
+        "id": "q063",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee",
+          "spiritual"
+        ],
+        "interests_pred": [
+          "coffee",
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q064",
+      "group": "relative_date",
+      "text": "Thứ 6 này mình đi Huế 3 ngày, xe máy, thích lịch sử",
+      "gold": {
+        "start_date": "2026-11-20",
+        "num_days": 3,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-20",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "Thứ 6 này",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-20",
+          "num_days": 3,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.343,
+      "score": {
+        "id": "q064",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q065",
+      "group": "relative_date",
+      "text": "Tết dương lịch đi Huế 2 ngày, ô tô, thích tham quan",
+      "gold": {
+        "start_date": "2027-01-01",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "sightseeing"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2027-01-01",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "sightseeing"
+          ]
+        },
+        "date_text": "Tết dương lịch",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "sightseeing"
+          ],
+          "soft_preferences": [],
+          "start_date": "2027-01-01",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.163,
+      "score": {
+        "id": "q065",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "sightseeing"
+        ],
+        "interests_pred": [
+          "sightseeing"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q068",
+      "group": "relative_date",
+      "text": "Giữa tháng 12 mình đi Huế 2 ngày, ô tô, thích tâm linh",
+      "gold": {
+        "start_date": "2026-12-15",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-15",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "spiritual"
+          ]
+        },
+        "date_text": "Giữa tháng 12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-15",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.108,
+      "score": {
+        "id": "q068",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "spiritual"
+        ],
+        "interests_pred": [
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q069",
+      "group": "relative_date",
+      "text": "Thứ 2 tới đi Huế 1 ngày, xe máy, thích ẩm thực",
+      "gold": {
+        "start_date": "2026-11-23",
+        "num_days": 1,
+        "travel_mode": "motorbike",
+        "interests": [
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-23",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "food"
+          ]
+        },
+        "date_text": "Thứ 2 tới",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-23",
+          "num_days": 1,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.13,
+      "score": {
+        "id": "q069",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food"
+        ],
+        "interests_pred": [
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q070",
+      "group": "relative_date",
+      "text": "Ngày mai mình đi Huế 2 ngày, đi bộ, nhẹ nhàng thôi",
+      "gold": {
+        "start_date": "2026-11-19",
+        "num_days": 2,
+        "travel_mode": "walk",
+        "pace": "relaxed"
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-19",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "relaxed",
+          "interests": []
+        },
+        "date_text": "Ngày mai",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-11-19",
+          "num_days": 2,
+          "travel_mode": "walk",
+          "pace": "relaxed"
+        }
+      },
+      "error": null,
+      "latency_s": 2.133,
+      "score": {
+        "id": "q070",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q071",
+      "group": "relative_date",
+      "text": "Tuần tới đi Huế 4 ngày, ô tô, dày lịch, thích di tích",
+      "gold": {
+        "start_date": "2026-11-23",
+        "num_days": 4,
+        "travel_mode": "car",
+        "pace": "packed",
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-23",
+          "num_days": 4,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "packed",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "Tuần tới",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-23",
+          "num_days": 4,
+          "travel_mode": "car",
+          "pace": "packed"
+        }
+      },
+      "error": null,
+      "latency_s": 2.146,
+      "score": {
+        "id": "q071",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q072",
+      "group": "relative_date",
+      "text": "Cuối tháng 12 đi Huế 3 ngày bằng xe máy, thích ăn uống và cà phê",
+      "gold": {
+        "start_date": "2026-12-25",
+        "num_days": 3,
+        "travel_mode": "motorbike",
+        "interests": [
+          "coffee",
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-25",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "coffee",
+            "food"
+          ]
+        },
+        "date_text": "Cuối tháng 12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee",
+            "food"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-25",
+          "num_days": 3,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.252,
+      "score": {
+        "id": "q072",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee",
+          "food"
+        ],
+        "interests_pred": [
+          "coffee",
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q073",
+      "group": "relative_date",
+      "text": "Thứ 4 đi Huế 1 ngày, đi bộ, thích bảo tàng",
+      "gold": {
+        "start_date": "2026-11-25",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "culture"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-25",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "culture"
+          ]
+        },
+        "date_text": "Thứ 4",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-25",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.172,
+      "score": {
+        "id": "q073",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "culture"
+        ],
+        "interests_pred": [
+          "culture"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q074",
+      "group": "relative_date",
+      "text": "Mốt đi Huế 2 ngày, xe máy, thích chụp ảnh",
+      "gold": {
+        "start_date": "2026-11-20",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "photography"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-20",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "photography"
+          ]
+        },
+        "date_text": "mot",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "photography"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-20",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 1.878,
+      "score": {
+        "id": "q074",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "photography"
+        ],
+        "interests_pred": [
+          "photography"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q075",
+      "group": "relative_date",
+      "text": "Ngày 5 tháng 3 đi Huế 2 ngày, ô tô, thích thiên nhiên",
+      "gold": {
+        "start_date": "2027-03-05",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "nature"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2027-03-05",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "nature"
+          ]
+        },
+        "date_text": "Ngày 5 tháng 3",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "nature"
+          ],
+          "soft_preferences": [],
+          "start_date": "2027-03-05",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.032,
+      "score": {
+        "id": "q075",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "nature"
+        ],
+        "interests_pred": [
+          "nature"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q076",
+      "group": "relative_date",
+      "text": "Cuối tuần này đi Huế 1 ngày, đi bộ, chỉ muốn uống cà phê",
+      "gold": {
+        "start_date": "2026-11-21",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "coffee"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-21",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "coffee"
+          ]
+        },
+        "date_text": "Cuối tuần này",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-21",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.091,
+      "score": {
+        "id": "q076",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee"
+        ],
+        "interests_pred": [
+          "coffee"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q077",
+      "group": "relative_date",
+      "text": "Thứ bảy này mình đi Huế 2 ngày, xe máy, thích lăng và chùa",
+      "gold": {
+        "start_date": "2026-11-21",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history",
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-21",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "history",
+            "spiritual"
+          ]
+        },
+        "date_text": "Thứ bảy này",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history",
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-21",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.367,
+      "score": {
+        "id": "q077",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history",
+          "spiritual"
+        ],
+        "interests_pred": [
+          "history",
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q078",
+      "group": "relative_date",
+      "text": "Giáng sinh đi Huế 3 ngày bằng ô tô, thích văn hóa",
+      "gold": {
+        "start_date": "2026-12-24",
+        "num_days": 3,
+        "travel_mode": "car",
+        "interests": [
+          "culture"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-24",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "culture"
+          ]
+        },
+        "date_text": "Giáng sinh",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-24",
+          "num_days": 3,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.072,
+      "score": {
+        "id": "q078",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "culture"
+        ],
+        "interests_pred": [
+          "culture"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q079",
+      "group": "relative_date",
+      "text": "Thứ 5 tuần này đi Huế 1 ngày, xe máy, ăn đặc sản",
+      "gold": {
+        "start_date": "2026-11-19",
+        "num_days": 1,
+        "travel_mode": "motorbike",
+        "interests": [
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-19",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "food"
+          ]
+        },
+        "date_text": "Thứ 5 tuần này",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-19",
+          "num_days": 1,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.27,
+      "score": {
+        "id": "q079",
+        "group": "relative_date",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food"
+        ],
+        "interests_pred": [
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q081",
+      "group": "no_diacritics",
+      "text": "di hue 2 ngay tu 20/12, xe may, thich lang tam",
+      "gold": {
+        "start_date": "2026-12-20",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-20",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "20/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-20",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.277,
+      "score": {
+        "id": "q081",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q084",
+      "group": "no_diacritics",
+      "text": "mai di hue 1 ngay di bo, thich cafe",
+      "gold": {
+        "start_date": "2026-11-19",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "coffee"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-19",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "coffee"
+          ]
+        },
+        "date_text": "mai",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-19",
+          "num_days": 1,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.273,
+      "score": {
+        "id": "q084",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": false,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee"
+        ],
+        "interests_pred": [
+          "coffee"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q085",
+      "group": "no_diacritics",
+      "text": "hue 3n2d tu 10/12, oto, thich di tich, bao tang",
+      "gold": {
+        "start_date": "2026-12-10",
+        "num_days": 3,
+        "travel_mode": "car",
+        "interests": [
+          "culture",
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-10",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "culture",
+            "history"
+          ]
+        },
+        "date_text": "10/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture",
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-10",
+          "num_days": 3,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.315,
+      "score": {
+        "id": "q085",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "culture",
+          "history"
+        ],
+        "interests_pred": [
+          "culture",
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q086",
+      "group": "no_diacritics",
+      "text": "di hue 2 ngay tu 15/12 xe may, muon di dai noi va chua thien mu",
+      "gold": {
+        "start_date": "2026-12-15",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history",
+          "spiritual"
+        ],
+        "must_include": [
+          "huetripo:531787",
+          "huetripo:197559"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-15",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "15/12",
+        "must_include": [
+          {
+            "text": "Đại Nội",
+            "place_id": "huetripo:531787",
+            "score": 0.85
+          },
+          {
+            "text": "chùa Thiên Mụ",
+            "place_id": "huetripo:197559",
+            "score": 1.0
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-15",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.203,
+      "score": {
+        "id": "q086",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "history",
+          "spiritual"
+        ],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q087",
+      "group": "no_diacritics",
+      "text": "t7 toi di hue 1 ngay, di bo, thich cafe va an vat",
+      "gold": {
+        "start_date": "2026-11-21",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "coffee",
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-21",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "coffee",
+            "food"
+          ]
+        },
+        "date_text": "t7 toi",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee",
+            "food"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-21",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.171,
+      "score": {
+        "id": "q087",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee",
+          "food"
+        ],
+        "interests_pred": [
+          "coffee",
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q088",
+      "group": "no_diacritics",
+      "text": "lich hue 2n1đ từ 12/12, thuê xm, thích lăng",
+      "gold": {
+        "start_date": "2026-12-12",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-12",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "12/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-12",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.314,
+      "score": {
+        "id": "q088",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q089",
+      "group": "no_diacritics",
+      "text": "đi huế 3 ngày từ 1/12 bằng ô tô, lịch dày nha, thích chùa vs chợ",
+      "gold": {
+        "start_date": "2026-12-01",
+        "num_days": 3,
+        "travel_mode": "car",
+        "pace": "packed",
+        "interests": [
+          "shopping",
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-01",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "packed",
+          "interests": [
+            "shopping",
+            "spiritual"
+          ]
+        },
+        "date_text": "1/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "shopping",
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-01",
+          "num_days": 3,
+          "travel_mode": "car",
+          "pace": "packed"
+        }
+      },
+      "error": null,
+      "latency_s": 2.083,
+      "score": {
+        "id": "q089",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "shopping",
+          "spiritual"
+        ],
+        "interests_pred": [
+          "shopping",
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q091",
+      "group": "no_diacritics",
+      "text": "hue 1 ngay 25/11 di bo, thong tha, thich chua",
+      "gold": {
+        "start_date": "2026-11-25",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "pace": "relaxed",
+        "interests": [
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-25",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "relaxed",
+          "interests": [
+            "spiritual"
+          ]
+        },
+        "date_text": "25/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-25",
+          "num_days": 1,
+          "travel_mode": "walk",
+          "pace": "relaxed"
+        }
+      },
+      "error": null,
+      "latency_s": 2.114,
+      "score": {
+        "id": "q091",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "spiritual"
+        ],
+        "interests_pred": [
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q092",
+      "group": "no_diacritics",
+      "text": "cn này đi huế 1 ngày, xe máy, ăn đặc sản",
+      "gold": {
+        "start_date": "2026-11-22",
+        "num_days": 1,
+        "travel_mode": "motorbike",
+        "interests": [
+          "food"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "food"
+          ]
+        },
+        "date_text": "cn này",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.135,
+      "score": {
+        "id": "q092",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food"
+        ],
+        "interests_pred": [
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q093",
+      "group": "no_diacritics",
+      "text": "di hue 4 ngay tu 18/12 bang xe may, muon di nhieu cho nhat co the",
+      "gold": {
+        "start_date": "2026-12-18",
+        "num_days": 4,
+        "travel_mode": "motorbike",
+        "pace": "packed"
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-18",
+          "num_days": 4,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "packed",
+          "interests": []
+        },
+        "date_text": "18/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-18",
+          "num_days": 4,
+          "travel_mode": "motorbike",
+          "pace": "packed"
+        }
+      },
+      "error": null,
+      "latency_s": 1.884,
+      "score": {
+        "id": "q093",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q094",
+      "group": "no_diacritics",
+      "text": "lên lịch huế 2 ngày từ 6/12 nhé, đi ô tô, mê cà fê",
+      "gold": {
+        "start_date": "2026-12-06",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "coffee"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-06",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "6/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "cà fê"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [
+            "cà fê"
+          ],
+          "start_date": "2026-12-06",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.064,
+      "score": {
+        "id": "q094",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "coffee"
+        ],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q095",
+      "group": "no_diacritics",
+      "text": "di hue 2 ngay tu 9/12 xe may, thich lang tu duc",
+      "gold": {
+        "start_date": "2026-12-09",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history"
+        ],
+        "must_include": [
+          "huetripo:483480"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-09",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "9/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-09",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.403,
+      "score": {
+        "id": "q095",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": false,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q096",
+      "group": "no_diacritics",
+      "text": "hue 1 ngay hom nay, di bo, xem bao tang",
+      "gold": {
+        "start_date": "2026-11-18",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "culture"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-18",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "culture"
+          ]
+        },
+        "date_text": "hom nay",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-18",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.38,
+      "score": {
+        "id": "q096",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "culture"
+        ],
+        "interests_pred": [
+          "culture"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q097",
+      "group": "no_diacritics",
+      "text": "đi huế 3 ngày từ 26/12, thuê xe máy, thik chụp hình sống ảo",
+      "gold": {
+        "start_date": "2026-12-26",
+        "num_days": 3,
+        "travel_mode": "motorbike",
+        "interests": [
+          "photography"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-26",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "photography"
+          ]
+        },
+        "date_text": "26/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "photography"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-26",
+          "num_days": 3,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.61,
+      "score": {
+        "id": "q097",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "photography"
+        ],
+        "interests_pred": [
+          "photography"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q098",
+      "group": "no_diacritics",
+      "text": "lich hue 2 ngay tu 13/12 oto, nhe nhang, thich tam linh",
+      "gold": {
+        "start_date": "2026-12-13",
+        "num_days": 2,
+        "travel_mode": "car",
+        "pace": "relaxed",
+        "interests": [
+          "spiritual"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-13",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "spiritual"
+          ]
+        },
+        "date_text": "13/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "nhe nhang"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "spiritual"
+          ],
+          "soft_preferences": [
+            "nhe nhang"
+          ],
+          "start_date": "2026-12-13",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.494,
+      "score": {
+        "id": "q098",
+        "group": "no_diacritics",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": false,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "spiritual"
+        ],
+        "interests_pred": [
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q103",
+      "group": "soft",
+      "text": "Đi Huế 2 ngày từ 12/12 có 2 bé nhỏ, đi ô tô, thích thiên nhiên",
+      "gold": {
+        "start_date": "2026-12-12",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "nature"
+        ],
+        "soft_preferences": [
+          "có trẻ nhỏ"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-12",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "nature"
+          ]
+        },
+        "date_text": "12/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "2 bé nhỏ"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "nature"
+          ],
+          "soft_preferences": [
+            "2 bé nhỏ"
+          ],
+          "start_date": "2026-12-12",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.169,
+      "score": {
+        "id": "q103",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "nature"
+        ],
+        "interests_pred": [
+          "nature"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 1,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q104",
+      "group": "soft",
+      "text": "Lên lịch Huế 1 ngày 30/11 đi bộ, ngân sách thấp, ưu tiên chỗ miễn phí",
+      "gold": {
+        "start_date": "2026-11-30",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "soft_preferences": [
+          "ngân sách thấp",
+          "ưu tiên chỗ miễn phí"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-30",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "30/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "ngân sách thấp"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [
+            "ngân sách thấp"
+          ],
+          "start_date": "2026-11-30",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.11,
+      "score": {
+        "id": "q104",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 2,
+        "soft_found": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q106",
+      "group": "soft",
+      "text": "Lịch Huế 2 ngày từ 15/12, ô tô, đi theo nhóm 10 người, thích ăn hải sản",
+      "gold": {
+        "start_date": "2026-12-15",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "food"
+        ],
+        "soft_preferences": [
+          "nhóm 10 người",
+          "hải sản"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-15",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "15/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "nhóm 10 người",
+          "ăn hải sản"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [
+            "nhóm 10 người",
+            "ăn hải sản"
+          ],
+          "start_date": "2026-12-15",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.317,
+      "score": {
+        "id": "q106",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "food"
+        ],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 2,
+        "soft_found": 2,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q107",
+      "group": "soft",
+      "text": "Đi Huế 1 ngày 22/11, đi bộ, muốn trải nghiệm như người địa phương, tránh chỗ đông",
+      "gold": {
+        "start_date": "2026-11-22",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "soft_preferences": [
+          "trải nghiệm như người địa phương",
+          "tránh chỗ đông"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "22/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "tránh chỗ đông",
+          "trải nghiệm như người địa phương"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [
+            "tránh chỗ đông",
+            "trải nghiệm như người địa phương"
+          ],
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.188,
+      "score": {
+        "id": "q107",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 2,
+        "soft_found": 2,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q108",
+      "group": "soft",
+      "text": "Lên lịch Huế 2 ngày từ 1/12, xe máy, thích ăn chay, đi chùa",
+      "gold": {
+        "start_date": "2026-12-01",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "spiritual"
+        ],
+        "soft_preferences": [
+          "ăn chay"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-01",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "spiritual"
+          ]
+        },
+        "date_text": "1/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "ăn chay"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "spiritual"
+          ],
+          "soft_preferences": [
+            "ăn chay"
+          ],
+          "start_date": "2026-12-01",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.482,
+      "score": {
+        "id": "q108",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "spiritual"
+        ],
+        "interests_pred": [
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 1,
+        "soft_found": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q109",
+      "group": "soft",
+      "text": "Đi Huế 3 ngày từ 19/12 với người yêu, ô tô, thích chỗ lãng mạn và hoàng hôn",
+      "gold": {
+        "start_date": "2026-12-19",
+        "num_days": 3,
+        "travel_mode": "car",
+        "soft_preferences": [
+          "đi với người yêu",
+          "lãng mạn",
+          "hoàng hôn"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-19",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "19/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "người yêu",
+          "hoàng hôn"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [
+            "người yêu",
+            "hoàng hôn"
+          ],
+          "start_date": "2026-12-19",
+          "num_days": 3,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.362,
+      "score": {
+        "id": "q109",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 3,
+        "soft_found": 2,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q110",
+      "group": "soft",
+      "text": "Lịch Huế 2 ngày từ 6/12, xe máy, mình hay say xe nên đừng đi xa trung tâm",
+      "gold": {
+        "start_date": "2026-12-06",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "soft_preferences": [
+          "say xe",
+          "không đi xa trung tâm"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-06",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "6/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "say xe"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [
+            "say xe"
+          ],
+          "start_date": "2026-12-06",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 1.957,
+      "score": {
+        "id": "q110",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 2,
+        "soft_found": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q111",
+      "group": "soft",
+      "text": "Đi Huế 1 ngày 27/11 đi bộ, thích làng nghề truyền thống và đồ thủ công",
+      "gold": {
+        "start_date": "2026-11-27",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "soft_preferences": [
+          "làng nghề truyền thống",
+          "đồ thủ công"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-27",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "27/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "đồ thủ công"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [
+            "đồ thủ công"
+          ],
+          "start_date": "2026-11-27",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.182,
+      "score": {
+        "id": "q111",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 2,
+        "soft_found": 1,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q114",
+      "group": "soft",
+      "text": "Lịch Huế 1 ngày 4/12, đi bộ, chỉ đi chỗ có mái che vì sợ mưa",
+      "gold": {
+        "start_date": "2026-12-04",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "soft_preferences": [
+          "chỗ có mái che",
+          "sợ mưa"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-04",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "4/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "chỗ có mái che"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [
+            "chỗ có mái che"
+          ],
+          "start_date": "2026-12-04",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.295,
+      "score": {
+        "id": "q114",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 2,
+        "soft_found": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q115",
+      "group": "soft",
+      "text": "Đi Huế 2 ngày từ 11/12, ô tô, thích món Huế chính gốc, quán lâu đời",
+      "gold": {
+        "start_date": "2026-12-11",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "food"
+        ],
+        "soft_preferences": [
+          "quán lâu đời"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-11",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "food"
+          ]
+        },
+        "date_text": "11/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "quán lâu đời"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "food"
+          ],
+          "soft_preferences": [
+            "quán lâu đời"
+          ],
+          "start_date": "2026-12-11",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.444,
+      "score": {
+        "id": "q115",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "food"
+        ],
+        "interests_pred": [
+          "food"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 1,
+        "soft_found": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q117",
+      "group": "soft",
+      "text": "Đi Huế 3 ngày từ 26/12, ô tô, có người đi xe lăn",
+      "gold": {
+        "start_date": "2026-12-26",
+        "num_days": 3,
+        "travel_mode": "car",
+        "soft_preferences": [
+          "người đi xe lăn"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-26",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "26/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "người đi xe lăn"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [
+            "người đi xe lăn"
+          ],
+          "start_date": "2026-12-26",
+          "num_days": 3,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.015,
+      "score": {
+        "id": "q117",
+        "group": "soft",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 1,
+        "soft_found": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q121",
+      "group": "must_exclude",
+      "text": "Đi Huế 2 ngày từ 20/12, xe máy, nhất định phải đến lăng Minh Mạng và Kinh Thành",
+      "gold": {
+        "start_date": "2026-12-20",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history"
+        ],
+        "must_include": [
+          "huetripo:424131",
+          "huetripo:860594"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-20",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "20/12",
+        "must_include": [
+          {
+            "text": "lăng Minh Mạng",
+            "place_id": "huetripo:424131",
+            "score": 0.85
+          },
+          {
+            "text": "Kinh Thành",
+            "place_id": "huetripo:860594",
+            "score": 0.85
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-20",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.373,
+      "score": {
+        "id": "q121",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q122",
+      "group": "must_exclude",
+      "text": "Lịch Huế 1 ngày 25/11, đi bộ, không đi chợ, thích chùa",
+      "gold": {
+        "start_date": "2026-11-25",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "spiritual"
+        ],
+        "exclude_categories": [
+          "market"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-25",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "spiritual"
+          ]
+        },
+        "date_text": "25/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [
+          "market"
+        ],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-25",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.095,
+      "score": {
+        "id": "q122",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "spiritual"
+        ],
+        "interests_pred": [
+          "spiritual"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q123",
+      "group": "must_exclude",
+      "text": "Đi Huế 3 ngày từ 5/12, ô tô, muốn ghé biển Thuận An và phá Tam Giang",
+      "gold": {
+        "start_date": "2026-12-05",
+        "num_days": 3,
+        "travel_mode": "car",
+        "interests": [
+          "nature"
+        ],
+        "must_include": [
+          "huetripo:891750",
+          "huetripo:282608"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-05",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "nature"
+          ]
+        },
+        "date_text": "5/12",
+        "must_include": [
+          {
+            "text": "biển Thuận An",
+            "place_id": "huetripo:891750",
+            "score": 1.0
+          },
+          {
+            "text": "Tam Giang",
+            "place_id": "huetripo:282608",
+            "score": 0.85
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [
+          "phá Tam Giang"
+        ],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "nature"
+          ],
+          "soft_preferences": [
+            "phá Tam Giang"
+          ],
+          "start_date": "2026-12-05",
+          "num_days": 3,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.324,
+      "score": {
+        "id": "q123",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "nature"
+        ],
+        "interests_pred": [
+          "nature"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q124",
+      "group": "must_exclude",
+      "text": "Lên lịch Huế 2 ngày từ 12/12, xe máy, đã đi Đại Nội rồi nên bỏ qua",
+      "gold": {
+        "start_date": "2026-12-12",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "exclude": [
+          "huetripo:531787"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-12",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "12/12",
+        "must_include": [],
+        "exclude": [
+          {
+            "text": "Đại Nội",
+            "place_id": "huetripo:531787",
+            "score": 0.85
+          }
+        ],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-12",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 3.021,
+      "score": {
+        "id": "q124",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q125",
+      "group": "must_exclude",
+      "text": "Đi Huế 1 ngày 30/11, xe máy, phải có cầu ngói Thanh Toàn",
+      "gold": {
+        "start_date": "2026-11-30",
+        "num_days": 1,
+        "travel_mode": "motorbike",
+        "must_include": [
+          "huetripo:676368"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-30",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "30/11",
+        "must_include": [
+          {
+            "text": "cầu ngói Thanh Toàn",
+            "place_id": "huetripo:676368",
+            "score": 0.85
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-11-30",
+          "num_days": 1,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 3.379,
+      "score": {
+        "id": "q125",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q126",
+      "group": "must_exclude",
+      "text": "Lịch Huế 2 ngày từ 8/12, ô tô, không đi lăng tẩm, thích cà phê và chợ",
+      "gold": {
+        "start_date": "2026-12-08",
+        "num_days": 2,
+        "travel_mode": "car",
+        "interests": [
+          "coffee",
+          "shopping"
+        ],
+        "exclude_categories": [
+          "historic"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-08",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "coffee",
+            "shopping"
+          ]
+        },
+        "date_text": "8/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [
+          "historic"
+        ],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee",
+            "shopping"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-08",
+          "num_days": 2,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.735,
+      "score": {
+        "id": "q126",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "coffee",
+          "shopping"
+        ],
+        "interests_pred": [
+          "coffee",
+          "shopping"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q127",
+      "group": "must_exclude",
+      "text": "Đi Huế 3 ngày từ 15/12, xe máy, muốn đi lăng Gia Long, chùa Từ Hiếu, làng hương Thủy Xuân",
+      "gold": {
+        "start_date": "2026-12-15",
+        "num_days": 3,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history",
+          "spiritual"
+        ],
+        "must_include": [
+          "huetripo:689381",
+          "huetripo:865952",
+          "huetripo:860726"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-15",
+          "num_days": 3,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "15/12",
+        "must_include": [
+          {
+            "text": "lăng Gia Long",
+            "place_id": "huetripo:689381",
+            "score": 0.85
+          },
+          {
+            "text": "chùa Từ Hiếu",
+            "place_id": "huetripo:865952",
+            "score": 1.0
+          },
+          {
+            "text": "làng hương Thủy Xuân",
+            "place_id": "huetripo:860726",
+            "score": 1.0
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-12-15",
+          "num_days": 3,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.891,
+      "score": {
+        "id": "q127",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": false
+        },
+        "interests_gold": [
+          "history",
+          "spiritual"
+        ],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q128",
+      "group": "must_exclude",
+      "text": "Lên lịch Huế 1 ngày 22/11 đi bộ, không uống cà phê, thích bảo tàng",
+      "gold": {
+        "start_date": "2026-11-22",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "interests": [
+          "culture"
+        ],
+        "exclude_categories": [
+          "cafe"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": [
+            "culture"
+          ]
+        },
+        "date_text": "22/11",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [
+          "cafe"
+        ],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "culture"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-22",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.995,
+      "score": {
+        "id": "q128",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "culture"
+        ],
+        "interests_pred": [
+          "culture"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q130",
+      "group": "must_exclude",
+      "text": "Lịch Huế 2 ngày từ 6/12, xe máy, tránh chùa Thiên Mụ vì đi rồi, thích lăng",
+      "gold": {
+        "start_date": "2026-12-06",
+        "num_days": 2,
+        "travel_mode": "motorbike",
+        "interests": [
+          "history"
+        ],
+        "exclude": [
+          "huetripo:197559"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-06",
+          "num_days": 2,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "motorbike",
+          "pace": "moderate",
+          "interests": [
+            "history"
+          ]
+        },
+        "date_text": "6/12",
+        "must_include": [],
+        "exclude": [
+          {
+            "text": "chùa Thiên Mụ",
+            "place_id": "huetripo:197559",
+            "score": 1.0
+          }
+        ],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "history"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-06",
+          "num_days": 2,
+          "travel_mode": "motorbike"
+        }
+      },
+      "error": null,
+      "latency_s": 2.309,
+      "score": {
+        "id": "q130",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "history"
+        ],
+        "interests_pred": [
+          "history"
+        ],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q131",
+      "group": "must_exclude",
+      "text": "Đi Huế 1 ngày 27/11, đi bộ, chắc chắn phải đi cầu Trường Tiền và phố đi bộ",
+      "gold": {
+        "start_date": "2026-11-27",
+        "num_days": 1,
+        "travel_mode": "walk",
+        "must_include": [
+          "huetripo:664215",
+          "huetripo:043732"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-11-27",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "walk",
+          "pace": "moderate",
+          "interests": []
+        },
+        "date_text": "27/11",
+        "must_include": [
+          {
+            "text": "cầu Trường Tiền",
+            "place_id": "huetripo:664215",
+            "score": 1.0
+          },
+          {
+            "text": "phố đi bộ",
+            "place_id": "huetripo:043732",
+            "score": 0.85
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "start_date": "2026-11-27",
+          "num_days": 1,
+          "travel_mode": "walk"
+        }
+      },
+      "error": null,
+      "latency_s": 2.492,
+      "score": {
+        "id": "q131",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q134",
+      "group": "must_exclude",
+      "text": "Lịch Huế 1 ngày 4/12, ô tô, muốn đi chùa Huyền Không",
+      "gold": {
+        "start_date": "2026-12-04",
+        "num_days": 1,
+        "travel_mode": "car",
+        "interests": [
+          "spiritual"
+        ],
+        "must_include": [
+          "huetripo:672346"
+        ]
+      },
+      "pred": {
+        "intent": "plan_new",
+        "request": {
+          "city": "hue",
+          "start_date": "2026-12-04",
+          "num_days": 1,
+          "day_start": "08:00:00",
+          "day_end": "21:00:00",
+          "travel_mode": "car",
+          "pace": "moderate",
+          "interests": [
+            "spiritual"
+          ]
+        },
+        "date_text": "4/12",
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [
+          "pace",
+          "day_start",
+          "day_end"
+        ],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "spiritual"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-12-04",
+          "num_days": 1,
+          "travel_mode": "car"
+        }
+      },
+      "error": null,
+      "latency_s": 2.515,
+      "score": {
+        "id": "q134",
+        "group": "must_exclude",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": true,
+        "fields": {
+          "start_date": true,
+          "num_days": true,
+          "travel_mode": true,
+          "pace": true,
+          "day_start": true,
+          "day_end": true,
+          "interests": true
+        },
+        "interests_gold": [
+          "spiritual"
+        ],
+        "interests_pred": [
+          "spiritual"
+        ],
+        "must_ok": false,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q136",
+      "group": "other_intent",
+      "text": "Đại Nội mở cửa mấy giờ?",
+      "gold": {
+        "intent": "place_info",
+        "must_include": [
+          "huetripo:531787"
+        ]
+      },
+      "pred": {
+        "intent": "place_info",
+        "request": null,
+        "date_text": null,
+        "must_include": [
+          {
+            "text": "Đại Nội",
+            "place_id": "huetripo:531787",
+            "score": 0.85
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": []
+        }
+      },
+      "error": null,
+      "latency_s": 2.528,
+      "score": {
+        "id": "q136",
+        "group": "other_intent",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q138",
+      "group": "other_intent",
+      "text": "Bỏ chùa Thiên Mụ ra khỏi lịch, thêm một quán cà phê",
+      "gold": {
+        "intent": "modify_plan",
+        "exclude": [
+          "huetripo:197559"
+        ],
+        "interests": [
+          "coffee"
+        ]
+      },
+      "pred": {
+        "intent": "modify_plan",
+        "request": null,
+        "date_text": "mot",
+        "must_include": [],
+        "exclude": [
+          {
+            "text": "chùa Thiên Mụ",
+            "place_id": "huetripo:197559",
+            "score": 1.0
+          }
+        ],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {
+          "interests": [
+            "coffee"
+          ],
+          "soft_preferences": [],
+          "start_date": "2026-11-20"
+        }
+      },
+      "error": null,
+      "latency_s": 3.233,
+      "score": {
+        "id": "q138",
+        "group": "other_intent",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q139",
+      "group": "other_intent",
+      "text": "Vé vào lăng Tự Đức bao nhiêu tiền?",
+      "gold": {
+        "intent": "place_info",
+        "must_include": [
+          "huetripo:483480"
+        ]
+      },
+      "pred": {
+        "intent": "out_of_scope",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {}
+      },
+      "error": null,
+      "latency_s": 1.783,
+      "score": {
+        "id": "q139",
+        "group": "other_intent",
+        "intent_ok": false,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": false,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q140",
+      "group": "other_intent",
+      "text": "Thời tiết Huế ngày mai thế nào?",
+      "gold": {
+        "intent": "out_of_scope"
+      },
+      "pred": {
+        "intent": "out_of_scope",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {}
+      },
+      "error": null,
+      "latency_s": 1.78,
+      "score": {
+        "id": "q140",
+        "group": "other_intent",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q143",
+      "group": "other_intent",
+      "text": "Đặt giúp mình vé máy bay Hà Nội đi Huế",
+      "gold": {
+        "intent": "out_of_scope"
+      },
+      "pred": {
+        "intent": "out_of_scope",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {}
+      },
+      "error": null,
+      "latency_s": 1.818,
+      "score": {
+        "id": "q143",
+        "group": "other_intent",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q144",
+      "group": "other_intent",
+      "text": "Thêm 1 ngày nữa vào lịch",
+      "gold": {
+        "intent": "modify_plan"
+      },
+      "pred": {
+        "intent": "modify_plan",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": [],
+          "num_days": 1
+        }
+      },
+      "error": null,
+      "latency_s": 3.17,
+      "score": {
+        "id": "q144",
+        "group": "other_intent",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q145",
+      "group": "other_intent",
+      "text": "Lăng Khải Định cách Đại Nội bao xa?",
+      "gold": {
+        "intent": "place_info",
+        "must_include": [
+          "huetripo:627150",
+          "huetripo:531787"
+        ]
+      },
+      "pred": {
+        "intent": "place_info",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": []
+        }
+      },
+      "error": null,
+      "latency_s": 2.441,
+      "score": {
+        "id": "q145",
+        "group": "other_intent",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": false,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q148",
+      "group": "other_intent",
+      "text": "Khách sạn nào gần Đại Nội?",
+      "gold": {
+        "intent": "out_of_scope"
+      },
+      "pred": {
+        "intent": "place_info",
+        "request": null,
+        "date_text": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": []
+        }
+      },
+      "error": null,
+      "latency_s": 2.791,
+      "score": {
+        "id": "q148",
+        "group": "other_intent",
+        "intent_ok": false,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q149",
+      "group": "other_intent",
+      "text": "Chùa Thiên Mụ có cần mặc đồ kín không?",
+      "gold": {
+        "intent": "place_info",
+        "must_include": [
+          "huetripo:197559"
+        ]
+      },
+      "pred": {
+        "intent": "place_info",
+        "request": null,
+        "date_text": null,
+        "must_include": [
+          {
+            "text": "chùa Thiên Mụ",
+            "place_id": "huetripo:197559",
+            "score": 1.0
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "soft_preferences": [],
+        "defaulted": [],
+        "clarification": null,
+        "partial": {
+          "interests": [],
+          "soft_preferences": []
+        }
+      },
+      "error": null,
+      "latency_s": 2.278,
+      "score": {
+        "id": "q149",
+        "group": "other_intent",
+        "intent_ok": true,
+        "clarify_gold": false,
+        "clarify_pred": false,
+        "clarify_ok": true,
+        "planned": false,
+        "fields": {},
+        "interests_gold": [],
+        "interests_pred": [],
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "soft_gold": 0,
+        "soft_found": 0,
+        "full_match": true
+      }
+    }
+  ]
+}
