@@ -183,6 +183,47 @@ def _insert_places(
     )
 
 
+def _insert_missing(
+    request: PlanRequest,
+    itinerary: Itinerary,
+    dropped: list[DroppedStop],
+    still_missing: list[str],
+    candidate_by_id: dict[str, Place],
+    lookup: InMemoryPlaceRepository,
+    travel: TravelTimeProvider,
+) -> tuple[Itinerary, ValidationReport, list[DroppedStop], list[str]]:
+    """Chèn điểm bắt buộc còn vắng rồi xếp lại giờ và kiểm lại."""
+    grown = _insert_places(
+        request, itinerary, [candidate_by_id[pid] for pid in still_missing], lookup, travel
+    )
+    result = retime_itinerary(request, grown, lookup, travel)
+    itinerary = result.itinerary
+    # Điểm đã bỏ ở lượt xếp giờ trước có thể được chèn lại rồi bị bỏ tiếp: chỉ ghi một lần.
+    seen_drops = {(drop.day_index, drop.place_id) for drop in dropped}
+    dropped += [
+        drop for drop in result.dropped if (drop.day_index, drop.place_id) not in seen_drops
+    ]
+    report = validate_itinerary(request, itinerary, lookup, travel)
+    planned = _planned_ids(itinerary)
+    inserted = [pid for pid in still_missing if pid in planned]
+    return itinerary, report, dropped, inserted
+
+
+def _fill_step(
+    request: PlanRequest,
+    itinerary: Itinerary,
+    report: ValidationReport | None,
+    candidates: Sequence[Place],
+    lookup: InMemoryPlaceRepository,
+    travel: TravelTimeProvider,
+) -> tuple[Itinerary, ValidationReport | None, list[AddedStop]]:
+    """Lấp khoảng trống bằng điểm thêm; nếu có điểm thêm thì kiểm lại lịch."""
+    filled, added = fill_schedule_gaps(request, itinerary, candidates, travel)
+    if added:
+        return filled, validate_itinerary(request, filled, lookup, travel), added
+    return itinerary, report, added
+
+
 def plan_trip(
     request: PlanRequest,
     places: Sequence[Place],
@@ -289,26 +330,15 @@ def plan_trip(
     inserted: list[str] = []
     still_missing = [issue.place_id for issue in best.missing if issue.place_id is not None]
     if retime and itinerary is not None and still_missing:
-        grown = _insert_places(
-            request, itinerary, [candidate_by_id[pid] for pid in still_missing], lookup, travel
+        itinerary, report, dropped, inserted = _insert_missing(
+            request, itinerary, dropped, still_missing, candidate_by_id, lookup, travel
         )
-        result = retime_itinerary(request, grown, lookup, travel)
-        itinerary = result.itinerary
-        # Điểm đã bỏ ở lượt xếp giờ trước có thể được chèn lại rồi bị bỏ tiếp: chỉ ghi một lần.
-        seen_drops = {(drop.day_index, drop.place_id) for drop in dropped}
-        dropped += [
-            drop for drop in result.dropped if (drop.day_index, drop.place_id) not in seen_drops
-        ]
-        report = validate_itinerary(request, itinerary, lookup, travel)
-        planned = _planned_ids(itinerary)
-        inserted = [pid for pid in still_missing if pid in planned]
 
     added: list[AddedStop] = []
     if fill_gaps and retime and itinerary is not None:
-        filled, added = fill_schedule_gaps(request, itinerary, candidates, travel)
-        if added:
-            itinerary = filled
-            report = validate_itinerary(request, itinerary, lookup, travel)
+        itinerary, report, added = _fill_step(
+            request, itinerary, report, candidates, lookup, travel
+        )
 
     planned = _planned_ids(itinerary)
     missing = [place_id for place_id in dict.fromkeys(must_include) if place_id not in planned]
