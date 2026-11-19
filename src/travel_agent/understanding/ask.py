@@ -74,11 +74,13 @@ def ask_query(
     max_repairs: int = 2,
     travel: TravelTimeProvider | None = None,
     landmarks: int = 0,
+    fill_gaps: bool = False,
 ) -> AskOutcome:
     """Hiểu câu bằng `qu_generator`; nếu là lập lịch đủ thông tin thì gọi `plan_trip`.
 
     Ràng buộc đưa vào lập lịch: điểm `must_include` và `exclude` đã liên kết được (có place_id),
     cùng `exclude_categories`. Mention chưa liên kết không đưa vào, và được ghi trong phần hiển thị.
+    `fill_gaps` chuyển cho `plan_trip` (lệnh ask bật mặc định, trừ khi có `--no-fill`).
     Lỗi hạ tầng (GenerationError) và JSON sai (ExtractionError) không bị bắt ở đây.
     """
     query = parse_query(text, ref, qu_generator, places)
@@ -97,6 +99,7 @@ def ask_query(
         retime=retime,
         max_repairs=max_repairs,
         landmarks=landmarks,
+        fill_gaps=fill_gaps,
         must_include=[m.place_id for m in query.must_include if m.place_id is not None],
         exclude_ids=[m.place_id for m in query.exclude if m.place_id is not None],
         exclude_categories=query.exclude_categories,
@@ -230,6 +233,12 @@ def _render_plan(query: ParsedQuery, result: PlanResult, by_id: dict[str, Place]
     if errors:
         lines.append("Lỗi còn lại, lịch này chưa dùng được:")
         lines.extend(f"  - {message}" for message in errors)
+    if result.added:
+        lines.append("Điểm thêm vào:")
+        for add in result.added:
+            place = by_id.get(add.place_id)
+            name = place.name if place is not None else add.place_id
+            lines.append(f"  - Ngày {add.day_index + 1}: {name}. Lý do: {add.reason}")
     if result.dropped:
         lines.append("Điểm bị bỏ khi xếp giờ:")
         for drop in result.dropped:

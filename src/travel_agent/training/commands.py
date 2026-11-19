@@ -161,6 +161,11 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     plan.add_argument("--day-start", type=_clock_arg, help="Giờ bắt đầu ngày, HH:MM")
     plan.add_argument("--day-end", type=_clock_arg, help="Giờ kết thúc ngày, HH:MM")
     plan.add_argument("--no-retime", action="store_true", help="Giữ giờ của model, không xếp lại")
+    plan.add_argument(
+        "--no-fill",
+        action="store_true",
+        help="Không lấp khoảng trống (bữa ăn, quãng trống dài) bằng điểm thêm",
+    )
     plan.add_argument("--max-repairs", type=int, default=2, help="Số lượt sửa tối đa")
     plan.add_argument(
         "--landmarks",
@@ -249,6 +254,7 @@ def _plan_payload(result: PlanResult) -> dict[str, Any]:
         "dropped": [dataclasses.asdict(stop) for stop in result.dropped],
         "missing_must": result.missing_must,
         "inserted_must": result.inserted_must,
+        "added": [dataclasses.asdict(stop) for stop in result.added],
         "attempts": [
             {
                 "kind": attempt.kind,
@@ -298,6 +304,7 @@ def _cmd_plan(args: argparse.Namespace) -> int:
         retime=not args.no_retime,
         max_repairs=args.max_repairs,
         landmarks=args.landmarks,
+        fill_gaps=not args.no_fill,
     )
     print(json.dumps(_plan_payload(result), ensure_ascii=False, indent=2))
     return EXIT_OK if result.valid else EXIT_PLAN_INVALID

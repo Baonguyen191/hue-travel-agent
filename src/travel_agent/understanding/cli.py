@@ -129,6 +129,11 @@ def add_understanding_commands(sub: argparse._SubParsersAction[argparse.Argument
         help="Số điểm tham quan nổi tiếng thêm vào candidate, 0 để tắt (mặc định 6)",
     )
     ask.add_argument("--no-retime", action="store_true", help="Không xếp lại giờ theo quy tắc")
+    ask.add_argument(
+        "--no-fill",
+        action="store_true",
+        help="Không lấp khoảng trống (bữa ăn, quãng trống dài) bằng điểm thêm",
+    )
     ask.add_argument("--db", type=Path, default=DEFAULT_DB, help="DB địa điểm")
     ask.add_argument("--host", default=DEFAULT_HOST)
     ask.add_argument("--json", action="store_true", help="In JSON máy đọc thay vì chữ tiếng Việt")
@@ -319,6 +324,7 @@ def _cmd_ask(args: argparse.Namespace) -> int:
             retime=not args.no_retime,
             max_repairs=args.max_repairs,
             landmarks=args.landmarks,
+            fill_gaps=not args.no_fill,
         )
     except ExtractionError as exc:
         print(f"Không đọc được đầu ra của model hiểu câu: {exc}", file=sys.stderr)

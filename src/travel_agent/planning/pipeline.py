@@ -24,6 +24,8 @@ from travel_agent.domain.models import (
     PlanRequest,
 )
 from travel_agent.planning.candidates import select_candidates
+from travel_agent.planning.fill import AddedStop
+from travel_agent.planning.fill import fill_gaps as fill_schedule_gaps
 from travel_agent.planning.hours import minute_floor, time_of
 from travel_agent.planning.prompt import build_messages
 from travel_agent.planning.schedule import DroppedStop
@@ -61,6 +63,8 @@ class PlanResult(BaseModel):
     missing_must: list[str] = Field(default_factory=list)
     # Id bắt buộc vắng sau sửa model, được chèn bằng code và vẫn còn trong lịch cuối.
     inserted_must: list[str] = Field(default_factory=list)
+    # Điểm thêm vào để lấp khoảng trống (bữa ăn, quãng trống); rỗng khi `fill_gaps` tắt.
+    added: list[AddedStop] = Field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -193,6 +197,7 @@ def plan_trip(
     exclude_ids: Collection[str] = (),
     exclude_categories: Collection[Category] = (),
     landmarks: int = 0,
+    fill_gaps: bool = False,
 ) -> PlanResult:
     """Sinh lịch cho `request`, tối đa `1 + max_repairs` lượt gọi model.
 
@@ -211,6 +216,9 @@ def plan_trip(
     `must_include`, `exclude_ids`, `exclude_categories` chuyển cho `select_candidates`; không truyền
     thì kết quả như trước. Loại trừ thắng bắt buộc: điểm vừa bắt buộc vừa bị loại nằm trong
     `missing_must` và không được chèn. `landmarks` chuyển cho `select_candidates` (0 là tắt).
+
+    `fill_gaps` bật bước lấp khoảng trống (xem planning/fill.py) sau lần xếp giờ cuối, rồi kiểm lại
+    lịch. Bước này chỉ chạy khi `retime` bật, vì nó xếp giờ lại; `added` liệt kê điểm đã thêm.
     """
     if max_repairs < 0:
         raise ValueError("max_repairs không được âm")
@@ -295,6 +303,13 @@ def plan_trip(
         planned = _planned_ids(itinerary)
         inserted = [pid for pid in still_missing if pid in planned]
 
+    added: list[AddedStop] = []
+    if fill_gaps and retime and itinerary is not None:
+        filled, added = fill_schedule_gaps(request, itinerary, candidates, travel)
+        if added:
+            itinerary = filled
+            report = validate_itinerary(request, itinerary, lookup, travel)
+
     planned = _planned_ids(itinerary)
     missing = [place_id for place_id in dict.fromkeys(must_include) if place_id not in planned]
     return PlanResult(
@@ -306,4 +321,5 @@ def plan_trip(
         candidates_ids=[place.id for place in candidates],
         missing_must=missing,
         inserted_must=inserted,
+        added=added,
     )

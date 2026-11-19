@@ -13,6 +13,7 @@ import pytest
 
 from tests.planning.factories import make_place
 from travel_agent.domain.models import Category, PlanRequest
+from travel_agent.planning.fill import GAP_REASON, AddedStop
 from travel_agent.planning.pipeline import PlanResult
 from travel_agent.planning.schedule import DroppedStop
 from travel_agent.training.generator import Generation
@@ -294,3 +295,13 @@ def test_render_itinerary_has_names_times_and_categories() -> None:
     assert re.search(r"\d{2}:\d{2}–\d{2}:\d{2} Bảo tàng Cổ vật \(bảo tàng\)", text)
     assert re.search(r"\d{2}:\d{2}–\d{2}:\d{2} Quán Bún Bò \(nhà hàng\)", text)
     assert "Đã gọi model 1 lần, trong đó sửa 0 lần." in text
+
+
+def test_render_plan_lists_added_places_with_reasons() -> None:
+    outcome = _plan_outcome()
+    assert outcome.plan is not None
+    added = [AddedStop(day_index=0, place_id="t:cafe", reason=GAP_REASON)]
+    outcome = AskOutcome("plan", outcome.query, outcome.plan.model_copy(update={"added": added}))
+    text = render_ask(outcome, PLACES)
+    assert "Điểm thêm vào:" in text
+    assert f"Cà phê Ba Lần. Lý do: {GAP_REASON}" in text
