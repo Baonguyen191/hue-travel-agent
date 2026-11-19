@@ -276,3 +276,72 @@ def test_repair_is_not_attempted_for_warnings_only() -> None:
     assert len(generator.seen) == 1
     assert result.report is not None and result.report.issues
     assert all(issue.severity.value == "warning" for issue in result.report.issues)
+
+
+def test_must_and_exclude_reach_candidates() -> None:
+    raw = _itinerary_json([("t:lunch", "11:30", "12:30"), ("t:dinner", "18:00", "19:00")])
+    generator = ScriptedGenerator([raw])
+    result = _plan(
+        generator,
+        must_include=["t:lunch"],
+        exclude_ids=["t:cafe"],
+        exclude_categories=[Category.MUSEUM],
+    )
+    assert "t:lunch" in result.candidates_ids
+    assert "t:cafe" not in result.candidates_ids
+    assert all(
+        place.category is not Category.MUSEUM
+        for place in PLACES
+        if place.id in result.candidates_ids
+    )
+
+
+def test_missing_must_empty_when_must_is_in_itinerary() -> None:
+    result = _plan(ScriptedGenerator([VALID_RAW]), must_include=["t:museum"])
+    assert result.missing_must == []
+
+
+def test_missing_must_lists_unknown_and_excluded_ids() -> None:
+    result = _plan(
+        ScriptedGenerator([VALID_RAW]),
+        must_include=["t:museum", "x:404", "t:cafe"],
+        exclude_categories=[Category.CAFE],
+    )
+    assert result.missing_must == ["x:404", "t:cafe"]
+
+
+def test_missing_must_is_every_must_when_nothing_parses() -> None:
+    result = _plan(
+        ScriptedGenerator([NOT_JSON]), max_repairs=0, must_include=["t:museum", "t:museum"]
+    )
+    assert result.itinerary is None
+    assert result.missing_must == ["t:museum"]
+
+
+def test_missing_must_counts_stops_dropped_by_retime() -> None:
+    """Điểm bắt buộc mà retime bỏ (ngoài giờ mở cửa) thì vẫn nằm trong missing_must."""
+    closed_morning = make_place("t:museum", Category.MUSEUM, hours="Mo-Su 06:00-07:00")
+    places = [closed_morning, *PLACES[2:]]
+    raw = _itinerary_json(
+        [
+            ("t:museum", "08:30", "10:30"),
+            ("t:lunch", "11:30", "12:30"),
+            ("t:dinner", "18:00", "19:00"),
+        ]
+    )
+    result = plan_trip(
+        REQUEST,
+        places,
+        ScriptedGenerator([raw]),
+        TRAVEL,
+        clock=FakeClock(),
+        max_repairs=0,
+        must_include=["t:museum"],
+    )
+    assert [drop.place_id for drop in result.dropped] == ["t:museum"]
+    assert result.missing_must == ["t:museum"]
+
+
+def test_no_options_means_no_missing_must() -> None:
+    result = _plan(ScriptedGenerator([VALID_RAW]))
+    assert result.missing_must == []

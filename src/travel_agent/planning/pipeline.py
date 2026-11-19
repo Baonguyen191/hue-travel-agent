@@ -8,14 +8,14 @@ Hàm thuần ngoài `generator`. Dùng đúng các hàm mà eval dùng (`candida
 from __future__ import annotations
 
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Collection, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from travel_agent.data.place_repository import InMemoryPlaceRepository
-from travel_agent.domain.models import Itinerary, Place, PlanRequest
+from travel_agent.domain.models import Category, Itinerary, Place, PlanRequest
 from travel_agent.planning.candidates import select_candidates
 from travel_agent.planning.prompt import build_messages
 from travel_agent.planning.schedule import DroppedStop
@@ -47,6 +47,8 @@ class PlanResult(BaseModel):
     attempts: list[PlanAttempt]
     dropped: list[DroppedStop]  # điểm bị bỏ khi xếp giờ, của lượt tốt nhất
     candidates_ids: list[str]
+    # Id bắt buộc (must_include) không có trong lịch cuối, kể cả id không có trong DB.
+    missing_must: list[str] = Field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -77,6 +79,9 @@ def plan_trip(
     retime: bool = True,
     max_repairs: int = 2,
     clock: Callable[[], float] = time.perf_counter,
+    must_include: Sequence[str] = (),
+    exclude_ids: Collection[str] = (),
+    exclude_categories: Collection[Category] = (),
 ) -> PlanResult:
     """Sinh lịch cho `request`, tối đa `1 + max_repairs` lượt gọi model.
 
@@ -84,11 +89,21 @@ def plan_trip(
     (kèm lịch đã xếp giờ và các lỗi ERROR); nếu không parse được thì sinh lại từ đầu. Dừng khi
     hết ERROR hoặc hết lượt. Trả về lượt có ít ERROR nhất; hòa thì lấy lượt sau.
     `seed` mặc định là `candidate_seed(request_key(request))`, đúng như eval.
+    `must_include`, `exclude_ids`, `exclude_categories` chuyển cho `select_candidates`; không truyền
+    thì kết quả như trước. `missing_must` là các id bắt buộc không có trong lịch cuối (sau khi xếp
+    giờ bỏ điểm). Loại trừ thắng bắt buộc: điểm vừa bắt buộc vừa bị loại nằm trong `missing_must`.
     """
     if max_repairs < 0:
         raise ValueError("max_repairs không được âm")
     candidate_rng = candidate_seed(request_key(request)) if seed is None else seed
-    candidates = select_candidates(request, places, candidate_rng)
+    candidates = select_candidates(
+        request,
+        places,
+        candidate_rng,
+        must_include=must_include,
+        exclude_ids=exclude_ids,
+        exclude_categories=exclude_categories,
+    )
     # Giống metrics.score_output: chỉ candidate mới là địa điểm hợp lệ.
     lookup = InMemoryPlaceRepository(candidates)
     schema: dict[str, Any] = itinerary_format_schema(request.num_days)
@@ -133,6 +148,12 @@ def plan_trip(
         if _rank(trial) >= _rank(best):
             best = trial
 
+    planned_ids = (
+        {stop.place_id for day in best.itinerary.days for stop in day.stops}
+        if best.itinerary is not None
+        else set()
+    )
+    missing = [place_id for place_id in dict.fromkeys(must_include) if place_id not in planned_ids]
     return PlanResult(
         itinerary=best.itinerary,
         report=best.report,
@@ -140,4 +161,5 @@ def plan_trip(
         attempts=attempts,
         dropped=best.dropped,
         candidates_ids=[place.id for place in candidates],
+        missing_must=missing,
     )

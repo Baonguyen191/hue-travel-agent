@@ -1,10 +1,21 @@
-"""Lệnh CLI hiểu câu: parse "câu" (một câu, in JSON) và qu-eval (đo trên bộ eval).
+"""Lệnh CLI hiểu câu: parse "câu" (một câu, in JSON), qu-eval (đo trên bộ eval), ask (hiểu rồi
+lập lịch).
 
 Đăng ký từ travel_agent/cli.py, không nằm trong training/commands.py, để closure của stage DVC
 (tests/training/test_dvc_pipeline.py) không đổi.
 
-Tham số sinh cố định cho cả hai lệnh (không đọc từ configs/eval.yaml, để đo QU không lẫn với
-eval lập lịch): temperature 0, seed 0, num_ctx 4096, num_predict 512.
+Tham số sinh cố định cho parse và qu-eval (không đọc từ configs/eval.yaml, để đo QU không lẫn với
+eval lập lịch): temperature 0, seed 0, num_ctx 4096, num_predict 512. Lệnh ask hiểu câu bằng bộ
+tham số đó, còn lập lịch dùng mục generation của configs/eval.yaml như lệnh plan.
+
+Lưu ý VRAM: model QU mặc định qwen3.5:4b (~3,3 GB) và model lập lịch (~3,4 GB) cùng vừa 8 GB VRAM,
+nên Ollama không phải đổi model. Nếu chọn qwen3.5:9b (~6,6 GB) thì hai model không cùng vừa,
+Ollama sẽ tải đổi qua lại và lần gọi đầu có thể chậm thêm vài giây.
+
+Mã thoát của ask: 0 là có lịch hợp lệ, từ chối, hoặc báo chưa hỗ trợ; 2 sai cách dùng;
+3 lịch còn lỗi ERROR; 4 cần hỏi lại (không lập lịch); 5 lỗi hạ tầng Ollama; 6 model hiểu câu
+trả JSON sai schema sau khi thử lại. Mã 3 của parse và mã 3 của ask là hai ý nghĩa khác nhau,
+mỗi lệnh có bảng mã riêng.
 """
 
 from __future__ import annotations
@@ -16,15 +27,21 @@ import sys
 import time
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
+
+import yaml
 
 from travel_agent.training.commands import (
+    EVAL_CONFIG,
     RL_CONFIG,
+    _generation_params,
     _rl_final_model,
     file_sha256,
     load_usable_places,
 )
 from travel_agent.training.generator import DEFAULT_HOST, GenerationError, OllamaGenerator
 from travel_agent.training.gitinfo import current_commit
+from travel_agent.understanding.ask import AskOutcome, ask_query, render_ask
 from travel_agent.understanding.evaluate import (
     EVAL_FILE,
     EVAL_REF,
@@ -41,8 +58,14 @@ EXIT_OK = 0
 EXIT_USAGE = 2  # sai cách dùng hoặc thiếu file
 EXIT_EXTRACTION = 3  # model trả JSON sai schema sau khi thử lại (lệnh parse)
 EXIT_GENERATION = 5  # lỗi hạ tầng: Ollama không chạy, model chưa pull, timeout
+EXIT_PLAN_INVALID = 3  # ask: lịch còn lỗi ERROR (cùng số với EXIT_EXTRACTION, khác ý nghĩa)
+EXIT_CLARIFY = 4  # ask: câu thiếu thông tin, cần hỏi lại; không gọi model lập lịch
+EXIT_ASK_EXTRACTION = 6  # ask: model hiểu câu trả JSON sai schema sau khi thử lại
 
 DEFAULT_DB = Path("data/hue.sqlite")
+# Mặc định 4b: trên tập test QU đạt full match 0,88 (9b: 0,86), nhanh hơn (~2,1 s so với ~3,2 s),
+# và 4b cùng model lập lịch vừa 8 GB VRAM nên không phải đổi model.
+DEFAULT_QU_MODEL = "qwen3.5:4b"
 # Hằng số sinh cố định của bộ hiểu câu. Đổi các số này là đổi kết quả đo, nên ghi vào báo cáo.
 TEMPERATURE = 0.0
 SEED = 0
@@ -73,6 +96,36 @@ def add_understanding_commands(sub: argparse._SubParsersAction[argparse.Argument
     evaluate.add_argument("--db", type=Path, default=DEFAULT_DB)
     evaluate.add_argument("--host", default=DEFAULT_HOST)
     evaluate.set_defaults(func=_cmd_qu_eval)
+
+    ask = sub.add_parser(
+        "ask",
+        help="Hiểu một câu tự do rồi lập lịch trình Huế (hoặc hỏi lại, từ chối, báo chưa hỗ trợ)",
+        description=(
+            "Hiểu câu bằng model QU, rồi lập lịch bằng model lập lịch. Câu ngoài phạm vi được từ "
+            "chối; sửa lịch và hỏi thông tin địa điểm chưa hỗ trợ; câu thiếu ngày hoặc số ngày "
+            "thì hỏi lại (mã thoát 4)."
+        ),
+        epilog=(
+            "Lưu ý VRAM: mặc định QU là qwen3.5:4b (~3,3 GB), cùng model lập lịch (~3,4 GB) "
+            "vừa 8 GB VRAM nên Ollama không đổi model. Dùng qwen3.5:9b (~6,6 GB) thì hai model "
+            "không cùng vừa, Ollama sẽ đổi qua lại và lần gọi đầu chậm thêm vài giây."
+        ),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    ask.add_argument("text", help="Câu yêu cầu, đặt trong dấu nháy")
+    ask.add_argument(
+        "--qu-model", default=DEFAULT_QU_MODEL, help="Tag Ollama hiểu câu (mặc định qwen3.5:4b)"
+    )
+    ask.add_argument(
+        "--plan-model", help="Tag Ollama lập lịch; mặc định là final.ollama_model trong rl.yaml"
+    )
+    ask.add_argument("--ref", type=_date_arg, help="Ngày tham chiếu YYYY-MM-DD; mặc định hôm nay")
+    ask.add_argument("--max-repairs", type=int, default=2, help="Số lần sửa tối đa (mặc định 2)")
+    ask.add_argument("--no-retime", action="store_true", help="Không xếp lại giờ theo quy tắc")
+    ask.add_argument("--db", type=Path, default=DEFAULT_DB, help="DB địa điểm")
+    ask.add_argument("--host", default=DEFAULT_HOST)
+    ask.add_argument("--json", action="store_true", help="In JSON máy đọc thay vì chữ tiếng Việt")
+    ask.set_defaults(func=_cmd_ask)
 
 
 def _date_arg(text: str) -> dt.date:
@@ -198,3 +251,73 @@ def _cmd_qu_eval(args: argparse.Namespace) -> int:
     _print_summary(summary, args.split, args.model)
     print(f"Đã ghi báo cáo vào {args.out}")
     return EXIT_OK
+
+
+def _plan_generator(model: str, host: str, generation: dict[str, Any]) -> OllamaGenerator:
+    """Model lập lịch: tham số sinh lấy từ configs/eval.yaml, đúng như lệnh plan."""
+    return OllamaGenerator(
+        model,
+        host=host,
+        temperature=generation["temperature"],
+        seed=generation["seed"],
+        num_predict=generation["num_predict"],
+        num_ctx=generation["num_ctx"],
+    )
+
+
+def _ask_exit_code(outcome: AskOutcome) -> int:
+    if outcome.kind == "clarification":
+        return EXIT_CLARIFY
+    if outcome.kind == "plan" and outcome.plan is not None and not outcome.plan.valid:
+        return EXIT_PLAN_INVALID
+    return EXIT_OK
+
+
+def _ask_payload(outcome: AskOutcome) -> dict[str, object]:
+    return {
+        "outcome": outcome.kind,
+        "query": outcome.query.model_dump(mode="json"),
+        "plan": outcome.plan.model_dump(mode="json") if outcome.plan is not None else None,
+    }
+
+
+def _cmd_ask(args: argparse.Namespace) -> int:
+    if _missing([args.db]):
+        return EXIT_USAGE
+    if args.max_repairs < 0:
+        print("--max-repairs không được âm.", file=sys.stderr)
+        return EXIT_USAGE
+    plan_model = args.plan_model or _rl_final_model(RL_CONFIG)
+    if plan_model is None:
+        print("Thiếu --plan-model và configs/rl.yaml không có final.ollama_model.", file=sys.stderr)
+        return EXIT_USAGE
+    try:
+        generation = _generation_params(EVAL_CONFIG)
+    except (OSError, ValueError, yaml.YAMLError) as exc:
+        print(f"Không đọc được tham số sinh: {exc}", file=sys.stderr)
+        return EXIT_USAGE
+
+    ref = args.ref or dt.date.today()
+    places = load_usable_places(args.db)
+    try:
+        outcome = ask_query(
+            args.text,
+            ref,
+            _generator(args.qu_model, args.host),
+            _plan_generator(plan_model, args.host, generation),
+            places,
+            retime=not args.no_retime,
+            max_repairs=args.max_repairs,
+        )
+    except ExtractionError as exc:
+        print(f"Không đọc được đầu ra của model hiểu câu: {exc}", file=sys.stderr)
+        return EXIT_ASK_EXTRACTION
+    except GenerationError as exc:
+        print(f"Lỗi khi gọi model: {exc}", file=sys.stderr)
+        return EXIT_GENERATION
+
+    if args.json:
+        print(json.dumps(_ask_payload(outcome), ensure_ascii=False, indent=2))
+    else:
+        print(render_ask(outcome, places))
+    return _ask_exit_code(outcome)

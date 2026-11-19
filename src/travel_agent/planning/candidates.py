@@ -7,7 +7,7 @@ Chỉ lấy địa điểm trong bán kính quanh Đại Nội, bán kính tùy 
 from __future__ import annotations
 
 import random
-from collections.abc import Sequence
+from collections.abc import Collection, Sequence
 
 from travel_agent.domain.models import (
     Category,
@@ -68,22 +68,60 @@ def preferred_categories(interests: Sequence[str]) -> set[Category]:
     return found
 
 
-def select_candidates(request: PlanRequest, places: Sequence[Place], seed: int) -> list[Place]:
+def select_candidates(
+    request: PlanRequest,
+    places: Sequence[Place],
+    seed: int,
+    *,
+    must_include: Sequence[str] = (),
+    exclude_ids: Collection[str] = (),
+    exclude_categories: Collection[Category] = (),
+) -> list[Place]:
     """Giữ chỗ cho bữa ăn, rồi lấy xoay vòng theo loại; loại khớp sở thích được lấy nhiều hơn.
 
     Mỗi vòng đi loại khớp sở thích trước, rồi tới các loại còn lại bắt đầu từ vị trí xoay theo seed,
     để khi limit nhỏ loại bị cắt không luôn là loại cuối enum.
+
+    Tùy chọn (mặc định không đổi kết quả so với trước khi có tùy chọn):
+    - `exclude_ids`, `exclude_categories`: bỏ trước khi chọn, kể cả khi điểm nằm trong
+      `must_include`.
+      Loại trừ thắng bắt buộc: điểm vừa bắt buộc vừa bị loại thì không vào candidate.
+    - `must_include`: id địa điểm bắt buộc có mặt, bỏ qua bán kính. Id không có trong `places` bị
+      bỏ qua lặng lẽ. Tổng số candidate giữ nguyên bằng `candidate_limit`: điểm bắt buộc chiếm chỗ
+      của các điểm không bắt buộc xếp cuối (lấy sau). Nếu số điểm bắt buộc vượt limit thì giữ hết
+      điểm bắt buộc và không lấy thêm điểm nào khác.
     """
     rng = random.Random(seed)
+    excluded_ids = set(exclude_ids)
+    excluded_categories = set(exclude_categories)
+    by_id = {place.id: place for place in places}
+    must_ids = list(dict.fromkeys(must_include))  # bỏ trùng, giữ thứ tự người dùng
+    must_places = [
+        by_id[place_id]
+        for place_id in must_ids
+        if place_id in by_id
+        and place_id not in excluded_ids
+        and by_id[place_id].category not in excluded_categories
+    ]
+    must_set = {place.id for place in must_places}
+
     queues: dict[Category, list[Place]] = {category: [] for category in Category}
-    nearby = [place for place in places if within_radius(place, request.travel_mode)]
+    nearby = [
+        place
+        for place in places
+        if within_radius(place, request.travel_mode)
+        and place.id not in excluded_ids
+        and place.category not in excluded_categories
+        and place.id not in must_set
+    ]
     for place in sorted(nearby, key=lambda item: item.id):
         queues[place.category].append(place)
     for queue in queues.values():
         rng.shuffle(queue)
 
     limit = candidate_limit(request)
-    meals = min(MEALS_PER_DAY * request.num_days, limit // 2)
+    free = max(0, limit - len(must_places))  # chỗ còn lại cho điểm không bắt buộc
+    meals = min(MEALS_PER_DAY * request.num_days, free // 2)
     restaurants = queues[Category.RESTAURANT]
     chosen = restaurants[:meals]
     del restaurants[:meals]
@@ -96,11 +134,12 @@ def select_candidates(request: PlanRequest, places: Sequence[Place], seed: int) 
     # Mỗi vòng: một điểm cho mỗi loại khớp sở thích, một điểm cho mỗi loại còn lại, rồi các điểm
     # thêm của loại khớp sở thích. Nhờ vậy khi limit nhỏ, mọi loại khớp sở thích vẫn có mặt.
     passes = [(order, 1), (first, PREFERRED_PICKS_PER_ROUND - 1)]
-    while len(chosen) < limit and any(queues.values()):
+    while len(chosen) < free and any(queues.values()):
         for categories, picks in passes:
             for category in categories:
                 for _ in range(picks):
-                    if queues[category] and len(chosen) < limit:
+                    if queues[category] and len(chosen) < free:
                         chosen.append(queues[category].pop())
+    chosen.extend(must_places)
     rng.shuffle(chosen)
     return chosen
