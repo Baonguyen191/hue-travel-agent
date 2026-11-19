@@ -105,6 +105,16 @@ _TRAVEL_PAIRS: tuple[tuple[TravelMode, str], ...] = tuple(
 # Từ đứng ngay trước cụm phương tiện (dạng không dấu) làm cụm thành phủ định: "không đi bộ nhiều".
 _NEGATING_BEFORE: frozenset[str] = frozenset({"khong", "it", "chang", "dung", "tranh"})
 
+# Nhịp nhẹ khi LLM để pace là null. Các cụm đã gồm từ phủ định ("đừng xếp dày" là nhẹ, không phải
+# dày). Cụm đứng sau từ phủ định ("không thoải mái") không tính, xem _pace_from_text.
+_RELAXED_PHRASES: tuple[str, ...] = (
+    "đừng xếp dày",
+    "không quá dày",
+    "không dày",
+    "thoải mái",
+    "không vội",
+)
+
 # Phủ định trong câu: "không đi X", "không uống X", "bỏ X", "tránh X" (X là loại địa điểm).
 _NEGATION_WORDS = ("không", "đừng", "chẳng")
 _NEGATION_MODIFIERS = ("muốn", "thích", "nên", "cần")
@@ -363,6 +373,24 @@ _FEW_SHOT: tuple[tuple[str, dict[str, Any]], ...] = (
             "city": None,
         },
     ),
+    (
+        "Mình muốn đi biển Thuận An rồi ghé Lăng Tự Đức, đi 2 ngày bằng xe máy từ 5/1 nhé.",
+        {
+            "intent": "plan_new",
+            "date_text": "5/1",
+            "duration_text": "2 ngày",
+            "travel_mode": "motorbike",
+            "pace": None,
+            "day_start": None,
+            "day_end": None,
+            "interest_phrases": [],
+            "must_include_mentions": ["biển Thuận An", "Lăng Tự Đức"],
+            "exclude_mentions": [],
+            "exclude_category_phrases": [],
+            "soft_preferences": [],
+            "city": None,
+        },
+    ),
 )
 
 
@@ -507,6 +535,22 @@ def _negated(prefix: str) -> bool:
     return any(strip_diacritics(word) in _NEGATING_BEFORE for word in prefix.split()[-2:])
 
 
+def _pace_from_text(text: str) -> Pace | None:
+    """Nhịp nhẹ nêu rõ trong câu, đọc theo từng mệnh đề, dùng khi LLM để pace là null.
+
+    Chỉ trả RELAXED. Cụm nhẹ có từ phủ định nằm trong chính cụm ("đừng xếp dày", "không dày") nên
+    khớp là nhẹ. Cụm không có phủ định ("thoải mái") mà đứng sau "không" hoặc "đừng" thì bị bỏ
+    qua ("không thoải mái" không phải nhịp nhẹ). Không có cụm nào khớp thì None.
+    """
+    for clause in _CLAUSE_SPLIT.split(text):
+        diacritic, cleaned = clean_phrase(clause)
+        for phrase in _RELAXED_PHRASES:
+            for match in keyword_pattern(keyword_form(phrase, diacritic)).finditer(cleaned):
+                if not _negated(cleaned[: match.start()]):
+                    return Pace.RELAXED
+    return None
+
+
 def _explicit_travel_modes(text: str) -> set[TravelMode]:
     """Phương tiện được nêu rõ trong câu, đọc theo từng mệnh đề. Cụm bị phủ định không tính."""
     found: set[TravelMode] = set()
@@ -645,8 +689,10 @@ def build_parsed_query(
         partial["num_days"] = num_days
     if travel_mode is not None:
         partial["travel_mode"] = travel_mode.value
-    if extraction.pace is not None:
-        partial["pace"] = extraction.pace.value
+    # Pace do LLM đưa ra thắng; chỉ khi LLM để null mới đọc nhịp nhẹ từ câu gốc.
+    pace = extraction.pace if extraction.pace is not None else _pace_from_text(text)
+    if pace is not None:
+        partial["pace"] = pace.value
     if day_start is not None:
         partial["day_start"] = _clock_text(day_start)
     if day_end is not None:
@@ -675,7 +721,7 @@ def build_parsed_query(
     defaulted: list[str] = []
     if travel_mode is None:
         defaulted.append("travel_mode")
-    if extraction.pace is None:
+    if pace is None:
         defaulted.append("pace")
     if day_start is None:
         defaulted.append("day_start")
@@ -687,7 +733,7 @@ def build_parsed_query(
         day_start=day_start or DEFAULT_START,
         day_end=day_end or DEFAULT_END,
         travel_mode=travel_mode or TravelMode.MOTORBIKE,
-        pace=extraction.pace or Pace.MODERATE,
+        pace=pace or Pace.MODERATE,
         interests=interests,
     )
     return ParsedQuery(**base, request=request, defaulted=defaulted)

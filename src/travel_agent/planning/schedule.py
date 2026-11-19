@@ -3,9 +3,11 @@
 Model chỉ cần chọn điểm và xếp thứ tự; code tính giờ theo quy tắc (xem plan 6, mục "Xếp giờ"):
 
 - Ngày bắt đầu ở day_start. Giữ nguyên ngày (date) và thứ tự điểm của model.
-- Điểm thường: giờ đến = max(giờ rảnh sớm nhất, giờ mở cửa sớm nhất còn vừa lượt thăm).
-  Giờ rảnh = giờ rời điểm đã giữ trước + thời gian đi (làm tròn lên phút, cùng quy tắc với solver
-  và validator). Lượt thăm = thời lượng model ghi nếu > 0, không thì VISIT_MINUTES[loại].
+- Điểm thường: giờ đến = max(giờ model ghi, giờ rảnh sớm nhất, giờ mở cửa sớm nhất còn vừa lượt
+  thăm, khung bữa ăn). Giờ model ghi là sàn: xếp lại chỉ đẩy giờ về sau, không kéo về đầu ngày
+  (trừ khi giờ model trước day_start, khi đó khung ngày là sàn). Giờ rảnh = giờ rời điểm đã giữ
+  trước + thời gian đi (làm tròn lên phút, cùng quy tắc với solver và validator).
+  Lượt thăm = thời lượng model ghi nếu > 0, không thì VISIT_MINUTES[loại].
 - Không vừa khung mở cửa hoặc vượt day_end thì bỏ điểm và ghi lý do. Điểm sau đó đi từ điểm
   đã giữ gần nhất.
 - Mã địa điểm lạ (không có trong `places`): giữ nguyên dòng của model (giờ không đổi, không
@@ -87,9 +89,10 @@ def _retime_day(
             clock = max(clock, base + minute_floor(model_stop.depart))
             continue
         visit = _visit_minutes(model_stop, place)
-        ready = clock
+        # Giờ model ghi là sàn: không xếp sớm hơn nó (xem đầu module).
+        ready = max(clock, base + minute_floor(model_stop.arrive))
         if origin is not None:
-            ready = max(clock, origin_depart + _travel_minutes(request, origin, place, travel))
+            ready = max(ready, origin_depart + _travel_minutes(request, origin, place, travel))
         meal_start = _meal_start(request, day_index, model_stop, place)
         if meal_start is not None:
             ready = max(ready, meal_start)

@@ -73,6 +73,7 @@ def ask_query(
     retime: bool = True,
     max_repairs: int = 2,
     travel: TravelTimeProvider | None = None,
+    landmarks: int = 0,
 ) -> AskOutcome:
     """Hiểu câu bằng `qu_generator`; nếu là lập lịch đủ thông tin thì gọi `plan_trip`.
 
@@ -95,6 +96,7 @@ def ask_query(
         travel if travel is not None else HaversineEstimator(),
         retime=retime,
         max_repairs=max_repairs,
+        landmarks=landmarks,
         must_include=[m.place_id for m in query.must_include if m.place_id is not None],
         exclude_ids=[m.place_id for m in query.exclude if m.place_id is not None],
         exclude_categories=query.exclude_categories,

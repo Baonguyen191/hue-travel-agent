@@ -6,7 +6,9 @@ Chỉ lấy địa điểm trong bán kính quanh Đại Nội, bán kính tùy 
 
 from __future__ import annotations
 
+import math
 import random
+import re
 from collections.abc import Collection, Sequence
 
 from travel_agent.domain.models import (
@@ -50,6 +52,20 @@ SPARE_CANDIDATES = 4
 MEALS_PER_DAY = 2
 PREFERRED_PICKS_PER_ROUND = 2
 
+# Điểm tham quan nổi tiếng (landmark) thêm vào candidate khi `landmarks > 0` và không đi bộ.
+# Không lấy nhà hàng và quán cà phê: chúng đã có chỗ riêng qua giữ chỗ bữa ăn và sở thích.
+LANDMARK_EXCLUDED_CATEGORIES: frozenset[Category] = frozenset({Category.RESTAURANT, Category.CAFE})
+# Số landmark mặc định của lệnh `plan` và `ask` (thư viện mặc định 0 để giữ eval không đổi).
+DEFAULT_LANDMARKS = 6
+# Khi không có sở thích khớp: lịch sử (di tích, bảo tàng), tâm linh (chùa, nhà thờ), điểm tham quan.
+DEFAULT_LANDMARK_CATEGORIES: frozenset[Category] = frozenset(
+    {Category.HISTORIC, Category.MUSEUM, Category.RELIGIOUS, Category.ATTRACTION}
+)
+# Thuộc tính "Đánh giá" có dạng "4.4/5 (29 lượt, Google)". Dấu thập phân là "." hoặc ",";
+# số lượt có thể có dấu phân nghìn "." hoặc ",".
+_RATING_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*/\s*5")
+_REVIEWS_RE = re.compile(r"\((\d[\d.,]*)\s*lượt")
+
 
 def candidate_limit(request: PlanRequest) -> int:
     """Đủ điểm cho ngày dày nhất (validator cấm lặp place_id), cộng vài điểm dự phòng."""
@@ -68,6 +84,59 @@ def preferred_categories(interests: Sequence[str]) -> set[Category]:
     return found
 
 
+def popularity_score(place: Place) -> float:
+    """Độ phổ biến từ thuộc tính "Đánh giá" (vd "4.4/5 (29 lượt, Google)"); 0 nếu không đọc được.
+
+    Công thức: log10(1 + số lượt đánh giá) + điểm sao / 10.
+    - Số lượt là tín hiệu chính: đo số người đã đến và đánh giá, và log làm giảm chênh lệch lớn.
+      Điểm sao của điểm tham quan thường nằm quanh 4,5-4,7 nên ít phân biệt được; đã thử nhân
+      sao với log lượt và điểm lăng vua không vào top 6 của Huế.
+    - Điểm sao chỉ là tie-break (tối đa 0,5, tức cỡ một chênh lệch khoảng 3 lần số lượt).
+    - Không có số lượt (chỉ "4.8/5") thì điểm là điểm sao / 10: vẫn xếp sau điểm có lượt.
+    - Số lượt đọc bằng cách bỏ mọi dấu "." và "," (phân nghìn). Thiếu hoặc lỗi thì 0.
+    """
+    text = place.attributes.get("Đánh giá")
+    if not text:
+        return 0.0
+    rating_match = _RATING_RE.search(text)
+    if rating_match is None:
+        return 0.0
+    rating = min(max(float(rating_match.group(1).replace(",", ".")), 0.0), 5.0)
+    reviews_match = _REVIEWS_RE.search(text)
+    if reviews_match is None:
+        return rating / 10
+    digits = re.sub(r"\D", "", reviews_match.group(1))
+    reviews = int(digits) if digits else 0
+    return math.log10(1 + reviews) + rating / 10
+
+
+def landmark_places(
+    request: PlanRequest,
+    places: Sequence[Place],
+    limit: int,
+    *,
+    excluded_ids: Collection[str],
+    excluded_categories: Collection[Category],
+    reserved_ids: Collection[str],
+) -> list[Place]:
+    """Tối đa `limit` điểm tham quan nổi tiếng theo độ phổ biến giảm dần; không phụ thuộc seed.
+
+    Bỏ qua bán kính (điểm xa vẫn được xét), loại nhà hàng và quán cà phê, tôn trọng loại trừ,
+    và bỏ các id đã có (`reserved_ids`: điểm bắt buộc). Hòa điểm thì xếp theo id.
+    Đi bộ không có landmark: bán kính đi bộ quá nhỏ để điểm xa có ý nghĩa.
+    """
+    if limit <= 0 or request.travel_mode is TravelMode.WALK:
+        return []
+    wanted = preferred_categories(request.interests) or set(DEFAULT_LANDMARK_CATEGORIES)
+    allowed = (wanted - LANDMARK_EXCLUDED_CATEGORIES) - set(excluded_categories)
+    if not allowed:
+        return []
+    skipped = set(excluded_ids) | set(reserved_ids)
+    pool = [place for place in places if place.category in allowed and place.id not in skipped]
+    ranked = sorted(pool, key=lambda item: (-popularity_score(item), item.id))
+    return ranked[:limit]
+
+
 def select_candidates(
     request: PlanRequest,
     places: Sequence[Place],
@@ -76,6 +145,7 @@ def select_candidates(
     must_include: Sequence[str] = (),
     exclude_ids: Collection[str] = (),
     exclude_categories: Collection[Category] = (),
+    landmarks: int = 0,
 ) -> list[Place]:
     """Giữ chỗ cho bữa ăn, rồi lấy xoay vòng theo loại; loại khớp sở thích được lấy nhiều hơn.
 
@@ -90,7 +160,12 @@ def select_candidates(
       bỏ qua lặng lẽ. Tổng số candidate giữ nguyên bằng `candidate_limit`: điểm bắt buộc chiếm chỗ
       của các điểm không bắt buộc xếp cuối (lấy sau). Nếu số điểm bắt buộc vượt limit thì giữ hết
       điểm bắt buộc và không lấy thêm điểm nào khác.
+    - `landmarks`: tối đa số điểm tham quan nổi tiếng (xem `landmark_places`) thêm vào, bỏ qua bán
+      kính. Chúng chiếm chỗ của điểm thường xếp cuối, không chiếm chỗ bữa ăn, và tổng vẫn bằng
+      `candidate_limit`. Đi bộ hoặc 0 thì không thêm điểm nào.
     """
+    if landmarks < 0:
+        raise ValueError("landmarks không được âm")
     rng = random.Random(seed)
     excluded_ids = set(exclude_ids)
     excluded_categories = set(exclude_categories)
@@ -105,6 +180,18 @@ def select_candidates(
     ]
     must_set = {place.id for place in must_places}
 
+    limit = candidate_limit(request)
+    landmark_list = landmark_places(
+        request,
+        places,
+        min(landmarks, max(0, limit - len(must_places))),
+        excluded_ids=excluded_ids,
+        excluded_categories=excluded_categories,
+        reserved_ids=must_set,
+    )
+    landmark_set = {place.id for place in landmark_list}
+    reserved = must_set | landmark_set
+
     queues: dict[Category, list[Place]] = {category: [] for category in Category}
     nearby = [
         place
@@ -112,15 +199,14 @@ def select_candidates(
         if within_radius(place, request.travel_mode)
         and place.id not in excluded_ids
         and place.category not in excluded_categories
-        and place.id not in must_set
+        and place.id not in reserved
     ]
     for place in sorted(nearby, key=lambda item: item.id):
         queues[place.category].append(place)
     for queue in queues.values():
         rng.shuffle(queue)
 
-    limit = candidate_limit(request)
-    free = max(0, limit - len(must_places))  # chỗ còn lại cho điểm không bắt buộc
+    free = max(0, limit - len(must_places) - len(landmark_list))  # chỗ cho điểm thường
     meals = min(MEALS_PER_DAY * request.num_days, free // 2)
     restaurants = queues[Category.RESTAURANT]
     chosen = restaurants[:meals]
@@ -141,5 +227,6 @@ def select_candidates(
                     if queues[category] and len(chosen) < free:
                         chosen.append(queues[category].pop())
     chosen.extend(must_places)
+    chosen.extend(landmark_list)
     rng.shuffle(chosen)
     return chosen

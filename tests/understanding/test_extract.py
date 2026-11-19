@@ -103,7 +103,7 @@ def test_schema_enums_and_time_pattern() -> None:
 def test_messages_have_system_few_shot_and_final_user_turn() -> None:
     messages = build_extraction_messages("đi Huế 2 ngày", WED)
     assert messages[0]["role"] == "system"
-    assert len(_FEW_SHOT) == 6
+    assert len(_FEW_SHOT) == 7
     assert len(messages) == 1 + 2 * len(_FEW_SHOT) + 1
     assert messages[-1]["role"] == "user"
     assert messages[-1]["content"].endswith("Câu: đi Huế 2 ngày")

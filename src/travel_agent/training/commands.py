@@ -17,6 +17,7 @@ import yaml
 
 from travel_agent.data.place_repository import InMemoryPlaceRepository
 from travel_agent.domain.models import Pace, Place, PlanRequest, TravelMode
+from travel_agent.planning.candidates import DEFAULT_LANDMARKS
 from travel_agent.planning.pipeline import PlanResult, plan_trip
 from travel_agent.review.models import ReviewStatus
 from travel_agent.review.store import ReviewStore
@@ -161,6 +162,12 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     plan.add_argument("--day-end", type=_clock_arg, help="Giờ kết thúc ngày, HH:MM")
     plan.add_argument("--no-retime", action="store_true", help="Giữ giờ của model, không xếp lại")
     plan.add_argument("--max-repairs", type=int, default=2, help="Số lượt sửa tối đa")
+    plan.add_argument(
+        "--landmarks",
+        type=int,
+        default=DEFAULT_LANDMARKS,
+        help="Số điểm tham quan nổi tiếng thêm vào candidate, 0 để tắt (mặc định 6)",
+    )
     plan.add_argument("--db", type=Path, default=Path("data/hue.sqlite"))
     plan.add_argument("--host", default=DEFAULT_HOST)
     plan.set_defaults(func=_cmd_plan)
@@ -240,6 +247,8 @@ def _plan_payload(result: PlanResult) -> dict[str, Any]:
             for issue in issues
         ],
         "dropped": [dataclasses.asdict(stop) for stop in result.dropped],
+        "missing_must": result.missing_must,
+        "inserted_must": result.inserted_must,
         "attempts": [
             {
                 "kind": attempt.kind,
@@ -258,6 +267,9 @@ def _cmd_plan(args: argparse.Namespace) -> int:
         return EXIT_USAGE
     if args.max_repairs < 0:
         print("--max-repairs không được âm.", file=sys.stderr)
+        return EXIT_USAGE
+    if args.landmarks < 0:
+        print("--landmarks không được âm.", file=sys.stderr)
         return EXIT_USAGE
     model = args.model or _rl_final_model(RL_CONFIG)
     if model is None:
@@ -285,6 +297,7 @@ def _cmd_plan(args: argparse.Namespace) -> int:
         HaversineEstimator(),
         retime=not args.no_retime,
         max_repairs=args.max_repairs,
+        landmarks=args.landmarks,
     )
     print(json.dumps(_plan_payload(result), ensure_ascii=False, indent=2))
     return EXIT_OK if result.valid else EXIT_PLAN_INVALID

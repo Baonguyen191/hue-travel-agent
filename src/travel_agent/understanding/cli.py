@@ -31,6 +31,7 @@ from typing import Any
 
 import yaml
 
+from travel_agent.planning.candidates import DEFAULT_LANDMARKS
 from travel_agent.training.commands import (
     EVAL_CONFIG,
     RL_CONFIG,
@@ -121,6 +122,12 @@ def add_understanding_commands(sub: argparse._SubParsersAction[argparse.Argument
     )
     ask.add_argument("--ref", type=_date_arg, help="Ngày tham chiếu YYYY-MM-DD; mặc định hôm nay")
     ask.add_argument("--max-repairs", type=int, default=2, help="Số lần sửa tối đa (mặc định 2)")
+    ask.add_argument(
+        "--landmarks",
+        type=int,
+        default=DEFAULT_LANDMARKS,
+        help="Số điểm tham quan nổi tiếng thêm vào candidate, 0 để tắt (mặc định 6)",
+    )
     ask.add_argument("--no-retime", action="store_true", help="Không xếp lại giờ theo quy tắc")
     ask.add_argument("--db", type=Path, default=DEFAULT_DB, help="DB địa điểm")
     ask.add_argument("--host", default=DEFAULT_HOST)
@@ -284,6 +291,9 @@ def _ask_payload(outcome: AskOutcome) -> dict[str, object]:
 def _cmd_ask(args: argparse.Namespace) -> int:
     if _missing([args.db]):
         return EXIT_USAGE
+    if args.landmarks < 0:
+        print("--landmarks không được âm.", file=sys.stderr)
+        return EXIT_USAGE
     if args.max_repairs < 0:
         print("--max-repairs không được âm.", file=sys.stderr)
         return EXIT_USAGE
@@ -308,6 +318,7 @@ def _cmd_ask(args: argparse.Namespace) -> int:
             places,
             retime=not args.no_retime,
             max_repairs=args.max_repairs,
+            landmarks=args.landmarks,
         )
     except ExtractionError as exc:
         print(f"Không đọc được đầu ra của model hiểu câu: {exc}", file=sys.stderr)

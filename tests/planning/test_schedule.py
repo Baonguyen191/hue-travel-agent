@@ -100,11 +100,11 @@ def test_tight_schedule_is_free_of_travel_errors() -> None:
 
     assert result.dropped == []
     assert codes(check(request, result.itinerary, lookup, TEN_MINUTES)).isdisjoint(TIMING_CODES)
-    # Ngày bắt đầu ở day_start (07:30), mỗi chặng đi 10 phút; giờ tham quan theo VISIT_MINUTES.
+    # Giờ model ghi là sàn: A giữ 09:00; B đến sau khi rời A + 10 phút đi; C tương tự.
     assert times(result) == [
-        ("t:a", "07:30", "08:30"),
-        ("t:b", "08:40", "09:40"),
-        ("t:c", "09:50", "10:50"),
+        ("t:a", "09:00", "10:00"),
+        ("t:b", "10:10", "11:10"),
+        ("t:c", "11:20", "12:20"),
     ]
 
 
@@ -138,8 +138,8 @@ def test_closed_all_day_stop_is_dropped_and_next_travels_from_last_kept() -> Non
     result = retime(request, model, lookup, TEN_MINUTES)
 
     assert result.dropped == [DroppedStop(0, "t:closed", "đóng cửa cả ngày")]
-    # Điểm C đi từ A (rời 08:30) chứ không từ điểm đã bỏ: 08:30 + 10 phút.
-    assert times(result) == [("t:a", "07:30", "08:30"), ("t:c", "08:40", "09:40")]
+    # Điểm C đi từ A (rời 10:00) chứ không từ điểm đã bỏ; C giữ giờ 11:00 của model vì đã kịp.
+    assert times(result) == [("t:a", "09:00", "10:00"), ("t:c", "11:00", "12:00")]
     assert codes(check(request, result.itinerary, lookup, TEN_MINUTES)).isdisjoint(TIMING_CODES)
 
 
@@ -336,7 +336,7 @@ def _missing_meal_count(request, plan, lookup) -> int:
     return sum(1 for issue in report.issues if issue.code is IssueCode.MISSING_MEAL)
 
 
-def test_compacted_day_keeps_lunch_inside_the_lunch_window() -> None:
+def test_lunch_modelled_before_the_lunch_window_is_moved_into_it() -> None:
     request = request_for(Pace.MODERATE, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
     lookup = repo(
         open_place("t:a"),
@@ -347,21 +347,22 @@ def test_compacted_day_keeps_lunch_inside_the_lunch_window() -> None:
         [
             stop("t:a", "08:00", "09:00"),
             stop("t:b", "09:00", "10:00"),
-            stop("t:lunch", "11:30", "12:30"),
+            stop("t:lunch", "10:50", "11:50"),
         ]
     )
     result = retime(request, model, lookup, TEN_MINUTES)
-    # Không có khung này thì bữa trưa sẽ bị kéo về 09:50, ngoài khung 11:00-13:30.
+    # Model đặt trước khung 11:00-13:30: không xếp sớm hơn giờ bắt đầu khung bữa trưa.
     assert times(result)[-1] == ("t:lunch", "11:00", "12:00")
     assert _missing_meal_count(request, result.itinerary, lookup) <= _missing_meal_count(
         request, model, lookup
     )
 
 
-def test_compacted_day_keeps_dinner_inside_the_dinner_window() -> None:
+def test_dinner_modelled_early_in_the_dinner_window_is_moved_into_it() -> None:
     request = request_for(Pace.MODERATE, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
     lookup = repo(open_place("t:a"), open_place("t:dinner", category=Category.RESTAURANT))
-    model = itinerary([stop("t:a", "08:00", "09:00"), stop("t:dinner", "18:00", "19:00")])
+    # Model đặt chồng lên khung bữa tối (17:30-20:00) nhưng bắt đầu sớm: neo vào 17:30.
+    model = itinerary([stop("t:a", "08:00", "09:00"), stop("t:dinner", "17:00", "18:00")])
     result = retime(request, model, lookup, TEN_MINUTES)
     assert times(result)[-1] == ("t:dinner", "17:30", "18:30")
 
@@ -372,13 +373,38 @@ def test_meal_window_is_not_applied_when_day_does_not_cover_it() -> None:
     lookup = repo(open_place("t:a"), open_place("t:dinner", category=Category.RESTAURANT))
     model = itinerary([stop("t:a", "09:00", "10:00"), stop("t:dinner", "17:45", "18:00")])
     result = retime(request, model, lookup, TEN_MINUTES)
-    assert times(result)[-1][1] == "10:10"
+    # Giờ model được giữ: 17:45 (không có khung bữa nào neo lên 17:30 và không kéo về 10:10).
+    assert times(result)[-1][1] == "17:45"
 
 
-def test_non_restaurant_in_a_meal_window_is_still_compacted() -> None:
+def test_non_restaurant_in_a_meal_window_keeps_the_model_time() -> None:
     request = request_for(Pace.MODERATE, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
     lookup = repo(open_place("t:a"), open_place("t:cafe", category=Category.CAFE))
     model = itinerary([stop("t:a", "08:00", "09:00"), stop("t:cafe", "11:30", "12:00")])
     result = retime(request, model, lookup, TEN_MINUTES)
-    # Ngày bắt đầu 07:30: bảo tàng 07:30-08:30, quán cà phê đến 08:40 (không bị neo vào 11:30).
-    assert times(result)[-1][1] == "08:40"
+    # Quán cà phê không neo vào khung bữa; giờ 11:30 của model được giữ.
+    assert times(result)[-1] == ("t:cafe", "11:30", "12:00")
+
+
+def test_afternoon_visit_at_fifteen_keeps_fifteen() -> None:
+    request = request_for(Pace.RELAXED, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(open_place("t:a"), open_place("t:b"))
+    model = itinerary([stop("t:a", "09:00", "10:00"), stop("t:b", "15:00", "16:00")])
+    result = retime(request, model, lookup, TEN_MINUTES)
+    assert times(result) == [("t:a", "09:00", "10:00"), ("t:b", "15:00", "16:00")]
+    assert check(request, result.itinerary, lookup, TEN_MINUTES).errors() == []
+
+
+def test_retime_never_moves_a_stop_earlier_than_the_model() -> None:
+    request = request_for(Pace.RELAXED, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(open_place("t:a"), open_place("t:b"), open_place("t:c"))
+    model = itinerary(
+        [
+            stop("t:a", "09:00", "10:00"),
+            stop("t:b", "12:00", "13:00"),
+            stop("t:c", "13:30", "14:30"),
+        ]
+    )
+    result = retime(request, model, lookup, NO_TRAVEL)
+    arrives = [s.arrive for s in result.itinerary.days[0].stops]
+    assert arrives == [dt.time(9, 0), dt.time(12, 0), dt.time(13, 30)]

@@ -189,7 +189,12 @@ def test_must_and_exclude_are_passed_to_candidates() -> None:
     assert outcome.plan is not None
     assert "t:pagoda" in outcome.plan.candidates_ids
     assert "t:cafe" not in outcome.plan.candidates_ids
-    assert outcome.plan.missing_must == ["t:pagoda"]
+    # Model không xếp chùa: lỗi thiếu điểm bắt buộc được sửa, rồi chèn bằng code.
+    assert outcome.plan.inserted_must == ["t:pagoda"]
+    assert outcome.plan.missing_must == []
+    assert outcome.plan.itinerary is not None
+    planned = [s.place_id for d in outcome.plan.itinerary.days for s in d.stops]
+    assert "t:pagoda" in planned
 
 
 def test_exclude_category_reaches_candidates() -> None:

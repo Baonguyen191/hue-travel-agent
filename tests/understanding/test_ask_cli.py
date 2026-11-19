@@ -120,12 +120,13 @@ def test_must_and_exclude_reach_candidates_and_missing_must_json(
             exclude_mentions=["Cà phê Ba Lần"],
         )
     )
-    # Model giả không đưa chùa vào lịch: chùa nằm trong missing_must nhưng không làm lịch thành lỗi.
+    # Model giả không đưa chùa vào lịch: lỗi thiếu điểm bắt buộc được sửa, rồi chèn bằng code.
     assert _run(ask_env, "đi Huế 20/12, 1 ngày", "--json") == 0
     payload = json.loads(capsys.readouterr().out)
     assert "t:pagoda" in payload["plan"]["candidates_ids"]
     assert "t:cafe" not in payload["plan"]["candidates_ids"]
-    assert payload["plan"]["missing_must"] == ["t:pagoda"]
+    assert payload["plan"]["inserted_must"] == ["t:pagoda"]
+    assert payload["plan"]["missing_must"] == []
 
 
 def test_json_shape_for_plan(ask_env: dict[str, Any], capsys: pytest.CaptureFixture[str]) -> None:

@@ -11,7 +11,7 @@ from tests.planning.factories import make_pool
 from travel_agent.cli import main
 from travel_agent.data.place_repository import SqlitePlaceRepository
 from travel_agent.domain.models import Category, PlanRequest, TravelMode
-from travel_agent.planning.candidates import select_candidates
+from travel_agent.planning.candidates import DEFAULT_LANDMARKS, select_candidates
 from travel_agent.training import commands
 from travel_agent.training.commands import load_usable_places
 from travel_agent.training.generator import Generation
@@ -65,7 +65,12 @@ def db(tmp_path: Path) -> Path:
 
 def _valid_raw(db_places: list[Any]) -> str:
     """Lịch một ngày dùng đúng candidate mà lệnh plan sẽ chọn (cùng seed, cùng request)."""
-    candidates = select_candidates(CLI_REQUEST, db_places, candidate_seed(request_key(CLI_REQUEST)))
+    candidates = select_candidates(
+        CLI_REQUEST,
+        db_places,
+        candidate_seed(request_key(CLI_REQUEST)),
+        landmarks=DEFAULT_LANDMARKS,
+    )
     restaurants = [p.id for p in candidates if p.category is Category.RESTAURANT][:2]
     others = [p.id for p in candidates if p.category is not Category.RESTAURANT]
     stops = [
@@ -175,3 +180,28 @@ def test_missing_days_exits_two(db: Path) -> None:
 def test_missing_db_exits_two(tmp_path: Path) -> None:
     code = main(_plan_args(tmp_path / "none.sqlite", "--model", "fake"))
     assert code == commands.EXIT_USAGE
+
+
+def test_negative_landmarks_is_a_usage_error(db: Path) -> None:
+    FakeGenerator.outputs = [_valid_raw(load_usable_places(db))]
+    assert main(_plan_args(db, "--model", "fake", "--landmarks", "-1")) == commands.EXIT_USAGE
+
+
+def test_landmarks_flag_defaults_to_six_and_reaches_plan_trip(
+    db: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    seen: list[int] = []
+    real = commands.plan_trip
+
+    def spy(*args: Any, **kwargs: Any) -> Any:
+        seen.append(kwargs["landmarks"])
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(commands, "plan_trip", spy)
+    FakeGenerator.outputs = [_valid_raw(load_usable_places(db))]
+    assert main(_plan_args(db, "--model", "fake")) == commands.EXIT_OK
+    # Với 0 thì candidate khác, nên dùng output không parse được để chỉ kiểm tra tham số truyền đi.
+    FakeGenerator.outputs = ["không phải json"]
+    FakeGenerator.seen = []
+    main(_plan_args(db, "--model", "fake", "--landmarks", "0", "--max-repairs", "0"))
+    assert seen == [DEFAULT_LANDMARKS, 0]

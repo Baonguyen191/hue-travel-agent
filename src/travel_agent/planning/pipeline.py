@@ -9,23 +9,32 @@ from __future__ import annotations
 
 import time
 from collections.abc import Callable, Collection, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
 from travel_agent.data.place_repository import InMemoryPlaceRepository
-from travel_agent.domain.models import Category, Itinerary, Place, PlanRequest
+from travel_agent.domain.models import (
+    Category,
+    Itinerary,
+    Place,
+    PlannedDay,
+    PlannedStop,
+    PlanRequest,
+)
 from travel_agent.planning.candidates import select_candidates
+from travel_agent.planning.hours import minute_floor, time_of
 from travel_agent.planning.prompt import build_messages
 from travel_agent.planning.schedule import DroppedStop
 from travel_agent.planning.schedule import retime as retime_itinerary
+from travel_agent.planning.solver import VISIT_MINUTES
 from travel_agent.routing.travel_time import TravelTimeProvider
 from travel_agent.training.generator import PlanGenerator, itinerary_format_schema
 from travel_agent.training.parsing import parse_itinerary
 from travel_agent.training.requests import request_key
 from travel_agent.training.runner import candidate_seed
-from travel_agent.validation.report import ValidationReport
+from travel_agent.validation.report import Issue, IssueCode, Severity, ValidationReport
 from travel_agent.validation.validator import validate_itinerary
 
 
@@ -33,7 +42,8 @@ class PlanAttempt(BaseModel):
     kind: Literal["generate", "repair"]
     raw: str
     parsed: bool
-    # Số lỗi ERROR của validator. Bằng 0 khi không parse được (lúc đó validator không chạy).
+    # Số lỗi ERROR của validator cộng số điểm bắt buộc vắng (coi như ERROR). Bằng 0 khi không
+    # parse được (lúc đó validator không chạy).
     error_count: int
     latency_s: float
 
@@ -42,13 +52,15 @@ class PlanResult(BaseModel):
     itinerary: (
         Itinerary | None
     )  # lịch đã xếp giờ của lượt tốt nhất; None nếu không lượt nào parse được
-    report: ValidationReport | None
-    valid: bool  # không còn lỗi ERROR nào
+    report: ValidationReport | None  # chỉ của validator, không chứa lỗi thiếu điểm bắt buộc
+    valid: bool  # không còn lỗi ERROR của validator nào
     attempts: list[PlanAttempt]
-    dropped: list[DroppedStop]  # điểm bị bỏ khi xếp giờ, của lượt tốt nhất
+    dropped: list[DroppedStop]  # điểm bị bỏ khi xếp giờ, của lượt tốt nhất (và lần chèn)
     candidates_ids: list[str]
-    # Id bắt buộc (must_include) không có trong lịch cuối, kể cả id không có trong DB.
+    # Id bắt buộc (must_include) không có trong lịch cuối, kể cả id không có trong DB hoặc bị loại.
     missing_must: list[str] = Field(default_factory=list)
+    # Id bắt buộc vắng sau sửa model, được chèn bằng code và vẫn còn trong lịch cuối.
+    inserted_must: list[str] = Field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -56,17 +68,115 @@ class _Trial:
     itinerary: Itinerary | None  # đã xếp giờ nếu retime bật
     report: ValidationReport | None  # None khi output không parse được
     dropped: list[DroppedStop]
+    # Điểm bắt buộc (có trong candidate) vắng khỏi lịch; coi như ERROR khi lặp và khi chọn lượt.
+    missing: list[Issue] = field(default_factory=list)
 
 
 def _is_valid(trial: _Trial) -> bool:
-    return trial.report is not None and trial.report.is_valid
+    """Dừng vòng lặp: không ERROR của validator và không thiếu điểm bắt buộc nào."""
+    return trial.report is not None and trial.report.is_valid and not trial.missing
+
+
+def _error_count(trial: _Trial) -> int:
+    if trial.report is None:
+        return 0
+    return len(trial.report.errors()) + len(trial.missing)
 
 
 def _rank(trial: _Trial) -> tuple[bool, int]:
     """Lượt parse được luôn hơn lượt không parse; trong đó ít ERROR hơn thì hơn."""
     if trial.report is None:
         return (False, 0)
-    return (True, -len(trial.report.errors()))
+    return (True, -_error_count(trial))
+
+
+def _planned_ids(itinerary: Itinerary | None) -> set[str]:
+    if itinerary is None:
+        return set()
+    return {stop.place_id for day in itinerary.days for stop in day.stops}
+
+
+def _missing_issues(
+    itinerary: Itinerary, required: Sequence[str], names: dict[str, str]
+) -> list[Issue]:
+    """Lỗi tổng hợp ERROR cho điểm bắt buộc vắng. Không phải do validator sinh."""
+    planned = _planned_ids(itinerary)
+    return [
+        Issue(
+            code=IssueCode.MISSING_REQUIRED_PLACE,
+            severity=Severity.ERROR,
+            message=f"Thiếu điểm bắt buộc: {names.get(place_id, place_id)} ({place_id})",
+            place_id=place_id,
+        )
+        for place_id in required
+        if place_id not in planned
+    ]
+
+
+def _leg_minutes(
+    origin: Place, destination: Place, request: PlanRequest, travel: TravelTimeProvider
+) -> float:
+    return travel.travel_leg(origin.coords, destination.coords, request.travel_mode).minutes
+
+
+def _best_position(
+    request: PlanRequest,
+    stops: Sequence[PlannedStop],
+    place: Place,
+    lookup: InMemoryPlaceRepository,
+    travel: TravelTimeProvider,
+) -> int:
+    """Vị trí chèn làm tăng ít thời gian đi nhất; hòa thì vị trí sớm hơn.
+
+    Điểm lạ (không có trong `lookup`) không có tọa độ nên không tính chặng nào của nó.
+    """
+    best_pos, best_cost = 0, float("inf")
+    for pos in range(len(stops) + 1):
+        before = lookup.get(stops[pos - 1].place_id) if pos > 0 else None
+        after = lookup.get(stops[pos].place_id) if pos < len(stops) else None
+        cost = 0.0
+        if before is not None:
+            cost += _leg_minutes(before, place, request, travel)
+        if after is not None:
+            cost += _leg_minutes(place, after, request, travel)
+        if before is not None and after is not None:
+            cost -= _leg_minutes(before, after, request, travel)
+        if cost < best_cost:
+            best_pos, best_cost = pos, cost
+    return best_pos
+
+
+def _insert_places(
+    request: PlanRequest,
+    itinerary: Itinerary,
+    places: Sequence[Place],
+    lookup: InMemoryPlaceRepository,
+    travel: TravelTimeProvider,
+) -> Itinerary:
+    """Chèn từng điểm vào ngày ít điểm nhất (hòa thì ngày sớm hơn), tại vị trí thêm ít đi lại nhất.
+
+    Giờ tạm là day_start với thời lượng VISIT_MINUTES[loại]; retime đặt giờ thật sau đó.
+    """
+    if not itinerary.days:
+        return itinerary
+    days: list[list[PlannedStop]] = [list(day.stops) for day in itinerary.days]
+    start = minute_floor(request.day_start)
+    for place in places:
+        day_index = min(range(len(days)), key=lambda i: len(days[i]))
+        stops = days[day_index]
+        pos = _best_position(request, stops, place, lookup, travel)
+        placeholder = PlannedStop(
+            place_id=place.id,
+            arrive=request.day_start,
+            depart=time_of(start + VISIT_MINUTES[place.category]),
+        )
+        stops.insert(pos, placeholder)
+    return Itinerary(
+        days=[
+            PlannedDay(date=day.date, stops=stops)
+            for day, stops in zip(itinerary.days, days, strict=True)
+        ]
+    )
 
 
 def plan_trip(
@@ -82,16 +192,25 @@ def plan_trip(
     must_include: Sequence[str] = (),
     exclude_ids: Collection[str] = (),
     exclude_categories: Collection[Category] = (),
+    landmarks: int = 0,
 ) -> PlanResult:
     """Sinh lịch cho `request`, tối đa `1 + max_repairs` lượt gọi model.
 
     Lượt đầu dùng prompt sinh như eval. Lượt sau: nếu output trước parse được thì dùng prompt sửa
-    (kèm lịch đã xếp giờ và các lỗi ERROR); nếu không parse được thì sinh lại từ đầu. Dừng khi
-    hết ERROR hoặc hết lượt. Trả về lượt có ít ERROR nhất; hòa thì lấy lượt sau.
+    (kèm lịch đã xếp giờ, các lỗi ERROR và các điểm bắt buộc còn vắng); nếu không parse được thì
+    sinh lại từ đầu. Dừng khi hết ERROR và không thiếu điểm bắt buộc, hoặc hết lượt. Trả về lượt
+    có ít lỗi nhất (lỗi thiếu điểm bắt buộc được tính như ERROR); hòa thì lấy lượt sau.
+
+    Điểm bắt buộc có trong candidate (có trong DB, không bị loại) mà vẫn vắng sau mọi lượt sửa
+    thì được chèn bằng code (`_insert_places`), rồi xếp lại giờ và kiểm lại. Việc chèn chỉ làm khi
+    `retime` bật, vì giờ chèn cần xếp lại. `inserted_must` là các điểm chèn xong còn trong lịch;
+    `missing_must` là các id bắt buộc còn vắng ở lịch cuối (gồm id không có trong DB và id bị loại).
+    `PlanResult.valid` chỉ xét ERROR của validator; thiếu điểm bắt buộc nằm ở `missing_must`.
+
     `seed` mặc định là `candidate_seed(request_key(request))`, đúng như eval.
     `must_include`, `exclude_ids`, `exclude_categories` chuyển cho `select_candidates`; không truyền
-    thì kết quả như trước. `missing_must` là các id bắt buộc không có trong lịch cuối (sau khi xếp
-    giờ bỏ điểm). Loại trừ thắng bắt buộc: điểm vừa bắt buộc vừa bị loại nằm trong `missing_must`.
+    thì kết quả như trước. Loại trừ thắng bắt buộc: điểm vừa bắt buộc vừa bị loại nằm trong
+    `missing_must` và không được chèn. `landmarks` chuyển cho `select_candidates` (0 là tắt).
     """
     if max_repairs < 0:
         raise ValueError("max_repairs không được âm")
@@ -103,9 +222,14 @@ def plan_trip(
         must_include=must_include,
         exclude_ids=exclude_ids,
         exclude_categories=exclude_categories,
+        landmarks=landmarks,
     )
     # Giống metrics.score_output: chỉ candidate mới là địa điểm hợp lệ.
     lookup = InMemoryPlaceRepository(candidates)
+    candidate_by_id = {place.id: place for place in candidates}
+    names = {place.id: place.name for place in places}
+    # Điểm bắt buộc mà model có thể đặt được: đúng những id có trong candidate.
+    required = [place_id for place_id in dict.fromkeys(must_include) if place_id in candidate_by_id]
     schema: dict[str, Any] = itinerary_format_schema(request.num_days)
     attempts: list[PlanAttempt] = []
 
@@ -121,13 +245,14 @@ def plan_trip(
                 result = retime_itinerary(request, itinerary, lookup, travel)
                 itinerary, dropped = result.itinerary, result.dropped
             report = validate_itinerary(request, itinerary, lookup, travel)
-            trial = _Trial(itinerary=itinerary, report=report, dropped=dropped)
+            missing = _missing_issues(itinerary, required, names)
+            trial = _Trial(itinerary=itinerary, report=report, dropped=dropped, missing=missing)
         attempts.append(
             PlanAttempt(
                 kind=kind,
                 raw=generation.content,
                 parsed=trial.report is not None,
-                error_count=len(trial.report.errors()) if trial.report is not None else 0,
+                error_count=_error_count(trial),
                 latency_s=latency_s,
             )
         )
@@ -140,7 +265,10 @@ def plan_trip(
         repairs += 1
         if trial.itinerary is not None and trial.report is not None:
             messages = build_messages(
-                request, candidates, broken=trial.itinerary, issues=trial.report.issues
+                request,
+                candidates,
+                broken=trial.itinerary,
+                issues=[*trial.report.issues, *trial.missing],
             )
             trial = attempt("repair", messages)
         else:
@@ -148,18 +276,34 @@ def plan_trip(
         if _rank(trial) >= _rank(best):
             best = trial
 
-    planned_ids = (
-        {stop.place_id for day in best.itinerary.days for stop in day.stops}
-        if best.itinerary is not None
-        else set()
-    )
-    missing = [place_id for place_id in dict.fromkeys(must_include) if place_id not in planned_ids]
+    itinerary, report = best.itinerary, best.report
+    dropped = list(best.dropped)
+    inserted: list[str] = []
+    still_missing = [issue.place_id for issue in best.missing if issue.place_id is not None]
+    if retime and itinerary is not None and still_missing:
+        grown = _insert_places(
+            request, itinerary, [candidate_by_id[pid] for pid in still_missing], lookup, travel
+        )
+        result = retime_itinerary(request, grown, lookup, travel)
+        itinerary = result.itinerary
+        # Điểm đã bỏ ở lượt xếp giờ trước có thể được chèn lại rồi bị bỏ tiếp: chỉ ghi một lần.
+        seen_drops = {(drop.day_index, drop.place_id) for drop in dropped}
+        dropped += [
+            drop for drop in result.dropped if (drop.day_index, drop.place_id) not in seen_drops
+        ]
+        report = validate_itinerary(request, itinerary, lookup, travel)
+        planned = _planned_ids(itinerary)
+        inserted = [pid for pid in still_missing if pid in planned]
+
+    planned = _planned_ids(itinerary)
+    missing = [place_id for place_id in dict.fromkeys(must_include) if place_id not in planned]
     return PlanResult(
-        itinerary=best.itinerary,
-        report=best.report,
-        valid=_is_valid(best),
+        itinerary=itinerary,
+        report=report,
+        valid=report is not None and report.is_valid,
         attempts=attempts,
-        dropped=best.dropped,
+        dropped=dropped,
         candidates_ids=[place.id for place in candidates],
         missing_must=missing,
+        inserted_must=inserted,
     )

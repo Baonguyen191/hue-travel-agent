@@ -23,6 +23,8 @@ class IssueCode(StrEnum):
     OPENING_HOURS_UNKNOWN = "opening_hours_unknown"
     OVERLOADED_DAY = "overloaded_day"
     MISSING_MEAL = "missing_meal"
+    # Không do validator sinh: pipeline tự tạo khi điểm bắt buộc vắng mặt, xem planning/pipeline.py.
+    MISSING_REQUIRED_PLACE = "missing_required_place"
 
 
 class Issue(BaseModel):
