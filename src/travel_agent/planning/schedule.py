@@ -7,7 +7,12 @@ Model chỉ cần chọn điểm và xếp thứ tự; code tính giờ theo quy
   thăm, khung bữa ăn). Giờ model ghi là sàn: xếp lại chỉ đẩy giờ về sau, không kéo về đầu ngày
   (trừ khi giờ model trước day_start, khi đó khung ngày là sàn). Giờ rảnh = giờ rời điểm đã giữ
   trước + thời gian đi (làm tròn lên phút, cùng quy tắc với solver và validator).
-  Lượt thăm = thời lượng model ghi nếu > 0, không thì VISIT_MINUTES[loại].
+  Lượt thăm lấy từ `visit_minutes` (planning/durations.py): thuộc tính DB của điểm nếu đọc được,
+  không thì thời lượng model ghi nếu > 0, không thì VISIT_MINUTES[loại].
+- Trùng mã: trước khi xếp giờ, mọi lần xuất hiện sau của một mã đã có trước đó (qua các ngày)
+  bị bỏ với lý do "trùng điểm đã có trong lịch". Lần đầu theo thứ tự model luôn được giữ ở bước
+  này. Ngày chỉ toàn điểm trùng thì giữ điểm đầu của model để schema còn một điểm; validator sẽ
+  báo duplicate_place.
 - Không vừa khung mở cửa hoặc vượt day_end thì bỏ điểm và ghi lý do. Điểm sau đó đi từ điểm
   đã giữ gần nhất.
 - Mã địa điểm lạ (không có trong `places`): giữ nguyên dòng của model (giờ không đổi, không
@@ -27,6 +32,7 @@ from dataclasses import dataclass
 
 from travel_agent.data.place_repository import PlaceLookup
 from travel_agent.domain.models import Itinerary, Place, PlannedDay, PlannedStop, PlanRequest
+from travel_agent.planning.durations import visit_minutes
 from travel_agent.planning.hours import (
     MINUTES_PER_DAY,
     Interval,
@@ -35,9 +41,10 @@ from travel_agent.planning.hours import (
     open_ranges,
     time_of,
 )
-from travel_agent.planning.solver import VISIT_MINUTES
 from travel_agent.routing.travel_time import TravelTimeProvider
 from travel_agent.validation.validator import MEAL_CATEGORIES, MEAL_WINDOWS
+
+REASON_DUPLICATE = "trùng điểm đã có trong lịch"
 
 
 @dataclass(frozen=True)
@@ -59,13 +66,45 @@ def retime(
     places: PlaceLookup,
     travel: TravelTimeProvider,
 ) -> RetimeResult:
+    model_days, duplicate_drops = _drop_duplicates(itinerary)
     days: list[PlannedDay] = []
     dropped: list[DroppedStop] = []
     for day_index, day in enumerate(itinerary.days):
-        stops, day_dropped = _retime_day(request, day_index, day.stops, places, travel)
+        stops, day_dropped = _retime_day(request, day_index, model_days[day_index], places, travel)
         days.append(PlannedDay(date=day.date, stops=stops))
+        dropped.extend(duplicate_drops[day_index])
         dropped.extend(day_dropped)
     return RetimeResult(itinerary=Itinerary(days=days), dropped=dropped)
+
+
+def _drop_duplicates(
+    itinerary: Itinerary,
+) -> tuple[list[list[PlannedStop]], list[list[DroppedStop]]]:
+    """Bỏ mọi lần xuất hiện sau của một mã đã có trước đó trong lịch (qua các ngày), trước khi
+    xếp giờ. Lần đầu theo thứ tự model luôn được giữ ở bước này.
+
+    Ngày mà mọi điểm đều là trùng thì giữ điểm đầu của model (không tính là bỏ) để schema còn ít
+    nhất một điểm; validator báo duplicate_place cho điểm đó.
+    """
+    seen: set[str] = set()
+    days_stops: list[list[PlannedStop]] = []
+    days_dropped: list[list[DroppedStop]] = []
+    for day_index, day in enumerate(itinerary.days):
+        stops: list[PlannedStop] = []
+        dropped: list[DroppedStop] = []
+        for stop in day.stops:
+            if stop.place_id in seen:
+                dropped.append(DroppedStop(day_index, stop.place_id, REASON_DUPLICATE))
+                continue
+            seen.add(stop.place_id)
+            stops.append(stop)
+        if not stops and day.stops:
+            # Mọi điểm đều trùng nên `dropped` đúng là các điểm của ngày theo thứ tự: bỏ điểm đầu.
+            stops = [day.stops[0]]
+            dropped = dropped[1:]
+        days_stops.append(stops)
+        days_dropped.append(dropped)
+    return days_stops, days_dropped
 
 
 def _retime_day(
@@ -88,7 +127,8 @@ def _retime_day(
             kept.append(model_stop)
             clock = max(clock, base + minute_floor(model_stop.depart))
             continue
-        visit = _visit_minutes(model_stop, place)
+        model_minutes = minute_floor(model_stop.depart) - minute_floor(model_stop.arrive)
+        visit = visit_minutes(place, model_minutes)
         # Giờ model ghi là sàn: không xếp sớm hơn nó (xem đầu module).
         ready = max(clock, base + minute_floor(model_stop.arrive))
         if origin is not None:
@@ -142,12 +182,6 @@ def _meal_start(
     if not starts:
         return None
     return day_index * MINUTES_PER_DAY + minute_floor(min(starts))
-
-
-def _visit_minutes(model_stop: PlannedStop, place: Place) -> int:
-    """Thời lượng model ghi nếu dương, không thì hằng số theo loại (chỉ ở mức phút)."""
-    model = minute_floor(model_stop.depart) - minute_floor(model_stop.arrive)
-    return model if model > 0 else VISIT_MINUTES[place.category]
 
 
 def _travel_minutes(

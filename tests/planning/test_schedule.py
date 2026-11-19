@@ -20,7 +20,8 @@ from travel_agent.domain.models import (
     TravelMode,
 )
 from travel_agent.planning.candidates import select_candidates
-from travel_agent.planning.schedule import DroppedStop, RetimeResult, retime
+from travel_agent.planning.durations import VISIT_ATTRIBUTE
+from travel_agent.planning.schedule import REASON_DUPLICATE, DroppedStop, RetimeResult, retime
 from travel_agent.planning.solver import SolveStatus, solve
 from travel_agent.routing.travel_time import HaversineEstimator, TravelTimeProvider
 from travel_agent.validation.report import IssueCode, ValidationReport
@@ -408,3 +409,121 @@ def test_retime_never_moves_a_stop_earlier_than_the_model() -> None:
     result = retime(request, model, lookup, NO_TRAVEL)
     arrives = [s.arrive for s in result.itinerary.days[0].stops]
     assert arrives == [dt.time(9, 0), dt.time(12, 0), dt.time(13, 30)]
+
+
+def timed(pid: str, raw: str) -> Place:
+    """Điểm có thuộc tính thời lượng tham quan trong DB (dạng thật là chuỗi số phút)."""
+    return open_place(pid).model_copy(update={"attributes": {VISIT_ATTRIBUTE: raw}})
+
+
+def test_duplicate_within_a_day_is_dropped_and_first_occurrence_kept() -> None:
+    request = request_for(Pace.RELAXED, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(open_place("t:a"), open_place("t:b"))
+    model = itinerary(
+        [
+            stop("t:a", "09:00", "10:00"),
+            stop("t:b", "10:00", "11:00"),
+            stop("t:a", "11:00", "12:00"),
+        ]
+    )
+
+    result = retime(request, model, lookup, NO_TRAVEL)
+
+    assert result.dropped == [DroppedStop(0, "t:a", REASON_DUPLICATE)]
+    assert times(result) == [("t:a", "09:00", "10:00"), ("t:b", "10:00", "11:00")]
+    assert IssueCode.DUPLICATE_PLACE not in codes(
+        check(request, result.itinerary, lookup, NO_TRAVEL)
+    )
+
+
+def test_duplicate_across_days_is_dropped_from_the_later_day() -> None:
+    request = request_for(Pace.RELAXED, 2, TravelMode.WALK, DAY_WINDOWS[1])
+    lookup = repo(*(open_place(f"t:{name}") for name in "abc"))
+    model = itinerary(
+        [stop("t:a", "09:00", "10:00"), stop("t:b", "10:00", "11:00")],
+        [stop("t:b", "09:00", "10:00"), stop("t:c", "10:00", "11:00")],
+    )
+
+    result = retime(request, model, lookup, NO_TRAVEL)
+
+    assert result.dropped == [DroppedStop(1, "t:b", REASON_DUPLICATE)]
+    assert [[s.place_id for s in day.stops] for day in result.itinerary.days] == [
+        ["t:a", "t:b"],
+        ["t:c"],
+    ]
+    assert IssueCode.DUPLICATE_PLACE not in codes(
+        check(request, result.itinerary, lookup, NO_TRAVEL)
+    )
+
+
+def test_duplicate_is_removed_before_timing_so_travel_starts_from_the_kept_stop() -> None:
+    request = request_for(Pace.RELAXED, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(open_place("t:a"), open_place("t:b"))
+    model = itinerary(
+        [
+            stop("t:a", "09:00", "10:00"),
+            stop("t:a", "10:00", "10:30"),
+            stop("t:b", "10:00", "11:00"),
+        ]
+    )
+
+    result = retime(request, model, lookup, TEN_MINUTES)
+
+    # Nếu trùng còn trong lúc xếp giờ, A thứ hai giữ tới 10:30 và B đến 10:40. Bỏ trùng trước
+    # nên B đi từ A đã giữ (rời 10:00): đến 10:10.
+    assert times(result) == [("t:a", "09:00", "10:00"), ("t:b", "10:10", "11:10")]
+
+
+def test_day_made_only_of_duplicates_keeps_its_first_stop_for_the_validator() -> None:
+    request = request_for(Pace.RELAXED, 2, TravelMode.WALK, DAY_WINDOWS[1])
+    lookup = repo(open_place("t:a"), open_place("t:b"))
+    model = itinerary(
+        [stop("t:a", "09:00", "10:00"), stop("t:b", "10:00", "11:00")],
+        [stop("t:a", "09:00", "10:00"), stop("t:b", "10:00", "11:00")],
+    )
+
+    result = retime(request, model, lookup, NO_TRAVEL)
+
+    # Schema cần một điểm mỗi ngày: giữ điểm đầu của ngày 2, nên validator báo duplicate_place.
+    assert result.dropped == [DroppedStop(1, "t:b", REASON_DUPLICATE)]
+    assert [[s.place_id for s in day.stops] for day in result.itinerary.days] == [
+        ["t:a", "t:b"],
+        ["t:a"],
+    ]
+    report = check(request, result.itinerary, lookup, NO_TRAVEL)
+    assert [(i.code, i.day_index, i.stop_index) for i in report.errors()] == [
+        (IssueCode.DUPLICATE_PLACE, 1, 0)
+    ]
+
+
+def test_database_visit_time_sets_the_departure() -> None:
+    request = request_for(Pace.RELAXED, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(open_place("t:a"), timed("t:b", "120"))
+    model = itinerary([stop("t:a", "09:00", "10:00"), stop("t:b", "15:00", "15:30")])
+
+    result = retime(request, model, lookup, NO_TRAVEL)
+
+    # Model ghi 30 phút nhưng DB ghi 120 phút: lượt thăm lấy 120 phút.
+    assert times(result) == [("t:a", "09:00", "10:00"), ("t:b", "15:00", "17:00")]
+
+
+def test_database_visit_time_is_clamped_to_the_range() -> None:
+    request = request_for(Pace.RELAXED, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    lookup = repo(timed("t:long", "600"))
+    model = itinerary([stop("t:long", "09:00", "10:00")])
+
+    result = retime(request, model, lookup, NO_TRAVEL)
+
+    assert times(result) == [("t:long", "09:00", "13:00")]  # 600 phút kẹp về 240
+
+
+def test_retime_takes_visit_minutes_from_the_database_not_the_solver_constant() -> None:
+    request = request_for(Pace.RELAXED, 1, TravelMode.MOTORBIKE, DAY_WINDOWS[0])
+    # Model ghi 45 phút, DB ghi 90 phút (dạng thật): thuộc tính DB thắng, không giữ 45.
+    lookup = repo(timed("t:cafe", "90"))
+    model = itinerary([stop("t:cafe", "09:00", "09:45")])
+
+    result = retime(request, model, lookup, NO_TRAVEL)
+
+    assert times(result) == [("t:cafe", "09:00", "10:30")]
+    assert check(request, result.itinerary, lookup, NO_TRAVEL).errors() == []
