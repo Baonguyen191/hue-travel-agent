@@ -11,7 +11,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Literal
 
-from travel_agent.domain.models import Category, Place
+from travel_agent.domain.models import Category, Place, PlanRequest
 from travel_agent.planning.pipeline import PlanResult, plan_trip
 from travel_agent.routing.travel_time import HaversineEstimator, TravelTimeProvider
 from travel_agent.training.generator import PlanGenerator
@@ -184,6 +184,20 @@ def _render_plan(query: ParsedQuery, result: PlanResult, by_id: dict[str, Place]
     request = query.request
     if request is None:
         raise ValueError("lập lịch cần request")
+    lines = _header_lines(query, request)
+    lines.extend(_itinerary_lines(result, by_id))
+    lines.extend(_report_lines(result, by_id))
+    return "\n".join(lines)
+
+
+def _place_name(by_id: dict[str, Place], place_id: str) -> str:
+    """Tên địa điểm nếu có trong DB, không thì trả về place_id."""
+    place = by_id.get(place_id)
+    return place.name if place is not None else place_id
+
+
+def _header_lines(query: ParsedQuery, request: PlanRequest) -> list[str]:
+    """Tiêu đề, phần giả định, sở thích và các mention chưa liên kết được."""
     lines = [f"Lịch trình Huế {request.num_days} ngày, bắt đầu {_date_vi(request.start_date)}."]
 
     assumed = _assumptions(query)
@@ -201,27 +215,36 @@ def _render_plan(query: ParsedQuery, result: PlanResult, by_id: dict[str, Place]
     unlinked_exclude = [m.text for m in query.exclude if m.place_id is None]
     if unlinked_exclude:
         lines.append("Không tìm thấy trong DB để loại trừ: " + ", ".join(unlinked_exclude))
+    return lines
 
-    lines.append("")
+
+def _itinerary_lines(result: PlanResult, by_id: dict[str, Place]) -> list[str]:
+    """Dòng trống rồi các ngày với từng điểm dừng, hoặc thông báo không đọc được lịch."""
+    lines = [""]
     if result.itinerary is None:
         lines.append(
             f"Không đọc được lịch từ model sau {len(result.attempts)} lần gọi. Thử lại sau."
         )
-    else:
-        for index, day in enumerate(result.itinerary.days, start=1):
-            lines.append(f"Ngày {index} — {_date_vi(day.date)}")
-            for stop in day.stops:
-                place = by_id.get(stop.place_id)
-                if place is None:
-                    name, kind = f"{stop.place_id} (không có trong DB)", "không rõ"
-                else:
-                    name, kind = place.name, CATEGORY_VI.get(place.category, place.category.value)
-                line = f"  {stop.arrive:%H:%M}–{stop.depart:%H:%M} {name} ({kind})"
-                if stop.note:
-                    line += f" — {stop.note}"
-                lines.append(line)
-            lines.append("")
+        return lines
+    for index, day in enumerate(result.itinerary.days, start=1):
+        lines.append(f"Ngày {index} — {_date_vi(day.date)}")
+        for stop in day.stops:
+            place = by_id.get(stop.place_id)
+            if place is None:
+                name, kind = f"{stop.place_id} (không có trong DB)", "không rõ"
+            else:
+                name, kind = place.name, CATEGORY_VI.get(place.category, place.category.value)
+            line = f"  {stop.arrive:%H:%M}–{stop.depart:%H:%M} {name} ({kind})"
+            if stop.note:
+                line += f" — {stop.note}"
+            lines.append(line)
+        lines.append("")
+    return lines
 
+
+def _report_lines(result: PlanResult, by_id: dict[str, Place]) -> list[str]:
+    """Cảnh báo, lỗi còn lại, điểm thêm/bỏ, điểm bắt buộc thiếu và số lần gọi model."""
+    lines: list[str] = []
     report = result.report
     warnings = (
         [i.message for i in report.issues if i.severity is Severity.WARNING] if report else []
@@ -236,19 +259,17 @@ def _render_plan(query: ParsedQuery, result: PlanResult, by_id: dict[str, Place]
     if result.added:
         lines.append("Điểm thêm vào:")
         for add in result.added:
-            place = by_id.get(add.place_id)
-            name = place.name if place is not None else add.place_id
+            name = _place_name(by_id, add.place_id)
             lines.append(f"  - Ngày {add.day_index + 1}: {name}. Lý do: {add.reason}")
     if result.dropped:
         lines.append("Điểm bị bỏ khi xếp giờ:")
         for drop in result.dropped:
-            place = by_id.get(drop.place_id)
-            name = place.name if place is not None else drop.place_id
+            name = _place_name(by_id, drop.place_id)
             lines.append(f"  - Ngày {drop.day_index + 1}: {name}. Lý do: {drop.reason}")
     if result.missing_must:
-        names = [by_id[pid].name if pid in by_id else pid for pid in result.missing_must]
+        names = [_place_name(by_id, pid) for pid in result.missing_must]
         lines.append("Yêu cầu bắt buộc chưa có trong lịch: " + ", ".join(names))
 
     repairs = sum(1 for attempt in result.attempts if attempt.kind == "repair")
     lines.append(f"Đã gọi model {len(result.attempts)} lần, trong đó sửa {repairs} lần.")
-    return "\n".join(lines)
+    return lines
