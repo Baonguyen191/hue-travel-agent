@@ -5,8 +5,10 @@
         --db data/hue.sqlite --out-dir reports/data
 
 Chỉ ĐỌC DB (mở ở chế độ `mode=ro`, file DB là dependency của DVC). Ghi hai file vào --out-dir:
-- cleanup_suggestions.csv: mỗi dòng một gợi ý, UTF-8 có BOM để mở bằng Excel.
-- cleanup_suggestions.md: tóm tắt số lượng và quy tắc.
+- cleanup_suggestions.csv: mỗi dòng một gợi ý, UTF-8 có BOM để mở bằng Excel. Cột `decision`
+  người duyệt điền (ok / bo / giu:<place_id>). Khi sinh lại, quyết định đã điền được giữ theo
+  `suggestion_id`, không bị mất.
+- cleanup_suggestions.md: tóm tắt số lượng, quy tắc và cách điền `decision`.
 Địa điểm đã bị loại (rejected) không được xét lại. Đề xuất không tự sửa gì trong DB.
 """
 
@@ -16,12 +18,13 @@ import argparse
 import csv
 import sys
 from collections import Counter
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from travel_agent.data.cleanup_suggestions import (
     CATEGORY_RULES,
     CSV_FIELDS,
+    DECISION_FIELD,
     KIND_CATEGORY,
     KIND_DUPLICATE,
     KIND_MISSING,
@@ -30,6 +33,8 @@ from travel_agent.data.cleanup_suggestions import (
     Suggestion,
     build_suggestions,
     count_by_kind,
+    merge_with_previous,
+    read_csv_rows,
 )
 from travel_agent.domain.models import Place
 from travel_agent.review.models import ReviewStatus
@@ -57,13 +62,19 @@ def load_active(db: Path) -> tuple[list[Place], dict[str, str]]:
     return places, statuses
 
 
-def write_csv(path: Path, rows: Sequence[Suggestion]) -> None:
+def write_csv(path: Path, rows: Sequence[Mapping[str, str]]) -> None:
     # utf-8-sig ghi BOM đầu file để Excel nhận đúng tiếng Việt.
     with path.open("w", encoding="utf-8-sig", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
         writer.writeheader()
-        for row in rows:
-            writer.writerow(row.as_row())
+        writer.writerows(rows)
+
+
+def read_previous(path: Path) -> list[dict[str, str]]:
+    """CSV lần trước (nếu có) để giữ quyết định đã điền. Thiếu file thì coi như chưa có gì."""
+    if not path.exists():
+        return []
+    return read_csv_rows(path)
 
 
 def write_md(
@@ -108,6 +119,21 @@ def write_md(
         f"- `{KIND_MISSING}`: trong {top_n} địa điểm nhiều lượt đánh giá nhất (thuộc tính"
         ' "Đánh giá"), thiếu giờ mở cửa hợp lệ hoặc thời lượng tham quan.',
         "",
+        "## Cách điền cột `decision` (trong CSV)",
+        "",
+        "- `ok`: áp dụng gợi ý. Với `duplicate`: loại địa điểm ở cột `place_id`, giữ"
+        " `other_place_id`. Với `category`: đổi loại sang `suggested_category`.",
+        "- `bo`: bỏ qua, không đổi gì.",
+        "- Để trống: chưa quyết định, không đổi gì.",
+        "- `giu:<place_id>` (chỉ dòng `duplicate`): chọn bản giữ. `place_id` phải là một trong"
+        " hai id của cặp (`place_id` hoặc `other_place_id`); bản còn lại bị loại.",
+        "- `missing_data` chỉ là thông tin, điền gì cũng không đổi. Sửa giờ mở cửa bằng"
+        " `travel-agent review` (có evidence).",
+        "- Không đổi tên cột hoặc thứ tự cột. Khi lưu lại từ Excel, chọn CSV UTF-8 để giữ tiếng"
+        " Việt.",
+        "- Quy trình: chạy `scripts/data/apply_cleanup.py` để xem trước (không ghi gì), rồi chạy"
+        " lại với `--apply` để áp dụng. Chạy lại không đổi thêm gì.",
+        "",
         "## Lưu ý",
         "",
         "- Trùng tên trong nhóm 3 địa điểm sẽ hiện thành 3 cặp; chỉ cần xử lý một lần.",
@@ -136,7 +162,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     rows = build_suggestions(places, statuses, top_n=args.top)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    write_csv(args.out_dir / CSV_NAME, rows)
+    csv_path = args.out_dir / CSV_NAME
+    previous = read_previous(csv_path)
+    merged = merge_with_previous(rows, previous)
+    write_csv(csv_path, merged)
+    decided = sum(1 for row in merged if row[DECISION_FIELD])
     write_md(
         args.out_dir / MD_NAME,
         rows,
@@ -148,6 +178,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     print(f"Địa điểm xét: {len(places)}")
     for kind, count in count_by_kind(rows).items():
         print(f"  {kind}: {count}")
+    print(f"Quyết định đã giữ từ lần trước: {decided}")
     print(f"Ghi {args.out_dir / CSV_NAME} và {args.out_dir / MD_NAME}")
     return EXIT_OK
 

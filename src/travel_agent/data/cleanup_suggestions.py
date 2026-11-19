@@ -12,10 +12,13 @@ hay ghi DB. Người duyệt xác nhận rồi mới sửa qua `travel-agent rev
 
 from __future__ import annotations
 
+import csv
+import hashlib
 import re
 import unicodedata
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
+from pathlib import Path
 
 from travel_agent.domain.models import Category, Place
 from travel_agent.domain.opening_hours import parse_opening_hours
@@ -280,7 +283,17 @@ def top_popular(places: Sequence[Place], n: int) -> list[Place]:
     return sorted(places, key=lambda p: (-popularity_score(p), p.id))[:n]
 
 
+# Cột người duyệt điền trong Excel. `suggestion_id` là khóa ổn định để giữ quyết định khi sinh lại.
+DECISION_FIELD = "decision"
+ID_FIELD = "suggestion_id"
+DECISION_OK = "ok"  # áp dụng gợi ý
+DECISION_SKIP = "bo"  # bỏ qua, không đổi gì
+DECISION_KEEP = "giu"  # chỉ với duplicate: giu:<place_id> chọn bản giữ
+ORPHAN_PREFIX = "[không còn trong lần sinh mới] "
+
 CSV_FIELDS = (
+    DECISION_FIELD,
+    ID_FIELD,
     "kind",
     "place_id",
     "name",
@@ -311,8 +324,90 @@ class Suggestion:
     reason: str = ""
     suggested_action: str = ""
 
-    def as_row(self) -> dict[str, str]:
-        return {key: str(value) for key, value in asdict(self).items()}
+    @property
+    def suggestion_id(self) -> str:
+        return make_suggestion_id(
+            self.kind, self.place_id, self.other_place_id, self.suggested_category
+        )
+
+    def as_row(self, decision: str = "") -> dict[str, str]:
+        row = {key: str(value) for key, value in asdict(self).items()}
+        return {DECISION_FIELD: decision, ID_FIELD: self.suggestion_id, **row}
+
+
+def make_suggestion_id(
+    kind: str, place_id: str, other_place_id: str, suggested_category: str
+) -> str:
+    """Mã ổn định của một gợi ý: băm kind + place_id + other_place_id/suggested_category.
+
+    Không dùng số thứ tự dòng vì thứ tự thay đổi mỗi lần sinh lại.
+    """
+    raw = "|".join((kind, place_id, other_place_id, suggested_category))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
+
+
+@dataclass(frozen=True)
+class Decision:
+    action: str  # "" (chưa quyết định), "ok", "bo" hoặc "giu"
+    keep_id: str = ""
+
+
+def parse_decision(raw: str | None) -> Decision:
+    """Đọc giá trị cột decision. Ném ValueError nếu không đúng định dạng."""
+    value = (raw or "").strip()
+    if not value:
+        return Decision("")
+    lowered = value.lower()
+    if lowered in (DECISION_OK, DECISION_SKIP):
+        return Decision(lowered)
+    prefix, sep, rest = value.partition(":")
+    if sep and prefix.strip().lower() in (DECISION_KEEP, "giữ"):
+        keep_id = rest.strip()
+        if not keep_id:
+            raise ValueError("giu: cần kèm place_id, ví dụ giu:huetripo:123")
+        return Decision(DECISION_KEEP, keep_id)
+    raise ValueError(
+        f"decision không hợp lệ: {value!r} (dùng ok, bo, giu:<place_id> hoặc để trống)"
+    )
+
+
+def read_csv_rows(path: Path) -> list[dict[str, str]]:
+    """Đọc CSV gợi ý (UTF-8, có hoặc không BOM)."""
+    with path.open(encoding="utf-8-sig", newline="") as handle:
+        return [dict(row) for row in csv.DictReader(handle)]
+
+
+def merge_with_previous(
+    rows: Sequence[Suggestion], previous: Sequence[Mapping[str, str]]
+) -> list[dict[str, str]]:
+    """Gộp gợi ý mới với quyết định đã điền trong CSV cũ, theo suggestion_id.
+
+    Dòng cũ có quyết định nhưng không còn gợi ý nào khớp được giữ lại ở cuối, có tiền tố
+    cảnh báo, để công việc của người duyệt không bị mất khi dữ liệu thay đổi.
+    """
+    decided: dict[str, Mapping[str, str]] = {}
+    for prev in previous:
+        if (prev.get(DECISION_FIELD) or "").strip() and prev.get(ID_FIELD):
+            decided[prev[ID_FIELD]] = prev
+
+    merged: list[dict[str, str]] = []
+    seen: set[str] = set()
+    for row in rows:
+        sid = row.suggestion_id
+        seen.add(sid)
+        match = decided.get(sid)
+        decision = "" if match is None else match.get(DECISION_FIELD, "").strip()
+        merged.append(row.as_row(decision=decision))
+
+    for sid, orphan in decided.items():
+        if sid in seen:
+            continue
+        kept = {field: orphan.get(field, "") for field in CSV_FIELDS}
+        reason = kept.get("reason", "")
+        if not reason.startswith(ORPHAN_PREFIX):
+            kept["reason"] = ORPHAN_PREFIX + reason
+        merged.append(kept)
+    return merged
 
 
 def build_suggestions(

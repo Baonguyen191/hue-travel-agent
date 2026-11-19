@@ -44,13 +44,15 @@ def test_write_csv_has_bom_header_and_vietnamese_text(tmp_path: Path) -> None:
         other_place_id="huetripo:2",
         suggested_action="gộp: giữ huetripo:2",
     )
-    suggest_cleanup.write_csv(path, [row])
+    suggest_cleanup.write_csv(path, [row.as_row()])
 
     raw = path.read_bytes()
     assert raw.startswith(b"\xef\xbb\xbf")
     with path.open(encoding="utf-8-sig", newline="") as handle:
         rows = list(csv.DictReader(handle))
     assert list(rows[0].keys()) == list(CSV_FIELDS)
+    assert rows[0]["decision"] == ""
+    assert len(rows[0]["suggestion_id"]) == 16
     assert rows[0]["name"] == "Chợ Đông Ba Huế"
     assert rows[0]["suggested_action"] == "gộp: giữ huetripo:2"
 

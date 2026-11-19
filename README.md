@@ -48,6 +48,39 @@ Xuất các địa điểm đã duyệt (đã áp override):
 travel-agent export-approved --db data\hue.sqlite --out data\hue_places_approved.jsonl
 ```
 
+### Dọn dữ liệu theo gợi ý
+
+1. Sinh lại danh sách gợi ý (chỉ đọc DB):
+
+   ```powershell
+   .venv\Scripts\python.exe scripts\data\suggest_cleanup.py
+   ```
+
+2. Mở `reports\data\cleanup_suggestions.csv` bằng Excel và điền cột `decision`: `ok` (áp dụng),
+   `bo` (bỏ qua), để trống (chưa quyết định). Dòng trùng có thể ghi `giu:<place_id>` để chọn bản
+   giữ. Chi tiết nằm trong `reports\data\cleanup_suggestions.md`.
+3. Xem trước những gì sẽ đổi (không ghi gì):
+
+   ```powershell
+   .venv\Scripts\python.exe scripts\datapply_cleanup.py
+   ```
+
+4. Áp dụng thật. Mỗi lần có thay đổi, file `reports\data\cleanup_applied_<thời gian>.json`
+   liệt kê từng thay đổi:
+
+   ```powershell
+   .venv\Scripts\python.exe scripts\datapply_cleanup.py --apply
+   ```
+
+5. Ghi lại DB cho DVC:
+
+   ```powershell
+   dvc add data\hue.sqlite
+   ```
+
+Sinh lại gợi ý không làm mất quyết định đã điền (giữ theo `suggestion_id`). Chạy `--apply` lần
+hai không đổi gì thêm.
+
 ## Thêm link nguồn dữ liệu
 
 Cũng trong server `review`, mở http://127.0.0.1:8765/links:

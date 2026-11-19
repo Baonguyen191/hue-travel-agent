@@ -1,253 +1,253 @@
-﻿kind,place_id,name,category,status,other_place_id,other_name,distance_m,suggested_category,matched_keyword,reason,suggested_action
-duplicate,huetripo:586446,Bánh Xèo Làng Chuồn - Ngọc Cẩm,restaurant,pending,huetripo:318963,Bánh Xèo Làng Chuồn,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:318963
-duplicate,huetripo:887713,Thành Cafe,cafe,pending,huetripo:761054,Thành Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:761054
-duplicate,huetripo:147458,Ốc Minh Nghĩa,restaurant,pending,huetripo:068881,Ốc Minh Nghĩa,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:068881
-duplicate,huetripo:273549,Đậu Hũ,restaurant,pending,huetripo:371056,Đậu hũ bên cạnh chùa Thiên Mụ,220,,,tên này nằm trong tên kia; cách 220 m; loại tương thích,gộp: giữ huetripo:371056
-duplicate,huetripo:273549,Đậu Hũ,restaurant,pending,huetripo:591521,Đậu hũ dưới chân chùa Thiên Mụ,220,,,tên này nằm trong tên kia; cách 220 m; loại tương thích,gộp: giữ huetripo:591521
-duplicate,huetripo:902006,Sayaka Huế,restaurant,pending,huetripo:664826,Sayaka Buffet - AEON MALL Huế,47,,,tên này nằm trong tên kia; cách 47 m; loại tương thích,gộp: giữ huetripo:664826
-duplicate,huetripo:906049,Quán Lâm Gân Kiệu,restaurant,pending,huetripo:448081,Lâm Gân Kiệu,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:448081
-duplicate,huetripo:763807,MEMOIRÉ,restaurant,pending,huetripo:967406,Cafe Memoire,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:967406
-duplicate,huetripo:458735,Mémoire Café,cafe,pending,huetripo:763807,MEMOIRÉ,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:763807
-duplicate,huetripo:082998,Quán Hương - Bèo nậm lọc,restaurant,pending,huetripo:647793,Quán Hương - Bèo Nậm Lọc Cung An Định Gia Truyền,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:647793
-duplicate,huetripo:338032,Ngọc Chè Bưởi,restaurant,pending,huetripo:992963,Ngọc chè bưởi,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:992963
-duplicate,huetripo:845788,Bún đậu Gia Di,restaurant,pending,huetripo:805249,Bún đậu Gia Di,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:805249
-duplicate,huetripo:600683,Đông Sương Sầu,restaurant,pending,huetripo:254894,Đông Sương Sầu,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:254894
-duplicate,huetripo:305138,Bánh ép 1992,restaurant,pending,huetripo:923978,Bánh ép 1992,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:923978
-duplicate,huetripo:443081,Bánh ướt Huyền Anh,restaurant,pending,huetripo:419353,Bánh ướt Huyền Anh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:419353
-duplicate,huetripo:532914,Bánh ép Trang,restaurant,pending,huetripo:614307,Bánh ép Trang,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:614307
-duplicate,huetripo:866416,Gà Trường Trinh,restaurant,pending,huetripo:472480,Gà Trường Trinh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:472480
-duplicate,huetripo:507442,Sóc Nâu,cafe,pending,huetripo:220797,Sóc Nâu,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:220797
-duplicate,huetripo:592826,Imperial Craft Bia Brewpub,restaurant,pending,huetripo:823524,Imperial Craft Bia Brewpub,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:823524
-duplicate,huetripo:768678,Quán Bà Tý bún thịt nướng và nem lụi,restaurant,pending,huetripo:340993,Quán Bà Tý - bún thịt nướng và nem lụi (cơ sở 2),0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:340993
-duplicate,huetripo:280633,Góc Phố,restaurant,pending,huetripo:151554,Nhà hàng Góc Phố,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:151554
-duplicate,huetripo:133158,Quán Bánh bà Chi xứ Huế,restaurant,pending,huetripo:984952,Quán bánh bà chi,72,,,tên này nằm trong tên kia; cách 72 m; loại tương thích,gộp: giữ huetripo:984952
-duplicate,huetripo:166550,Nhà hàng Phở Sài Gòn,restaurant,pending,huetripo:557925,Phở Sài Gòn,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:557925
-duplicate,huetripo:323780,Phở Sài Gòn - Nguyễn Văn Cừ,restaurant,pending,huetripo:557925,Phở Sài Gòn,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:557925
-duplicate,huetripo:883824,Quán bánh Chi,restaurant,pending,huetripo:160991,Quán bánh Chi,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:160991
-duplicate,huetripo:562945,Nhà hàng Huế Cổ,restaurant,pending,huetripo:717324,Nhà hàng Huế cổ,24,,,tên giống nhau sau chuẩn hóa; cách 24 m; loại tương thích,gộp: giữ huetripo:717324
-duplicate,huetripo:805020,THE THAI CUISINE,restaurant,pending,huetripo:952369,The Thai Cuisine Huế,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:952369
-duplicate,huetripo:497653,Bánh ép Gia Di,restaurant,pending,huetripo:075622,Bánh ép Gia Di,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:075622
-duplicate,huetripo:226279,Nhà hàng chay Tịnh Quán,restaurant,pending,huetripo:170220,Nhà hàng chay Tịnh Quán,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:170220
-duplicate,huetripo:740304,Cao Lẩu Vườn,restaurant,pending,huetripo:714590,Đặc sản dê - Cao lầu vườn,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:714590
-duplicate,huetripo:850239,Nhà hàng Mặt trời mới - Cơm niêu gia đình,restaurant,pending,huetripo:572796,Cơm niêu Gia Đình,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:572796
-duplicate,huetripo:355218,Bún bò Huế Bà Gái,restaurant,pending,huetripo:575981,Bún bò bà Gái,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:575981
-duplicate,huetripo:514529,Nhà cũ Bistro,cafe,pending,huetripo:238093,Nhà Cũ Bistro,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:238093
-duplicate,huetripo:183847,Kida - Phở bát đá Huế,restaurant,pending,huetripo:683382,Kida - Phở bát đá Huế,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:683382
-duplicate,huetripo:091689,Bánh canh cua rời chị Nga,restaurant,pending,huetripo:758778,Bánh canh cua rời,8,,,tên này nằm trong tên kia; cách 8 m; loại tương thích,gộp: giữ huetripo:758778
-duplicate,huetripo:855005,Quán Nga (bánh canh cua rời),restaurant,pending,huetripo:758778,Bánh canh cua rời,8,,,tên này nằm trong tên kia; cách 8 m; loại tương thích,gộp: giữ huetripo:758778
-duplicate,huetripo:523406,Lẩu Phố,restaurant,pending,huetripo:170056,Lẩu Phố,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:170056
-duplicate,huetripo:970953,Bánh canh Nam Phổ,restaurant,pending,huetripo:763349,Bánh Canh Nam Phổ + Bèo Nậm Lọc - Quán Hằng,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:763349
-duplicate,huetripo:702640,Bánh canh Nam Phổ Thuý,restaurant,pending,huetripo:970953,Bánh canh Nam Phổ,64,,,tên này nằm trong tên kia; cách 64 m; loại tương thích,gộp: giữ huetripo:970953
-duplicate,huetripo:963244,Chè Hẻm,restaurant,pending,huetripo:811386,Chè Hẻm,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:811386
-duplicate,huetripo:254769,Nhà hàng Hoa Sơn Quán,restaurant,pending,huetripo:878742,Nhà hàng Hoa Sơn Quán,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:878742
-duplicate,huetripo:000288,Bánh Mì Trường Tiền O Tho,restaurant,pending,huetripo:635199,Bánh mì Trường Tiền O Tho,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:635199
-duplicate,huetripo:100630,Nhà hàng Hi Boss,restaurant,pending,huetripo:804382,Nhà hàng Hi Boss,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:804382
-duplicate,huetripo:921633,Nhà Cám - Bún đậu mắm tôm,restaurant,pending,huetripo:877039,NHÀ CÁM (Bún đậu mắm tôm - Cơm Tấm),25,,,tên này nằm trong tên kia; cách 25 m; loại tương thích,gộp: giữ huetripo:877039
-duplicate,huetripo:785307,Green House Coffee,cafe,pending,huetripo:799023,Green house coffee - tea & food,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:799023
-duplicate,huetripo:890351,Quán Hạnh bánh khoái - nem lụi,restaurant,pending,huetripo:231374,Quán Hạnh,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:231374
-duplicate,huetripo:017950,Quán bánh bà Chi,restaurant,pending,huetripo:691469,Quán bánh bà Chi,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:691469
-duplicate,huetripo:919464,Cửu Đỉnh,historic,pending,huetripo:162001,Cửu Đỉnh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:162001
-duplicate,huetripo:663942,Quảng trường Ngọ Môn,historic,pending,huetripo:472680,Ngọ Môn,91,,,tên này nằm trong tên kia; cách 91 m; loại tương thích,gộp: giữ huetripo:472680
-duplicate,huetripo:116754,Cơm Âm phủ,restaurant,pending,huetripo:260182,Cơm Âm Phủ,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:260182
-duplicate,huetripo:843941,Quán Cơm Âm Phủ,restaurant,pending,huetripo:260182,Cơm Âm Phủ,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:260182
-duplicate,huetripo:843941,Quán Cơm Âm Phủ,restaurant,pending,huetripo:116754,Cơm Âm phủ,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:116754
-duplicate,huetripo:391295,Tà Vẹt,restaurant,pending,huetripo:390853,Nhà hàng Kinh Đô 3 - Tà Vẹt,16,,,tên này nằm trong tên kia; cách 16 m; loại tương thích,gộp: giữ huetripo:390853
-duplicate,huetripo:684471,Đèn dầu beer,restaurant,pending,huetripo:680689,Đèn Dầu beer,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:680689
-duplicate,huetripo:844513,Chè Mợ Tôn Đích,restaurant,pending,huetripo:743905,Chè Mợ Tôn Đích,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:743905
-duplicate,huetripo:894312,Madam Thu Huế,restaurant,pending,huetripo:239441,Madam Thu 2,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:239441
-duplicate,huetripo:239441,Madam Thu 2,restaurant,pending,huetripo:523614,Madam Thu 2,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:523614
-duplicate,huetripo:894312,Madam Thu Huế,restaurant,pending,huetripo:523614,Madam Thu 2,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:523614
-duplicate,huetripo:894312,Madam Thu Huế,restaurant,pending,huetripo:090955,Nhà hàng Madam Thu,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:090955
-duplicate,huetripo:212922,Takoyaki Hotto - Cửa Thượng Tứ,cafe,pending,huetripo:204705,Takoyaki Hotto,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:204705
-duplicate,huetripo:031179,Why Not? Bar,restaurant,pending,huetripo:365393,Why Not? Bar - Restaurant,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:365393
-duplicate,huetripo:661968,Chè Kinh Đô,restaurant,pending,huetripo:404132,Chè Kinh Đô Huế,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:404132
-duplicate,huetripo:605161,Nhà hàng Phước Thạnh,restaurant,pending,huetripo:171371,Nhà hàng Phước Thạnh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:171371
-duplicate,huetripo:952596,Quán 36,restaurant,pending,huetripo:403419,Quán 36,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:403419
-duplicate,huetripo:530642,Chè Ngọc Hiền,restaurant,pending,huetripo:117679,Chè Ngọc Hiền,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:117679
-duplicate,huetripo:553779,Điện Cần Chánh,historic,pending,huetripo:267265,Điện Cần Chánh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:267265
-duplicate,huetripo:466598,Hàng Me (Mẹ),restaurant,pending,huetripo:212233,Hàng Me Mẹ,230,,,tên giống nhau sau chuẩn hóa; cách 230 m; loại tương thích,gộp: giữ huetripo:212233
-duplicate,huetripo:093299,Tịnh Tâm Vegan,restaurant,pending,huetripo:142479,Tịnh Tâm Vegan,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:142479
-duplicate,huetripo:141042,Vị Huế Restaurant & Café,restaurant,pending,huetripo:884925,Vị Huế Restaurant & Café,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:884925
-duplicate,huetripo:941923,Cà Phê Muối,restaurant,pending,huetripo:254866,Cà Phê Muối Huế,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:254866
-duplicate,huetripo:278383,Ốc Đảo Quán - cơ sở 1,restaurant,pending,huetripo:648664,Ốc Đảo,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:648664
-duplicate,huetripo:141103,Ốc đảo quán,restaurant,pending,huetripo:648664,Ốc Đảo,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:648664
-duplicate,huetripo:141103,Ốc đảo quán,restaurant,pending,huetripo:278383,Ốc Đảo Quán - cơ sở 1,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:278383
-duplicate,huetripo:759007,Chợ Đông Ba Huế,market,pending,huetripo:193028,Chợ Đông Ba,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:193028
-duplicate,huetripo:995229,Hải Triều Quán,restaurant,pending,huetripo:881937,Hải Triều Quán,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:881937
-duplicate,huetripo:723283,Tịnh Gia Viên,restaurant,pending,huetripo:155427,Nhà hàng Tịnh Gia Viên,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:155427
-duplicate,huetripo:973110,Đề-Pô Café,cafe,pending,huetripo:872148,Đề-Pô Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:872148
-duplicate,huetripo:191196,CODO COFFEE,cafe,pending,huetripo:462334,CODO Coffee,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:462334
-duplicate,huetripo:593425,Bún Giấm Nuốc,restaurant,pending,huetripo:507856,Bún giấm nuốc,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:507856
-duplicate,huetripo:991055,Góc cũ Cafe,cafe,pending,huetripo:476837,Gốc Cũ Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:476837
-duplicate,huetripo:494972,Nhà hàng Cung Đình,restaurant,pending,huetripo:841309,Nhà hàng Cung Đình,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:841309
-duplicate,huetripo:869017,Chuồn Chuồn Cafe,cafe,pending,huetripo:164496,Chuồn Chuồn Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:164496
-duplicate,huetripo:890433,Cà phê MR KEN,cafe,pending,huetripo:609313,Mr. Ken,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:609313
-duplicate,huetripo:213010,GIAO cafe,cafe,pending,huetripo:039998,Giao Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:039998
-duplicate,huetripo:973741,Han Cafe,cafe,pending,huetripo:002139,Han Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:002139
-duplicate,huetripo:821476,Nhà hàng Cảng,restaurant,pending,huetripo:985715,Nhà hàng Cảng,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:985715
-duplicate,huetripo:595901,Cafe Mai Uyển,cafe,pending,huetripo:581505,Cafe Mai Uyển,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:581505
-duplicate,huetripo:934505,Quán lẩu bò Hương Đồng,restaurant,pending,huetripo:384354,Lẩu bò Hương Đồng,11,,,tên này nằm trong tên kia; cách 11 m; loại tương thích,gộp: giữ huetripo:384354
-duplicate,huetripo:725223,An Nhiên Garden Vegetarian,restaurant,pending,huetripo:108710,An Nhien Garden Vegetarian - Nhà Hàng & Café,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:108710
-duplicate,huetripo:750122,Quán ăn tại chợ Làng Chuồn,restaurant,pending,huetripo:683777,Làng Chuồn,265,,,tên này nằm trong tên kia; cách 265 m; loại tương thích,gộp: giữ huetripo:683777
-duplicate,huetripo:197701,Làng Cổ Phước Tích,historic,pending,huetripo:931460,Điểm du lịch làng cổ Phước Tích,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:931460
-category,huetripo:727727,75A COFFEE,restaurant,pending,,,,cafe,coffee,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:025890,75Dope CAFE,restaurant,pending,,,,cafe,cafe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:753251,Biển Chân Mây,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:102632,Biển Cảnh Dương,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:295729,Biển Hàm Rồng,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:069755,Biển Hải Dương,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:874437,Biển Lăng Cô,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:928216,Biển Lộc Bình,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:891750,Biển Thuận An,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:120006,Biển Tân An,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:979341,Biển Tân Cảnh Dương,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:175153,Biển Tân Mỹ,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:779954,Biển Vinh Hiền,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:267413,Biển Vinh Hải,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:177693,Biển Vinh Thanh,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:427043,Biển Đông Dương,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:718272,Bạch Mã Village - Thác trượt Bạch Mã,attraction,pending,,,,park,thac,thác nước nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:555641,Bến Thuyền Đầm Thủy Tú Tam Giang,attraction,pending,,,,park,dam,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:581505,Cafe Mai Uyển,restaurant,pending,,,,cafe,cafe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:586343,Cafe Ý Lan,restaurant,pending,,,,cafe,cafe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:941923,Cà Phê Muối,restaurant,pending,,,,cafe,ca phe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:087975,Cà phê Thảo Uyên,restaurant,pending,,,,cafe,ca phe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:747024,Cầu An Cựu,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:214688,Cầu An Hòa,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:971622,Cầu Bán Nguyệt,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:851447,Cầu Chợ Dinh,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:003939,Cầu Dã Viên,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:405741,Cầu Kho Rèn,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:285771,Cầu Phú Xuân,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:664215,Cầu Trường Tiền,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:237950,Cầu Vỹ Dạ,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:563167,Cầu gỗ lim,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:948370,Cầu Đập Đá,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:928795,Cửa biển Tư Hiền,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:156781,Cửa hàng bánh kẹo Thiên Thịnh,market,pending,,,,,cua hang,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
-category,huetripo:721123,Hồ Khe Ngang,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:503060,Hồ Thái Dịch,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:497038,Hồ Thủy Tiên,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:906247,Hồ Truồi,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:799743,Hồ Trái Tim,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:588373,Hồ Tân Miếu,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:463976,Hồ Võ Sanh,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:970786,Hồ Xã Tắc,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:728551,Khu Du Lịch Sinh Thái Thác Bồ Ghè,attraction,pending,,,,park,thac,thác nước nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:189429,Kẹo Đậu phộng Thiên Thanh Hoàng,market,pending,,,,,keo,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
-category,huetripo:881100,Ngũ Hồ (Vườn Quốc gia Bạch Mã),attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:473604,Núi Bạch Mã - Vườn quốc gia Bạch Mã,attraction,pending,,,,viewpoint,núi,đồi hoặc núi nhưng xếp vào điểm tham quan,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:578450,OHLALA COFFEE & MILKTEA,restaurant,pending,,,,cafe,coffee,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:282608,Phá Tam Giang,attraction,pending,,,,park,pha,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:000289,Siêu thị Coop Mart Huế,market,pending,,,,,sieu thi,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
-category,huetripo:778466,Siêu thị GO! Huế,market,pending,,,,,sieu thi,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
-category,huetripo:718015,Thác Mơ,attraction,pending,,,,park,thac,thác nước nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:510748,Thác Nhị Hồ,attraction,pending,,,,park,thac,thác nước nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:124347,Tiệm CAMAY - Cà phê & Bánh ép,restaurant,pending,,,,cafe,ca phe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:803515,Tách Coffee & Beer,restaurant,pending,,,,cafe,coffee,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:489415,Vincom Plaza Huế,market,pending,,,,,vincom,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
-category,huetripo:586190,Á Ha Cafe,restaurant,pending,,,,cafe,cafe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
-category,huetripo:395933,Đầm An Cư (Lập An),attraction,pending,,,,park,dam,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:678782,Đầm Chuồn,attraction,pending,,,,park,dam,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:922167,Đầm phá Cầu Hai,attraction,pending,,,,park,pha,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
-category,huetripo:390308,Đặc sản Cung đình Thiên Hương,market,pending,,,,,dac san,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
-category,huetripo:309856,Đặc sản Miền Trung Thiên Phú,market,pending,,,,,dac san,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
-category,huetripo:178851,Đặc sản Thiên Phú,market,pending,,,,,dac san,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
-category,huetripo:192068,Đồi Thiên An,attraction,pending,,,,viewpoint,đồi,đồi hoặc núi nhưng xếp vào điểm tham quan,đổi loại thành viewpoint nếu xác nhận
-category,huetripo:496391,Đồi Vọng Cảnh,attraction,pending,,,,viewpoint,đồi,đồi hoặc núi nhưng xếp vào điểm tham quan,đổi loại thành viewpoint nếu xác nhận
-missing_data,huetripo:615115,Nhà hàng Maison Trang,restaurant,pending,,,,,,thiếu thời lượng tham quan; 4334 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:876531,Nook Eatery,restaurant,pending,,,,,,thiếu thời lượng tham quan; 4407 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:231374,Quán Hạnh,restaurant,pending,,,,,,thiếu thời lượng tham quan; 4053 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:352234,Jollibee Vincom Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 3489 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:173018,Nina's Café,cafe,pending,,,,,,thiếu thời lượng tham quan; 3325 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:768910,Nhà hàng Nhật Bản Shinosushi,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2868 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:759007,Chợ Đông Ba Huế,market,pending,,,,,,thiếu thời lượng tham quan; 3311 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:467517,Nhà hàng Shino,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2805 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:535174,Nhà hàng DMZ,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 3109 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:719204,DMZ Bar & Restaurant,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 3109 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:811386,Chè Hẻm,restaurant,pending,,,,,,thiếu thời lượng tham quan; 3405 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:422641,Nhà hàng Nhật Bản Shino Sushi,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2754 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:588308,Nhà hàng chay Tĩnh,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2737 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:937980,Bún Bò Huế Sen,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2809 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:239441,Madam Thu 2,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2618 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:090955,Nhà hàng Madam Thu,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2412 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:523614,Madam Thu 2,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2412 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:304452,Cozy Restaurant (Hue),restaurant,pending,,,,,,thiếu thời lượng tham quan; 2347 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:193173,Nhà hàng cơm niêu Khải Hoàn,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2388 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:499390,Nhà hàng Hannam,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2215 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:141042,Vị Huế Restaurant & Café,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 2199 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:422267,Cơm hến Hoa Đông,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2360 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:100418,Nhà hàng Zucca,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2083 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:538043,Nhà hàng Vỹ Dạ Xưa,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 2083 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:713931,Jollibee Nguyễn Trãi,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1901 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:263921,Nhà hàng hải sản Bé Thân,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2269 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:207754,Nhà hàng Bánh Gánh,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1887 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:023678,Dookki AEON MALL Huế,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1779 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:497653,Bánh ép Gia Di,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1915 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:995000,La Carambole Bistro,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1823 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:840197,Jollibee AEON MALL Huế,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1733 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:559187,Nhà hàng Vườn Khế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1814 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:260047,Jollibee Nguyễn Huệ,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1748 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:854427,Pizza Hut Go! Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1662 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:955959,Món ăn đặc sản Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1662 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:391295,Tà Vẹt,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1740 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:756222,Eco Restaurant,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1580 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:629151,Pizza Hut Signature - AEON MALL Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1494 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:001615,Củi Café,cafe,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1521 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:419353,Bánh ướt Huyền Anh,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1646 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:335433,Donald Trung - Bánh Ướt & Bánh Cuốn Thịt Heo,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1599 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:202079,Texas Chicken AEON Mall Huế,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1438 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:592826,Imperial Craft Bia Brewpub,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1433 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:823524,Imperial Craft Bia Brewpub,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1433 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:693049,The Chàm Craft Beer and Whisky,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1390 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:575981,Bún bò bà Gái,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1774 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:075140,Nhà hàng Bà Đỏ,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1688 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:877003,Bánh bèo - nậm - lọc Bà Đỏ,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1675 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:726072,Nhà hàng Yaki Yum,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1388 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:481321,Nhà hàng - Huong Giang Hotel Resort & Spa,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1627 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:635199,Bánh mì Trường Tiền O Tho,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1512 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:281424,Nhà hàng KSND Laguna Lăng Cô,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1377 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:272476,Nhà hàng La Brasserie (Indochine Palace),restaurant,pending,,,,,,thiếu thời lượng tham quan; 1420 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:151048,WooDong AEON MALL Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1399 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:755242,Nhà hàng cơm niêu Chạn,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1354 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:743905,Chè Mợ Tôn Đích,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1545 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:757632,Nhà hàng Little Italy,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1416 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:684212,Secret Lounge Hue,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1144 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:297664,Dookki Vincom Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1104 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:667763,Túc Tắc Tea - Lý Thường Kiệt,cafe,pending,,,,,,thiếu thời lượng tham quan; 1036 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:953253,Cafe on Thu Wheels,cafe,pending,,,,,,thiếu thời lượng tham quan; 1038 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:532914,Bánh ép Trang,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1030 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:410479,Quán Hít hà,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1000 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:392012,Izakaya TAKA,restaurant,pending,,,,,,thiếu thời lượng tham quan; 947 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:374894,Nhà hàng Lạc Thiện,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1110 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:075442,Nhà hàng Hot Tuna,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1062 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:173250,Nhà hàng cơm niêu Huế - Mâm,restaurant,pending,,,,,,thiếu thời lượng tham quan; 950 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:254866,Cà Phê Muối Huế,cafe,pending,,,,,,thiếu thời lượng tham quan; 1174 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:545138,1984 Coffee - Pub - Restaurant,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 908 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:614307,Bánh ép Trang,restaurant,pending,,,,,,thiếu thời lượng tham quan; 961 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:495931,Quán cơm chị Tẹo,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1122 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:538250,Hít Hà - Thế Giới Đồ Cuốn,restaurant,pending,,,,,,thiếu thời lượng tham quan; 910 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:779162,Cơm Niêu Bánh Gánh 2,restaurant,pending,,,,,,thiếu thời lượng tham quan; 876 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:102876,Quán ăn An Tâm,restaurant,pending,,,,,,thiếu thời lượng tham quan; 891 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:878742,Nhà hàng Hoa Sơn Quán,restaurant,pending,,,,,,thiếu thời lượng tham quan; 924 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:102328,AURA - Mixology & Karaoke,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 867 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:721094,Le Cercle Hue,restaurant,pending,,,,,,thiếu thời lượng tham quan; 864 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:984952,Quán bánh bà chi,restaurant,pending,,,,,,thiếu thời lượng tham quan; 938 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:892296,BreadTalk AEON MALL Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 813 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:494945,Happy Bar,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 822 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:242493,Nhà hàng hải sản Làng Chài Lăng Cô,restaurant,pending,,,,,,thiếu thời lượng tham quan; 986 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:568297,Bếp Thị,restaurant,pending,,,,,,thiếu thời lượng tham quan; 836 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:248768,Nhà hàng Family Home Cafe & Restaurant,restaurant,pending,,,,,,thiếu thời lượng tham quan; 823 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:108710,An Nhien Garden Vegetarian - Nhà Hàng & Café,restaurant,pending,,,,,,thiếu thời lượng tham quan; 781 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:596425,An Nhiên Garden – Nhà Hàng Chay & Cafe,restaurant,pending,,,,,,thiếu thời lượng tham quan; 781 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:008789,PhinHolic,cafe,pending,,,,,,thiếu thời lượng tham quan; 853 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:725223,An Nhiên Garden Vegetarian,restaurant,pending,,,,,,thiếu thời lượng tham quan; 774 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:469927,Bánh canh cua Hương,restaurant,pending,,,,,,thiếu thời lượng tham quan; 884 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:912311,Quán chay Thanh Liễu,restaurant,pending,,,,,,thiếu thời lượng tham quan; 840 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:696531,Cơm Niêu - Nhà Hàng SALA,restaurant,pending,,,,,,thiếu thời lượng tham quan; 791 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:091004,Chaleng Thai Food,restaurant,pending,,,,,,thiếu thời lượng tham quan; 748 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:841309,Nhà hàng Cung Đình,restaurant,pending,,,,,,thiếu thời lượng tham quan; 874 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:160991,Quán bánh Chi,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 845 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:822662,La Paix Bistro,restaurant,pending,,,,,,thiếu thời lượng tham quan; 751 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:784908,HP3 BBQ - AEON MALL Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 739 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
-missing_data,huetripo:127875,Mingle-Vegetarian-Cafe-Restaurant,cafe,pending,,,,,,thiếu thời lượng tham quan; 731 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+﻿decision,suggestion_id,kind,place_id,name,category,status,other_place_id,other_name,distance_m,suggested_category,matched_keyword,reason,suggested_action
+,6b0b878bfe8c99a3,duplicate,huetripo:586446,Bánh Xèo Làng Chuồn - Ngọc Cẩm,restaurant,pending,huetripo:318963,Bánh Xèo Làng Chuồn,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:318963
+,7bf9d09b81766069,duplicate,huetripo:887713,Thành Cafe,cafe,pending,huetripo:761054,Thành Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:761054
+,3d1df43f65f1145d,duplicate,huetripo:147458,Ốc Minh Nghĩa,restaurant,pending,huetripo:068881,Ốc Minh Nghĩa,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:068881
+,254f5ff7ccf50af5,duplicate,huetripo:273549,Đậu Hũ,restaurant,pending,huetripo:371056,Đậu hũ bên cạnh chùa Thiên Mụ,220,,,tên này nằm trong tên kia; cách 220 m; loại tương thích,gộp: giữ huetripo:371056
+,3e206f55c15d6f39,duplicate,huetripo:273549,Đậu Hũ,restaurant,pending,huetripo:591521,Đậu hũ dưới chân chùa Thiên Mụ,220,,,tên này nằm trong tên kia; cách 220 m; loại tương thích,gộp: giữ huetripo:591521
+,ed70b0aa7ed2aa73,duplicate,huetripo:902006,Sayaka Huế,restaurant,pending,huetripo:664826,Sayaka Buffet - AEON MALL Huế,47,,,tên này nằm trong tên kia; cách 47 m; loại tương thích,gộp: giữ huetripo:664826
+,a01161c235e5ab44,duplicate,huetripo:906049,Quán Lâm Gân Kiệu,restaurant,pending,huetripo:448081,Lâm Gân Kiệu,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:448081
+,5c5057e58f5d8427,duplicate,huetripo:763807,MEMOIRÉ,restaurant,pending,huetripo:967406,Cafe Memoire,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:967406
+,f2c6b3dab7415ab5,duplicate,huetripo:458735,Mémoire Café,cafe,pending,huetripo:763807,MEMOIRÉ,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:763807
+,6abeb7c63c17ece1,duplicate,huetripo:082998,Quán Hương - Bèo nậm lọc,restaurant,pending,huetripo:647793,Quán Hương - Bèo Nậm Lọc Cung An Định Gia Truyền,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:647793
+,130a37204f47a844,duplicate,huetripo:338032,Ngọc Chè Bưởi,restaurant,pending,huetripo:992963,Ngọc chè bưởi,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:992963
+,e69592e380cd9362,duplicate,huetripo:845788,Bún đậu Gia Di,restaurant,pending,huetripo:805249,Bún đậu Gia Di,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:805249
+,e8abdea66d931d0d,duplicate,huetripo:600683,Đông Sương Sầu,restaurant,pending,huetripo:254894,Đông Sương Sầu,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:254894
+,041466d568dbb641,duplicate,huetripo:305138,Bánh ép 1992,restaurant,pending,huetripo:923978,Bánh ép 1992,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:923978
+,277f6bfdcb1c0901,duplicate,huetripo:443081,Bánh ướt Huyền Anh,restaurant,pending,huetripo:419353,Bánh ướt Huyền Anh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:419353
+,3f489d5d84200f13,duplicate,huetripo:532914,Bánh ép Trang,restaurant,pending,huetripo:614307,Bánh ép Trang,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:614307
+,b44f06df7fe11151,duplicate,huetripo:866416,Gà Trường Trinh,restaurant,pending,huetripo:472480,Gà Trường Trinh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:472480
+,8ca9449fb1d3f79c,duplicate,huetripo:507442,Sóc Nâu,cafe,pending,huetripo:220797,Sóc Nâu,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:220797
+,b53d624a8eb5a973,duplicate,huetripo:592826,Imperial Craft Bia Brewpub,restaurant,pending,huetripo:823524,Imperial Craft Bia Brewpub,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:823524
+,8fd730368f3454ab,duplicate,huetripo:768678,Quán Bà Tý bún thịt nướng và nem lụi,restaurant,pending,huetripo:340993,Quán Bà Tý - bún thịt nướng và nem lụi (cơ sở 2),0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:340993
+,fb71126d1d625acb,duplicate,huetripo:280633,Góc Phố,restaurant,pending,huetripo:151554,Nhà hàng Góc Phố,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:151554
+,acd1f92c2a154a2b,duplicate,huetripo:133158,Quán Bánh bà Chi xứ Huế,restaurant,pending,huetripo:984952,Quán bánh bà chi,72,,,tên này nằm trong tên kia; cách 72 m; loại tương thích,gộp: giữ huetripo:984952
+,d9b188f52294ad4f,duplicate,huetripo:166550,Nhà hàng Phở Sài Gòn,restaurant,pending,huetripo:557925,Phở Sài Gòn,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:557925
+,976ed88ff0b283c9,duplicate,huetripo:323780,Phở Sài Gòn - Nguyễn Văn Cừ,restaurant,pending,huetripo:557925,Phở Sài Gòn,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:557925
+,2625bfe637fe1fab,duplicate,huetripo:883824,Quán bánh Chi,restaurant,pending,huetripo:160991,Quán bánh Chi,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:160991
+,2567548bd258aa6e,duplicate,huetripo:562945,Nhà hàng Huế Cổ,restaurant,pending,huetripo:717324,Nhà hàng Huế cổ,24,,,tên giống nhau sau chuẩn hóa; cách 24 m; loại tương thích,gộp: giữ huetripo:717324
+,82476859f03abbc6,duplicate,huetripo:805020,THE THAI CUISINE,restaurant,pending,huetripo:952369,The Thai Cuisine Huế,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:952369
+,2580384f0d1b0698,duplicate,huetripo:497653,Bánh ép Gia Di,restaurant,pending,huetripo:075622,Bánh ép Gia Di,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:075622
+,fc75118d901d1395,duplicate,huetripo:226279,Nhà hàng chay Tịnh Quán,restaurant,pending,huetripo:170220,Nhà hàng chay Tịnh Quán,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:170220
+,005bbb7b4565d248,duplicate,huetripo:740304,Cao Lẩu Vườn,restaurant,pending,huetripo:714590,Đặc sản dê - Cao lầu vườn,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:714590
+,81e5b70b72b834d4,duplicate,huetripo:850239,Nhà hàng Mặt trời mới - Cơm niêu gia đình,restaurant,pending,huetripo:572796,Cơm niêu Gia Đình,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:572796
+,f8d3ef61b6c99a10,duplicate,huetripo:355218,Bún bò Huế Bà Gái,restaurant,pending,huetripo:575981,Bún bò bà Gái,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:575981
+,49c504a134fa550f,duplicate,huetripo:514529,Nhà cũ Bistro,cafe,pending,huetripo:238093,Nhà Cũ Bistro,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:238093
+,d126e23a7b438b57,duplicate,huetripo:183847,Kida - Phở bát đá Huế,restaurant,pending,huetripo:683382,Kida - Phở bát đá Huế,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:683382
+,4458407e55c7a75f,duplicate,huetripo:091689,Bánh canh cua rời chị Nga,restaurant,pending,huetripo:758778,Bánh canh cua rời,8,,,tên này nằm trong tên kia; cách 8 m; loại tương thích,gộp: giữ huetripo:758778
+,078dc0d2319c58bc,duplicate,huetripo:855005,Quán Nga (bánh canh cua rời),restaurant,pending,huetripo:758778,Bánh canh cua rời,8,,,tên này nằm trong tên kia; cách 8 m; loại tương thích,gộp: giữ huetripo:758778
+,a4d6cc53a5dfc331,duplicate,huetripo:523406,Lẩu Phố,restaurant,pending,huetripo:170056,Lẩu Phố,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:170056
+,db5217fa1264fe95,duplicate,huetripo:970953,Bánh canh Nam Phổ,restaurant,pending,huetripo:763349,Bánh Canh Nam Phổ + Bèo Nậm Lọc - Quán Hằng,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:763349
+,a3340bab2c0eb43f,duplicate,huetripo:702640,Bánh canh Nam Phổ Thuý,restaurant,pending,huetripo:970953,Bánh canh Nam Phổ,64,,,tên này nằm trong tên kia; cách 64 m; loại tương thích,gộp: giữ huetripo:970953
+,8bfd563e2476c50e,duplicate,huetripo:963244,Chè Hẻm,restaurant,pending,huetripo:811386,Chè Hẻm,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:811386
+,31a5e0fb79bb6cc8,duplicate,huetripo:254769,Nhà hàng Hoa Sơn Quán,restaurant,pending,huetripo:878742,Nhà hàng Hoa Sơn Quán,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:878742
+,b64239cd883e4473,duplicate,huetripo:000288,Bánh Mì Trường Tiền O Tho,restaurant,pending,huetripo:635199,Bánh mì Trường Tiền O Tho,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:635199
+,189827dc0cc9e929,duplicate,huetripo:100630,Nhà hàng Hi Boss,restaurant,pending,huetripo:804382,Nhà hàng Hi Boss,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:804382
+,7418c3973f0ca822,duplicate,huetripo:921633,Nhà Cám - Bún đậu mắm tôm,restaurant,pending,huetripo:877039,NHÀ CÁM (Bún đậu mắm tôm - Cơm Tấm),25,,,tên này nằm trong tên kia; cách 25 m; loại tương thích,gộp: giữ huetripo:877039
+,883797fe4e5cf974,duplicate,huetripo:785307,Green House Coffee,cafe,pending,huetripo:799023,Green house coffee - tea & food,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:799023
+,8e315c0be9e739f1,duplicate,huetripo:890351,Quán Hạnh bánh khoái - nem lụi,restaurant,pending,huetripo:231374,Quán Hạnh,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:231374
+,21c11d6a157ca094,duplicate,huetripo:017950,Quán bánh bà Chi,restaurant,pending,huetripo:691469,Quán bánh bà Chi,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:691469
+,7777ec93c5393035,duplicate,huetripo:919464,Cửu Đỉnh,historic,pending,huetripo:162001,Cửu Đỉnh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:162001
+,fa98e533c2994eba,duplicate,huetripo:663942,Quảng trường Ngọ Môn,historic,pending,huetripo:472680,Ngọ Môn,91,,,tên này nằm trong tên kia; cách 91 m; loại tương thích,gộp: giữ huetripo:472680
+,1d2fc137aec5283e,duplicate,huetripo:116754,Cơm Âm phủ,restaurant,pending,huetripo:260182,Cơm Âm Phủ,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:260182
+,ac93f717548e23a7,duplicate,huetripo:843941,Quán Cơm Âm Phủ,restaurant,pending,huetripo:260182,Cơm Âm Phủ,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:260182
+,ecaf89b3086ff842,duplicate,huetripo:843941,Quán Cơm Âm Phủ,restaurant,pending,huetripo:116754,Cơm Âm phủ,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:116754
+,81f770ca13c85ac4,duplicate,huetripo:391295,Tà Vẹt,restaurant,pending,huetripo:390853,Nhà hàng Kinh Đô 3 - Tà Vẹt,16,,,tên này nằm trong tên kia; cách 16 m; loại tương thích,gộp: giữ huetripo:390853
+,5c82eb27ef23244d,duplicate,huetripo:684471,Đèn dầu beer,restaurant,pending,huetripo:680689,Đèn Dầu beer,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:680689
+,fe36f6add005de99,duplicate,huetripo:844513,Chè Mợ Tôn Đích,restaurant,pending,huetripo:743905,Chè Mợ Tôn Đích,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:743905
+,374bfe2251208e9d,duplicate,huetripo:894312,Madam Thu Huế,restaurant,pending,huetripo:239441,Madam Thu 2,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:239441
+,66210e65892ef37f,duplicate,huetripo:239441,Madam Thu 2,restaurant,pending,huetripo:523614,Madam Thu 2,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:523614
+,6a067fd372665fd7,duplicate,huetripo:894312,Madam Thu Huế,restaurant,pending,huetripo:523614,Madam Thu 2,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:523614
+,58c3224947b933c4,duplicate,huetripo:894312,Madam Thu Huế,restaurant,pending,huetripo:090955,Nhà hàng Madam Thu,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:090955
+,ce0800ce1fbbcb42,duplicate,huetripo:212922,Takoyaki Hotto - Cửa Thượng Tứ,cafe,pending,huetripo:204705,Takoyaki Hotto,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:204705
+,fadadf72eeb491bb,duplicate,huetripo:031179,Why Not? Bar,restaurant,pending,huetripo:365393,Why Not? Bar - Restaurant,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:365393
+,dc8247f31769d0ff,duplicate,huetripo:661968,Chè Kinh Đô,restaurant,pending,huetripo:404132,Chè Kinh Đô Huế,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:404132
+,b50045ebdc36addc,duplicate,huetripo:605161,Nhà hàng Phước Thạnh,restaurant,pending,huetripo:171371,Nhà hàng Phước Thạnh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:171371
+,175ae4053aa621d9,duplicate,huetripo:952596,Quán 36,restaurant,pending,huetripo:403419,Quán 36,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:403419
+,766bdff3744b330b,duplicate,huetripo:530642,Chè Ngọc Hiền,restaurant,pending,huetripo:117679,Chè Ngọc Hiền,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:117679
+,36fa47fc7bf3451b,duplicate,huetripo:553779,Điện Cần Chánh,historic,pending,huetripo:267265,Điện Cần Chánh,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:267265
+,c40b2ab8859e6e1e,duplicate,huetripo:466598,Hàng Me (Mẹ),restaurant,pending,huetripo:212233,Hàng Me Mẹ,230,,,tên giống nhau sau chuẩn hóa; cách 230 m; loại tương thích,gộp: giữ huetripo:212233
+,0429adbb5d4e4c3a,duplicate,huetripo:093299,Tịnh Tâm Vegan,restaurant,pending,huetripo:142479,Tịnh Tâm Vegan,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:142479
+,40b592ab26717081,duplicate,huetripo:141042,Vị Huế Restaurant & Café,restaurant,pending,huetripo:884925,Vị Huế Restaurant & Café,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:884925
+,2c34e152d37b87ac,duplicate,huetripo:941923,Cà Phê Muối,restaurant,pending,huetripo:254866,Cà Phê Muối Huế,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:254866
+,bf3aa71f79b88596,duplicate,huetripo:278383,Ốc Đảo Quán - cơ sở 1,restaurant,pending,huetripo:648664,Ốc Đảo,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:648664
+,709b998979fc4593,duplicate,huetripo:141103,Ốc đảo quán,restaurant,pending,huetripo:648664,Ốc Đảo,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:648664
+,c37e9b15dd5d52ee,duplicate,huetripo:141103,Ốc đảo quán,restaurant,pending,huetripo:278383,Ốc Đảo Quán - cơ sở 1,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:278383
+,cb19efa3b309e43f,duplicate,huetripo:759007,Chợ Đông Ba Huế,market,pending,huetripo:193028,Chợ Đông Ba,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:193028
+,31a6db186275517b,duplicate,huetripo:995229,Hải Triều Quán,restaurant,pending,huetripo:881937,Hải Triều Quán,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:881937
+,869793e78058128f,duplicate,huetripo:723283,Tịnh Gia Viên,restaurant,pending,huetripo:155427,Nhà hàng Tịnh Gia Viên,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:155427
+,106416c3981b16f8,duplicate,huetripo:973110,Đề-Pô Café,cafe,pending,huetripo:872148,Đề-Pô Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:872148
+,bc8666ee8657290f,duplicate,huetripo:191196,CODO COFFEE,cafe,pending,huetripo:462334,CODO Coffee,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:462334
+,7c86bdb1bd11e063,duplicate,huetripo:593425,Bún Giấm Nuốc,restaurant,pending,huetripo:507856,Bún giấm nuốc,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:507856
+,845081852750251a,duplicate,huetripo:991055,Góc cũ Cafe,cafe,pending,huetripo:476837,Gốc Cũ Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:476837
+,e0377e912f7f6112,duplicate,huetripo:494972,Nhà hàng Cung Đình,restaurant,pending,huetripo:841309,Nhà hàng Cung Đình,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:841309
+,39b950fc54034ab1,duplicate,huetripo:869017,Chuồn Chuồn Cafe,cafe,pending,huetripo:164496,Chuồn Chuồn Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:164496
+,2fc3f144792433f0,duplicate,huetripo:890433,Cà phê MR KEN,cafe,pending,huetripo:609313,Mr. Ken,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:609313
+,8362ab78f72d55cc,duplicate,huetripo:213010,GIAO cafe,cafe,pending,huetripo:039998,Giao Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:039998
+,fa81eb6dab9457fd,duplicate,huetripo:973741,Han Cafe,cafe,pending,huetripo:002139,Han Cafe,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:002139
+,7375e3655254abc1,duplicate,huetripo:821476,Nhà hàng Cảng,restaurant,pending,huetripo:985715,Nhà hàng Cảng,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:985715
+,a820eca21ef0dc5b,duplicate,huetripo:595901,Cafe Mai Uyển,cafe,pending,huetripo:581505,Cafe Mai Uyển,0,,,tên giống nhau sau chuẩn hóa; cách 0 m; loại tương thích,gộp: giữ huetripo:581505
+,4b2522dae89cc865,duplicate,huetripo:934505,Quán lẩu bò Hương Đồng,restaurant,pending,huetripo:384354,Lẩu bò Hương Đồng,11,,,tên này nằm trong tên kia; cách 11 m; loại tương thích,gộp: giữ huetripo:384354
+,aada0be27dd14d98,duplicate,huetripo:725223,An Nhiên Garden Vegetarian,restaurant,pending,huetripo:108710,An Nhien Garden Vegetarian - Nhà Hàng & Café,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:108710
+,4b1c440586a615b4,duplicate,huetripo:750122,Quán ăn tại chợ Làng Chuồn,restaurant,pending,huetripo:683777,Làng Chuồn,265,,,tên này nằm trong tên kia; cách 265 m; loại tương thích,gộp: giữ huetripo:683777
+,103024662f09087f,duplicate,huetripo:197701,Làng Cổ Phước Tích,historic,pending,huetripo:931460,Điểm du lịch làng cổ Phước Tích,0,,,tên này nằm trong tên kia; cách 0 m; loại tương thích,gộp: giữ huetripo:931460
+,d5ee5c8cf970ecc0,category,huetripo:727727,75A COFFEE,restaurant,pending,,,,cafe,coffee,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,03734ed020aea07a,category,huetripo:025890,75Dope CAFE,restaurant,pending,,,,cafe,cafe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,b1d4307f6009e234,category,huetripo:753251,Biển Chân Mây,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,de24fbd04573ae4b,category,huetripo:102632,Biển Cảnh Dương,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,bad1f12ad36640ee,category,huetripo:295729,Biển Hàm Rồng,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,7ee9f3946ebf9f05,category,huetripo:069755,Biển Hải Dương,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,ecf6970a36b4aab1,category,huetripo:874437,Biển Lăng Cô,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,e73ee372bbb92a68,category,huetripo:928216,Biển Lộc Bình,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,8f9e2cd3aef6a3d6,category,huetripo:891750,Biển Thuận An,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,1bc7f0c9e60e12ce,category,huetripo:120006,Biển Tân An,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,82a8361a6be882ca,category,huetripo:979341,Biển Tân Cảnh Dương,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,9546d5e2446c151e,category,huetripo:175153,Biển Tân Mỹ,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,ddeaf72413dbc0af,category,huetripo:779954,Biển Vinh Hiền,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,a2e7a4c57f0ef220,category,huetripo:267413,Biển Vinh Hải,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,4566ac0c764369d7,category,huetripo:177693,Biển Vinh Thanh,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,366f415f035cf02a,category,huetripo:427043,Biển Đông Dương,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,f2083e09c64b09cc,category,huetripo:718272,Bạch Mã Village - Thác trượt Bạch Mã,attraction,pending,,,,park,thac,thác nước nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,bd660a5a7aa257ec,category,huetripo:555641,Bến Thuyền Đầm Thủy Tú Tam Giang,attraction,pending,,,,park,dam,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,c711c14100f29ccf,category,huetripo:581505,Cafe Mai Uyển,restaurant,pending,,,,cafe,cafe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,962f0f7d9449163d,category,huetripo:586343,Cafe Ý Lan,restaurant,pending,,,,cafe,cafe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,cde1fdf8c78bd92f,category,huetripo:941923,Cà Phê Muối,restaurant,pending,,,,cafe,ca phe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,6359230bca51c012,category,huetripo:087975,Cà phê Thảo Uyên,restaurant,pending,,,,cafe,ca phe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,d41a911fb8a946c1,category,huetripo:747024,Cầu An Cựu,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,f05c536a6782222d,category,huetripo:214688,Cầu An Hòa,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,47b550cd7cc464b3,category,huetripo:971622,Cầu Bán Nguyệt,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,c49e1f6a3ada6787,category,huetripo:851447,Cầu Chợ Dinh,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,d7c9f8c55e8a6249,category,huetripo:003939,Cầu Dã Viên,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,e36532a74d7d928a,category,huetripo:405741,Cầu Kho Rèn,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,ae4c0cf358f0b97f,category,huetripo:285771,Cầu Phú Xuân,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,32240d73cf38ed61,category,huetripo:664215,Cầu Trường Tiền,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,0dc8bada433cac97,category,huetripo:237950,Cầu Vỹ Dạ,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,31792c1e57bce166,category,huetripo:563167,Cầu gỗ lim,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,ab38bb6a249b86a8,category,huetripo:948370,Cầu Đập Đá,park,pending,,,,viewpoint,cau,cầu nhưng xếp vào công viên,đổi loại thành viewpoint nếu xác nhận
+,9addac45e6f4bff5,category,huetripo:928795,Cửa biển Tư Hiền,attraction,pending,,,,park,bien,bãi biển nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,90359bbcb26a0c2f,category,huetripo:156781,Cửa hàng bánh kẹo Thiên Thịnh,market,pending,,,,,cua hang,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
+,3ad2df0eac0d90d9,category,huetripo:721123,Hồ Khe Ngang,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,d11c682af7ae9782,category,huetripo:503060,Hồ Thái Dịch,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,b9d6c605df357837,category,huetripo:497038,Hồ Thủy Tiên,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,d99b7d5b261d7766,category,huetripo:906247,Hồ Truồi,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,5e9158d088ebb3a7,category,huetripo:799743,Hồ Trái Tim,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,139316b86183b172,category,huetripo:588373,Hồ Tân Miếu,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,89d49d2e4a4719f8,category,huetripo:463976,Hồ Võ Sanh,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,9d577082e50b84ce,category,huetripo:970786,Hồ Xã Tắc,attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,5135b8d08e233935,category,huetripo:728551,Khu Du Lịch Sinh Thái Thác Bồ Ghè,attraction,pending,,,,park,thac,thác nước nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,68b19b355f804e59,category,huetripo:189429,Kẹo Đậu phộng Thiên Thanh Hoàng,market,pending,,,,,keo,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
+,468f43136f7bcf8b,category,huetripo:881100,Ngũ Hồ (Vườn Quốc gia Bạch Mã),attraction,pending,,,,park,hồ,hồ nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,b3a3da6a7024890f,category,huetripo:473604,Núi Bạch Mã - Vườn quốc gia Bạch Mã,attraction,pending,,,,viewpoint,núi,đồi hoặc núi nhưng xếp vào điểm tham quan,đổi loại thành viewpoint nếu xác nhận
+,6ee930fdc482349f,category,huetripo:578450,OHLALA COFFEE & MILKTEA,restaurant,pending,,,,cafe,coffee,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,75bbd0e6fd112e93,category,huetripo:282608,Phá Tam Giang,attraction,pending,,,,park,pha,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,e818247085be7d68,category,huetripo:000289,Siêu thị Coop Mart Huế,market,pending,,,,,sieu thi,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
+,8918dbea2c02fc91,category,huetripo:778466,Siêu thị GO! Huế,market,pending,,,,,sieu thi,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
+,e8e9eeb6bcd24104,category,huetripo:718015,Thác Mơ,attraction,pending,,,,park,thac,thác nước nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,d7aee8a9d68dac67,category,huetripo:510748,Thác Nhị Hồ,attraction,pending,,,,park,thac,thác nước nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,30a99ca9bf6649ce,category,huetripo:124347,Tiệm CAMAY - Cà phê & Bánh ép,restaurant,pending,,,,cafe,ca phe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,6f784556514cc592,category,huetripo:803515,Tách Coffee & Beer,restaurant,pending,,,,cafe,coffee,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,d830acbec17973ee,category,huetripo:489415,Vincom Plaza Huế,market,pending,,,,,vincom,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
+,d8d437c8cd86b755,category,huetripo:586190,Á Ha Cafe,restaurant,pending,,,,cafe,cafe,tên ghi cafe hoặc coffee nhưng xếp nhà hàng,đổi loại thành cafe nếu xác nhận
+,18fbd02bfd52b7a8,category,huetripo:395933,Đầm An Cư (Lập An),attraction,pending,,,,park,dam,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,250abd45e5108d90,category,huetripo:678782,Đầm Chuồn,attraction,pending,,,,park,dam,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,59e55777862519e3,category,huetripo:922167,Đầm phá Cầu Hai,attraction,pending,,,,park,pha,phá hoặc đầm nhưng xếp vào điểm tham quan,đổi loại thành park nếu xác nhận
+,81975fb71580113e,category,huetripo:390308,Đặc sản Cung đình Thiên Hương,market,pending,,,,,dac san,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
+,dcb0eb4b71881c1a,category,huetripo:309856,Đặc sản Miền Trung Thiên Phú,market,pending,,,,,dac san,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
+,48c89bb8aed8533d,category,huetripo:178851,Đặc sản Thiên Phú,market,pending,,,,,dac san,"trung tâm thương mại, siêu thị hoặc cửa hàng, không phải chợ truyền thống",giữ market; người duyệt quyết định vì không có loại shop
+,580e3b5ae96b0a8e,category,huetripo:192068,Đồi Thiên An,attraction,pending,,,,viewpoint,đồi,đồi hoặc núi nhưng xếp vào điểm tham quan,đổi loại thành viewpoint nếu xác nhận
+,274e5991730b7ef0,category,huetripo:496391,Đồi Vọng Cảnh,attraction,pending,,,,viewpoint,đồi,đồi hoặc núi nhưng xếp vào điểm tham quan,đổi loại thành viewpoint nếu xác nhận
+,cabe5b2ffd6cec2f,missing_data,huetripo:615115,Nhà hàng Maison Trang,restaurant,pending,,,,,,thiếu thời lượng tham quan; 4334 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,271b1dff1f3ee13c,missing_data,huetripo:876531,Nook Eatery,restaurant,pending,,,,,,thiếu thời lượng tham quan; 4407 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,ae4cb230bb87d853,missing_data,huetripo:231374,Quán Hạnh,restaurant,pending,,,,,,thiếu thời lượng tham quan; 4053 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,9d79fff9505091d8,missing_data,huetripo:352234,Jollibee Vincom Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 3489 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,ef5493777ddaaed1,missing_data,huetripo:173018,Nina's Café,cafe,pending,,,,,,thiếu thời lượng tham quan; 3325 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,db17b29b22e8e901,missing_data,huetripo:768910,Nhà hàng Nhật Bản Shinosushi,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2868 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,96672a3207601ee5,missing_data,huetripo:759007,Chợ Đông Ba Huế,market,pending,,,,,,thiếu thời lượng tham quan; 3311 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,6160c6f71a50cb28,missing_data,huetripo:467517,Nhà hàng Shino,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2805 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,2d8d36b34b2df490,missing_data,huetripo:535174,Nhà hàng DMZ,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 3109 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,57d350588e64b8d6,missing_data,huetripo:719204,DMZ Bar & Restaurant,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 3109 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,a634fccb91ffd520,missing_data,huetripo:811386,Chè Hẻm,restaurant,pending,,,,,,thiếu thời lượng tham quan; 3405 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,239748e2365307ed,missing_data,huetripo:422641,Nhà hàng Nhật Bản Shino Sushi,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2754 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,0b64143b38952dcf,missing_data,huetripo:588308,Nhà hàng chay Tĩnh,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2737 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,7bb980d69264deb6,missing_data,huetripo:937980,Bún Bò Huế Sen,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2809 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,7c42018ca8ce5adf,missing_data,huetripo:239441,Madam Thu 2,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2618 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,a9ca579bfe568212,missing_data,huetripo:090955,Nhà hàng Madam Thu,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2412 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,ffe4056b8aa90064,missing_data,huetripo:523614,Madam Thu 2,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2412 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,e08999be8b22c317,missing_data,huetripo:304452,Cozy Restaurant (Hue),restaurant,pending,,,,,,thiếu thời lượng tham quan; 2347 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,b846433a0e05d0dc,missing_data,huetripo:193173,Nhà hàng cơm niêu Khải Hoàn,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2388 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,b4981169b2143a42,missing_data,huetripo:499390,Nhà hàng Hannam,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2215 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,e39a82e0df5b0273,missing_data,huetripo:141042,Vị Huế Restaurant & Café,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 2199 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,0948201a15dfecab,missing_data,huetripo:422267,Cơm hến Hoa Đông,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2360 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,f912cacfc2f10d15,missing_data,huetripo:100418,Nhà hàng Zucca,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2083 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,452963c4f5a49e87,missing_data,huetripo:538043,Nhà hàng Vỹ Dạ Xưa,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 2083 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,4628b95249c4a4b2,missing_data,huetripo:713931,Jollibee Nguyễn Trãi,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1901 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,37850060fc42fa5e,missing_data,huetripo:263921,Nhà hàng hải sản Bé Thân,restaurant,pending,,,,,,thiếu thời lượng tham quan; 2269 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,bf01d473d62502d3,missing_data,huetripo:207754,Nhà hàng Bánh Gánh,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1887 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,3fefc14272d31473,missing_data,huetripo:023678,Dookki AEON MALL Huế,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1779 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,44361f76a25bb90e,missing_data,huetripo:497653,Bánh ép Gia Di,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1915 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,14aeb383d12d8403,missing_data,huetripo:995000,La Carambole Bistro,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1823 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,f88619fc5b9c80a8,missing_data,huetripo:840197,Jollibee AEON MALL Huế,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1733 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,1e03733be2953b1d,missing_data,huetripo:559187,Nhà hàng Vườn Khế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1814 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,4f01d6afb38ecd1b,missing_data,huetripo:260047,Jollibee Nguyễn Huệ,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1748 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,b891812ecfbd97f3,missing_data,huetripo:854427,Pizza Hut Go! Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1662 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,19b198d133f10b53,missing_data,huetripo:955959,Món ăn đặc sản Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1662 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,2d0bdca719f8a60d,missing_data,huetripo:391295,Tà Vẹt,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1740 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,9913e7caf8cb4ae9,missing_data,huetripo:756222,Eco Restaurant,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1580 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,cd96a078c92d10fd,missing_data,huetripo:629151,Pizza Hut Signature - AEON MALL Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1494 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,fb34e16682718657,missing_data,huetripo:001615,Củi Café,cafe,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1521 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,ca255be135db49c7,missing_data,huetripo:419353,Bánh ướt Huyền Anh,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1646 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,5ebf6d59e07b74cc,missing_data,huetripo:335433,Donald Trung - Bánh Ướt & Bánh Cuốn Thịt Heo,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1599 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,2d51e2590e1d7d47,missing_data,huetripo:202079,Texas Chicken AEON Mall Huế,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1438 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,b9c58d6be628648c,missing_data,huetripo:592826,Imperial Craft Bia Brewpub,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1433 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,3e3e112c7d42bfa1,missing_data,huetripo:823524,Imperial Craft Bia Brewpub,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1433 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,a275bd1c8c2ae3cc,missing_data,huetripo:693049,The Chàm Craft Beer and Whisky,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1390 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,5ab9147093eb34ff,missing_data,huetripo:575981,Bún bò bà Gái,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1774 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,d395cd940304e71a,missing_data,huetripo:075140,Nhà hàng Bà Đỏ,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1688 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,22f469a05ec29054,missing_data,huetripo:877003,Bánh bèo - nậm - lọc Bà Đỏ,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1675 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,300bf93c86d10c80,missing_data,huetripo:726072,Nhà hàng Yaki Yum,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1388 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,c4edfeec14bcc24f,missing_data,huetripo:481321,Nhà hàng - Huong Giang Hotel Resort & Spa,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1627 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,445073dc94eb1687,missing_data,huetripo:635199,Bánh mì Trường Tiền O Tho,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1512 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,c330cbe3bbc485c9,missing_data,huetripo:281424,Nhà hàng KSND Laguna Lăng Cô,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1377 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,4119ea8768c6abc1,missing_data,huetripo:272476,Nhà hàng La Brasserie (Indochine Palace),restaurant,pending,,,,,,thiếu thời lượng tham quan; 1420 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,12a227da5ad99500,missing_data,huetripo:151048,WooDong AEON MALL Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1399 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,7e81270bc47fc59c,missing_data,huetripo:755242,Nhà hàng cơm niêu Chạn,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1354 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,15673b54f65bd930,missing_data,huetripo:743905,Chè Mợ Tôn Đích,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1545 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,8566d8af5b2c783c,missing_data,huetripo:757632,Nhà hàng Little Italy,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1416 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,841aa5eb92873454,missing_data,huetripo:684212,Secret Lounge Hue,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1144 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,49ec90c885a34d9f,missing_data,huetripo:297664,Dookki Vincom Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1104 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,7a727a64596ef80a,missing_data,huetripo:667763,Túc Tắc Tea - Lý Thường Kiệt,cafe,pending,,,,,,thiếu thời lượng tham quan; 1036 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,7eff852859073607,missing_data,huetripo:953253,Cafe on Thu Wheels,cafe,pending,,,,,,thiếu thời lượng tham quan; 1038 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,413f85d8f3a77595,missing_data,huetripo:532914,Bánh ép Trang,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1030 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,258f2d94152e43eb,missing_data,huetripo:410479,Quán Hít hà,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1000 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,6adaa08d760db749,missing_data,huetripo:392012,Izakaya TAKA,restaurant,pending,,,,,,thiếu thời lượng tham quan; 947 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,5d98383027ce1212,missing_data,huetripo:374894,Nhà hàng Lạc Thiện,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1110 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,e95ac9336d4469f8,missing_data,huetripo:075442,Nhà hàng Hot Tuna,restaurant,pending,,,,,,thiếu thời lượng tham quan; 1062 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,60f0ddd31af4edd6,missing_data,huetripo:173250,Nhà hàng cơm niêu Huế - Mâm,restaurant,pending,,,,,,thiếu thời lượng tham quan; 950 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,3eb496bf35071c63,missing_data,huetripo:254866,Cà Phê Muối Huế,cafe,pending,,,,,,thiếu thời lượng tham quan; 1174 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,b19e9160da45c238,missing_data,huetripo:545138,1984 Coffee - Pub - Restaurant,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 908 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,dad9d4d24921feb1,missing_data,huetripo:614307,Bánh ép Trang,restaurant,pending,,,,,,thiếu thời lượng tham quan; 961 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,0ee51b6d660305e2,missing_data,huetripo:495931,Quán cơm chị Tẹo,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 1122 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,8b37b3ae52deff2e,missing_data,huetripo:538250,Hít Hà - Thế Giới Đồ Cuốn,restaurant,pending,,,,,,thiếu thời lượng tham quan; 910 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,21c28a605343c08a,missing_data,huetripo:779162,Cơm Niêu Bánh Gánh 2,restaurant,pending,,,,,,thiếu thời lượng tham quan; 876 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,3f2fc923b9ea61c3,missing_data,huetripo:102876,Quán ăn An Tâm,restaurant,pending,,,,,,thiếu thời lượng tham quan; 891 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,3d46193d30c3c55b,missing_data,huetripo:878742,Nhà hàng Hoa Sơn Quán,restaurant,pending,,,,,,thiếu thời lượng tham quan; 924 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,5f9b5b21d50b2a34,missing_data,huetripo:102328,AURA - Mixology & Karaoke,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 867 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,fa6a34e246d49c6b,missing_data,huetripo:721094,Le Cercle Hue,restaurant,pending,,,,,,thiếu thời lượng tham quan; 864 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,ffbfba146f8a92b4,missing_data,huetripo:984952,Quán bánh bà chi,restaurant,pending,,,,,,thiếu thời lượng tham quan; 938 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,fa26d68fcd54cb93,missing_data,huetripo:892296,BreadTalk AEON MALL Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 813 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,8b8fd0c68cbb95cf,missing_data,huetripo:494945,Happy Bar,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 822 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,a972a9a580c04725,missing_data,huetripo:242493,Nhà hàng hải sản Làng Chài Lăng Cô,restaurant,pending,,,,,,thiếu thời lượng tham quan; 986 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,59c52e7b328671c4,missing_data,huetripo:568297,Bếp Thị,restaurant,pending,,,,,,thiếu thời lượng tham quan; 836 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,d72a9b4a13a827be,missing_data,huetripo:248768,Nhà hàng Family Home Cafe & Restaurant,restaurant,pending,,,,,,thiếu thời lượng tham quan; 823 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,220b8304ef851f1a,missing_data,huetripo:108710,An Nhien Garden Vegetarian - Nhà Hàng & Café,restaurant,pending,,,,,,thiếu thời lượng tham quan; 781 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,41990dd8c9b1bc2e,missing_data,huetripo:596425,An Nhiên Garden – Nhà Hàng Chay & Cafe,restaurant,pending,,,,,,thiếu thời lượng tham quan; 781 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,6a193bc037019d11,missing_data,huetripo:008789,PhinHolic,cafe,pending,,,,,,thiếu thời lượng tham quan; 853 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,6a2722c77e404019,missing_data,huetripo:725223,An Nhiên Garden Vegetarian,restaurant,pending,,,,,,thiếu thời lượng tham quan; 774 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,b57cfb5437a5a59d,missing_data,huetripo:469927,Bánh canh cua Hương,restaurant,pending,,,,,,thiếu thời lượng tham quan; 884 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,a91fbde4efb84221,missing_data,huetripo:912311,Quán chay Thanh Liễu,restaurant,pending,,,,,,thiếu thời lượng tham quan; 840 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,891e14406bf4f5e9,missing_data,huetripo:696531,Cơm Niêu - Nhà Hàng SALA,restaurant,pending,,,,,,thiếu thời lượng tham quan; 791 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,d43bc66b42ef93f8,missing_data,huetripo:091004,Chaleng Thai Food,restaurant,pending,,,,,,thiếu thời lượng tham quan; 748 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,4e625518b9d4b491,missing_data,huetripo:841309,Nhà hàng Cung Đình,restaurant,pending,,,,,,thiếu thời lượng tham quan; 874 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,9633d9061a49f6c1,missing_data,huetripo:160991,Quán bánh Chi,restaurant,pending,,,,,,"thiếu giờ mở cửa, thiếu thời lượng tham quan; 845 lượt đánh giá",tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,e7cfe5ac73630fa2,missing_data,huetripo:822662,La Paix Bistro,restaurant,pending,,,,,,thiếu thời lượng tham quan; 751 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,35da65d2300b7810,missing_data,huetripo:784908,HP3 BBQ - AEON MALL Huế,restaurant,pending,,,,,,thiếu thời lượng tham quan; 739 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
+,ef1e24dfdc26a34f,missing_data,huetripo:127875,Mingle-Vegetarian-Cafe-Restaurant,cafe,pending,,,,,,thiếu thời lượng tham quan; 731 lượt đánh giá,tra nguồn kiểm chứng rồi sửa trong travel-agent review (giờ mở cửa cần evidence)
