@@ -30,6 +30,7 @@ import random
 from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Any
 
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 
@@ -293,6 +294,34 @@ def _route(
         return None, SolveStatus.INFEASIBLE, "không có địa điểm nào mở trong khung ngày"
     size = len(nodes) + 1
     num_days = request.num_days
+    transit, cost = _arc_matrices(nodes, places, travel_min, bias)
+
+    manager = pywrapcp.RoutingIndexManager(size, num_days, 0)
+    routing = pywrapcp.RoutingModel(manager)
+    routing.SetArcCostEvaluatorOfAllVehicles(routing.RegisterTransitMatrix(cost))
+
+    time_dim = _add_time_dimension(routing, request, transit)
+    _add_sights_dimension(routing, request, nodes, slots, targets)
+    _constrain_nodes(routing, manager, time_dim, nodes)
+
+    solution = routing.SolveWithParameters(_search_parameters(time_limit_s))
+    status = routing.status()
+    if status in _TIMEOUT:
+        return None, SolveStatus.TIMED_OUT, f"hết {time_limit_s:g} giây trước khi hội tụ"
+    if solution is None or status not in _SUCCESS:
+        return None, SolveStatus.INFEASIBLE, f"OR-Tools không tìm được lời giải (status {status})"
+    routes = _read_routes(solution, routing, manager, time_dim, num_days)
+    return routes, SolveStatus.SOLVED, ""
+
+
+def _arc_matrices(
+    nodes: Sequence[_Node],
+    places: Sequence[Place],
+    travel_min: Sequence[Sequence[int]],
+    bias: Sequence[int],
+) -> tuple[list[list[int]], list[list[int]]]:
+    """Ma trận (thời gian qua cung gồm thời lượng tham quan, chi phí cung) cho OR-Tools."""
+    size = len(nodes) + 1
 
     def leg(a: int, b: int) -> int:
         if a == 0 or b == 0:
@@ -308,11 +337,12 @@ def _route(
         ]
         for a in range(size)
     ]
+    return transit, cost
 
-    manager = pywrapcp.RoutingIndexManager(size, num_days, 0)
-    routing = pywrapcp.RoutingModel(manager)
-    routing.SetArcCostEvaluatorOfAllVehicles(routing.RegisterTransitMatrix(cost))
 
+def _add_time_dimension(routing: Any, request: PlanRequest, transit: Any) -> Any:
+    """Thêm dimension "time" (phút tuyệt đối), mỗi xe bắt đầu và kết thúc trong khung ngày."""
+    num_days = request.num_days
     time_cb = routing.RegisterTransitMatrix(transit)
     routing.AddDimension(time_cb, MINUTES_PER_DAY, num_days * MINUTES_PER_DAY, False, "time")
     time_dim = routing.GetDimensionOrDie("time")
@@ -324,7 +354,18 @@ def _route(
         low, high = day_bounds(request, day)
         time_dim.CumulVar(routing.Start(day)).SetRange(low, low)
         time_dim.CumulVar(routing.End(day)).SetRange(low, high)
+    return time_dim
 
+
+def _add_sights_dimension(
+    routing: Any,
+    request: PlanRequest,
+    nodes: Sequence[_Node],
+    slots: Sequence[_Slot],
+    targets: Sequence[int],
+) -> None:
+    """Thêm dimension "sights" đếm điểm thường mỗi ngày, kèm sàn mềm theo pace."""
+    num_days = request.num_days
     # Chỉ đếm điểm thường; chỗ cho bữa ăn được giữ riêng để điểm thường không chiếm mất.
     meals = [sum(1 for slot in slots if slot.day == day) for day in range(num_days)]
     count_cb = routing.RegisterUnaryTransitVector([0, *(int(n.slot is None) for n in nodes)])
@@ -338,6 +379,9 @@ def _route(
         wanted = min(capacities[day], max(0, floor - meals[day]))
         sights_dim.SetCumulVarSoftLowerBound(routing.End(day), wanted, SHORT_DAY_PENALTY)
 
+
+def _constrain_nodes(routing: Any, manager: Any, time_dim: Any, nodes: Sequence[_Node]) -> None:
+    """Gắn window giờ đến, xe được phép và disjunction cho từng node (điểm thường, bữa ăn)."""
     by_slot: dict[int, list[int]] = {}
     by_place: dict[int, list[int]] = {}
     for k, node in enumerate(nodes):
@@ -365,6 +409,9 @@ def _route(
         if len(indices) > 1:
             routing.AddDisjunction(indices, 0, 1)
 
+
+def _search_parameters(time_limit_s: float) -> Any:
+    """Tham số tìm kiếm: lời giải đầu bằng chèn rẻ nhất song song, rồi hạ dốc cục bộ."""
     params = pywrapcp.DefaultRoutingSearchParameters()
     params.first_solution_strategy = (
         routing_enums_pb2.FirstSolutionStrategy.PARALLEL_CHEAPEST_INSERTION
@@ -372,12 +419,13 @@ def _route(
     # Chỉ hạ dốc tới tối ưu cục bộ: kết quả không phụ thuộc tốc độ máy, nên cùng seed cùng plan.
     params.local_search_metaheuristic = routing_enums_pb2.LocalSearchMetaheuristic.GREEDY_DESCENT
     params.time_limit.FromMicroseconds(max(1, int(time_limit_s * 1_000_000)))
-    solution = routing.SolveWithParameters(params)
-    status = routing.status()
-    if status in _TIMEOUT:
-        return None, SolveStatus.TIMED_OUT, f"hết {time_limit_s:g} giây trước khi hội tụ"
-    if solution is None or status not in _SUCCESS:
-        return None, SolveStatus.INFEASIBLE, f"OR-Tools không tìm được lời giải (status {status})"
+    return params
+
+
+def _read_routes(
+    solution: Any, routing: Any, manager: Any, time_dim: Any, num_days: int
+) -> list[list[_Visit]]:
+    """Đọc route từng ngày từ lời giải: node OR-Tools, giờ đến lấy từ cumul thời gian."""
     routes: list[list[_Visit]] = []
     for day in range(num_days):
         route: list[_Visit] = []
@@ -387,7 +435,7 @@ def _route(
             route.append(_Visit(int(manager.IndexToNode(index)) - 1, arrive))
             index = solution.Value(routing.NextVar(index))
         routes.append(route)
-    return routes, SolveStatus.SOLVED, ""
+    return routes
 
 
 def _check_routes(
