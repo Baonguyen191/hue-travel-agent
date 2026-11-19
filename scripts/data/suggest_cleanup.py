@@ -1,0 +1,156 @@
+"""Tạo danh sách gợi ý dọn dữ liệu Huế để người duyệt xác nhận.
+
+    .venv/Scripts/python.exe scripts/data/suggest_cleanup.py
+    .venv/Scripts/python.exe scripts/data/suggest_cleanup.py \
+        --db data/hue.sqlite --out-dir reports/data
+
+Chỉ ĐỌC DB (mở ở chế độ `mode=ro`, file DB là dependency của DVC). Ghi hai file vào --out-dir:
+- cleanup_suggestions.csv: mỗi dòng một gợi ý, UTF-8 có BOM để mở bằng Excel.
+- cleanup_suggestions.md: tóm tắt số lượng và quy tắc.
+Địa điểm đã bị loại (rejected) không được xét lại. Đề xuất không tự sửa gì trong DB.
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import sys
+from collections import Counter
+from collections.abc import Sequence
+from pathlib import Path
+
+from travel_agent.data.cleanup_suggestions import (
+    CATEGORY_RULES,
+    CSV_FIELDS,
+    KIND_CATEGORY,
+    KIND_DUPLICATE,
+    KIND_MISSING,
+    KIND_ORDER,
+    TOP_POPULAR,
+    Suggestion,
+    build_suggestions,
+    count_by_kind,
+)
+from travel_agent.domain.models import Place
+from travel_agent.review.models import ReviewStatus
+from travel_agent.review.store import ReviewStore
+
+DEFAULT_DB = Path("data/hue.sqlite")
+DEFAULT_OUT_DIR = Path("reports/data")
+CSV_NAME = "cleanup_suggestions.csv"
+MD_NAME = "cleanup_suggestions.md"
+
+EXIT_OK = 0
+EXIT_ERROR = 1
+
+
+def load_active(db: Path) -> tuple[list[Place], dict[str, str]]:
+    """Địa điểm đã áp override, bỏ loại REJECTED, kèm trạng thái duyệt theo id."""
+    store = ReviewStore(db, read_only=True)
+    try:
+        items, _ = store.query(limit=-1)  # LIMIT -1 = không giới hạn
+    finally:
+        store.close()
+    active = [item for item in items if item.status is not ReviewStatus.REJECTED]
+    places = [item.effective_place() for item in active]
+    statuses = {item.place.id: item.status.value for item in active}
+    return places, statuses
+
+
+def write_csv(path: Path, rows: Sequence[Suggestion]) -> None:
+    # utf-8-sig ghi BOM đầu file để Excel nhận đúng tiếng Việt.
+    with path.open("w", encoding="utf-8-sig", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=CSV_FIELDS)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow(row.as_row())
+
+
+def write_md(
+    path: Path,
+    rows: Sequence[Suggestion],
+    *,
+    db: Path,
+    place_total: int,
+    top_n: int,
+) -> None:
+    counts = count_by_kind(rows)
+    per_rule = Counter(row.reason for row in rows if row.kind == KIND_CATEGORY)
+    lines = [
+        "# Gợi ý dọn dữ liệu địa điểm Huế",
+        "",
+        f"Sinh bởi `scripts/data/suggest_cleanup.py` từ `{db.as_posix()}` (chỉ đọc).",
+        "Đây là danh sách đề xuất để người duyệt xác nhận. Chưa có gì trong DB bị sửa.",
+        "Sửa thật: `travel-agent review`, dùng override kèm evidence khi đổi giờ mở cửa.",
+        "",
+        f"Địa điểm xét (đã bỏ loại REJECTED): {place_total}.",
+        "",
+        "## Số dòng theo loại",
+        "",
+        "| Loại | Số dòng |",
+        "| --- | ---: |",
+    ]
+    lines += [f"| {kind} | {counts.get(kind, 0)} |" for kind in KIND_ORDER]
+    lines += [
+        "",
+        "## Quy tắc",
+        "",
+        f"- `{KIND_DUPLICATE}`: tên giống nhau hoặc nằm trong nhau (đã bỏ dấu, bỏ từ Huế/Hue,"
+        " độ dài tên ngắn nhất từ 6 ký tự), loại tương thích, cách dưới 300 m. Giữ bản có nhiều"
+        " thuộc tính hơn, rồi nhiều lượt đánh giá hơn.",
+        f"- `{KIND_CATEGORY}`: từ khóa trong tên không khớp loại hiện tại. Số dòng theo quy tắc:",
+    ]
+    rule_labels = {rule.label for rule in CATEGORY_RULES}
+    for label in sorted(rule_labels):
+        if per_rule.get(label):
+            lines.append(f"  - {label}: {per_rule[label]}")
+    lines += [
+        f"- `{KIND_MISSING}`: trong {top_n} địa điểm nhiều lượt đánh giá nhất (thuộc tính"
+        ' "Đánh giá"), thiếu giờ mở cửa hợp lệ hoặc thời lượng tham quan.',
+        "",
+        "## Lưu ý",
+        "",
+        "- Trùng tên trong nhóm 3 địa điểm sẽ hiện thành 3 cặp; chỉ cần xử lý một lần.",
+        '- Quy tắc từ khóa là heuristic. Từ ngắn như "hồ", "đồi", "lăng" khớp đúng dấu để'
+        ' tránh nhầm "đôi", "làng".',
+        '- Mục "shop" trong market không có loại tương ứng trong Category, nên chỉ cảnh báo.',
+        "",
+    ]
+    path.write_text("\n".join(lines), encoding="utf-8")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(description="Gợi ý dọn dữ liệu địa điểm (chỉ đọc DB).")
+    parser.add_argument("--db", type=Path, default=DEFAULT_DB)
+    parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
+    parser.add_argument("--top", type=int, default=TOP_POPULAR, help="số địa điểm phổ biến nhất")
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    if not args.db.exists():
+        print(f"Không tìm thấy DB: {args.db}", file=sys.stderr)
+        return EXIT_ERROR
+    places, statuses = load_active(args.db)
+    rows = build_suggestions(places, statuses, top_n=args.top)
+
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    write_csv(args.out_dir / CSV_NAME, rows)
+    write_md(
+        args.out_dir / MD_NAME,
+        rows,
+        db=args.db,
+        place_total=len(places),
+        top_n=args.top,
+    )
+
+    print(f"Địa điểm xét: {len(places)}")
+    for kind, count in count_by_kind(rows).items():
+        print(f"  {kind}: {count}")
+    print(f"Ghi {args.out_dir / CSV_NAME} và {args.out_dir / MD_NAME}")
+    return EXIT_OK
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
