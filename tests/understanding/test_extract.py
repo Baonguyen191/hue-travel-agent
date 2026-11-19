@@ -8,8 +8,10 @@ from typing import Any
 import pytest
 
 from travel_agent.domain.models import Category, Coordinates, Pace, Place, TravelMode
+from travel_agent.planning.candidates import INTEREST_CATEGORIES
 from travel_agent.training.generator import Generation, GenerationError
 from travel_agent.understanding.extract import (
+    _CATEGORY_INTEREST,
     _FEW_SHOT,
     EXTRACTION_SCHEMA,
     Extraction,
@@ -456,3 +458,232 @@ def test_bare_mot_means_day_after_tomorrow_but_counting_mot_is_not_a_date() -> N
     counting = _parse("đi Huế một mình 2 ngày", _answer(duration_text="2 ngày"))
     assert counting.request is None
     assert "start_date" not in counting.partial
+
+
+# ---------------------------------------------------------------------------
+# Sở thích suy ra từ địa điểm và yêu cầu mềm
+# ---------------------------------------------------------------------------
+
+_DAYS = {"date_text": "20/12", "duration_text": "2 ngày"}
+
+
+def test_category_interest_table_picks_an_interest_that_contains_the_category() -> None:
+    # ATTRACTION là nhóm gom chung trong DB nên không suy ra sở thích.
+    assert set(_CATEGORY_INTEREST) == set(Category) - {Category.ATTRACTION}
+    for category, interest in _CATEGORY_INTEREST.items():
+        assert category in INTEREST_CATEGORIES[interest], (category, interest)
+
+
+def test_attraction_place_adds_no_interest() -> None:
+    places = [_place("p:beach", "Bãi biển Thuận An", Category.ATTRACTION)]
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, ghé bãi biển Thuận An",
+        _answer(**_DAYS, must_include_mentions=["bãi biển Thuận An"]),
+        places,
+    )
+    assert [item.place_id for item in query.must_include] == ["p:beach"]
+    assert query.request is not None
+    assert query.request.interests == []
+
+
+def test_negated_soft_preference_adds_no_interest() -> None:
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, không ăn cay",
+        _answer(**_DAYS, soft_preferences=["không ăn cay"]),
+    )
+    assert query.request is not None
+    assert query.request.interests == []
+    assert query.soft_preferences == ["không ăn cay"]
+
+
+def test_unaccented_negated_soft_preference_adds_no_interest() -> None:
+    query = _parse(
+        "di hue 2 ngay 20/12, khong an cay",
+        _answer(**_DAYS, soft_preferences=["khong an cay"]),
+    )
+    assert query.request is not None
+    assert query.request.interests == []
+
+
+def test_affirmative_soft_preference_still_adds_interest() -> None:
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, thích ăn cay",
+        _answer(**_DAYS, soft_preferences=["thích ăn cay", "hải sản"]),
+    )
+    assert query.request is not None
+    assert query.request.interests == ["food"]
+
+
+def test_must_include_places_add_interests_by_category() -> None:
+    places = [
+        _place("p:market", "Chợ Đông Ba", Category.MARKET),
+        _place("p:tomb", "Lăng Khải Định", Category.HISTORIC),
+    ]
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, ghé chợ Đông Ba và lăng Khải Định",
+        _answer(**_DAYS, must_include_mentions=["chợ Đông Ba", "lăng Khải Định"]),
+        places,
+    )
+    assert query.request is not None
+    assert query.request.interests == ["history", "shopping"]
+    assert query.partial["interests"] == ["history", "shopping"]
+
+
+def test_unlinked_must_include_adds_no_interest() -> None:
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, ghé Quán Không Có",
+        _answer(**_DAYS, must_include_mentions=["Quán Không Có"]),
+        [],
+    )
+    assert query.request is not None
+    assert query.request.interests == []
+
+
+def test_excluded_place_does_not_add_interest() -> None:
+    places = [_place("p:market", "Chợ Đông Ba", Category.MARKET)]
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, bỏ chợ Đông Ba",
+        _answer(**_DAYS, exclude_mentions=["chợ Đông Ba"]),
+        places,
+    )
+    assert query.request is not None
+    assert query.request.interests == []
+    assert [item.place_id for item in query.exclude] == ["p:market"]
+
+
+def test_place_info_does_not_infer_interests() -> None:
+    places = [_place("p:tomb", "Lăng Khải Định", Category.HISTORIC)]
+    query = _parse(
+        "Lăng Khải Định mở cửa lúc mấy giờ?",
+        _answer(intent="place_info", must_include_mentions=["Lăng Khải Định"]),
+        places,
+    )
+    assert query.request is None
+    assert query.partial["interests"] == []
+
+
+def test_interest_word_in_soft_preference_adds_interest_and_keeps_phrase() -> None:
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, mình thích ăn hải sản",
+        _answer(**_DAYS, soft_preferences=["hải sản"]),
+    )
+    assert query.request is not None
+    assert query.request.interests == ["food"]
+    assert query.soft_preferences == ["hải sản"]
+
+
+def test_accented_soft_preferences_that_are_not_interests_stay_soft() -> None:
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, tránh chỗ đông, làng nghề",
+        _answer(
+            **_DAYS,
+            interest_phrases=["làng nghề"],
+            exclude_category_phrases=["chỗ đông"],
+        ),
+    )
+    assert query.request is not None
+    assert query.request.interests == []
+    assert query.exclude_categories == []
+    assert query.soft_preferences == ["làng nghề", "chỗ đông"]
+
+
+# ---------------------------------------------------------------------------
+# Phương tiện đọc từ câu gốc khi LLM bỏ sót hoặc khác
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("text", "llm_mode", "expected"),
+    [
+        ("Đi Huế 2 ngày 20/12 bằng taxi nhé", None, TravelMode.CAR),
+        ("Đi Huế 2 ngày 20/12, đi xe hơi", None, TravelMode.CAR),
+        ("Đi Huế 2 ngày 20/12, đi o to", None, TravelMode.CAR),
+        ("di hue 2 ngay 20/12 di bo", None, TravelMode.WALK),
+        ("Đi Huế 2 ngày 20/12, đi bộ là chính", None, TravelMode.WALK),
+        ("Đi Huế 2 ngày 20/12, thuê xe máy", None, TravelMode.MOTORBIKE),
+        ("Đi Huế 2 ngày 20/12, xe máy điện", TravelMode.CAR, TravelMode.MOTORBIKE),
+        ("Đi Huế 2 ngày 20/12 bằng taxi", TravelMode.MOTORBIKE, TravelMode.CAR),
+    ],
+)
+def test_explicit_travel_keyword_wins_over_null_or_different_llm_value(
+    text: str, llm_mode: TravelMode | None, expected: TravelMode
+) -> None:
+    query = _parse(
+        text,
+        _answer(**_DAYS, travel_mode=llm_mode.value if llm_mode else None),
+    )
+    assert query.request is not None
+    assert query.request.travel_mode is expected
+    assert "travel_mode" not in query.defaulted
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Đi Huế 2 ngày 20/12, thích ngắm cảnh, không đi bộ nhiều",
+        "Đi Huế 2 ngày 20/12, ít đi bộ thôi",
+        "Đi Huế 2 ngày 20/12, không muốn đi bộ",
+    ],
+)
+def test_negated_walking_is_a_soft_preference_not_a_mode(text: str) -> None:
+    query = _parse(text, _answer(**_DAYS))
+    assert query.request is not None
+    assert query.request.travel_mode is TravelMode.MOTORBIKE
+    assert "travel_mode" in query.defaulted
+
+
+def test_two_different_explicit_modes_keep_llm_value_only_if_one_of_them() -> None:
+    text = "Đi Huế 2 ngày 20/12, đi bộ hoặc taxi"
+    unknown = _parse(text, _answer(**_DAYS))
+    assert unknown.request is not None
+    assert "travel_mode" in unknown.defaulted
+    chosen = _parse(text, _answer(**_DAYS, travel_mode="car"))
+    assert chosen.request is not None
+    assert chosen.request.travel_mode is TravelMode.CAR
+
+
+# ---------------------------------------------------------------------------
+# Loại bị phủ định trong câu gốc
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("Đi Huế 2 ngày 20/12, không uống cà phê", [Category.CAFE]),
+        ("Đi Huế 2 ngày 20/12, bỏ bảo tàng", [Category.MUSEUM]),
+        ("Đi Huế 2 ngày 20/12, tránh chợ", [Category.MARKET]),
+        ("Đi Huế 2 ngày 20/12, không muốn đi chợ đêm nhé", [Category.MARKET]),
+        ("Đi Huế 2 ngày 20/12, không đi bộ nhiều", []),
+        ("Đi Huế 2 ngày 20/12, tránh chỗ đông", []),
+        ("Đi Huế 2 ngày 20/12, chỉ đi chỗ có mái che", []),
+        ("Đi Huế 2 ngày 20/12, không đi chùa Thiên Mụ", []),
+    ],
+)
+def test_negated_category_is_read_from_raw_text_when_llm_misses_it(
+    text: str, expected: list[Category]
+) -> None:
+    query = _parse(text, _answer(**_DAYS))
+    assert query.exclude_categories == expected
+
+
+def test_negated_category_is_added_to_llm_categories_without_duplicates() -> None:
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, bỏ chợ, không uống cà phê",
+        _answer(**_DAYS, exclude_category_phrases=["chợ"]),
+    )
+    assert query.exclude_categories == [Category.CAFE, Category.MARKET]
+
+
+def test_negated_category_only_reads_the_first_phrase_of_its_clause() -> None:
+    query = _parse("Đi Huế 2 ngày 20/12, không đi chợ và chùa", _answer(**_DAYS))
+    assert query.exclude_categories == [Category.MARKET]
+
+
+def test_category_phrase_with_accents_does_not_match_look_alike_words() -> None:
+    query = _parse(
+        "Đi Huế 2 ngày 20/12, chỉ đi chỗ có mái che",
+        _answer(**_DAYS, exclude_category_phrases=["chỗ có mái che", "làng nghề"]),
+    )
+    assert query.exclude_categories == []
+    assert query.soft_preferences == ["chỗ có mái che", "làng nghề"]

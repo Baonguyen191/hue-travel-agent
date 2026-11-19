@@ -6,6 +6,7 @@ from travel_agent.planning.candidates import INTEREST_CATEGORIES
 from travel_agent.understanding.models import DurationSpec
 from travel_agent.understanding.normalize import (
     INTEREST_KEYWORDS,
+    has_diacritics,
     map_interests,
     parse_duration,
     strip_diacritics,
@@ -164,3 +165,39 @@ def test_every_table_keyword_maps_to_its_own_interest() -> None:
         for keyword in keywords:
             found, _ = map_interests([keyword])
             assert interest in found, keyword
+
+
+@pytest.mark.parametrize(
+    ("phrase", "interest"),
+    [
+        ("đồ ăn địa phương", "food"),
+        ("hải sản tươi", "food"),
+        ("món ăn truyền thống", "food"),
+        ("ẩm thực đường phố", "food"),
+        ("ăn vặt", "food"),
+        ("ăn", "food"),
+        ("biển xanh", "nature"),
+    ],
+)
+def test_food_and_sea_phrases_map_to_interests(phrase: str, interest: str) -> None:
+    assert map_interests([phrase]) == ([interest], [])
+
+
+@pytest.mark.parametrize(
+    "phrase",
+    [
+        "tránh chỗ đông",  # "chợ" không có trong "chỗ"
+        "chỉ đi chỗ có mái che",
+        "làng nghề truyền thống",  # "làng" không phải "lăng"
+    ],
+)
+def test_accented_phrase_does_not_hit_look_alike_keywords(phrase: str) -> None:
+    assert map_interests([phrase]) == ([], [phrase])
+
+
+def test_has_diacritics_detects_marks_and_d_stroke() -> None:
+    assert has_diacritics("chùa")
+    assert has_diacritics("đền")
+    assert has_diacritics("Đại Nội")
+    assert not has_diacritics("chua")
+    assert not has_diacritics("dai noi")

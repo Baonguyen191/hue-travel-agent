@@ -5,11 +5,15 @@ Mọi hàm ở đây là hàm thuần, không gọi mạng và không raise vớ
 
 from __future__ import annotations
 
+import functools
 import re
 import unicodedata
-from collections.abc import Iterable
+from collections.abc import Hashable, Iterable
+from typing import TypeVar
 
 from travel_agent.understanding.models import DurationSpec
+
+_K = TypeVar("_K", bound=Hashable)
 
 _COMBINING_MARK = "Mn"
 
@@ -103,8 +107,12 @@ INTEREST_KEYWORDS: dict[str, tuple[str, ...]] = {
         "ăn vặt",
         "đi ăn",
         "ẩm thực",
+        "ẩm thực đường phố",
         "đặc sản",
+        "hải sản",
+        "đồ ăn",
         "món",
+        "món ăn",
         "nhà hàng",
     ),
     "coffee": ("cà phê", "cafe", "coffee"),
@@ -115,28 +123,75 @@ INTEREST_KEYWORDS: dict[str, tuple[str, ...]] = {
 }
 
 # Từ khóa ngắn hoặc trùng từ thường (ăn = an toàn, chùa/chua = món chua, sông/sống, cổ/có):
-# chỉ khớp khi cả cụm chỉ là đúng từ đó, không khớp khi nằm trong cụm dài.
+# chỉ khớp khi cả cụm chỉ là đúng từ đó, không khớp khi nằm trong cụm dài. Tính theo dạng đã bỏ dấu.
 _EXACT_ONLY: frozenset[str] = frozenset({"an", "den", "co", "chua", "song", "doi", "cho", "qua"})
 
-
-def _clean_phrase(text: str) -> str:
-    """Bỏ dấu, thay ký tự không phải chữ/số/gạch ngang bằng khoảng trắng."""
-    stripped = strip_diacritics(text)
-    return " ".join(re.sub(r"[^a-z0-9\- ]", " ", stripped).split())
+# Ký tự không phải chữ/số/gạch ngang/khoảng trắng; gạch dưới cũng đổi thành khoảng trắng.
+_NON_WORD = re.compile(r"[^\w\- ]|_")
 
 
-def _keyword_pattern(keyword: str) -> re.Pattern[str]:
-    stripped = strip_diacritics(keyword)
-    escaped = re.escape(stripped)
-    if stripped in _EXACT_ONLY:
+def has_diacritics(text: str) -> bool:
+    """True nếu cụm có dấu thanh, dấu mũ, dấu móc hoặc chữ đ/Đ. Quyết định cách so khớp."""
+    if "đ" in text.lower():
+        return True
+    decomposed = unicodedata.normalize("NFD", text)
+    return any(unicodedata.category(ch) == _COMBINING_MARK for ch in decomposed)
+
+
+def _squash(text: str) -> str:
+    """NFC, chữ thường, ký tự lạ thành khoảng trắng, gộp khoảng trắng; giữ nguyên dấu."""
+    nfc = unicodedata.normalize("NFC", text).lower()
+    return " ".join(_NON_WORD.sub(" ", nfc).split())
+
+
+def clean_phrase(text: str) -> tuple[bool, str]:
+    """(cụm có dấu hay không, cụm đã làm sạch để so khớp).
+
+    Cụm có dấu giữ dấu: chỉ khớp với từ khóa có dấu. Cụm không dấu bỏ dấu: khớp với dạng
+    không dấu của từ khóa. Vì vậy "tránh chỗ đông" không khớp "chợ", còn "cho dong" (không dấu)
+    vẫn khớp "cho" và đó là chỗ còn mơ hồ.
+    """
+    if has_diacritics(text):
+        return True, _squash(text)
+    return False, _squash(strip_diacritics(text))
+
+
+def keyword_form(keyword: str, diacritic: bool) -> str:
+    """Dạng của từ khóa cùng loại với cụm: có dấu nếu diacritic, không dấu nếu không."""
+    return _squash(keyword) if diacritic else _squash(strip_diacritics(keyword))
+
+
+@functools.cache
+def keyword_pattern(form: str, exact: bool = False) -> re.Pattern[str]:
+    """Regex khớp form đứng riêng (ranh giới là không phải chữ/số). exact: cả cụm phải bằng form."""
+    escaped = re.escape(form)
+    if exact:
         return re.compile(rf"^{escaped}$")
-    return re.compile(rf"(?<![a-z0-9]){escaped}(?![a-z0-9])")
+    return re.compile(rf"(?<!\w){escaped}(?!\w)")
 
 
-_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = tuple(
-    (interest, _keyword_pattern(keyword))
-    for interest, keywords in INTEREST_KEYWORDS.items()
-    for keyword in keywords
+def keyword_hits(
+    phrase: str,
+    pairs: Iterable[tuple[_K, str]],
+    exact_words: frozenset[str] = frozenset(),
+) -> set[_K]:
+    """Nhãn của các cặp (nhãn, từ khóa) khớp với cụm, theo quy tắc của clean_phrase.
+
+    exact_words: các từ khóa (dạng không dấu) chỉ khớp khi cả cụm đúng là từ đó.
+    """
+    diacritic, cleaned = clean_phrase(phrase)
+    if not cleaned:
+        return set()
+    hits: set[_K] = set()
+    for label, keyword in pairs:
+        exact = strip_diacritics(keyword) in exact_words
+        if keyword_pattern(keyword_form(keyword, diacritic), exact).search(cleaned):
+            hits.add(label)
+    return hits
+
+
+_INTEREST_PAIRS: tuple[tuple[str, str], ...] = tuple(
+    (interest, keyword) for interest, keywords in INTEREST_KEYWORDS.items() for keyword in keywords
 )
 
 
@@ -149,10 +204,9 @@ def map_interests(phrases: Iterable[str]) -> tuple[list[str], list[str]]:
     found: set[str] = set()
     unmatched: list[str] = []
     for phrase in phrases:
-        cleaned = _clean_phrase(phrase)
-        if not cleaned:
+        if not clean_phrase(phrase)[1]:
             continue
-        hits = {interest for interest, pattern in _PATTERNS if pattern.search(cleaned)}
+        hits = keyword_hits(phrase, _INTEREST_PAIRS, _EXACT_ONLY)
         if hits:
             found |= hits
         else:

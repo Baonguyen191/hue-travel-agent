@@ -162,3 +162,26 @@ def test_empty_inputs_give_empty_or_unlinked_results() -> None:
     (result,) = link_places(["Đại Nội"], [])
     assert result.place_id is None
     assert result.score == 0.0
+
+
+@requires_db
+@pytest.mark.parametrize(
+    "mention",
+    ["lang tu duc", "Lang Tu Duc", "lăng tự đức", "tu duc", "Lăng vua Tự Đức"],
+)
+def test_tu_duc_mausoleum_links_with_or_without_diacritics(
+    mention: str, hue_places: list[Place]
+) -> None:
+    # Ca thật trong DB, không dấu: "tu duc" nằm đúng thứ tự trong "Lăng vua Tự Đức" (bậc 0.85),
+    # và không tên nào khác trong DB có "tu duc" nên không có đối thủ hòa điểm.
+    assert _linked_id(mention, hue_places) == "huetripo:483480"
+
+
+def test_gapped_in_order_words_link_to_the_longer_name() -> None:
+    places = [
+        _place("p1", "Lăng vua Tự Đức", Category.HISTORIC),
+        _place("p2", "Lăng Dục Đức", Category.HISTORIC),
+    ]
+    (result,) = link_places(["lang tu duc"], places)
+    assert result.place_id == "p1"
+    assert result.score == 0.85

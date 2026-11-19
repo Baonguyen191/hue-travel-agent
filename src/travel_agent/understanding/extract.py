@@ -11,6 +11,7 @@ bị rò rỉ. Mọi tham số sinh (temperature, seed, num_ctx, num_predict) l�
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import json
 import re
 from collections.abc import Iterable, Sequence
@@ -22,8 +23,21 @@ from travel_agent.domain.models import Category, Pace, Place, PlanRequest, Trave
 from travel_agent.training.generator import PlanGenerator
 from travel_agent.understanding.dates import resolve_date_text
 from travel_agent.understanding.link import link_places
-from travel_agent.understanding.models import DurationSpec, Intent, ParsedQuery
-from travel_agent.understanding.normalize import map_interests, parse_duration, strip_diacritics
+from travel_agent.understanding.models import (
+    DurationSpec,
+    Intent,
+    ParsedQuery,
+    PlaceMention,
+)
+from travel_agent.understanding.normalize import (
+    clean_phrase,
+    keyword_form,
+    keyword_hits,
+    keyword_pattern,
+    map_interests,
+    parse_duration,
+    strip_diacritics,
+)
 
 CITY = "hue"
 DEFAULT_START = dt.time(8, 0)
@@ -37,22 +51,70 @@ _CLOCK_RE = re.compile(_CLOCK_PATTERN)
 _HUE_NAMES = frozenset({"hue", "thanh pho hue", "tp hue"})
 _WEEKDAY_NAMES = ("thứ Hai", "thứ Ba", "thứ Tư", "thứ Năm", "thứ Sáu", "thứ Bảy", "Chủ nhật")
 
-# Cụm loại địa điểm -> Category (đã bỏ dấu khi so). Cụm dài hơn được ưu tiên như nhau: mọi khóa
-# khớp đều được lấy, nên "quán cà phê" vẫn ra CAFE qua khóa "ca phe".
+# Cụm loại địa điểm -> Category, viết CÓ DẤU. Cụm không dấu cũng khớp (bỏ dấu cả hai bên). Khớp
+# đứng riêng nên "quán cà phê" vẫn ra CAFE qua khóa "cà phê". Khác dấu thì không khớp: "chợ" không
+# khớp "chỗ đông", "lăng" không khớp "làng nghề".
 _CATEGORY_PHRASES: dict[str, Category] = {
-    "cho": Category.MARKET,
-    "chua": Category.RELIGIOUS,
-    "den tho": Category.RELIGIOUS,
-    "lang": Category.HISTORIC,
-    "lang tam": Category.HISTORIC,
-    "di tich": Category.HISTORIC,
-    "bao tang": Category.MUSEUM,
-    "ca phe": Category.CAFE,
+    "chợ": Category.MARKET,
+    "chợ đêm": Category.MARKET,
+    "chùa": Category.RELIGIOUS,
+    "đền thờ": Category.RELIGIOUS,
+    "lăng": Category.HISTORIC,
+    "lăng tẩm": Category.HISTORIC,
+    "di tích": Category.HISTORIC,
+    "bảo tàng": Category.MUSEUM,
+    "cà phê": Category.CAFE,
     "cafe": Category.CAFE,
-    "quan an": Category.RESTAURANT,
-    "nha hang": Category.RESTAURANT,
-    "cong vien": Category.PARK,
+    "quán ăn": Category.RESTAURANT,
+    "nhà hàng": Category.RESTAURANT,
+    "công viên": Category.PARK,
 }
+_CATEGORY_PAIRS: tuple[tuple[Category, str], ...] = tuple(
+    (category, phrase) for phrase, category in _CATEGORY_PHRASES.items()
+)
+
+# Loại địa điểm -> sở thích tương ứng, dùng khi người dùng nêu tên địa điểm cụ thể muốn đến.
+# Mỗi loại chọn sở thích cụ thể nhất có loại đó trong INTEREST_CATEGORIES (test kiểm tra).
+# ATTRACTION không có ở đây: trong DB đó là nhóm gom chung (bãi biển, làng, cầu...), không phải
+# bằng chứng cho sightseeing.
+_CATEGORY_INTEREST: dict[Category, str] = {
+    Category.HISTORIC: "history",
+    Category.MUSEUM: "culture",
+    Category.RELIGIOUS: "spiritual",
+    Category.MARKET: "shopping",
+    Category.RESTAURANT: "food",
+    Category.CAFE: "coffee",
+    Category.PARK: "nature",
+    Category.VIEWPOINT: "nature",
+}
+
+# Từ phủ định trong yêu cầu mềm: có dấu thì khớp dạng có dấu; không dấu thì chỉ khớp dạng không dấu
+# của ba từ phổ biến (khong, dung, tranh), vì "it", "bo" không dấu quá mơ hồ.
+_SOFT_NEGATION_DIACRITIC: tuple[str, ...] = ("không", "chẳng", "đừng", "tránh", "ít", "bỏ")
+_SOFT_NEGATION_PLAIN: tuple[str, ...] = ("khong", "dung", "tranh")
+
+# Phương tiện, viết có dấu và không dấu (cùng quy tắc với loại địa điểm).
+_TRAVEL_MODE_KEYWORDS: dict[TravelMode, tuple[str, ...]] = {
+    TravelMode.CAR: ("ô tô", "oto", "o to", "xe hơi", "taxi", "grab car", "xe 4 chỗ", "xe du lịch"),
+    TravelMode.WALK: ("đi bộ",),
+    TravelMode.MOTORBIKE: ("xe máy", "xm", "thuê xe máy", "xe máy điện"),
+}
+_TRAVEL_PAIRS: tuple[tuple[TravelMode, str], ...] = tuple(
+    (mode, keyword) for mode, keywords in _TRAVEL_MODE_KEYWORDS.items() for keyword in keywords
+)
+# Từ đứng ngay trước cụm phương tiện (dạng không dấu) làm cụm thành phủ định: "không đi bộ nhiều".
+_NEGATING_BEFORE: frozenset[str] = frozenset({"khong", "it", "chang", "dung", "tranh"})
+
+# Phủ định trong câu: "không đi X", "không uống X", "bỏ X", "tránh X" (X là loại địa điểm).
+_NEGATION_WORDS = ("không", "đừng", "chẳng")
+_NEGATION_MODIFIERS = ("muốn", "thích", "nên", "cần")
+_NEGATED_VERBS = ("đi", "uống", "ăn", "ghé", "vào")
+_AVOID_VERBS = ("bỏ", "tránh")
+_FILLER_WORDS = ("nhé", "nha", "nhe", "nữa", "nua", "luôn", "luon", "đâu", "dau")
+# Từ kết thúc mệnh đề (dạng không dấu): "chợ và chùa" chỉ đọc "chợ".
+_CLAUSE_STOPS: frozenset[str] = frozenset({"va", "hoac", "nhung", "con", "thi"})
+_CLAUSE_SPLIT = re.compile(r"[,;.!?\n]+")
+_MAX_CATEGORY_WORDS = 4
 
 _DATE_PHRASE_RE = re.compile(
     r"(?<![a-z0-9])("
@@ -387,15 +449,106 @@ def _category_phrases(phrases: Iterable[str]) -> tuple[list[Category], list[str]
     found: set[Category] = set()
     unmatched: list[str] = []
     for phrase in phrases:
-        cleaned = _plain(phrase)
-        hits = {
-            category for key, category in _CATEGORY_PHRASES.items() if f" {key} " in f" {cleaned} "
-        }
+        if not clean_phrase(phrase)[1]:
+            continue
+        hits = keyword_hits(phrase, _CATEGORY_PAIRS)
         if hits:
             found |= hits
-        elif cleaned:
+        else:
             unmatched.append(phrase)
     return sorted(found, key=lambda item: item.value), unmatched
+
+
+@functools.cache
+def _negation_pattern(diacritic: bool) -> re.Pattern[str]:
+    """Đầu một phủ định (không đi / không muốn uống / bỏ / tránh), theo dạng có dấu hoặc không."""
+
+    def alternatives(words: Iterable[str]) -> str:
+        return "|".join(re.escape(keyword_form(word, diacritic)) for word in words)
+
+    negated = (
+        f"(?:{alternatives(_NEGATION_WORDS)})"
+        f"(?: (?:{alternatives(_NEGATION_MODIFIERS)}))? "
+        f"(?:{alternatives(_NEGATED_VERBS)})"
+    )
+    avoid = f"(?:{alternatives(_AVOID_VERBS)})"
+    return re.compile(rf"(?<!\w)(?:{negated}|{avoid}) ")
+
+
+def _whole_category(phrase: str, diacritic: bool) -> set[Category]:
+    """Loại địa điểm nếu cả cụm (chỉ thêm từ đệm cuối câu) đúng là một khóa trong bảng."""
+    if not phrase:
+        return set()
+    fillers = "|".join(re.escape(keyword_form(word, diacritic)) for word in _FILLER_WORDS)
+    found: set[Category] = set()
+    for key, category in _CATEGORY_PHRASES.items():
+        if re.fullmatch(rf"{re.escape(keyword_form(key, diacritic))}(?: (?:{fillers}))*", phrase):
+            found.add(category)
+    return found
+
+
+def _negated_categories(text: str) -> set[Category]:
+    """Loại địa điểm bị phủ định trong câu mà LLM có thể đã bỏ sót. Chỉ nhận khi X đứng riêng."""
+    found: set[Category] = set()
+    for clause in _CLAUSE_SPLIT.split(text):
+        diacritic, cleaned = clean_phrase(clause)
+        for match in _negation_pattern(diacritic).finditer(cleaned):
+            words: list[str] = []
+            for word in cleaned[match.end() :].split():
+                if strip_diacritics(word) in _CLAUSE_STOPS or len(words) == _MAX_CATEGORY_WORDS:
+                    break
+                words.append(word)
+            found |= _whole_category(" ".join(words), diacritic)
+    return found
+
+
+def _negated(prefix: str) -> bool:
+    """Trong hai từ ngay trước có từ phủ định không."""
+    return any(strip_diacritics(word) in _NEGATING_BEFORE for word in prefix.split()[-2:])
+
+
+def _explicit_travel_modes(text: str) -> set[TravelMode]:
+    """Phương tiện được nêu rõ trong câu, đọc theo từng mệnh đề. Cụm bị phủ định không tính."""
+    found: set[TravelMode] = set()
+    for clause in _CLAUSE_SPLIT.split(text):
+        diacritic, cleaned = clean_phrase(clause)
+        for mode, keyword in _TRAVEL_PAIRS:
+            for match in keyword_pattern(keyword_form(keyword, diacritic)).finditer(cleaned):
+                if not _negated(cleaned[: match.start()]):
+                    found.add(mode)
+    return found
+
+
+def _travel_mode(llm: TravelMode | None, text: str) -> TravelMode | None:
+    """Phương tiện nêu rõ trong câu thắng LLM, kể cả khi LLM để null.
+
+    Nêu đúng một loại: lấy loại đó. Nêu nhiều loại: giữ giá trị LLM nếu nằm trong số đó,
+    không thì null.
+    """
+    hits = _explicit_travel_modes(text)
+    if not hits:
+        return llm
+    if len(hits) == 1:
+        return next(iter(hits))
+    return llm if llm in hits else None
+
+
+def _interests_from_places(mentions: Sequence[PlaceMention], places: Sequence[Place]) -> set[str]:
+    """Sở thích suy ra từ loại của các địa điểm đã liên kết (chỉ dùng cho must_include)."""
+    by_id = {place.id: place for place in places}
+    found: set[str] = set()
+    for mention in mentions:
+        place = by_id.get(mention.place_id) if mention.place_id is not None else None
+        if place is not None and place.category in _CATEGORY_INTEREST:
+            found.add(_CATEGORY_INTEREST[place.category])
+    return found
+
+
+def _has_negation(phrase: str) -> bool:
+    """Yêu cầu mềm có từ phủ định (không ăn cay, tránh đông...) thì không suy ra sở thích."""
+    diacritic, cleaned = clean_phrase(phrase)
+    words = _SOFT_NEGATION_DIACRITIC if diacritic else _SOFT_NEGATION_PLAIN
+    return any(keyword_pattern(keyword_form(word, diacritic)).search(cleaned) for word in words)
 
 
 def _dedupe(items: Iterable[str]) -> list[str]:
@@ -456,12 +609,26 @@ def build_parsed_query(
     date_text, start = _resolve_start(extraction.date_text, text, ref)
     duration = _duration(extraction.duration_text, text)
     num_days = duration.num_days if duration is not None else None
+    travel_mode = _travel_mode(extraction.travel_mode, text)
 
     interests, unmatched_interests = map_interests(extraction.interest_phrases)
-    categories, unmatched_categories = _category_phrases(extraction.exclude_category_phrases)
+    # Sở thích có thể nằm trong yêu cầu mềm; cụm đó vẫn giữ nguyên trong soft_preferences.
+    # Cụm có từ phủ định ("không ăn cay") không đưa sở thích vào.
+    soft_interests, _ = map_interests(
+        phrase for phrase in extraction.soft_preferences if not _has_negation(phrase)
+    )
+    llm_categories, unmatched_categories = _category_phrases(extraction.exclude_category_phrases)
+    categories = sorted(
+        set(llm_categories) | _negated_categories(text), key=lambda item: item.value
+    )
     soft = _dedupe([*extraction.soft_preferences, *unmatched_interests, *unmatched_categories])
     must_include = link_places(extraction.must_include_mentions, places)
     exclude = link_places(extraction.exclude_mentions, places)
+    if extraction.intent is Intent.PLAN_NEW:
+        place_interests = _interests_from_places(must_include, places)
+    else:
+        place_interests = set()
+    interests = sorted(set(interests) | set(soft_interests) | place_interests)
 
     day_start = _clock(extraction.day_start)
     day_end = _clock(extraction.day_end)
@@ -476,8 +643,8 @@ def build_parsed_query(
         partial["start_date"] = start.isoformat()
     if num_days is not None:
         partial["num_days"] = num_days
-    if extraction.travel_mode is not None:
-        partial["travel_mode"] = extraction.travel_mode.value
+    if travel_mode is not None:
+        partial["travel_mode"] = travel_mode.value
     if extraction.pace is not None:
         partial["pace"] = extraction.pace.value
     if day_start is not None:
@@ -506,7 +673,7 @@ def build_parsed_query(
         return ParsedQuery(**base, clarification=question)
 
     defaulted: list[str] = []
-    if extraction.travel_mode is None:
+    if travel_mode is None:
         defaulted.append("travel_mode")
     if extraction.pace is None:
         defaulted.append("pace")
@@ -519,7 +686,7 @@ def build_parsed_query(
         num_days=num_days if num_days is not None else 1,
         day_start=day_start or DEFAULT_START,
         day_end=day_end or DEFAULT_END,
-        travel_mode=extraction.travel_mode or TravelMode.MOTORBIKE,
+        travel_mode=travel_mode or TravelMode.MOTORBIKE,
         pace=extraction.pace or Pace.MODERATE,
         interests=interests,
     )

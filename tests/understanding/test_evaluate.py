@@ -295,6 +295,19 @@ def test_run_eval_scores_and_records_errors_without_stopping() -> None:
     assert summarize(records).errors == 1
 
 
+def test_run_eval_keeps_raw_extraction_for_error_analysis() -> None:
+    items = [
+        _item("ok", {"intent": "out_of_scope"}, text="Thời tiết Huế thế nào?"),
+        _item("bad", {"intent": "out_of_scope"}, text="Câu không có đáp án"),
+    ]
+    generator = AnswerByText({"Thời tiết Huế thế nào?": _answer(intent="out_of_scope")})
+    ok, bad = run_eval(items, [], generator, EVAL_REF, _Clock())
+    assert ok.extraction is not None
+    assert ok.extraction["intent"] == "out_of_scope"
+    assert ok.extraction["interest_phrases"] == []
+    assert bad.extraction is None
+
+
 def test_run_eval_lets_infrastructure_errors_through() -> None:
     class Broken:
         def generate(

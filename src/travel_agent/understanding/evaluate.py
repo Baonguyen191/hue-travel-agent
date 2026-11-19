@@ -30,7 +30,12 @@ from pydantic import BaseModel, Field
 
 from travel_agent.domain.models import Pace, Place, TravelMode
 from travel_agent.training.generator import PlanGenerator
-from travel_agent.understanding.extract import ExtractionError, parse_query
+from travel_agent.understanding.extract import (
+    Extraction,
+    ExtractionError,
+    build_parsed_query,
+    extract,
+)
 from travel_agent.understanding.models import Intent, ParsedQuery
 from travel_agent.understanding.normalize import strip_diacritics
 
@@ -84,6 +89,8 @@ class EvalRecord(BaseModel):
     group: str
     text: str
     gold: dict[str, Any]
+    # JSON LLM trả về (trước khi code xử lý); None nếu lỗi trích. Giữ để phân tích lỗi sau này.
+    extraction: dict[str, Any] | None = None
     pred: ParsedQuery | None
     error: str | None
     latency_s: float
@@ -307,10 +314,12 @@ def run_eval(
     records: list[EvalRecord] = []
     for item in items:
         started = clock()
+        extraction: Extraction | None = None
         pred: ParsedQuery | None = None
         error: str | None = None
         try:
-            pred = parse_query(item.text, ref, generator, places)
+            extraction = extract(item.text, ref, generator)
+            pred = build_parsed_query(item.text, ref, extraction, places)
         except ExtractionError as exc:
             error = str(exc)
         latency = clock() - started
@@ -319,6 +328,7 @@ def run_eval(
             group=item.group,
             text=item.text,
             gold=item.gold,
+            extraction=extraction.model_dump(mode="json") if extraction is not None else None,
             pred=pred,
             error=error,
             latency_s=round(latency, 3),
