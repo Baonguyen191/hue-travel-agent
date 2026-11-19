@@ -668,35 +668,14 @@ def build_parsed_query(
     soft = _dedupe([*extraction.soft_preferences, *unmatched_interests, *unmatched_categories])
     must_include = link_places(extraction.must_include_mentions, places)
     exclude = link_places(extraction.exclude_mentions, places)
-    if extraction.intent is Intent.PLAN_NEW:
-        place_interests = _interests_from_places(must_include, places)
-    else:
-        place_interests = set()
-    interests = sorted(set(interests) | set(soft_interests) | place_interests)
+    interests = _merged_interests(extraction, interests, soft_interests, must_include, places)
 
-    day_start = _clock(extraction.day_start)
-    day_end = _clock(extraction.day_end)
-    if day_end is None and duration is not None and duration.half_day:
-        day_end = _half_day_end(day_start or DEFAULT_START)
-
-    partial: dict[str, object] = {
-        "interests": interests,
-        "soft_preferences": soft,
-    }
-    if start is not None:
-        partial["start_date"] = start.isoformat()
-    if num_days is not None:
-        partial["num_days"] = num_days
-    if travel_mode is not None:
-        partial["travel_mode"] = travel_mode.value
+    day_start, day_end = _day_window(extraction, duration)
     # Pace do LLM đưa ra thắng; chỉ khi LLM để null mới đọc nhịp nhẹ từ câu gốc.
     pace = extraction.pace if extraction.pace is not None else _pace_from_text(text)
-    if pace is not None:
-        partial["pace"] = pace.value
-    if day_start is not None:
-        partial["day_start"] = _clock_text(day_start)
-    if day_end is not None:
-        partial["day_end"] = _clock_text(day_end)
+    partial = _partial_fields(
+        interests, soft, start, num_days, travel_mode, pace, day_start, day_end
+    )
 
     base: dict[str, Any] = {
         "intent": extraction.intent,
@@ -712,21 +691,11 @@ def build_parsed_query(
 
     days_over_limit = num_days is not None and num_days > MAX_DAYS
     question = _clarification(start, date_text, num_days, days_over_limit)
-    if question is None and day_start is not None and day_end is not None:
-        if day_end <= day_start:
-            question = "Giờ kết thúc phải sau giờ bắt đầu. Bạn muốn đi từ mấy giờ đến mấy giờ?"
+    if question is None:
+        question = _order_question(day_start, day_end)
     if question is not None:
         return ParsedQuery(**base, clarification=question)
 
-    defaulted: list[str] = []
-    if travel_mode is None:
-        defaulted.append("travel_mode")
-    if pace is None:
-        defaulted.append("pace")
-    if day_start is None:
-        defaulted.append("day_start")
-    if day_end is None:
-        defaulted.append("day_end")
     request = PlanRequest(
         start_date=start if start is not None else ref,
         num_days=num_days if num_days is not None else 1,
@@ -736,7 +705,90 @@ def build_parsed_query(
         pace=pace or Pace.MODERATE,
         interests=interests,
     )
+    defaulted = _defaulted_fields(travel_mode, pace, day_start, day_end)
     return ParsedQuery(**base, request=request, defaulted=defaulted)
+
+
+def _merged_interests(
+    extraction: Extraction,
+    interests: Sequence[str],
+    soft_interests: Sequence[str],
+    must_include: Sequence[PlaceMention],
+    places: Sequence[Place],
+) -> list[str]:
+    """Sở thích hợp từ cụm sở thích, yêu cầu mềm và, khi lập lịch mới, các điểm bắt buộc."""
+    if extraction.intent is Intent.PLAN_NEW:
+        place_interests = _interests_from_places(must_include, places)
+    else:
+        place_interests = set()
+    return sorted(set(interests) | set(soft_interests) | place_interests)
+
+
+def _day_window(
+    extraction: Extraction, duration: DurationSpec | None
+) -> tuple[dt.time | None, dt.time | None]:
+    """Giờ bắt đầu và kết thúc trong ngày; nửa ngày thì suy ra giờ kết thúc nếu câu không nêu."""
+    day_start = _clock(extraction.day_start)
+    day_end = _clock(extraction.day_end)
+    if day_end is None and duration is not None and duration.half_day:
+        day_end = _half_day_end(day_start or DEFAULT_START)
+    return day_start, day_end
+
+
+def _partial_fields(
+    interests: list[str],
+    soft: list[str],
+    start: dt.date | None,
+    num_days: int | None,
+    travel_mode: TravelMode | None,
+    pace: Pace | None,
+    day_start: dt.time | None,
+    day_end: dt.time | None,
+) -> dict[str, object]:
+    """Các trường đã hiểu được, giữ đúng thứ tự chèn để JSON đầu ra không đổi."""
+    partial: dict[str, object] = {
+        "interests": interests,
+        "soft_preferences": soft,
+    }
+    if start is not None:
+        partial["start_date"] = start.isoformat()
+    if num_days is not None:
+        partial["num_days"] = num_days
+    if travel_mode is not None:
+        partial["travel_mode"] = travel_mode.value
+    if pace is not None:
+        partial["pace"] = pace.value
+    if day_start is not None:
+        partial["day_start"] = _clock_text(day_start)
+    if day_end is not None:
+        partial["day_end"] = _clock_text(day_end)
+    return partial
+
+
+def _order_question(day_start: dt.time | None, day_end: dt.time | None) -> str | None:
+    """Câu hỏi lại khi giờ kết thúc không sau giờ bắt đầu (chỉ khi cả hai đều có)."""
+    if day_start is not None and day_end is not None and day_end <= day_start:
+        return "Giờ kết thúc phải sau giờ bắt đầu. Bạn muốn đi từ mấy giờ đến mấy giờ?"
+    return None
+
+
+def _defaulted_fields(
+    travel_mode: TravelMode | None,
+    pace: Pace | None,
+    day_start: dt.time | None,
+    day_end: dt.time | None,
+) -> list[str]:
+    """Tên các trường mà code sẽ tự điền vì câu không nêu."""
+    defaulted: list[str] = []
+    if travel_mode is None:
+        defaulted.append("travel_mode")
+    if pace is None:
+        defaulted.append("pace")
+    if day_start is None:
+        defaulted.append("day_start")
+    if day_end is None:
+        defaulted.append("day_end")
+    return defaulted
 
 
 def parse_query(
