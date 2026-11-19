@@ -73,11 +73,24 @@ GENERATION_KEYS = ("temperature", "seed", "num_predict", "num_ctx")
 
 
 def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    _add_make_evalset(sub)
+    _add_eval(sub)
+    _add_build_dataset(sub)
+    _add_check_dataset(sub)
+    _add_reward_report(sub)
+    _add_plan(sub)
+
+
+def _add_make_evalset(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    """Đăng ký lệnh make-evalset."""
     evalset = sub.add_parser("make-evalset", help="Sinh bộ eval 100 request (chạy một lần)")
     evalset.add_argument("--out", type=Path, required=True)
     evalset.add_argument("--seed", type=int, required=True)
     evalset.set_defaults(func=_cmd_make_evalset)
 
+
+def _add_eval(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    """Đăng ký lệnh eval."""
     run = sub.add_parser("eval", help="Chạy bộ eval qua một model trong Ollama")
     run.add_argument("--db", type=Path, required=True)
     run.add_argument("--evalset", type=Path, required=True)
@@ -101,6 +114,9 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     )
     run.set_defaults(func=_cmd_eval)
 
+
+def _add_build_dataset(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    """Đăng ký lệnh build-dataset."""
     build = sub.add_parser(
         "build-dataset", help="Dựng dataset SFT từ solver (configs/dataset.yaml)"
     )
@@ -111,6 +127,9 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     build.add_argument("--manifest", type=Path, required=True)
     build.set_defaults(func=_cmd_build_dataset)
 
+
+def _add_check_dataset(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    """Đăng ký lệnh check-dataset."""
     check = sub.add_parser("check-dataset", help="Kiểm dataset SFT; hỏng thì exit 4")
     check.add_argument("--config", type=Path, required=True)
     check.add_argument("--db", type=Path, required=True)
@@ -130,6 +149,9 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     )
     check.set_defaults(func=_cmd_check_dataset)
 
+
+def _add_reward_report(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    """Đăng ký lệnh reward-report."""
     reward = sub.add_parser(
         "reward-report", help="Chấm reward trên output dev đã có; không qua kiểm tra thì exit 4"
     )
@@ -148,6 +170,9 @@ def add_training_commands(sub: argparse._SubParsersAction[argparse.ArgumentParse
     reward.add_argument("--out", type=Path, required=True, help="File JSON báo cáo")
     reward.set_defaults(func=_cmd_reward_report)
 
+
+def _add_plan(sub: argparse._SubParsersAction[argparse.ArgumentParser]) -> None:
+    """Đăng ký lệnh plan."""
     plan = sub.add_parser(
         "plan", help="Lập lịch một chuyến đi qua Ollama (xếp giờ, sửa lỗi); in JSON"
     )
@@ -360,6 +385,38 @@ def _cmd_make_evalset(args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _print_summary(run_name: str, model: str, split: Split, summary: EvalSummary) -> None:
+    """In tóm tắt một lần chạy eval ra stdout."""
+    print(f"{run_name}: {summary.n} request, model {model}, split {split.value}")
+    print(f"  first_pass_valid_rate: {summary.first_pass_valid_rate:.3f}")
+    print(f"  parse_error_rate:      {summary.parse_error_rate:.3f}")
+    print(f"  unknown_place_rate:    {summary.unknown_place_rate:.3f}")
+    print(f"  avg_stops_per_day:     {summary.avg_stops_per_day:.2f}")
+    print(f"  distinct_place_count:  {summary.distinct_place_count}")
+    print(f"  latency_p50_s:         {summary.latency_p50_s:.1f}")
+    for code, count in summary.issue_code_distribution.items():
+        print(f"  issue {code}: {count}")
+
+
+def _check_baseline(
+    meta: dict[str, str | int | float],
+    summary: EvalSummary,
+    baseline: tuple[dict[str, object], EvalSummary],
+) -> int:
+    """So với mốc: khác điều kiện thì EXIT_USAGE, kém hơn thì EXIT_REGRESSION, không thì EXIT_OK."""
+    baseline_meta, baseline_summary = baseline
+    differing = incomparable(meta, baseline_meta)
+    if differing:
+        print(f"Không so được với mốc: khác {', '.join(differing)}.", file=sys.stderr)
+        return EXIT_USAGE
+    problems = regressions(summary, baseline_summary)
+    for problem in problems:
+        print(f"KHÔNG QUA CỔNG: {problem}", file=sys.stderr)
+    if problems:
+        return EXIT_REGRESSION
+    return EXIT_OK
+
+
 def _cmd_eval(args: argparse.Namespace) -> int:
     for path in (args.db, args.evalset):
         if not path.exists():
@@ -418,29 +475,12 @@ def _cmd_eval(args: argparse.Namespace) -> int:
     report = {"meta": meta, "summary": summary.model_dump(mode="json")}
     args.out.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    print(f"{args.run_name}: {summary.n} request, model {args.model}, split {args.split.value}")
-    print(f"  first_pass_valid_rate: {summary.first_pass_valid_rate:.3f}")
-    print(f"  parse_error_rate:      {summary.parse_error_rate:.3f}")
-    print(f"  unknown_place_rate:    {summary.unknown_place_rate:.3f}")
-    print(f"  avg_stops_per_day:     {summary.avg_stops_per_day:.2f}")
-    print(f"  distinct_place_count:  {summary.distinct_place_count}")
-    print(f"  latency_p50_s:         {summary.latency_p50_s:.1f}")
-    for code, count in summary.issue_code_distribution.items():
-        print(f"  issue {code}: {count}")
+    _print_summary(args.run_name, args.model, args.split, summary)
 
     if args.mlflow:
         log_eval_run(args.run_name, meta, summary)
     if baseline is not None:
-        baseline_meta, baseline_summary = baseline
-        differing = incomparable(meta, baseline_meta)
-        if differing:
-            print(f"Không so được với mốc: khác {', '.join(differing)}.", file=sys.stderr)
-            return EXIT_USAGE
-        problems = regressions(summary, baseline_summary)
-        for problem in problems:
-            print(f"KHÔNG QUA CỔNG: {problem}", file=sys.stderr)
-        if problems:
-            return EXIT_REGRESSION
+        return _check_baseline(meta, summary, baseline)
     return EXIT_OK
 
 
