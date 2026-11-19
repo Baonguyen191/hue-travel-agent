@@ -257,3 +257,87 @@ def test_relative_dates_cross_new_year() -> None:
 
 def test_numeric_date_with_explicit_year_is_not_rolled_forward() -> None:
     assert resolve_date_text("20/12/2025", DEC_SUN) == dt.date(2025, 12, 20)
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        # Ref là thứ Tư 18/11: tuần Thứ Hai 16 .. Chủ nhật 22.
+        ("thứ 5 tuần này", dt.date(2026, 11, 19)),
+        ("thu 5 tuan nay", dt.date(2026, 11, 19)),
+        ("thứ tư tuần này", dt.date(2026, 11, 18)),
+        ("chủ nhật tuần này", dt.date(2026, 11, 22)),
+        ("CN tuần này", dt.date(2026, 11, 22)),
+        ("t7 tuần này", dt.date(2026, 11, 21)),
+        # Đã qua trong tuần: lấy ngày đó của tuần sau (lựa chọn đã ghi trong docstring).
+        ("thứ 2 tuần này", dt.date(2026, 11, 23)),
+        ("thứ 3 tuần này", dt.date(2026, 11, 24)),
+    ],
+)
+def test_weekday_of_this_week(text: str, expected: dt.date) -> None:
+    assert resolve_date_text(text, WED) == expected
+
+
+def test_weekday_of_this_week_from_sunday_and_monday() -> None:
+    # Ref là Chủ nhật 22/11: thứ 2 của tuần đó đã qua, Chủ nhật là chính ref.
+    assert resolve_date_text("thứ 2 tuần này", SUN) == dt.date(2026, 11, 23)
+    assert resolve_date_text("chủ nhật tuần này", SUN) == dt.date(2026, 11, 22)
+    # Ref là Thứ Hai 16/11: thứ 2 tuần này là chính ref.
+    assert resolve_date_text("thứ 2 tuần này", MON) == dt.date(2026, 11, 16)
+    assert resolve_date_text("thứ 7 tuần này", MON) == dt.date(2026, 11, 21)
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("t7", dt.date(2026, 11, 21)),
+        ("T7", dt.date(2026, 11, 21)),
+        ("t7 tới", dt.date(2026, 11, 21)),
+        ("T7 tới", dt.date(2026, 11, 21)),
+        ("t7 này", dt.date(2026, 11, 21)),
+        ("t2", dt.date(2026, 11, 23)),
+        ("t5 này", dt.date(2026, 11, 19)),
+        ("t6 sau", dt.date(2026, 11, 20)),
+        ("t4", dt.date(2026, 11, 25)),
+        ("CN", dt.date(2026, 11, 22)),
+    ],
+)
+def test_short_weekday_abbreviations(text: str, expected: dt.date) -> None:
+    assert resolve_date_text(text, WED) == expected
+
+
+@pytest.mark.parametrize("text", ["t1", "t8", "t", "t0", "tu", "tuan 5"])
+def test_unknown_short_weekday_returns_none(text: str) -> None:
+    assert resolve_date_text(text, WED) is None
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("20/12 năm sau", dt.date(2027, 12, 20)),
+        ("20-12 năm sau", dt.date(2027, 12, 20)),
+        ("ngày 20 tháng 12 năm sau", dt.date(2027, 12, 20)),
+        ("ngay 3 thang 1 nam sau", dt.date(2027, 1, 3)),
+        ("đầu tháng 3 năm sau", dt.date(2027, 3, 1)),
+        ("29/02 năm sau", None),  # 2027 không nhuận: không dời năm.
+    ],
+)
+def test_next_year_suffix_uses_ref_year_plus_one(text: str, expected: dt.date | None) -> None:
+    assert resolve_date_text(text, WED) == expected
+
+
+def test_next_year_suffix_leap_day_when_next_year_is_leap() -> None:
+    ref_2027 = dt.date(2027, 11, 18)
+    assert resolve_date_text("29/02 năm sau", ref_2027) == dt.date(2028, 2, 29)
+
+
+def test_next_year_suffix_is_relative_to_ref_year_not_to_today() -> None:
+    # Ref năm 2026 thì "năm sau" là 2027 dù ngày 20/12 đã trước ref trong năm đó.
+    assert resolve_date_text("20/12 năm sau", dt.date(2026, 12, 25)) == dt.date(2027, 12, 20)
+
+
+@pytest.mark.parametrize(
+    "text", ["20/12/2027 năm sau", "ngày 20 tháng 12 năm 2027 năm sau", "hôm nay năm sau"]
+)
+def test_next_year_suffix_with_explicit_year_or_relative_day_returns_none(text: str) -> None:
+    assert resolve_date_text(text, WED) is None

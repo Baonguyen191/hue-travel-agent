@@ -10,6 +10,10 @@ Quy tắc đã chọn (thứ Hai = 0 ... Chủ nhật = 6, như datetime.weekday
 - "thứ X" và "thứ X tới" / "thứ X sau" = thứ X đầu tiên sau ref, KHÔNG tính ref.
   (Hôm thứ Tư nói "thứ 4" thì hiểu là tuần sau; đây là lựa chọn, không phải sự thật ngôn ngữ.)
   X: "2" / "hai" .. "7" / "bảy"; "chủ nhật" / "CN" = Chủ nhật.
+  Viết tắt "t2" .. "t7" (và "T7 tới", "t7 này") hiểu như "thứ X"; "t" không kèm số thì không hiểu.
+- "thứ X tuần này" / "chủ nhật tuần này" / "t7 tuần này" = ngày đó trong tuần Thứ Hai đến Chủ
+  nhật chứa ref. Nếu ngày đó trước ref (đã qua) thì lấy ngày đó của tuần sau (lựa chọn, ghi nhận
+  ở đây: "tuần này" chỉ có nghĩa khi ngày còn ở phía trước).
 - "cuối tuần này" (và "cuối tuần" trơ) = thứ Bảy gần nhất từ ref trở đi; nếu ref là Chủ nhật
   thì trả ref.
 - "cuối tuần sau" / "cuối tuần tới" = mốc "cuối tuần này" + 7 ngày.
@@ -19,6 +23,9 @@ Quy tắc đã chọn (thứ Hai = 0 ... Chủ nhật = 6, như datetime.weekday
   nhuận kế tiếp; tối đa tìm 8 năm.
 - "dd/mm/yyyy", "dd-mm-yyyy", "ngày dd tháng mm năm yyyy": đúng ngày đó, không dời năm.
   Năm phải đủ 4 chữ số; "20/12/26" không hiểu, trả None.
+- "dd/mm năm sau", "ngày dd tháng mm năm sau", "đầu tháng N năm sau": năm = năm của ref + 1.
+  Ngày không có trong năm đó (29/02 năm không nhuận) trả None, không dời năm.
+  Kèm năm tường minh ("20/12/2027 năm sau") trả None.
 - "ngày dd tháng mm" (không năm): như dd/mm.
 - "đầu tháng N" = ngày 1, "giữa tháng N" = ngày 15, "cuối tháng N" = ngày 25 (không dùng ngày
   cuối tháng vì khác nhau theo tháng; đây là quy ước). Năm: như dd/mm, hoặc "năm yyyy".
@@ -62,9 +69,13 @@ _RELATIVE_DAYS: dict[str, int] = {
     "mot": 2,
 }
 
-_WEEKDAY_RE = re.compile(r"(?:thu (\d|hai|ba|tu|nam|sau|bay)|(chu nhat|cn))(?: (nay|toi|sau))?")
+# Nhóm 1: số thứ viết đầy đủ; nhóm 2: chữ số sau "t" (viết tắt); nhóm 3: chủ nhật.
+_WEEKDAY_NAME = r"thu (\d|hai|ba|tu|nam|sau|bay)|t(\d)|(chu nhat|cn)"
+_WEEKDAY_RE = re.compile(rf"(?:{_WEEKDAY_NAME})(?: (nay|toi|sau))?")
+_WEEK_WEEKDAY_RE = re.compile(rf"(?:{_WEEKDAY_NAME}) tuan nay")
 _WEEKEND_RE = re.compile(r"cuoi tuan(?: (nay|toi|sau))?")
 _NEXT_WEEK_RE = re.compile(r"tuan (?:sau|toi)")
+_NEXT_YEAR_SUFFIX = " nam sau"
 _HOLIDAY_JAN_1 = "tet duong lich"
 _HOLIDAY_DEC_24 = frozenset({"giang sinh", "noel"})
 _NUMERIC_RE = re.compile(r"(?:ngay )?(\d{1,2})\s*[./-]\s*(\d{1,2})(?:\s*[./-]\s*(\d{4}))?")
@@ -85,6 +96,15 @@ def _next_weekday(ref: dt.date, weekday: int, *, include_ref: bool) -> dt.date:
     if delta == 0 and not include_ref:
         delta = 7
     return ref + dt.timedelta(days=delta)
+
+
+def _this_week_weekday(ref: dt.date, weekday: int) -> dt.date:
+    """Ngày thứ `weekday` trong tuần Thứ Hai..Chủ nhật chứa ref; đã qua thì sang tuần sau."""
+    monday = ref - dt.timedelta(days=ref.weekday())
+    candidate = monday + dt.timedelta(days=weekday)
+    if candidate < ref:
+        candidate += dt.timedelta(days=7)
+    return candidate
 
 
 def _weekend_saturday(ref: dt.date) -> dt.date:
@@ -114,6 +134,32 @@ def _date_with_optional_year(
     return dt.date(int(year_text), month, day)
 
 
+def _weekday_target(number: str | None, t_digit: str | None, chu_nhat: str | None) -> int | None:
+    """Đổi nhóm khớp của _WEEKDAY_NAME thành weekday(); không hiểu thì None."""
+    if chu_nhat is not None:
+        return _SUNDAY
+    key = number if number is not None else t_digit
+    if key is None:
+        return None
+    return _WEEKDAY_INDEX.get(key)
+
+
+def _resolve_next_year(base: str, ref: dt.date) -> dt.date | None:
+    """Cụm "dd/mm", "ngày dd tháng mm", "đầu tháng mm" (đã bỏ hậu tố "năm sau") ở năm ref + 1."""
+    year = ref.year + 1
+    numeric = _NUMERIC_RE.fullmatch(base)
+    if numeric is not None and numeric.group(3) is None:
+        day, month = int(numeric.group(1)), int(numeric.group(2))
+        return dt.date(year, month, day)
+    words = _WORDS_DATE_RE.fullmatch(base)
+    if words is not None and words.group(3) is None:
+        return dt.date(year, int(words.group(2)), int(words.group(1)))
+    part = _PART_OF_MONTH_RE.fullmatch(base)
+    if part is not None and part.group(3) is None:
+        return dt.date(year, int(part.group(2)), _PART_OF_MONTH_DAY[part.group(1)])
+    return None
+
+
 def _resolve(text: str, ref: dt.date) -> dt.date | None:
     cleaned = _clean(text)
     if not cleaned:
@@ -121,14 +167,21 @@ def _resolve(text: str, ref: dt.date) -> dt.date | None:
     if cleaned in _RELATIVE_DAYS:
         return ref + dt.timedelta(days=_RELATIVE_DAYS[cleaned])
 
+    if cleaned.endswith(_NEXT_YEAR_SUFFIX):
+        return _resolve_next_year(cleaned[: -len(_NEXT_YEAR_SUFFIX)], ref)
+
+    week_weekday_match = _WEEK_WEEKDAY_RE.fullmatch(cleaned)
+    if week_weekday_match is not None:
+        target = _weekday_target(*week_weekday_match.groups())
+        if target is None:
+            return None
+        return _this_week_weekday(ref, target)
+
     weekday_match = _WEEKDAY_RE.fullmatch(cleaned)
     if weekday_match is not None:
-        number, chu_nhat, modifier = weekday_match.groups()
-        if chu_nhat is not None:
-            target = _SUNDAY
-        elif number is not None and number in _WEEKDAY_INDEX:
-            target = _WEEKDAY_INDEX[number]
-        else:
+        number, t_digit, chu_nhat, modifier = weekday_match.groups()
+        target = _weekday_target(number, t_digit, chu_nhat)
+        if target is None:
             return None
         return _next_weekday(ref, target, include_ref=modifier == "nay")
 

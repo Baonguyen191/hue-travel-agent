@@ -56,6 +56,9 @@ class ParsedQuery(BaseModel):
     # Tên trường được điền mặc định (ví dụ "pace", "travel_mode").
     defaulted: list[str] = Field(default_factory=list)
     clarification: str | None = None
+    # Các trường đã trích, dạng JSON (ngày ISO, giờ HH:MM, số, chuỗi, danh sách). Giữ cả khi chưa
+    # dựng được request (đang hỏi lại), để eval vẫn chấm được phần đã hiểu.
+    partial: dict[str, object] = Field(default_factory=dict)
 
     @model_validator(mode="after")
     def _intent_matches_fields(self) -> ParsedQuery:

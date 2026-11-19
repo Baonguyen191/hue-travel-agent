@@ -25,6 +25,7 @@ from travel_agent.review.store import ReviewStore
 from travel_agent.sources.models import LinkStatus
 from travel_agent.sources.store import LinkStore
 from travel_agent.training.commands import add_training_commands
+from travel_agent.understanding.cli import add_understanding_commands
 
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 # Khung bao gần đúng: nội đô Huế, các lăng phía nam, Thuận An. Xem lại trên bản đồ trước khi tải.
@@ -97,6 +98,7 @@ def _build_parser() -> argparse.ArgumentParser:
     export.add_argument("--out", type=Path, required=True)
     export.set_defaults(func=_cmd_export)
     add_training_commands(sub)
+    add_understanding_commands(sub)
     return parser
 
 

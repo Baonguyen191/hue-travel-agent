@@ -64,6 +64,17 @@ def test_defaults_are_empty_lists() -> None:
     assert query.soft_preferences == []
     assert query.defaulted == []
     assert query.date_text is None
+    assert query.partial == {}
+
+
+def test_partial_keeps_extracted_fields_without_request() -> None:
+    query = ParsedQuery(
+        intent=Intent.PLAN_NEW,
+        clarification="Bạn đi từ ngày nào?",
+        partial={"num_days": 2, "interests": ["history"]},
+    )
+    assert query.request is None
+    assert query.partial == {"num_days": 2, "interests": ["history"]}
 
 
 def test_exclude_categories_accepts_category_and_rejects_unknown_value() -> None:
