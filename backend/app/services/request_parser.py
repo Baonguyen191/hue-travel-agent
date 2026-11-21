@@ -1,17 +1,20 @@
-"""Trip-request parsing: Vietnamese rules first, OpenAI only to fill missing required fields.
+"""Trip-request parsing: query understanding first, OpenAI only to fill missing required fields.
 
-Without `OPENAI_API_KEY` the OpenAI step is skipped entirely, so the rule result is final.
+`understand()` uses the local Ollama model when `QU_ENABLED` is on and falls back to the
+Vietnamese rule parser otherwise. The OpenAI step runs only when no request could be built and a
+key exists; without a key the understanding result is final.
 """
 
 from __future__ import annotations
 
+import functools
 import json
 from datetime import date
 from typing import Any
 
 from openai import OpenAI
 
-from app.core.config import openai_api_key
+from app.core.config import ollama_url, openai_api_key, qu_enabled, qu_model
 from app.schemas.parsed_trip import ParsedTrip
 from app.services.poi_search import normalize_vietnamese
 from app.services.vi_request_parser import (
@@ -19,8 +22,10 @@ from app.services.vi_request_parser import (
     REQUIRED_FIELDS,
     derive_end_date,
     finalize_parsed,
-    parse_vietnamese_request,
 )
+from app.understanding.extract import OllamaExtractor
+from app.understanding.models import ParsedQuery, QuSource
+from app.understanding.understand import Extractor, understand
 
 __all__ = ["ParsedTrip", "TripRequestParser"]
 
@@ -33,19 +38,46 @@ _SYSTEM_PROMPT = (
 )
 
 
+@functools.cache
+def _shared_extractor() -> Extractor | None:
+    """One Ollama client per process; None when the LLM step is switched off."""
+    if not qu_enabled():
+        return None
+    return OllamaExtractor(ollama_url(), qu_model())
+
+
 class TripRequestParser:
-    """Rules first; the OpenAI call runs only when a key exists and fields are still missing."""
+    """Understanding first; the OpenAI call runs only when no request exists and a key does."""
 
     def parse(self, text: str, today: date | None = None) -> ParsedTrip:
-        parsed = parse_vietnamese_request(text, today or date.today())
+        query = understand(text, today or date.today(), extractor=_shared_extractor())
+        parsed = _to_parsed_trip(query)
         key = openai_api_key()
-        if not parsed.missing_fields or not key:
+        if parsed.request is not None or not parsed.missing_fields or not key:
             return parsed
         try:
             extra = _ask_openai(text, key, parsed.missing_fields)
         except Exception:
             return parsed
         return _fill_missing(parsed, extra)
+
+
+def _to_parsed_trip(query: ParsedQuery) -> ParsedTrip:
+    """The response shape of /plans/parse, built from a ParsedQuery."""
+    notes = list(query.notes)
+    if query.request is None and query.clarification:
+        notes.append(query.clarification)
+    if query.request is not None:
+        source = "OLLAMA" if query.source is QuSource.OLLAMA else "RULES"
+    else:
+        source = "FORM_FALLBACK"
+    return ParsedTrip(
+        request=query.request,
+        missing_fields=list(query.missing_fields),
+        source=source,
+        fields=dict(query.fields),
+        notes=notes,
+    )
 
 
 def _fill_missing(parsed: ParsedTrip, extra: dict[str, Any]) -> ParsedTrip:

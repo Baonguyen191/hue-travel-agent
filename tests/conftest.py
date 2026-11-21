@@ -6,3 +6,4 @@ import os
 
 os.environ["DATABASE_URL"] = "sqlite://"
 os.environ["CHECKPOINT_URL"] = "memory://"
+os.environ["QU_ENABLED"] = "false"

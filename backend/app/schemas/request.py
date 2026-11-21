@@ -28,8 +28,8 @@ class TripRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_dates_and_coordinates(self) -> "TripRequest":
-        if self.end_date <= self.start_date:
-            raise ValueError("end_date must be after start_date")
+        if self.end_date < self.start_date:
+            raise ValueError("end_date must not be before start_date")
         if (self.center_lat is None) != (self.center_lon is None):
             raise ValueError("center_lat and center_lon must be supplied together")
         if self.radius_km is not None and self.center_lat is None:

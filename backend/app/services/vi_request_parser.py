@@ -246,9 +246,9 @@ def _extract_preferences(text: str, fields: dict[str, Any]) -> None:
 
 def _check_end_after_start(fields: dict[str, Any], notes: list[str]) -> None:
     start, end = fields.get("start_date"), fields.get("end_date")
-    if start is not None and end is not None and end <= start:
+    if start is not None and end is not None and end < start:
         del fields["end_date"]
-        notes.append("Ngày kết thúc phải sau ngày bắt đầu; chưa điền ngày kết thúc.")
+        notes.append("Ngày kết thúc không được trước ngày bắt đầu; chưa điền ngày kết thúc.")
 
 
 def _build_request(fields: dict[str, Any], notes: list[str]) -> TripRequest | None:

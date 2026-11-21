@@ -77,3 +77,21 @@ def settings_notes() -> list[str]:
     if openai_api_key() is None:
         return ["OPENAI_API_KEY is not set; the request parser uses rules only."]
     return []
+
+
+def ollama_url() -> str:
+    """Base URL of the local Ollama server used by the query understanding step."""
+    return os.environ.get("OLLAMA_URL") or "http://localhost:11434"
+
+
+def qu_model() -> str:
+    """Ollama model that extracts phrases from user messages."""
+    return os.environ.get("QU_MODEL") or "qwen3.5:4b"
+
+
+def qu_enabled() -> bool:
+    """False turns the LLM step off so the rule parser answers alone (tests and offline use)."""
+    value = os.environ.get("QU_ENABLED")
+    if value is None or not value.strip():
+        return True
+    return value.strip().lower() not in {"0", "false", "no", "off"}
