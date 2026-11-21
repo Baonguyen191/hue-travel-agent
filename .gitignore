@@ -1,12 +1,25 @@
-.venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 .pytest_cache/
-.mypy_cache/
-.ruff_cache/
-data/raw/
-data/*.sqlite
-*.gguf
+.venv/
+
+# Environment and tooling
 .env
-# W&B ghi run local ở đây nếu không đặt WANDB_DIR
-wandb/
+.env.*
+!.env.example
+.coverage
+htmlcov/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Local editor files
+.vscode/
+.idea/
+
+# Data (source DB supplied out of band; runtime state DB is local only)
+data/*.sqlite
+backend/data/*.sqlite
+pytest-cache-files-*/

@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file: [.env]
+    environment:
+      HUE_SQLITE_PATH: /app/backend/data/hue.sqlite
+      DATABASE_URL: postgresql+psycopg://travel:travel@postgres:5432/travel
+    ports: ["8000:8000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: travel
+      POSTGRES_USER: travel
+      POSTGRES_PASSWORD: travel
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U travel -d travel"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+volumes: {}

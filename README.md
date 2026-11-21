@@ -1,222 +1,100 @@
-# Travel Agent: Huế
+# Hue Travel Multi-Agent
 
-Dữ liệu địa điểm và công cụ duyệt tay cho LLM lập lịch du lịch chạy offline.
-Lộ trình: `docs/superpowers/plans/2026-11-03-hue-planner-roadmap.md`.
+This repository includes PHASE 0–3: project setup, source auditing, normalized
+read-only POI retrieval, local search/ranking, and explicitly-labelled mock
+transport/hotel providers, a deterministic Search Agent, and a transparent
+Budget Agent, and a deterministic Itinerary Agent. It does not yet provide
+orchestration or booking.
 
-## Cài đặt (Windows, Python 3.11)
+## Dataset
 
-```powershell
-py -3.11 -m venv .venv
-.venv\Scripts\python -m pip install -e ".[dev]"
-```
+`data/hue.sqlite` is the source file supplied for this project. PHASE 0 copies
+it to `backend/data/hue.sqlite` for the backend to read. Both the audit script
+and the API open the backend copy using SQLite read-only mode; neither command
+changes the supplied source database.
 
-**Lưu ý đường dẫn có dấu:** khi project nằm trong thư mục có ký tự tiếng Việt (ví dụ
-`OneDrive\Máy tính`), Python 3.11 đọc sai file `.pth` của editable install, nên lệnh
-`travel-agent` báo `ModuleNotFoundError`. Có hai cách xử lý:
-- Chuyển project sang đường dẫn không dấu, ví dụ `C:\dev\TravelAgent` (khuyến nghị).
-- Hoặc đặt `$env:PYTHONPATH="src"` rồi chạy `.venv\Scripts\python -m travel_agent <lệnh>`.
+If setting up from a clean checkout, put the source database at
+`data/hue.sqlite`, then copy it to `backend/data/hue.sqlite` before starting the
+API. Do not edit either file in place.
 
-## Dữ liệu
+The dataset identifies its source as `huetripo.hue.gov.vn`. Its `license` field
+states that the data licence is unclear and asks consumers to cite the source.
+Verify data and image reuse rights with the owner before publishing or using
+the data commercially.
 
-Dữ liệu địa điểm © OpenStreetMap contributors, giấy phép ODbL-1.0.
-Chỉ tải một lần, theo nguyên tắc fair-use của Overpass API:
+## Run the audit
 
-```powershell
-travel-agent fetch-osm --out data\raw\osm_hue.json
-travel-agent ingest-osm data\raw\osm_hue.json --db data\hue.sqlite
-```
-
-## Duyệt tay
+From the repository root:
 
 ```powershell
-travel-agent review --db data\hue.sqlite
+.\.venv\Scripts\Activate.ps1
+python backend/scripts/audit_hue.py
 ```
 
-Mở http://127.0.0.1:8765. Server chỉ nghe trên máy này.
+The script uses `mode=ro` and reports integrity, record count, categories,
+NULL rates, JSON keys, coordinate ranges, sources, and licences. Add `--json`
+for machine-readable output or pass `--database <path>` to inspect another
+SQLite copy.
 
-**Thao tác:**
-- Mỗi địa điểm chọn một trong ba trạng thái: Duyệt (A), Cần sửa (F), Loại (R). Bỏ đánh giá: U.
-- Chuyển địa điểm: J/K hoặc ↓/↑.
-
-**Chỉnh sửa:**
-- Sửa tên, loại, giờ mở cửa được lưu dưới dạng override. Dữ liệu OSM gốc giữ nguyên.
-- Sửa giờ mở cửa phải dùng cú pháp OSM (ví dụ `Mo-Su 07:00-17:30`) và phải ghi nguồn kiểm chứng.
-
-Xuất các địa điểm đã duyệt (đã áp override):
+## Run the API
 
 ```powershell
-travel-agent export-approved --db data\hue.sqlite --out data\hue_places_approved.jsonl
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn app.main:app --app-dir backend --reload
 ```
 
-### Dọn dữ liệu theo gợi ý
+`GET /health` returns `200` when `backend/data/hue.sqlite` exists and can be
+opened read-only. It returns `503` with a clear error when the file is absent
+or unreadable. Set `HUE_SQLITE_PATH` only when intentionally pointing the API
+at another read-only SQLite copy.
 
-1. Sinh lại danh sách gợi ý (chỉ đọc DB):
+PHASE 1 also exposes these read-only endpoints:
 
-   ```powershell
-   .venv\Scripts\python.exe scripts\data\suggest_cleanup.py
-   ```
+```text
+GET /api/v1/places?category=historic&limit=50&offset=0
+GET /api/v1/places/huetripo:192068
+GET /api/v1/places/search?q=dai%20noi&limit=10
+GET /api/v1/places/nearby?lat=16.47&lon=107.58&radius_km=3
+```
 
-2. Mở `reports\data\cleanup_suggestions.csv` bằng Excel và điền cột `decision`: `ok` (áp dụng),
-   `bo` (bỏ qua), để trống (chưa quyết định). Dòng trùng có thể ghi `giu:<place_id>` để chọn bản
-   giữ. Chi tiết nằm trong `reports\data\cleanup_suggestions.md`.
-3. Xem trước những gì sẽ đổi (không ghi gì):
+`category` accepts only the eight source categories. Search is local-only,
+diacritic-insensitive, and returns a transparent score; nearby results use
+straight-line (Haversine) distance, not road ETA.
 
-   ```powershell
-   .venv\Scripts\python.exe scripts\datapply_cleanup.py
-   ```
+## Phase 3 provider fixtures
 
-4. Áp dụng thật. Mỗi lần có thay đổi, file `reports\data\cleanup_applied_<thời gian>.json`
-   liệt kê từng thay đổi:
+`MockTransportProvider` returns outbound and return-leg bus fixtures, priced in
+`VND_PER_PERSON_PER_LEG`. `MockHotelProvider` returns a Hue hotel fixture
+priced in `VND_PER_ROOM_PER_NIGHT`. All such offers have `source: "MOCK"` and
+cannot book anything. Each provider also supports explicit `empty` and
+`timeout` modes for error handling tests. `HaversineRouteEstimator` produces
+only straight-line distance and an `ESTIMATED` status; it never claims road ETA.
 
-   ```powershell
-   .venv\Scripts\python.exe scripts\datapply_cleanup.py --apply
-   ```
+## Phase 4 Search Agent
 
-5. Ghi lại DB cho DVC:
+`SearchAgent` combines source POIs with the provider interfaces concurrently.
+It only supports Hue (`Huế`, `Thành phố Huế`, or `Thừa Thiên Huế`) and returns
+`UNSUPPORTED_DESTINATION` elsewhere. Missing, empty, or timed-out providers
+produce warnings and no inferred quote. `TripRequest` is structured input for
+this layer; Vietnamese natural-language parsing arrives in Phase 7.
 
-   ```powershell
-   dvc add data\hue.sqlite
-   ```
+## Phase 5 Budget Agent
 
-Sinh lại gợi ý không làm mất quyết định đã điền (giữ theo `suggestion_id`). Chạy `--apply` lần
-hai không đổi gì thêm.
+`BudgetAgent` enumerates compatible outbound/return transport and hotel offers,
+then uses integer VND arithmetic. It labels each line `QUOTED`, `ESTIMATED`, or
+`UNKNOWN`; only known lines are summed. Admission fees and unavailable provider
+prices remain unknown and are never silently counted as zero.
 
-## Thêm link nguồn dữ liệu
+## Phase 6 Itinerary Agent
 
-Cũng trong server `review`, mở http://127.0.0.1:8765/links:
-- Dán một hoặc nhiều link (mỗi dòng một link), chọn chủ đề, thêm ghi chú nếu cần.
-- Link chỉ được lưu, không tự tải. Xử lý từng nguồn làm sau, sau khi kiểm tra điều khoản và
-  giấy phép của nguồn đó.
+`ItineraryAgent` schedules actual source `poi_id` values across calendar days,
+using nearest-neighbour Haversine routing, visit-duration assumptions, a meal
+break, and buffers. It labels all travel as estimated and all opening hours as
+requiring verification; no road ETA or day-of-week opening claim is invented.
 
-Liệt kê link chưa xử lý:
+## Test
 
 ```powershell
-travel-agent links --db data\hue.sqlite --status new
+.\.venv\Scripts\Activate.ps1
+python -m pytest -q
 ```
-
-## Độ phủ dữ liệu Huế (OSM, 2026-11-03T16:31:11Z)
-
-| Mục | Số lượng |
-|---|---|
-| Tổng địa điểm | 785 |
-| Có `opening_hours` | 159 |
-| restaurant | 309 |
-| cafe | 219 |
-| religious | 107 |
-| historic | 70 |
-| attraction | 36 |
-| market | 16 |
-| park | 16 |
-| museum | 12 |
-
-## Eval và MLOps
-
-Thiết kế: `docs/superpowers/specs/2026-11-11-sft-rl-training-design.md`.
-
-Cài thêm công cụ MLOps và thư viện đếm token cho bước kiểm dataset:
-
-```powershell
-.venv\Scripts\python -m pip install -e ".[dev,mlops,dataset]"
-```
-
-Cấu hình một lần trên mỗi máy (cache DVC, DVC remote và MLflow nằm ngoài OneDrive):
-
-```powershell
-New-Item -ItemType Directory -Force C:\dev\travelagent-dvc, C:\dev\travelagent-dvc-cache, C:\dev\travelagent-runs
-.venv\Scripts\dvc cache dir --local C:\dev\travelagent-dvc-cache
-.venv\Scripts\dvc remote add --local -d localstore C:\dev\travelagent-dvc
-```
-
-Chạy pipeline (cần Ollama đang chạy và đã pull model ghi trong `configs/eval.yaml`):
-
-```powershell
-.venv\Scripts\Activate.ps1
-$env:PYTHONPATH="src"
-dvc repro baseline_eval
-dvc repro check_dataset
-dvc metrics show
-```
-
-Dataset SFT (stage `build_dataset` và `check_dataset`, tham số trong `configs/dataset.yaml`):
-
-```powershell
-python -m travel_agent build-dataset --config configs/dataset.yaml --db data/hue.sqlite --evalset data/eval/hue_eval_v1.jsonl --out data/sft/hue_sft_v1.jsonl --manifest data/sft/manifest.json
-python -m travel_agent check-dataset --config configs/dataset.yaml --db data/hue.sqlite --evalset data/eval/hue_eval_v1.jsonl --dataset data/sft/hue_sft_v1.jsonl --out reports/dataset/check.json
-```
-
-- `build-dataset` loại mọi request trùng bộ eval (cả dev và test). Cùng config cho ra cùng file đến từng byte **chỉ khi solver không hết giờ** (`solver_time_limit_s`, 10 giây mỗi request). Máy bận làm vài request hết giờ và bị bỏ, nên danh sách request dùng và cả file đổi theo: lần build lại ngày 2026-11-18 có 19 request hết giờ (bản gốc 0) và md5 khác. Kiểm `timed_out` trong `data/sft/manifest.json`.
-- `check-dataset` đếm token bằng tokenizer của `Qwen/Qwen3.5-4B` trong cache Hugging Face (repo và revision ghi trong config). Không nạp được tokenizer thì lệnh hỏng; `--allow-skip-tokens` cho qua nhưng báo cáo ghi `token_check: skipped`. `--tokenizer-dir` trỏ tới thư mục tokenizer khác.
-
-Exit code của `eval`, `build-dataset` và `check-dataset`:
-
-| Mã | Nghĩa |
-|---|---|
-| 0 | Chạy xong, qua cổng |
-| 1 | Crash (traceback của Python) |
-| 2 | Sai cách dùng, thiếu file, hoặc báo cáo mốc chạy khác điều kiện nên không so được |
-| 3 | `eval` không qua cổng so với mốc |
-| 4 | Dataset không đạt: `build-dataset` không đủ mẫu, hoặc `check-dataset` hỏng; hoặc `reward-report` không qua kiểm tra |
-
-- **Bộ eval:** `data/eval/hue_eval_v1.jsonl`, 70 dev và 30 test. Stage `make_evalset` đã đóng băng;
-  không sinh lại. Lệnh `eval --split test` cần thêm `--allow-test` và chỉ dùng cho lần so sánh cuối.
-- **Tham số:** sửa trong `configs/eval.yaml`, không sửa trong `dvc.yaml`.
-- **MLflow:** `.venv\Scripts\mlflow ui --backend-store-uri sqlite:///C:/dev/travelagent-runs/mlflow.db`.
-- **Lưu ý:** duyệt tay địa điểm làm đổi `data/hue.sqlite`, nên `dvc repro` sẽ chạy lại eval.
-  Chạy `dvc add data/hue.sqlite` sau mỗi đợt duyệt để ghi version dữ liệu mới.
-
-## Model đã train và cách train lại
-
-Kết quả của baseline, SFT và SFT+RL trên dev và test nằm ở `reports/eval/README.md`. Model cuối là
-`travel-rl-v1` trong Ollama: 27/70 plan hợp lệ ngay lần đầu trên dev và 16/30 trên test, so với
-baseline `qwen3.5:4b` (6/70, 2/30). Model card: `models/sft/sft-v1/model_card.json` và
-`models/rl/rl-v1/model_card.json` (`parent` của RL là SFT step 250).
-
-**Chạy model cuối.** Model chỉ cho kết quả đúng khi nhận prompt dựng bằng `build_messages()` và JSON
-schema ép số ngày, như lệnh `eval`. Chưa có lệnh lập lịch cho một request đơn lẻ; cách chạy hiện có
-là lệnh `eval` với `--model travel-rl-v1` (tham số sinh trong `configs/eval.yaml`).
-
-**Môi trường train** (Windows, GPU 8 GB): venv riêng `C:\dev\venvs\travel` (Python 3.14), cài torch bản
-CUDA 13.0 từ `https://download.pytorch.org/whl/cu130` trước, rồi extra `train` trong `pyproject.toml`.
-Venv này không cài `travel_agent`: mọi script train chạy với `$env:PYTHONPATH="src"`. Export cần
-llama.cpp ở `C:/dev/llama.cpp` (commit ghi trong `models/*/export.json`). Metrics train gửi lên W&B
-nếu đã `wandb login` (project trong `configs/sft.yaml: sft.tracking`).
-
-**Stage DVC của phần train** (luôn dùng `--single-item`: không có cờ này, DVC chạy lại mọi stage phía
-trên có dep đổi, kể cả train SFT khoảng 30 giờ):
-
-```powershell
-$env:PYTHONPATH="src"; $env:PATH="$PWD\.venv\Scripts;$env:PATH"
-dvc repro --single-item sft          # SFT QLoRA, configs/sft.yaml (khoảng 17–30 giờ)
-dvc repro --single-item export_sft   # GGUF Q4_K_M + model Ollama travel-sft-v1
-dvc repro --single-item eval_sft     # eval dev, cổng so với baseline, model card
-dvc repro --single-item rl           # train tiếp từ SFT step 250 trên data/rl/rl-v1/round-1.jsonl
-dvc repro --single-item export_rl
-dvc repro --single-item eval_rl      # cổng so với SFT
-```
-
-- **Chọn checkpoint SFT** là việc tay: export và eval từng checkpoint (`export_gguf.py --checkpoint N`),
-  ghi step thắng vào `configs/sft.yaml: export.checkpoint`. Xem plan 4.
-- **RL bằng best-of-N** (GRPO không vừa GPU 8 GB, xem plan 5): mỗi vòng sinh 4 plan/request qua Ollama
-  (`scripts/train/best_of_n.py generate`), giữ plan tốt nhất có reward ≥ 0,9 (`select`), rồi train tiếp
-  bằng `sft.py --init-adapter ... --dataset ... --run-dir ...`. Dataset của vòng đã chọn được DVC theo dõi
-  ở `data/rl/rl-v1/`, nên stage `rl` không cần sinh lại.
-- **Kiểm reward** trên output dev đã có: `python -m travel_agent reward-report --outcomes
-  baseline=reports/eval/baseline_dev.outcomes.jsonl --outcomes sft=reports/eval/sft_dev.outcomes.jsonl
-  --better sft --worse baseline --out reports/reward/dev_check.json` (exit 4 nếu reward xếp hạng sai).
-- **Tái lập:** train trên GPU không tất định hoàn toàn (train lại RL cho 27/70, lần đầu 28/70). Dataset
-  SFT phụ thuộc solver có giới hạn thời gian (xem trên). Ngày 2026-11-18 `dvc.lock` được ghi lại bằng
-  `dvc commit` sau khi kiểm rằng code đổi không chạm đường chạy mặc định; mọi output dữ liệu và model
-  giữ nguyên hash.
-- **Run dài** nên chạy qua Task Scheduler (cửa sổ ẩn) để không phụ thuộc VS Code, và cài gói vào venv
-  train chỉ khi không có process train nào đang chạy.
-
-## Kiểm thử
-
-```powershell
-.venv\Scripts\ruff format src tests
-.venv\Scripts\ruff check src tests
-.venv\Scripts\mypy src
-.venv\Scripts\python -m pytest
-```
-
-Hoặc chạy tất cả bằng một lệnh: `powershell -File scripts\check.ps1`.
