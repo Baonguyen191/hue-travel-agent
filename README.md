@@ -61,6 +61,11 @@ GET /api/v1/places/nearby?lat=16.47&lon=107.58&radius_km=3
 diacritic-insensitive, and returns a transparent score; nearby results use
 straight-line (Haversine) distance, not road ETA.
 
+Plan and booking endpoints read an `X-User-Id` header (default `anonymous`) and
+store it as the plan owner. This is an MVP ownership check, not authentication:
+any caller can send any `X-User-Id`, so it only keeps one user's plan away from
+another user's plan. Real authentication is out of scope for this MVP.
+
 ## Phase 3 provider fixtures
 
 `MockTransportProvider` returns outbound and return-leg bus fixtures, priced in

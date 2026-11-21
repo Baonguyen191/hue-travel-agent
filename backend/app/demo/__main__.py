@@ -3,6 +3,7 @@
     python -m app.demo search --scenario dod
     python -m app.demo budget --scenario dod
     python -m app.demo itinerary --scenario dod
+    python -m app.demo book --scenario dod
 
 All use the local Hue SQLite source and deterministic mock providers, so every
 transport and hotel offer is labelled `[MOCK]`.
@@ -17,14 +18,26 @@ from typing import Any, get_args
 
 from pydantic import ValidationError
 
+from app.agents.booking import ApprovalRequiredError, BookingAgent, poi_names
 from app.agents.search import SearchAgent
 from app.core.config import hue_database_path
+from app.db.store import PlanStore
+from app.demo.booking_view import (
+    approval_lines,
+    blocked_lines,
+    booking_lines,
+    explanation_lines,
+    forbidden_lines,
+    retry_lines,
+)
 from app.demo.budget_view import render_budget
 from app.demo.formatting import format_table, money, request_lines, unit_label, warning_lines
 from app.demo.itinerary_view import render_itinerary
+from app.providers.booking_mock import MockBookingProvider, Mode, ReconcileStatus
 from app.providers.hotel_mock import MockHotelProvider
 from app.providers.transport_mock import MockTransportProvider
 from app.repositories.hue_places import HuePlacesRepository
+from app.schemas.booking import BookingResult
 from app.schemas.offer import HotelOffer, TransportOffer
 from app.schemas.itinerary import ItineraryResult
 from app.schemas.place import Place, PlaceCategory, PlaceSearchResult
@@ -32,6 +45,8 @@ from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
 from app.services.budget_optimizer import SIGHTSEEING_CATEGORIES, BudgetAgent
 from app.services.itinerary_optimizer import ItineraryAgent
+from app.services.quote import UnknownOptionError, approve_option, build_selected_offers
+from app.services.quote_revalidator import QuoteRevalidator
 
 SCENARIOS: dict[str, dict[str, Any]] = {
     "dod": {
@@ -48,6 +63,11 @@ SCENARIOS: dict[str, dict[str, Any]] = {
 
 _TABLE_HEADERS = ["#", "Name", "poi_id", "Score", "Rating", "Distance", "Source URL"]
 _DEFAULT_VISIT_COUNT = 6
+_BOOK_OPTIONS = ("BUDGET", "BALANCED", "COMFORT")
+_BOOK_THREAD = "demo-book"
+_BOOK_KEY = "demo-key-1"
+_OTHER_USER = "other-user"
+_PRICE_BUMP_VND = 100_000
 
 
 def _request_parent() -> argparse.ArgumentParser:
@@ -70,8 +90,21 @@ def _request_parent() -> argparse.ArgumentParser:
     return parent
 
 
+def _book_parser(subparsers: Any, shared: argparse.ArgumentParser) -> None:
+    book = subparsers.add_parser(
+        "book", parents=[shared],
+        help="Approve one budget option, then book it with mock providers.",
+    )
+    book.add_argument("--option", choices=_BOOK_OPTIONS, default="BUDGET", help="Budget option to approve.")
+    book.add_argument("--fail", choices=["transport", "hotel"], help="Make the provider refuse these offers.")
+    book.add_argument("--timeout", choices=["hotel"], help="Time out the hotel booking; the second press reconciles it.")
+    book.add_argument("--price-change", action="store_true", help="Change the outbound price after approval.")
+    book.add_argument("--other-user", action="store_true", help="Also show another user's refused attempt.")
+    book.add_argument("--json", action="store_true", help="Print only the final BookingResult JSON.")
+
+
 def build_parser() -> argparse.ArgumentParser:
-    """Build the argument parser with the `search`, `budget` and `itinerary` subcommands."""
+    """Build the argument parser with the `search`, `budget`, `itinerary` and `book` subcommands."""
     parser = argparse.ArgumentParser(prog="python -m app.demo", description="Agent demos.")
     subparsers = parser.add_subparsers(dest="command", required=True)
     shared = _request_parent()
@@ -93,6 +126,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="Plan days from Search results, then price the itinerary's visits and meals.",
     )
     itinerary.add_argument("--json", action="store_true", help="Print the raw ItineraryResult JSON.")
+    _book_parser(subparsers, shared)
     return parser
 
 
@@ -278,6 +312,128 @@ def _run_itinerary(request: TripRequest, args: argparse.Namespace) -> int:
     return 0
 
 
+def _book_payload(request: TripRequest, repository: HuePlacesRepository) -> dict[str, Any]:
+    """Build the plan payload the way the Orchestrator does, with visit ids for the budget."""
+    search = asyncio.run(
+        SearchAgent(repository, MockTransportProvider(), MockHotelProvider()).search(request)
+    )
+    itinerary = ItineraryAgent(places=repository).plan(request, search)
+    budget = BudgetAgent(places=repository).build(request, search, visit_poi_ids=itinerary.poi_ids())
+    return {
+        "request": request.model_dump(mode="json"),
+        "search": search.model_dump(mode="json"),
+        "budget": budget.model_dump(mode="json"),
+        "itinerary": itinerary.model_dump(mode="json"),
+    }
+
+
+def _offer_ids(selected: list[dict[str, Any]], kind: str) -> list[str]:
+    return [offer["id"] for offer in selected if offer["kind"] == kind]
+
+
+def _failure_modes(selected: list[dict[str, Any]], args: argparse.Namespace) -> dict[str, Mode]:
+    modes: dict[str, Mode] = {}
+    if args.fail == "transport":
+        modes.update({offer_id: "fail" for offer_id in _offer_ids(selected, "TRANSPORT")})
+    if args.fail == "hotel":
+        modes.update({offer_id: "fail" for offer_id in _offer_ids(selected, "HOTEL")})
+    if args.timeout == "hotel":
+        modes.update({offer_id: "timeout" for offer_id in _offer_ids(selected, "HOTEL")})
+    return modes
+
+
+def _reconcile_answers(
+    selected: list[dict[str, Any]], args: argparse.Namespace
+) -> dict[str, ReconcileStatus]:
+    if args.timeout != "hotel":
+        return {}
+    return {offer_id: "BOOKED" for offer_id in _offer_ids(selected, "HOTEL")}
+
+
+def _price_overrides(selected: list[dict[str, Any]], args: argparse.Namespace) -> dict[str, int] | None:
+    """Raise the outbound price so the revalidator sees a change after approval."""
+    outbound = next((offer for offer in selected if offer["kind"] == "TRANSPORT"), None)
+    if not args.price_change or outbound is None:
+        return None
+    return {outbound["id"]: outbound["price"] + _PRICE_BUMP_VND}
+
+
+def _book_agent(
+    store: PlanStore,
+    repository: HuePlacesRepository,
+    selected: list[dict[str, Any]],
+    args: argparse.Namespace,
+) -> tuple[BookingAgent, MockBookingProvider]:
+    provider = MockBookingProvider(
+        modes=_failure_modes(selected, args),
+        reconcile=_reconcile_answers(selected, args),
+    )
+    revalidator = QuoteRevalidator(
+        MockTransportProvider(price_overrides=_price_overrides(selected, args)),
+        MockHotelProvider(),
+    )
+    return BookingAgent(store, provider, revalidator, places=repository), provider
+
+
+def _blocked_message(agent: BookingAgent) -> str:
+    try:
+        agent.book(_BOOK_THREAD, _BOOK_KEY)
+    except ApprovalRequiredError as error:
+        return str(error)
+    return "Booking was not blocked."
+
+
+def _forbidden_message(agent: BookingAgent) -> str:
+    try:
+        agent.book(_BOOK_THREAD, _BOOK_KEY, user_id=_OTHER_USER)
+    except PermissionError as error:
+        return str(error)
+    return "The other user was not refused."
+
+
+def _book_steps(
+    agent: BookingAgent,
+    store: PlanStore,
+    provider: MockBookingProvider,
+    payload: dict[str, Any],
+    selected: list[dict[str, Any]],
+    args: argparse.Namespace,
+) -> tuple[list[str], BookingResult]:
+    """Run the numbered demo steps and return the rendered lines and the final result."""
+    names = poi_names(ItineraryResult.model_validate(payload["itinerary"]))
+    entries = {offer["id"]: offer for offer in selected}
+    lines = blocked_lines(_blocked_message(agent))
+    approval = approve_option(store, store.latest(_BOOK_THREAD), args.option)
+    lines += approval_lines(approval)
+    if args.other_user:
+        lines += forbidden_lines(_forbidden_message(agent))
+    first = agent.book(_BOOK_THREAD, _BOOK_KEY)
+    second = agent.book(_BOOK_THREAD, _BOOK_KEY)
+    lines += booking_lines(first, _BOOK_KEY, entries, names)
+    lines += retry_lines(first, second, entries, len(provider.book_calls))
+    lines += explanation_lines(second)
+    return lines, second
+
+
+def _run_book(request: TripRequest, args: argparse.Namespace) -> int:
+    repository = _repository()
+    payload = _book_payload(request, repository)
+    store = PlanStore("sqlite://")
+    store.save_plan(_BOOK_THREAD, payload)
+    try:
+        selected = build_selected_offers(payload["budget"], args.option)
+    except UnknownOptionError as error:
+        print(str(error), file=sys.stderr)
+        return 2
+    agent, provider = _book_agent(store, repository, selected, args)
+    lines, final = _book_steps(agent, store, provider, payload, selected, args)
+    if args.json:
+        print(final.model_dump_json(indent=2))
+    else:
+        print("\n".join(lines))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """Run a demo command and return a process exit code."""
     if hasattr(sys.stdout, "reconfigure"):
@@ -292,6 +448,8 @@ def main(argv: list[str] | None = None) -> int:
         return _run_budget(request, args)
     if args.command == "itinerary":
         return _run_itinerary(request, args)
+    if args.command == "book":
+        return _run_book(request, args)
     return _run_search(request, args)
 
 

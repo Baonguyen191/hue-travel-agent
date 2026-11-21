@@ -21,8 +21,14 @@ _FIXTURES: tuple[tuple[str, str, int, str], ...] = (
 class MockTransportProvider:
     """Return labelled mock bus, train and flight offers for both legs of a Hue trip."""
 
-    def __init__(self, mode: MockMode = "normal") -> None:
+    def __init__(
+        self,
+        mode: MockMode = "normal",
+        price_overrides: dict[str, int] | None = None,
+    ) -> None:
         self.mode = mode
+        # Tests and the demo only: replace the fixture price of listed offer ids.
+        self.price_overrides: dict[str, int] = dict(price_overrides or {})
 
     def search(self, request: TransportSearchRequest) -> list[TransportOffer]:
         if self.mode == "timeout":
@@ -39,7 +45,12 @@ class MockTransportProvider:
                 _offer(request, leg, origin, destination, departure, mode, provider, price, slug)
                 for mode, provider, price, slug in _FIXTURES
             )
-        return offers
+        return [self._apply_override(offer) for offer in offers]
+
+    def _apply_override(self, offer: TransportOffer) -> TransportOffer:
+        if offer.id not in self.price_overrides:
+            return offer
+        return offer.model_copy(update={"price_vnd": self.price_overrides[offer.id]})
 
 
 def _offer(

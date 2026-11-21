@@ -20,8 +20,14 @@ _FIXTURES: tuple[tuple[str, str, str, int], ...] = (
 class MockHotelProvider:
     """Return clearly-labelled per-room-per-night fixtures for Hue."""
 
-    def __init__(self, mode: MockMode = "normal") -> None:
+    def __init__(
+        self,
+        mode: MockMode = "normal",
+        price_overrides: dict[str, int] | None = None,
+    ) -> None:
         self.mode = mode
+        # Tests and the demo only: replace the fixture price of listed offer ids.
+        self.price_overrides: dict[str, int] = dict(price_overrides or {})
 
     def search(self, request: HotelSearchRequest) -> list[HotelOffer]:
         if self.mode == "timeout":
@@ -29,19 +35,26 @@ class MockHotelProvider:
         if self.mode == "empty":
             return []
 
-        return [
-            HotelOffer(
-                id=offer_id,
-                provider="Hue Stay Demo",
-                source="MOCK",
-                hotel_name=hotel_name,
-                destination=request.destination,
-                check_in=request.check_in,
-                check_out=request.check_out,
-                rooms_available=5,
-                price_per_room_night_vnd=price,
-                price_unit="VND_PER_ROOM_PER_NIGHT",
-                tier=tier,
-            )
-            for offer_id, hotel_name, tier, price in _FIXTURES
-        ]
+        return [self._offer(request, offer_id, hotel_name, tier, price) for offer_id, hotel_name, tier, price in _FIXTURES]
+
+    def _offer(
+        self,
+        request: HotelSearchRequest,
+        offer_id: str,
+        hotel_name: str,
+        tier: str,
+        price: int,
+    ) -> HotelOffer:
+        return HotelOffer(
+            id=offer_id,
+            provider="Hue Stay Demo",
+            source="MOCK",
+            hotel_name=hotel_name,
+            destination=request.destination,
+            check_in=request.check_in,
+            check_out=request.check_out,
+            rooms_available=5,
+            price_per_room_night_vnd=self.price_overrides.get(offer_id, price),
+            price_unit="VND_PER_ROOM_PER_NIGHT",
+            tier=tier,
+        )

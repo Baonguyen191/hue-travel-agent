@@ -100,3 +100,84 @@ def test_itinerary_json_output_is_a_parseable_itinerary_result(
     assert len(payload["days"]) == 3
     assert "huetripo:657208" in payload["excluded_poi_ids"]
     assert payload["validation"]["valid"] is True
+
+
+def test_book_dod_scenario_shows_steps_mock_items_and_contact_lines(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["book", "--scenario", "dod"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Đặt khi chưa duyệt → bị chặn (409)" in output
+    assert "Duyệt phương án Tiết kiệm (version 1" in output
+    assert "MÔ PHỎNG" in output
+    assert "TỰ LIÊN HỆ" in output
+    assert "BOOKED" in output
+    assert "không đặt trùng" in output
+    assert "Giải thích" in output
+
+
+def test_book_fail_hotel_reports_partially_booked(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["book", "--scenario", "dod", "--fail", "hotel"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "PARTIALLY_BOOKED" in output
+
+
+def test_book_timeout_hotel_is_reconciled_on_the_second_press(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["book", "--scenario", "dod", "--timeout", "hotel"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "UNKNOWN" in output
+    assert "đối soát" in output
+    assert "UNKNOWN → BOOKED" in output
+
+
+def test_book_price_change_reconfirms_and_books_nothing(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["book", "--scenario", "dod", "--price-change"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "RECONFIRM_REQUIRED" in output
+    assert "MOCK-" not in output
+    assert "book calls: 0" in output
+
+
+def test_book_other_user_is_refused_with_403(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["book", "--scenario", "dod", "--other-user"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "403" in output
+
+
+def test_book_json_prints_only_the_final_booking_result(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["book", "--scenario", "dod", "--json"])
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert payload["status"] == "BOOKED"
+    assert any(item["kind"] == "POI" for item in payload["items"])
+
+
+def test_book_unknown_option_exits_2_with_message(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["book", "--scenario", "dod", "--option", "COMFORT"])
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "COMFORT" in captured.err
