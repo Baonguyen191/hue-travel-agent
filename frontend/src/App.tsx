@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { BudgetTab } from "./pages/BudgetTab";
 import { ComingSoonPage } from "./pages/ComingSoonPage";
 import { ExplorePage } from "./pages/ExplorePage";
 import { ItineraryTab } from "./pages/ItineraryTab";
@@ -17,7 +18,7 @@ export function App() {
         <Route path="explore/:poiId" element={<PlaceDetailPage />} />
         <Route path="plan/:threadId" element={<PlanLayout />}>
           <Route index element={<ItineraryTab />} />
-          <Route path="budget" element={<ComingSoonPage title="Ngân sách & duyệt" />} />
+          <Route path="budget" element={<BudgetTab />} />
           <Route path="booking" element={<ComingSoonPage title="Đặt chỗ" />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
