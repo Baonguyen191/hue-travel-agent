@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { BookingTab } from "./pages/BookingTab";
 import { BudgetTab } from "./pages/BudgetTab";
-import { ComingSoonPage } from "./pages/ComingSoonPage";
 import { ExplorePage } from "./pages/ExplorePage";
 import { ItineraryTab } from "./pages/ItineraryTab";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -19,7 +19,7 @@ export function App() {
         <Route path="plan/:threadId" element={<PlanLayout />}>
           <Route index element={<ItineraryTab />} />
           <Route path="budget" element={<BudgetTab />} />
-          <Route path="booking" element={<ComingSoonPage title="Đặt chỗ" />} />
+          <Route path="booking" element={<BookingTab />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
