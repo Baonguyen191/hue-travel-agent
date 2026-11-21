@@ -28,11 +28,12 @@ from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.request import TripRequest
 from app.services.poi_search import normalize_vietnamese
 from app.services.quote import UnknownOptionError
-from app.understanding.models import Intent, ParsedQuery, PlanChange, PlanChangeKind
+from app.understanding.models import ApproveOption, Intent, ParsedQuery, PlanChange, PlanChangeKind
 from app.understanding.understand import ConversationContext, apply_changes
 
 Understand = Callable[[str, ConversationContext | None], ParsedQuery]
 _OPTION_RE = re.compile(r"\b(BUDGET|BALANCED|COMFORT)\b")
+_BOOK_PHRASES = ("dat ve", "dat khach san", "dat cho")
 _CHANGE_FORMS: dict[PlanChangeKind, str] = {
     PlanChangeKind.ADD_DAYS: "thêm {value} ngày",
     PlanChangeKind.REMOVE_DAYS: "bỏ {value} ngày",
@@ -68,7 +69,7 @@ class ChatService:
         self.chats.ensure_owned(conversation_id, user_id)
         context = self.chats.context(conversation_id)
         self.chats.add_message(conversation_id, "user", text)
-        parsed = await self._understand(text, context)
+        parsed = _quick_intent(text, await self._understand(text, context))
         reply = await self._respond(user_id, text, parsed, context)
         self.chats.save_context(conversation_id, context)
         message_id = self.chats.add_message(conversation_id, "assistant", reply.text, reply.model_dump(mode="json"))
@@ -278,6 +279,17 @@ def _options(plan: dict[str, Any]) -> dict[str, dict[str, Any]]:
 def _option_in(text: str) -> str | None:
     match = _OPTION_RE.search(text.upper())
     return match.group(1) if match else None
+
+
+def _quick_intent(text: str, parsed: ParsedQuery) -> ParsedQuery:
+    """Recognise the chat's own quick replies, which the rule parser would read as a new plan."""
+    folded = normalize_vietnamese(text)
+    option = _option_in(text)
+    if folded.startswith("duyet") and option is not None:
+        return parsed.model_copy(update={"intent": Intent.APPROVE, "approve_option": ApproveOption(option)})
+    if any(phrase in folded for phrase in _BOOK_PHRASES):
+        return parsed.model_copy(update={"intent": Intent.BOOK})
+    return parsed
 
 
 def _change_lines(changes: Sequence[PlanChange]) -> list[str]:

@@ -306,6 +306,24 @@ def test_any_other_message_cancels_a_pending_approval() -> None:
     assert h.store.active_approval(h.store.latest(h.chats.context("c-cancel").thread_id)["plan_id"]) is None
 
 
+def test_quick_replies_approve_and_book_work_without_any_scripted_understanding() -> None:
+    h = Harness()
+
+    async def scenario():
+        await _planned(h, "c-quick")
+        asked = await h.say("c-quick", "Duyệt BUDGET")
+        await h.say("c-quick", "đồng ý")
+        book_asked = await h.say("c-quick", "Đặt vé và khách sạn")
+        return asked, book_asked
+
+    asked, book_asked = _run(scenario)
+
+    assert asked.pending_confirmation == {"kind": "approve", "option": "BUDGET", "version": 1}
+    assert asked.understanding.intent == "approve"
+    assert book_asked.understanding.intent == "book"
+    assert book_asked.pending_confirmation["kind"] == "book"
+
+
 def test_cancel_word_stops_the_pending_approval_with_a_cancel_reply() -> None:
     h = Harness()
     h.fake.script("Duyệt BUDGET", _scripted(Intent.APPROVE, approve_option=ApproveOption.BUDGET))
