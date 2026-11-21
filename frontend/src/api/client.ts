@@ -122,5 +122,6 @@ export const api = {
   listPlaces: (params: { category?: PlaceCategory; limit?: number; offset?: number }, signal?: AbortSignal) =>
     apiRequest<PlacePage>(`/places${query(params)}`, { signal }),
 
-  getPlace: (poiId: string) => apiRequest<Place>(`/places/${encodeURIComponent(poiId)}`),
+  getPlace: (poiId: string, signal?: AbortSignal) =>
+    apiRequest<Place>(`/places/${encodeURIComponent(poiId)}`, { signal }),
 };
