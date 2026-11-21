@@ -35,3 +35,8 @@ class TripRequest(BaseModel):
         if self.radius_km is not None and self.center_lat is None:
             raise ValueError("radius_km requires center_lat and center_lon")
         return self
+
+    @property
+    def is_day_trip(self) -> bool:
+        """A trip that starts and ends on the same date needs no hotel night."""
+        return self.start_date == self.end_date

@@ -6,8 +6,9 @@ Path with an extractor (Ollama): the model returns verbatim phrases; code resolv
 decides whether to ask a question. Path without one (or when Ollama fails): the rule parser
 `vi_request_parser` gives the same kind of result with source RULES.
 
-`missing_fields` lists what the user did not state, before defaults. Defaults (origin Huế,
-1 person) only shape the TripRequest; the clarification asks for start date and duration only.
+`missing_fields` lists what the user did not state. `defaulted_fields` lists the subset that
+the TripRequest fills with a default (origin Huế, 1 person). The clarification asks for start
+date and duration only; the chat asks to confirm `defaulted_fields` before it plans.
 """
 
 from __future__ import annotations
@@ -43,6 +44,7 @@ from app.understanding.normalize import parse_budget_vnd, parse_duration
 
 DEFAULT_ORIGIN = HUE_NAME
 DEFAULT_PEOPLE = 1
+DEFAULTABLE_FIELDS = ("origin", "people")
 MAX_DAYS = 7
 MAX_PEOPLE = 20
 # Interest phrases the preference table does not cover (folded). Whole-word match, checked after
@@ -326,6 +328,7 @@ def _plan_query(draft: _Draft) -> ParsedQuery:
         fields=_fields(draft),
         date_text=draft.date_text,
         missing_fields=_missing(draft),
+        defaulted_fields=_defaulted(draft),
         clarification=text,
         quick_replies=list(replies),
         must_include=draft.must,
@@ -346,6 +349,16 @@ def _missing(draft: _Draft) -> list[str]:
         "people": draft.people is None,
     }
     return [name for name, absent in checks.items() if absent]
+
+
+def _defaulted(draft: _Draft) -> list[str]:
+    """Fields the request fills with a default because the user did not state them.
+
+    The request is still built with the defaults (so evaluation and the form flow keep
+    working). The chat must confirm these before it starts a plan.
+    """
+    absent = {"origin": draft.origin is None, "people": draft.people is None}
+    return [name for name in DEFAULTABLE_FIELDS if absent[name]]
 
 
 def _clarification(draft: _Draft) -> tuple[str, tuple[str, ...]] | None:

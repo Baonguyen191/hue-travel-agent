@@ -18,6 +18,7 @@ from app.schemas.search import SearchResult
 SIGHTSEEING_CATEGORIES = frozenset({"historic", "attraction", "museum", "religious", "park", "market"})
 FOOD_CATEGORIES = ("restaurant", "cafe")
 HUE_SOURCE = "HUE_POI_SOURCE"
+DAY_TRIP_WARNING = "Chuyến đi trong ngày: không cần lưu trú."
 MEAL_UNIT = "VND_PER_PERSON_PER_MEAL_ASSUMED"
 ADMISSION_UNIT = "VND_PER_PERSON"
 _WITHIN_STATUSES = frozenset({"WITHIN_BUDGET", "WITHIN_BUDGET_EXCLUDING_UNKNOWN"})
@@ -128,7 +129,7 @@ class BudgetAgent:
         items: list[CostItem] = [
             self._transport_item("transport_outbound", "Outbound transport", outbound, request.people),
             self._transport_item("transport_return", "Return transport", returning, request.people),
-            self._hotel_item(request, hotel),
+            *self._lodging_items(request, hotel),
         ]
         local = self._local_transport_item(days)
         if local is not None:
@@ -142,7 +143,7 @@ class BudgetAgent:
         status, remaining, status_warnings = self._budget_status(
             request.budget_vnd, known_total, known_max, unknown_count
         )
-        warnings: list[str] = []
+        warnings: list[str] = [DAY_TRIP_WARNING] if request.is_day_trip else []
         if unknown_count:
             warnings.append("Known total excludes items with an unknown amount.")
         warnings.extend(status_warnings)
@@ -175,6 +176,12 @@ class BudgetAgent:
             price_kind="QUOTED",
             note=f"{offer.provider} ({offer.id})",
         )
+
+    def _lodging_items(self, request: TripRequest, hotel: HotelOffer | None) -> list[CostItem]:
+        """A same-day trip has no lodging line at all."""
+        if request.is_day_trip:
+            return []
+        return [self._hotel_item(request, hotel)]
 
     @staticmethod
     def _hotel_item(request: TripRequest, hotel: HotelOffer | None) -> CostItem:
@@ -340,7 +347,7 @@ class BudgetAgent:
         warnings = list(search.warnings)
         if not search.transport_offers:
             warnings.append("Transport costs are unknown because no provider offer was available.")
-        if not search.hotel_offers:
+        if not search.hotel_offers and not request.is_day_trip:
             warnings.append("Lodging costs are unknown because no provider offer was available.")
         if request.people > request.rooms * self.config.guests_per_room:
             warnings.append(f"{request.people} people may not fit in {request.rooms} room(s)")

@@ -14,7 +14,7 @@ Reproduce a row with, from `backend/`:
 | Rules | test | 0.74 | 0.28 | 0.00 / n/a | 0.54 | 0.82 / 0.94 | 0.1 ms |
 | qwen3.5:4b (final prompt) | dev | 1.00 | 0.68 | 0.96 / 1.00 | 0.87 | 0.99 / 1.00 | 2.4 s |
 | qwen3.5:4b (final prompt) | test | 0.96 | 0.68 | n/a / n/a | 0.65 | 0.96 / 0.98 | 2.4 s |
-| qwen3.5:9b | test | not completed | | | | | |
+| qwen3.5:9b | test | 0.98 | 0.70 | n/a / n/a | 0.60 | 0.96 / 0.96 | 4.0 s |
 
 Notes:
 - "n/a" means the denominator is zero: the test split has no gold clarifications, and the 4b
@@ -22,9 +22,9 @@ Notes:
 - qwen3.5:4b on dev **before** the one prompt/post-processing tuning round: intent 0.99, full
   match 0.55, clarify P/R 0.92/0.96, category F1 0.78 (`qwen3.5-4b_dev.json` was overwritten by
   the tuned run; the numbers are from the first run's console output).
-- qwen3.5:9b: the test run was stopped by the operating system for low memory before it wrote
-  anything, and the optional dev run never started. Not measured; rerun with
-  `--model qwen3.5:9b --split test` when the machine has memory free.
+- qwen3.5:9b: the first test run was stopped by the operating system for low memory and wrote
+  nothing. The completed rerun is `qwen3.5-9b_test.json` (test only, no dev run): full match
+  0.70 against 0.68 for the 4b, but about 1.7 times the latency (p50 4.0 s against 2.4 s).
 - Old v1 result (88% full match) used a different gold (interests and PlanRequest fields) and
   is not directly comparable with these numbers.
 

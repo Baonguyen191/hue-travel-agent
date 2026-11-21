@@ -153,6 +153,43 @@ def test_defaults_fill_origin_and_people_only_in_the_request() -> None:
     assert "people" in query.missing_fields
 
 
+def test_defaulted_fields_list_origin_and_people_when_not_stated() -> None:
+    query = understand("Đi Huế 2 ngày từ 20/12", REF)
+
+    assert query.defaulted_fields == ["origin", "people"]
+    assert query.request is not None
+    assert query.request.origin == "Huế"
+
+
+def test_defaulted_fields_empty_when_origin_and_people_are_stated() -> None:
+    extractor = FakeExtractor(
+        date_text="20/12", duration_text="2 ngày", origin="Hà Nội", people=2
+    )
+
+    query = understand("Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12", REF, extractor=extractor, places=PLACES)
+
+    assert query.request is not None
+    assert query.defaulted_fields == []
+    assert query.missing_fields == []
+
+
+def test_defaulted_fields_lists_only_the_unstated_one() -> None:
+    extractor = FakeExtractor(date_text="20/12", duration_text="2 ngày", origin="Hà Nội")
+
+    query = understand("Từ Hà Nội đi Huế 2 ngày từ 20/12", REF, extractor=extractor, places=PLACES)
+
+    assert query.defaulted_fields == ["people"]
+    assert query.missing_fields == ["people"]
+
+
+def test_defaulted_fields_empty_for_modify_and_other_intents() -> None:
+    extractor = FakeExtractor(intent="place_info")
+
+    query = understand("Chợ Đông Ba mở cửa lúc mấy giờ?", REF, extractor=extractor, places=PLACES)
+
+    assert query.defaulted_fields == []
+
+
 def test_more_than_seven_days_asks_for_fewer() -> None:
     extractor = FakeExtractor(date_text="20/12", duration_text="9 ngày")
 

@@ -96,6 +96,7 @@ class ParsedQuery(BaseModel):
     fields: dict[str, Any] = Field(default_factory=dict)
     date_text: str | None = None
     missing_fields: list[str] = Field(default_factory=list)
+    defaulted_fields: list[str] = Field(default_factory=list)
     clarification: str | None = None
     quick_replies: list[str] = Field(default_factory=list)
     must_include: list[PlaceMention] = Field(default_factory=list)

@@ -21,9 +21,10 @@ class TransportSearchRequest(BaseModel):
     passengers: int = Field(ge=1, le=20)
 
     @model_validator(mode="after")
-    def return_after_departure(self) -> "TransportSearchRequest":
-        if self.return_date <= self.departure_date:
-            raise ValueError("return_date must be after departure_date")
+    def return_not_before_departure(self) -> "TransportSearchRequest":
+        """A same-day trip has a return on the departure date, so equal dates are allowed."""
+        if self.return_date < self.departure_date:
+            raise ValueError("return_date must not be before departure_date")
         return self
 
 

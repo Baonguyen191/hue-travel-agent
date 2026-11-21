@@ -47,17 +47,18 @@ class QuoteRevalidator:
                 passengers=request.people,
             )
         )
-        hotels = self.hotel_provider.search(
-            HotelSearchRequest(
-                destination=request.destination,
-                check_in=request.start_date,
-                check_out=request.end_date,
-                rooms=request.rooms,
-                guests=request.people,
-            )
-        )
         prices = {offer.id: offer.price_vnd for offer in transport}
-        prices.update({offer.id: offer.price_per_room_night_vnd for offer in hotels})
+        if not request.is_day_trip:
+            hotels = self.hotel_provider.search(
+                HotelSearchRequest(
+                    destination=request.destination,
+                    check_in=request.start_date,
+                    check_out=request.end_date,
+                    rooms=request.rooms,
+                    guests=request.people,
+                )
+            )
+            prices.update({offer.id: offer.price_per_room_night_vnd for offer in hotels})
         return prices
 
     @staticmethod

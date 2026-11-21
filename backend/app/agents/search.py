@@ -7,7 +7,7 @@ from collections.abc import Iterable, Sequence
 
 from app.providers.base import HotelProvider, ProviderTimeoutError, TransportProvider
 from app.repositories.hue_places import HuePlacesRepository
-from app.schemas.offer import HotelSearchRequest, TransportSearchRequest
+from app.schemas.offer import HotelOffer, HotelSearchRequest, TransportSearchRequest
 from app.schemas.place import Place, PlaceCategory, PlaceSearchResult
 from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
@@ -70,16 +70,7 @@ class SearchAgent:
                 passengers=request.people,
             ),
         )
-        hotel_task = asyncio.to_thread(
-            self.hotel_provider.search,
-            HotelSearchRequest(
-                destination=request.destination,
-                check_in=request.start_date,
-                check_out=request.end_date,
-                rooms=request.rooms,
-                guests=request.people,
-            ),
-        )
+        hotel_task = asyncio.to_thread(self._hotel_offers, request)
         poi_result, transport_result, hotel_result = await asyncio.gather(
             poi_task, transport_task, hotel_task, return_exceptions=True
         )
@@ -93,7 +84,7 @@ class SearchAgent:
             warnings.append("No Hue POIs matched the requested filters.")
         if not transport_offers:
             warnings.append("No transport quote is available; no price was inferred.")
-        if not hotel_offers:
+        if not hotel_offers and not request.is_day_trip:
             warnings.append("No hotel quote is available; no price was inferred.")
 
         return SearchResult(
@@ -102,6 +93,20 @@ class SearchAgent:
             transport_offers=transport_offers,
             hotel_offers=hotel_offers,
             warnings=warnings,
+        )
+
+    def _hotel_offers(self, request: TripRequest) -> list[HotelOffer]:
+        """A same-day trip needs no hotel, so the provider is not called at all."""
+        if request.is_day_trip:
+            return []
+        return self.hotel_provider.search(
+            HotelSearchRequest(
+                destination=request.destination,
+                check_in=request.start_date,
+                check_out=request.end_date,
+                rooms=request.rooms,
+                guests=request.people,
+            )
         )
 
     def _find_pois(self, request: TripRequest) -> list[PlaceSearchResult]:

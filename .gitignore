@@ -27,3 +27,6 @@ backend/data/*.bak
 backend/data/*.sqlite-wal
 backend/data/*.sqlite-shm
 backend/data/*.sqlite-journal
+
+# Evaluation run logs (console captures, never committed)
+reports/understanding/*.log
