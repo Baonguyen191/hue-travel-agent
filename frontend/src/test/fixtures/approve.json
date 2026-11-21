@@ -1,0 +1,37 @@
+{
+  "approval_id": "bbcc30ed-2b13-4525-b83c-037123548742",
+  "plan_id": "f8b6386b-b0ce-4c4f-ae29-3b3f3d9eef99",
+  "version": 1,
+  "option": "BUDGET",
+  "quote_hash": "8d67d415e1ab8493971e17bf035b8ea29cbd4d6b8b9da4b7f67c2e2b0f799957",
+  "selected_offers": [
+    {
+      "kind": "TRANSPORT",
+      "leg": "OUTBOUND",
+      "id": "mock-transport-outbound-standard",
+      "name": "Hue Sleeper Bus Demo",
+      "price": 400000,
+      "unit": "VND_PER_PERSON_PER_LEG",
+      "dates": "2026-12-05"
+    },
+    {
+      "kind": "TRANSPORT",
+      "leg": "RETURN",
+      "id": "mock-transport-return-standard",
+      "name": "Hue Sleeper Bus Demo",
+      "price": 400000,
+      "unit": "VND_PER_PERSON_PER_LEG",
+      "dates": "2026-12-07"
+    },
+    {
+      "kind": "HOTEL",
+      "leg": null,
+      "id": "mock-hotel-homestay",
+      "name": "Old Quarter Homestay Demo",
+      "price": 350000,
+      "unit": "VND_PER_ROOM_PER_NIGHT",
+      "dates": "2026-12-05..2026-12-07"
+    }
+  ],
+  "status": "APPROVED"
+}

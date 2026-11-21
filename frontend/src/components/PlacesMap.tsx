@@ -10,7 +10,8 @@ import { placeDetailPath } from "./PlaceCard";
 const HUE_CENTER: LatLngTuple = [16.4637, 107.5909];
 const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-function FitToPlaces({ points }: { points: LatLngTuple[] }) {
+/** Fits the map view to the given points; does nothing when there are none. */
+export function FitToPoints({ points }: { points: LatLngTuple[] }) {
   const map = useMap();
   useEffect(() => {
     if (points.length === 0) return;
@@ -60,7 +61,7 @@ export function PlacesMap({ places, heightClass = "h-72 md:h-[480px]" }: PlacesM
               </Popup>
             </CircleMarker>
           ))}
-          <FitToPlaces points={points} />
+          <FitToPoints points={points} />
         </MapContainer>
       </div>
       {legend.length > 0 ? (

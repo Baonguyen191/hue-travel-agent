@@ -1,9 +1,11 @@
 import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { ComingSoonPage } from "./pages/ComingSoonPage";
 import { ExplorePage } from "./pages/ExplorePage";
+import { ItineraryTab } from "./pages/ItineraryTab";
 import { NotFoundPage } from "./pages/NotFoundPage";
 import { PlaceDetailPage } from "./pages/PlaceDetailPage";
-import { PlanStubPage } from "./pages/PlanStubPage";
+import { PlanLayout } from "./pages/PlanLayout";
 import { RequestPage } from "./pages/RequestPage";
 
 export function App() {
@@ -13,7 +15,11 @@ export function App() {
         <Route index element={<RequestPage />} />
         <Route path="explore" element={<ExplorePage />} />
         <Route path="explore/:poiId" element={<PlaceDetailPage />} />
-        <Route path="plan/:threadId" element={<PlanStubPage />} />
+        <Route path="plan/:threadId" element={<PlanLayout />}>
+          <Route index element={<ItineraryTab />} />
+          <Route path="budget" element={<ComingSoonPage title="Ngân sách & duyệt" />} />
+          <Route path="booking" element={<ComingSoonPage title="Đặt chỗ" />} />
+        </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

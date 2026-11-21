@@ -108,7 +108,7 @@ export const api = {
   createOrEditPlan: (threadId: string, request: TripRequest) =>
     apiRequest<CheckpointState>(`/plans/${threadId}`, { method: "POST", body: request }),
 
-  getPlan: (threadId: string) => apiRequest<PlanRecord>(`/plans/${threadId}`),
+  getPlan: (threadId: string, signal?: AbortSignal) => apiRequest<PlanRecord>(`/plans/${threadId}`, { signal }),
 
   approvePlan: (threadId: string, body: ApprovalRequest) =>
     apiRequest<ApprovalResult>(`/plans/${threadId}/approve`, { method: "POST", body }),

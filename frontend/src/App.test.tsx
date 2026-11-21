@@ -1,15 +1,12 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { App } from "./App";
 import { routeFetch } from "./test/fetchMock";
 import { USER_ID_KEY } from "./lib/userId";
+import planJson from "./test/fixtures/plan.json";
 
-vi.mock("./components/PlacesMap", async () => {
-  const { createElement } = await import("react");
-  return { PlacesMap: () => createElement("div", { "data-testid": "map" }) };
-});
 
 function renderAt(path: string) {
   return render(
@@ -44,10 +41,11 @@ describe("app shell", () => {
     expect(screen.getByRole("heading", { name: "Khám phá Huế" })).toBeInTheDocument();
   });
 
-  it("shows the plan id on the plan route", () => {
-    renderAt("/plan/3f9c0a6e-1111-2222-3333-444455556666");
+  it("opens the plan route and shows the trip header", async () => {
+    routeFetch(() => ({ body: planJson }));
+    renderAt("/plan/e3d7c6b9-956b-42f7-9916-479fe993c969");
 
-    expect(screen.getByText("3f9c0a6e-1111-2222-3333-444455556666")).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: "Hà Nội → Huế" })).toBeInTheDocument();
   });
 
   it("shows a 404 page for unknown paths", () => {

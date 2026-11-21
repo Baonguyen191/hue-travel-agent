@@ -1,22 +1,27 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useParams } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import createPlanJson from "../test/fixtures/create-plan.json";
 import parseDodJson from "../test/fixtures/parse-dod.json";
 import parseMissingJson from "../test/fixtures/parse-missing.json";
 import { calledUrls, routeFetch, type RouteReply } from "../test/fetchMock";
-import { PlanStubPage } from "./PlanStubPage";
 import { DOD_SENTENCE, RequestPage } from "./RequestPage";
 
 const UUID_PLAN = /\/api\/v1\/plans\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+/** Stands in for the plan page: only proves the navigation and the thread id. */
+function PlanRouteProbe() {
+  const { threadId } = useParams();
+  return <p>Mã kế hoạch: {threadId}</p>;
+}
 
 function renderApp() {
   return render(
     <MemoryRouter initialEntries={["/"]}>
       <Routes>
         <Route path="/" element={<RequestPage />} />
-        <Route path="/plan/:threadId" element={<PlanStubPage />} />
+        <Route path="/plan/:threadId" element={<PlanRouteProbe />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -83,7 +88,7 @@ describe("RequestPage", () => {
     const planCall = calledUrls(fetchMock).find((url) => UUID_PLAN.test(url));
     expect(planCall).toBeDefined();
     const threadId = planCall!.split("/").pop()!;
-    expect(screen.getByText(threadId)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(threadId))).toBeInTheDocument();
 
     const [, init] = fetchMock.mock.calls.find(([url]) => UUID_PLAN.test(String(url))) as [string, RequestInit];
     expect(JSON.parse(init.body as string)).toMatchObject({
