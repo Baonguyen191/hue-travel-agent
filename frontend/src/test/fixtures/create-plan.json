@@ -1,0 +1,21 @@
+{
+  "thread_id": "e3d7c6b9-956b-42f7-9916-479fe993c969",
+  "status": "AWAITING_APPROVAL",
+  "plan_id": "34abd88f-e54b-424f-8d55-c6282bbc6620",
+  "version": 1,
+  "options": [
+    "BUDGET"
+  ],
+  "warnings": [],
+  "trace": [
+    "search",
+    "itinerary",
+    "budget",
+    "validate",
+    "approval"
+  ],
+  "retries": 0,
+  "attempts": [],
+  "approval": null,
+  "waiting": true
+}

@@ -1,0 +1,90 @@
+{
+  "items": [
+    {
+      "place": {
+        "id": "huetripo:531787",
+        "name": "Đại Nội Huế",
+        "category": "historic",
+        "lat": 16.4691811,
+        "lon": 107.5783543,
+        "address": "Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế",
+        "rating_value": 4.7,
+        "rating_count": 17,
+        "rating_source": "Google",
+        "opening_hours_raw": "07:30-17:30",
+        "opening_hours_confidence": "UNVERIFIED",
+        "visit_minutes": 150,
+        "price_min_vnd": 200000,
+        "price_max_vnd": 200000,
+        "price_unit": "UNKNOWN",
+        "price_status": "REFERENCE_RANGE",
+        "is_free_claim": false,
+        "summary": "Đại Nội Huế từng là trung tâm chính trị, văn hóa và là nơi sinh hoạt của 13 vị vua triều Nguyễn trong suốt 143 năm. Được UNESCO vinh danh là Di sản Văn hóa Thế giới vào năm 1993, quần thể kiến trúc đồ sộ và cổ kính này là một kiệt tác nghệ thuật rực rỡ. Đến với Đại Nội, du khách sẽ bước vào một hành trình vượt thời gian, tận mắt chiêm ngưỡng vẻ đẹp uy nghi và cảm nhận trọn vẹn thời kỳ vàng son của hoàng gia Việt Nam xưa.",
+        "photo_url": "https://huetripo.hue.gov.vn/uploads/DiaDiem/2026/Khamphahue-PhuongTienDiDenDaiNoi_1776758195.png",
+        "source": "huetripo.hue.gov.vn",
+        "source_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787",
+        "source_place_id": "b7677e73-0d3a-4759-9839-3cbde594b0bc",
+        "collected_at": "2026-11-04T01:12:52+07:00",
+        "raw_attributes": {
+          "Loại hình (theo nguồn)": "Điểm du lịch, tài nguyên / Di tích",
+          "Địa chỉ": "Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế",
+          "Giờ mở cửa (theo nguồn, không ghi ngày)": "07:30 – 17:30",
+          "Giờ mở cửa: giả định": "áp dụng mọi ngày trong tuần (nguồn không ghi ngày)",
+          "Thời gian trải nghiệm TB (phút)": "150",
+          "Giá tham khảo (theo nguồn)": "200.000đ",
+          "Giá vé": "Vé combo, Người lớn: 420.000đ; Vé vào cửa, Người lớn: 200.000đ; Vé vào cửa, Trẻ em: 40.000đ",
+          "Đánh giá": "4.7/5 (17 lượt, Google)",
+          "Điện thoại": "0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)",
+          "Tóm tắt": "Đại Nội Huế từng là trung tâm chính trị, văn hóa và là nơi sinh hoạt của 13 vị vua triều Nguyễn trong suốt 143 năm. Được UNESCO vinh danh là Di sản Văn hóa Thế giới vào năm 1993, quần thể kiến trúc đồ sộ và cổ kính này là một kiệt tác nghệ thuật rực rỡ. Đến với Đại Nội, du khách sẽ bước vào một hành trình vượt thời gian, tận mắt chiêm ngưỡng vẻ đẹp uy nghi và cảm nhận trọn vẹn thời kỳ vàng son của hoàng gia Việt Nam xưa.",
+          "Ảnh đại diện": "https://huetripo.hue.gov.vn/uploads/DiaDiem/2026/Khamphahue-PhuongTienDiDenDaiNoi_1776758195.png",
+          "Trang nguồn": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787"
+        }
+      },
+      "score": 74.284,
+      "distance_km": null
+    },
+    {
+      "place": {
+        "id": "huetripo:039509",
+        "name": "Đại Cung Môn",
+        "category": "historic",
+        "lat": 16.469527,
+        "lon": 107.577432,
+        "address": "Đại Nội Huế Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế",
+        "rating_value": 4.6,
+        "rating_count": 191,
+        "rating_source": "Google",
+        "opening_hours_raw": "07:30-17:30",
+        "opening_hours_confidence": "UNVERIFIED",
+        "visit_minutes": 120,
+        "price_min_vnd": null,
+        "price_max_vnd": null,
+        "price_unit": "UNKNOWN",
+        "price_status": "FREE_CLAIM",
+        "is_free_claim": true,
+        "summary": null,
+        "photo_url": "https://huetripo.hue.gov.vn/uploads/DaPhuongTien/2026/10/cce93baf-49b0-4404-a842-1d8f481728ef_1793346084.jpg",
+        "source": "huetripo.hue.gov.vn",
+        "source_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-cung-mon-039509",
+        "source_place_id": "a1ac6205-0641-4605-b44c-0c4431f80b8a",
+        "collected_at": "2026-11-04T01:12:52+07:00",
+        "raw_attributes": {
+          "Loại hình (theo nguồn)": "Điểm du lịch, tài nguyên / Di tích",
+          "Địa chỉ": "Đại Nội Huế Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế",
+          "Giờ mở cửa (theo nguồn, không ghi ngày)": "07:30 – 17:30",
+          "Giờ mở cửa: giả định": "áp dụng mọi ngày trong tuần (nguồn không ghi ngày)",
+          "Thời gian trải nghiệm TB (phút)": "120",
+          "Miễn phí": "có",
+          "Đánh giá": "4.6/5 (191 lượt, Google)",
+          "Ảnh đại diện": "https://huetripo.hue.gov.vn/uploads/DaPhuongTien/2026/10/cce93baf-49b0-4404-a842-1d8f481728ef_1793346084.jpg",
+          "Trang nguồn": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-cung-mon-039509"
+        }
+      },
+      "score": 62.359,
+      "distance_km": null
+    }
+  ],
+  "total": 2,
+  "limit": 20,
+  "offset": 0
+}

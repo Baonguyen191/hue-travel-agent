@@ -1,0 +1,37 @@
+{
+  "request": {
+    "origin": "Hà Nội",
+    "destination": "Huế",
+    "start_date": "2026-12-05",
+    "end_date": "2026-12-07",
+    "people": 2,
+    "rooms": 1,
+    "budget_vnd": 8000000,
+    "categories": [],
+    "keyword": null,
+    "preferences": [
+      "di tích",
+      "đặc sản"
+    ],
+    "center_lat": null,
+    "center_lon": null,
+    "radius_km": null
+  },
+  "missing_fields": [],
+  "source": "RULES",
+  "fields": {
+    "origin": "Hà Nội",
+    "destination": "Huế",
+    "start_date": "2026-12-05",
+    "duration_days": 3,
+    "nights": 2,
+    "people": 2,
+    "budget_vnd": 8000000,
+    "preferences": [
+      "di tích",
+      "đặc sản"
+    ],
+    "end_date": "2026-12-07"
+  },
+  "notes": []
+}

@@ -9,8 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
 
 from app.agents.checkpoint import open_checkpointer
 from app.api.places import router as places_router
@@ -75,6 +74,26 @@ def health(request: Request) -> dict[str, Any] | JSONResponse:
     return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content=body)
 
 
-# Mount last: a "/" mount registered before API routes would shadow them (e.g. /health).
-if FRONTEND_DIST.is_dir():
-    app.mount("/", StaticFiles(directory=FRONTEND_DIST, html=True), name="frontend")
+# Registered last: this catch-all must never shadow the API routers or /health.
+# FRONTEND_DIST is read per request so tests can point it at a temporary build.
+_RESERVED_FIRST_SEGMENTS = frozenset({"api", "health"})
+
+
+@app.get("/{full_path:path}", response_model=None, include_in_schema=False)
+def frontend_fallback(full_path: str) -> FileResponse | JSONResponse:
+    """Serve a real file from the frontend build, else index.html for client-side routes."""
+    not_found = JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Not Found"})
+    if full_path.split("/", 1)[0] in _RESERVED_FIRST_SEGMENTS or not FRONTEND_DIST.is_dir():
+        return not_found
+    root = FRONTEND_DIST.resolve()
+    if full_path:
+        try:
+            candidate = (root / full_path).resolve()
+        except (OSError, ValueError):
+            return not_found
+        if candidate.is_file() and candidate.is_relative_to(root):
+            return FileResponse(candidate)
+    index = root / "index.html"
+    if index.is_file():
+        return FileResponse(index)
+    return not_found

@@ -1,0 +1,14 @@
+{
+  "request": null,
+  "missing_fields": [
+    "origin",
+    "start_date",
+    "end_date"
+  ],
+  "source": "FORM_FALLBACK",
+  "fields": {
+    "destination": "Huế",
+    "people": 2
+  },
+  "notes": []
+}
