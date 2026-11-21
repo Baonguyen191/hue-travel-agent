@@ -12,7 +12,6 @@ ROOT = Path(__file__).resolve().parents[1]
 BACKEND = ROOT / "backend"
 sys.path.insert(0, str(BACKEND))
 
-from app.api import plans as plans_api  # noqa: E402
 from app.main import app  # noqa: E402
 
 
@@ -53,9 +52,9 @@ def test_health_reports_missing_database(monkeypatch) -> None:
 def test_health_is_503_when_the_state_database_is_unreachable(monkeypatch) -> None:
     monkeypatch.delenv("HUE_SQLITE_PATH", raising=False)
     unreachable = create_engine("sqlite:///" + str(ROOT / "no-such-dir" / "state.sqlite").replace("\\", "/"))
-    monkeypatch.setattr(plans_api.store, "engine", unreachable)
 
     with TestClient(app) as client:
+        monkeypatch.setattr(app.state.store, "engine", unreachable)
         response = client.get("/health")
 
     assert response.status_code == 503

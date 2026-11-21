@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
 import sys
 from pathlib import Path
 
@@ -115,3 +117,36 @@ def test_lifespan_refuses_to_start_on_invalid_settings(clean_env: pytest.MonkeyP
     with pytest.raises(RuntimeError, match="DATABASE_URL"):
         with TestClient(app):
             pass
+
+
+def test_import_survives_unsupported_database_url_and_lifespan_reports_it() -> None:
+    """A fresh interpreter: importing app.main must not fail, only the lifespan may refuse the URL."""
+    script = (
+        "import sys\n"
+        "from fastapi.testclient import TestClient\n"
+        "from app.main import app\n"
+        "print('IMPORTED', flush=True)\n"
+        "try:\n"
+        "    with TestClient(app):\n"
+        "        pass\n"
+        "except RuntimeError as error:\n"
+        "    print('LIFESPAN_ERROR ' + str(error), flush=True)\n"
+        "    sys.exit(0)\n"
+        "sys.exit(1)\n"
+    )
+    env = {**os.environ, "DATABASE_URL": "mysql://x/y", "CHECKPOINT_URL": "memory://"}
+
+    result = subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=BACKEND,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert "IMPORTED" in result.stdout
+    error_lines = [line for line in result.stdout.splitlines() if line.startswith("LIFESPAN_ERROR ")]
+    assert error_lines, result.stdout
+    assert "DATABASE_URL" in error_lines[0]

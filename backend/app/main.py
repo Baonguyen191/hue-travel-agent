@@ -14,34 +14,39 @@ from fastapi.staticfiles import StaticFiles
 
 from app.agents.checkpoint import open_checkpointer
 from app.api.places import router as places_router
-from app.api.plans import build_orchestrator, store as state_store, router as plans_router
+from app.api.plans import build_orchestrator, router as plans_router
 from app.api.bookings import router as bookings_router
 from app.core.config import checkpoint_url, database_url, hue_database_path, settings_notes, validate_settings
 from app.core.health import checkpoint_status, hue_source_status, state_db_status
 from app.db.migrate import upgrade_to_head
+from app.db.store import PlanStore
 
 logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Validate settings, migrate the state DB, then open the checkpointer and build the orchestrator."""
+    """Validate settings, migrate the state DB, open the plan store and checkpointer, build the orchestrator."""
     problems = validate_settings()
     if problems:
         raise RuntimeError("Invalid configuration: " + "; ".join(problems))
     for note in settings_notes():
         logger.info(note)
     upgrade_to_head(database_url())
+    store = PlanStore(database_url())
     target = checkpoint_url()
     async with open_checkpointer(target) as checkpointer:
+        app.state.store = store
         app.state.checkpointer = checkpointer
         app.state.checkpoint_url = target
-        app.state.orchestrator = build_orchestrator(checkpointer)
+        app.state.orchestrator = build_orchestrator(store, checkpointer)
         try:
             yield
         finally:
+            app.state.orchestrator = None
             app.state.checkpointer = None
             app.state.checkpoint_url = None
+            app.state.store = None
 
 
 app = FastAPI(title="Hue Travel Multi-Agent", version="0.0.1", lifespan=lifespan)
@@ -57,7 +62,7 @@ def health(request: Request) -> dict[str, Any] | JSONResponse:
     """Report each component; any component down makes the whole service 503."""
     components = {
         "hue_source": hue_source_status(hue_database_path()),
-        "state_db": state_db_status(state_store.engine),
+        "state_db": state_db_status(getattr(request.app.state, "store", None)),
         "checkpoint": checkpoint_status(
             getattr(request.app.state, "checkpointer", None),
             getattr(request.app.state, "checkpoint_url", None),

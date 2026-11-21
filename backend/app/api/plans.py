@@ -3,8 +3,8 @@
 `X-User-Id` is an MVP ownership check, not authentication: any caller can send any
 value. It only keeps one user's plan away from another user's plan.
 
-The orchestrator and its checkpointer are created in the FastAPI lifespan (see
-`app.main`) and stored on `app.state.orchestrator`.
+The plan store, orchestrator and checkpointer are created in the FastAPI lifespan (see
+`app.main`) and stored on `app.state`; nothing is opened at import time.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 from app.agents.orchestrator import NotWaitingError, Orchestrator, StalePlanError
 from app.agents.search import SearchAgent
-from app.core.config import database_url, hue_database_path
+from app.core.config import hue_database_path
 from app.db.store import DEFAULT_OWNER, PlanStore
 from app.providers.hotel_mock import MockHotelProvider
 from app.providers.transport_mock import MockTransportProvider
@@ -31,7 +31,6 @@ from app.services.quote import UnknownOptionError
 from app.services.request_parser import TripRequestParser
 
 router = APIRouter(prefix="/api/v1/plans", tags=["plans"])
-store = PlanStore(database_url())
 hue_places = HuePlacesRepository(hue_database_path())
 
 
@@ -39,7 +38,7 @@ class NaturalLanguageRequest(BaseModel):
     text: str = Field(min_length=1, max_length=4000)
 
 
-def build_orchestrator(checkpointer: BaseCheckpointSaver) -> Orchestrator:
+def build_orchestrator(store: PlanStore, checkpointer: BaseCheckpointSaver) -> Orchestrator:
     """Wire the agents, the plan store and the given checkpointer into one orchestrator."""
     return Orchestrator(
         SearchAgent(hue_places, MockTransportProvider(), MockHotelProvider()),
@@ -50,11 +49,17 @@ def build_orchestrator(checkpointer: BaseCheckpointSaver) -> Orchestrator:
     )
 
 
+def get_store(request: Request) -> PlanStore:
+    """Return the plan store that the lifespan opened on `app.state`."""
+    return request.app.state.store
+
+
 def get_orchestrator(request: Request) -> Orchestrator:
+    """Return the orchestrator that the lifespan built on `app.state`."""
     return request.app.state.orchestrator
 
 
-def owned_plan(thread_id: str, user_id: str) -> dict[str, Any]:
+def owned_plan(store: PlanStore, thread_id: str, user_id: str) -> dict[str, Any]:
     """Return the latest plan of a thread, or raise 404 when missing or 403 for another owner."""
     plan = store.latest(thread_id)
     if plan is None:
@@ -91,10 +96,11 @@ async def create_or_edit(
 @router.get("/{thread_id}")
 async def get_plan(
     thread_id: str,
+    store: PlanStore = Depends(get_store),
     orchestrator: Orchestrator = Depends(get_orchestrator),
     x_user_id: str = Header(default=DEFAULT_OWNER),
 ):
-    plan = owned_plan(thread_id, x_user_id)
+    plan = owned_plan(store, thread_id, x_user_id)
     return {**plan, "checkpoint": await orchestrator.state(thread_id)}
 
 
@@ -102,10 +108,11 @@ async def get_plan(
 async def approve(
     thread_id: str,
     body: ApprovalRequest,
+    store: PlanStore = Depends(get_store),
     orchestrator: Orchestrator = Depends(get_orchestrator),
     x_user_id: str = Header(default=DEFAULT_OWNER),
 ):
-    plan = owned_plan(thread_id, x_user_id)
+    plan = owned_plan(store, thread_id, x_user_id)
     if body.version != plan["version"]:
         raise HTTPException(409, "Plan version is stale; approve the latest version.")
     answer = {"action": "approve", "option": body.option, "user_id": x_user_id, "version": body.version}

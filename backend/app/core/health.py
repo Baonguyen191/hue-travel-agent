@@ -13,10 +13,10 @@ from typing import Any
 import psycopg
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from sqlalchemy import text
-from sqlalchemy.engine import Engine
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.agents.checkpoint import checkpoint_kind
+from app.db.store import PlanStore
 
 POSTGRES_CONNECT_TIMEOUT_SECONDS = 3
 
@@ -48,8 +48,11 @@ def hue_source_status(database_path: Path) -> dict[str, Any]:
     return component(available, detail, database="hue.sqlite", access="read-only")
 
 
-def state_db_status(engine: Engine) -> dict[str, Any]:
-    """Run `SELECT 1` through the plan store's engine."""
+def state_db_status(store: PlanStore | None) -> dict[str, Any]:
+    """Run `SELECT 1` through the plan store's engine; a store that is not open is down."""
+    if store is None:
+        return component(False, "State database is not open.")
+    engine = store.engine
     try:
         with engine.connect() as connection:
             connection.execute(text("SELECT 1"))
