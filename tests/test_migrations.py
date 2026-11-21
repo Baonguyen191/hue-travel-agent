@@ -14,10 +14,13 @@ BACKEND = ROOT / "backend"
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
+from app.chat import models as chat_models  # noqa: E402, F401  (registers the chat tables)
 from app.db.migrate import downgrade_to_base, upgrade_to_head  # noqa: E402
 from app.db.store import Base, PlanStore  # noqa: E402
 
-APP_TABLES = {"trips", "plan_versions", "approvals", "booking_intents"}
+PLAN_TABLES = {"trips", "plan_versions", "approvals", "booking_intents"}
+CHAT_TABLES = {"conversations", "chat_messages"}
+APP_TABLES = PLAN_TABLES | CHAT_TABLES
 
 
 def _file_url(tmp_path: Path, name: str = "migrated.sqlite") -> str:
@@ -46,11 +49,26 @@ def test_empty_file_migrated_to_head_matches_the_models(tmp_path: Path) -> None:
     assert differences == []
 
 
-def test_upgrade_creates_exactly_the_four_app_tables(tmp_path: Path) -> None:
+def test_upgrade_creates_exactly_the_app_tables(tmp_path: Path) -> None:
     url = _file_url(tmp_path)
 
     upgrade_to_head(url)
 
+    assert _table_names(url) == APP_TABLES | {"alembic_version"}
+
+
+def test_chat_revision_adds_only_the_chat_tables_and_downgrades_cleanly(tmp_path: Path) -> None:
+    from alembic import command
+
+    from app.db.migrate import alembic_config
+
+    url = _file_url(tmp_path, "chat.sqlite")
+    upgrade_to_head(url)
+
+    command.downgrade(alembic_config(url), "0001_initial")
+    assert _table_names(url) == PLAN_TABLES | {"alembic_version"}
+
+    command.upgrade(alembic_config(url), "head")
     assert _table_names(url) == APP_TABLES | {"alembic_version"}
 
 

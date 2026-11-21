@@ -13,6 +13,7 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
+from app.chat import models as chat_models  # noqa: E402, F401  (registers the chat tables)
 from app.core.config import database_url  # noqa: E402
 from app.db.store import Base, enable_sqlite_foreign_keys  # noqa: E402
 
