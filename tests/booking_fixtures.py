@@ -16,6 +16,8 @@ BACKEND = ROOT / "backend"
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
+from langgraph.checkpoint.memory import InMemorySaver  # noqa: E402
+
 from app.agents.orchestrator import Orchestrator  # noqa: E402
 from app.agents.search import SearchAgent  # noqa: E402
 from app.db.store import PlanStore  # noqa: E402
@@ -53,8 +55,9 @@ def make_plan(
         BudgetAgent(places=repository),
         ItineraryAgent(places=repository),
         store,
+        InMemorySaver(),
     )
-    asyncio.run(orchestrator.run(thread_id, request))
+    asyncio.run(orchestrator.start(thread_id, request))
     plan = store.latest(thread_id)
     assert plan is not None
     return plan

@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import sys
 import uuid
+from collections.abc import Iterator
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,7 +17,18 @@ if str(BACKEND) not in sys.path:
 
 from app.main import app  # noqa: E402
 
-client = TestClient(app)
+client: TestClient
+
+
+@pytest.fixture(autouse=True, scope="module")
+def _api_client() -> Iterator[None]:
+    """Run the app lifespan (orchestrator and checkpointer) around this module's tests."""
+    global client
+    with TestClient(app) as test_client:
+        client = test_client
+        yield
+
+
 ALICE = {"X-User-Id": "alice"}
 BOB = {"X-User-Id": "bob"}
 BOOK_KEY = {"idempotency_key": "api-key-00000001"}

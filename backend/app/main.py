@@ -3,18 +3,30 @@
 from __future__ import annotations
 
 import sqlite3
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from app.agents.checkpoint import open_checkpointer
 from app.api.places import router as places_router
-from app.api.plans import router as plans_router
+from app.api.plans import build_orchestrator, router as plans_router
 from app.api.bookings import router as bookings_router
 from app.core.config import hue_database_path
 
-app = FastAPI(title="Hue Travel Multi-Agent", version="0.0.1")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    """Open the checkpointer for the app's lifetime and build the orchestrator on it."""
+    async with open_checkpointer() as checkpointer:
+        app.state.orchestrator = build_orchestrator(checkpointer)
+        yield
+
+
+app = FastAPI(title="Hue Travel Multi-Agent", version="0.0.1", lifespan=lifespan)
 app.include_router(places_router)
 app.include_router(plans_router)
 app.include_router(bookings_router)

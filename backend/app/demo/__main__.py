@@ -4,6 +4,7 @@
     python -m app.demo budget --scenario dod
     python -m app.demo itinerary --scenario dod
     python -m app.demo book --scenario dod
+    python -m app.demo plan "Tôi đi Huế 3 ngày 2 đêm, xuất phát Hà Nội, 2 người" --start 2026-12-05
 
 All use the local Hue SQLite source and deterministic mock providers, so every
 transport and hotel offer is labelled `[MOCK]`.
@@ -14,6 +15,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import sys
+from datetime import date
 from typing import Any, get_args
 
 from pydantic import ValidationError
@@ -33,6 +35,7 @@ from app.demo.booking_view import (
 from app.demo.budget_view import render_budget
 from app.demo.formatting import format_table, money, request_lines, unit_label, warning_lines
 from app.demo.itinerary_view import render_itinerary
+from app.demo.plan_view import run_plan
 from app.providers.booking_mock import MockBookingProvider, Mode, ReconcileStatus
 from app.providers.hotel_mock import MockHotelProvider
 from app.providers.transport_mock import MockTransportProvider
@@ -127,7 +130,31 @@ def build_parser() -> argparse.ArgumentParser:
     )
     itinerary.add_argument("--json", action="store_true", help="Print the raw ItineraryResult JSON.")
     _book_parser(subparsers, shared)
+    _plan_parser(subparsers)
     return parser
+
+
+def _iso_date(value: str) -> date:
+    try:
+        return date.fromisoformat(value)
+    except ValueError as error:
+        raise argparse.ArgumentTypeError(f"ngày không hợp lệ (YYYY-MM-DD): {value}") from error
+
+
+def _plan_parser(subparsers: Any) -> None:
+    plan = subparsers.add_parser(
+        "plan",
+        help="Phân tích câu tiếng Việt, chạy LangGraph, duyệt (sau khi khởi động lại) và đặt mô phỏng.",
+    )
+    plan.add_argument("text", help="Câu yêu cầu tiếng Việt.")
+    plan.add_argument("--start", type=_iso_date, help="Ngày đi YYYY-MM-DD; chỉ điền khi câu chưa có ngày.")
+    plan.add_argument("--origin", help="Điểm đi; ghi đè giá trị trong câu.")
+    plan.add_argument("--people", type=int, help="Số người; ghi đè giá trị trong câu.")
+    plan.add_argument("--approve", choices=_BOOK_OPTIONS, help="Duyệt phương án này sau khi khởi động lại.")
+    plan.add_argument("--book", action="store_true", help="Đặt phương án đã duyệt (mô phỏng).")
+    plan.add_argument("--fail", choices=["hotel"], help="Khách sạn từ chối khi đặt.")
+    plan.add_argument("--checkpoint", help="File SQLite của checkpoint (mặc định: file tạm mỗi lần chạy).")
+    plan.add_argument("--json", action="store_true", help="In JSON của kết quả cuối.")
 
 
 def _overrides(args: argparse.Namespace) -> dict[str, Any]:
@@ -439,6 +466,8 @@ def main(argv: list[str] | None = None) -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
     args = build_parser().parse_args(argv)
+    if args.command == "plan":
+        return run_plan(args)
     try:
         request = build_request(args)
     except ValidationError as error:
