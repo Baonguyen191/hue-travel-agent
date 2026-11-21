@@ -1,7 +1,10 @@
-"""CLI demo for the Search Agent: `python -m app.demo search --scenario dod`.
+"""CLI demos for the Search and Budget Agents, run from `backend/`.
 
-Run from `backend/`. Uses the local Hue SQLite source and deterministic mock
-providers, so every transport and hotel offer is labelled `[MOCK]`.
+    python -m app.demo search --scenario dod
+    python -m app.demo budget --scenario dod
+
+Both use the local Hue SQLite source and deterministic mock providers, so every
+transport and hotel offer is labelled `[MOCK]`.
 """
 
 from __future__ import annotations
@@ -18,10 +21,12 @@ from app.core.config import hue_database_path
 from app.providers.hotel_mock import MockHotelProvider
 from app.providers.transport_mock import MockTransportProvider
 from app.repositories.hue_places import HuePlacesRepository
+from app.schemas.budget import BudgetOption, BudgetResult, CostItem
 from app.schemas.offer import HotelOffer, TransportOffer
 from app.schemas.place import PlaceCategory, PlaceSearchResult
 from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
+from app.services.budget_optimizer import SIGHTSEEING_CATEGORIES, BudgetAgent
 
 SCENARIOS: dict[str, dict[str, Any]] = {
     "dod": {
@@ -39,31 +44,54 @@ SCENARIOS: dict[str, dict[str, Any]] = {
 _UNIT_LABELS = {
     "VND_PER_PERSON_PER_LEG": "per person per leg",
     "VND_PER_ROOM_PER_NIGHT": "per room per night",
+    "VND_PER_GROUP_PER_DAY": "per group per day",
+    "VND_PER_PERSON_PER_DAY": "per person per day",
+    "VND_PER_PERSON_PER_MEAL_ASSUMED": "per person per meal (assumed)",
+    "VND_PER_PERSON": "per person",
 }
 _TABLE_HEADERS = ["#", "Name", "poi_id", "Score", "Rating", "Distance", "Source URL"]
+_LABEL_NAMES = {"BUDGET": "Tiết kiệm", "BALANCED": "Cân bằng", "COMFORT": "Thoải mái"}
+_DEFAULT_VISIT_COUNT = 6
 
 
-def build_parser() -> argparse.ArgumentParser:
-    """Build the argument parser with the `search` subcommand."""
-    parser = argparse.ArgumentParser(prog="python -m app.demo", description="Agent demos.")
-    subparsers = parser.add_subparsers(dest="command", required=True)
-    search = subparsers.add_parser("search", help="Run the Search Agent on a trip request.")
-    search.add_argument("--scenario", choices=sorted(SCENARIOS))
-    search.add_argument("--origin")
-    search.add_argument("--destination")
-    search.add_argument("--start", help="Start date, YYYY-MM-DD.")
-    search.add_argument("--end", help="End date, YYYY-MM-DD.")
-    search.add_argument("--people", type=int)
-    search.add_argument("--rooms", type=int)
-    search.add_argument("--budget", type=int, help="Budget in VND.")
-    search.add_argument("--pref", action="append", help="Preference text; repeatable.")
-    search.add_argument(
+def _request_parent() -> argparse.ArgumentParser:
+    """Request flags shared by every subcommand that builds a TripRequest."""
+    parent = argparse.ArgumentParser(add_help=False)
+    parent.add_argument("--scenario", choices=sorted(SCENARIOS))
+    parent.add_argument("--origin")
+    parent.add_argument("--destination")
+    parent.add_argument("--start", help="Start date, YYYY-MM-DD.")
+    parent.add_argument("--end", help="End date, YYYY-MM-DD.")
+    parent.add_argument("--people", type=int)
+    parent.add_argument("--rooms", type=int)
+    parent.add_argument("--budget", type=int, help="Budget in VND.")
+    parent.add_argument("--pref", action="append", help="Preference text; repeatable.")
+    parent.add_argument(
         "--category", action="append", choices=sorted(get_args(PlaceCategory)),
         help="Place category; repeatable.",
     )
-    search.add_argument("--keyword")
+    parent.add_argument("--keyword")
+    return parent
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the argument parser with the `search` and `budget` subcommands."""
+    parser = argparse.ArgumentParser(prog="python -m app.demo", description="Agent demos.")
+    subparsers = parser.add_subparsers(dest="command", required=True)
+    shared = _request_parent()
+    search = subparsers.add_parser(
+        "search", parents=[shared], help="Run the Search Agent on a trip request."
+    )
     search.add_argument("--per-category", type=int, default=5, help="Rows shown per category.")
     search.add_argument("--json", action="store_true", help="Print the raw SearchResult JSON.")
+    budget = subparsers.add_parser(
+        "budget", parents=[shared], help="Price a trip and rank budget options."
+    )
+    budget.add_argument(
+        "--visit", action="append", metavar="POI_ID",
+        help="A visited POI id; repeatable. Default: sample sightseeing candidates.",
+    )
+    budget.add_argument("--json", action="store_true", help="Print the raw BudgetResult JSON.")
     return parser
 
 
@@ -101,6 +129,10 @@ def build_request(args: argparse.Namespace) -> TripRequest:
 
 def _money(amount: int) -> str:
     return f"{amount:,} VND"
+
+
+def _money_range(low: int, high: int) -> str:
+    return _money(low) if low == high else f"{low:,} – {high:,} VND"
 
 
 def _unit_label(unit: str) -> str:
@@ -220,12 +252,138 @@ def render_text(request: TripRequest, result: SearchResult, per_category: int) -
     return "\n".join(lines)
 
 
+def _repository() -> HuePlacesRepository:
+    return HuePlacesRepository(hue_database_path())
+
+
 def _build_agent() -> SearchAgent:
-    return SearchAgent(
-        HuePlacesRepository(hue_database_path()),
-        MockTransportProvider(),
-        MockHotelProvider(),
+    return SearchAgent(_repository(), MockTransportProvider(), MockHotelProvider())
+
+
+def _default_visits(search: SearchResult) -> list[str]:
+    sightseeing = [
+        item.place.id for item in search.poi_candidates if item.place.category in SIGHTSEEING_CATEGORIES
+    ]
+    return sightseeing[:_DEFAULT_VISIT_COUNT]
+
+
+def _tag(item: CostItem) -> str:
+    if item.price_kind == "UNKNOWN":
+        return "[UNKNOWN]"
+    if item.source == "MOCK":
+        return "[MOCK]"
+    if item.source == "HUE_POI_SOURCE":
+        return "[DATA]"
+    return "[ESTIMATED]"
+
+
+def _amount_text(item: CostItem) -> str:
+    if item.amount_vnd is None:
+        return "unknown"
+    if item.amount_max_vnd is None:
+        return _money(item.amount_vnd)
+    return _money_range(item.amount_vnd, item.amount_max_vnd)
+
+
+def _label_text(option: BudgetOption) -> str:
+    if option.label is None:
+        return "-"
+    return f"{_LABEL_NAMES[option.label]} ({option.label})"
+
+
+def _option_row(rank: int, option: BudgetOption) -> list[str]:
+    outbound, returning, hotel = option.transport_outbound, option.transport_return, option.hotel
+    return [
+        str(rank),
+        _label_text(option),
+        f"{outbound.mode} {_money(outbound.price_vnd)}" if outbound else "-",
+        f"{returning.mode} {_money(returning.price_vnd)}" if returning else "-",
+        f"{hotel.hotel_name} ({hotel.tier}) {_money(hotel.price_per_room_night_vnd)}/night" if hotel else "-",
+        _money_range(option.known_total_vnd, option.known_total_max_vnd),
+        option.budget_status,
+        str(option.unknown_item_count),
+    ]
+
+
+def _options_table(result: BudgetResult) -> list[str]:
+    headers = ["#", "Label", "Outbound", "Return", "Hotel", "Total", "Status", "Unknown"]
+    rows = [headers] + [_option_row(rank, option) for rank, option in enumerate(result.options, start=1)]
+    return _format_table(rows)
+
+
+def _detail_option(result: BudgetResult) -> BudgetOption:
+    """Prefer BALANCED, then COMFORT, then BUDGET, then the first option."""
+    for label in ("BALANCED", "COMFORT", "BUDGET"):
+        match = next((option for option in result.options if option.label == label), None)
+        if match is not None:
+            return match
+    return result.options[0]
+
+
+def _item_line(item: CostItem) -> str:
+    unit = _unit_label(item.price_unit)
+    return (
+        f"  {_tag(item):<11} {item.label} | {item.quantity} x {unit} | "
+        f"{_amount_text(item)} | {item.note or '-'}"
     )
+
+
+def _detail_lines(result: BudgetResult) -> list[str]:
+    option = _detail_option(result)
+    lines = ["", f"Detail: {_label_text(option)}"]
+    lines.extend(_item_line(item) for item in option.items)
+    lines.append("")
+    lines.append(f"Known total: {_money_range(option.known_total_vnd, option.known_total_max_vnd)}")
+    lines.append(f"Unknown items: {option.unknown_item_count}")
+    lines.append(f"Remaining: {_money(option.budget_remaining_vnd)}" if option.budget_remaining_vnd is not None else "Remaining: n/a")
+    if result.shortfall_vnd is not None:
+        lines.append(f"Shortfall: {_money(result.shortfall_vnd)}")
+    warnings = result.warnings + option.warnings
+    lines.extend(_warning_lines(warnings))
+    return lines
+
+
+def _visit_labels(search: SearchResult, visits: list[str]) -> list[str]:
+    names = {item.place.id: item.place.name for item in search.poi_candidates}
+    return [f"{names[poi_id]} ({poi_id})" if poi_id in names else poi_id for poi_id in visits]
+
+
+def render_budget(
+    request: TripRequest, visit_labels: list[str], visits_are_sample: bool, result: BudgetResult
+) -> str:
+    """Render the request, the visits used, the option table and the detail section."""
+    lines = _request_lines(request)
+    prefix = "Sample visits (Itinerary will choose the real list)" if visits_are_sample else "Visits"
+    lines.append(f"{prefix}: {', '.join(visit_labels) or 'none'}")
+    lines.append("")
+    lines.append("Budget options")
+    lines.extend(_options_table(result))
+    lines.extend(_detail_lines(result))
+    return "\n".join(lines)
+
+
+def _run_search(request: TripRequest, args: argparse.Namespace) -> int:
+    result = asyncio.run(_build_agent().search(request))
+    if args.json:
+        print(result.model_dump_json(indent=2))
+    else:
+        print(render_text(request, result, args.per_category))
+    return 0
+
+
+def _run_budget(request: TripRequest, args: argparse.Namespace) -> int:
+    search = asyncio.run(_build_agent().search(request))
+    visits = args.visit or _default_visits(search)
+    try:
+        result = BudgetAgent(places=_repository()).build(request, search, visit_poi_ids=visits)
+    except ValueError as error:
+        print(str(error), file=sys.stderr)
+        return 2
+    if args.json:
+        print(result.model_dump_json(indent=2))
+    else:
+        print(render_budget(request, _visit_labels(search, visits), not args.visit, result))
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -238,12 +396,9 @@ def main(argv: list[str] | None = None) -> int:
     except ValidationError as error:
         print(f"Invalid request: {error}", file=sys.stderr)
         return 2
-    result = asyncio.run(_build_agent().search(request))
-    if args.json:
-        print(result.model_dump_json(indent=2))
-    else:
-        print(render_text(request, result, args.per_category))
-    return 0
+    if args.command == "budget":
+        return _run_budget(request, args)
+    return _run_search(request, args)
 
 
 if __name__ == "__main__":

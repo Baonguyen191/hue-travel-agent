@@ -56,8 +56,10 @@ def test_search_agent_combines_real_pois_with_mock_provider_offers() -> None:
     assert result.status == "READY"
     assert result.poi_candidates[0].place.name == "Đại Nội Huế"
     assert all(item.place.category == "historic" for item in result.poi_candidates)
-    assert len(result.transport_offers) == 2
-    assert len(result.hotel_offers) == 1
+    assert len(result.transport_offers) == 6
+    assert len(result.hotel_offers) == 3
+    assert {offer.mode for offer in result.transport_offers} == {"BUS", "TRAIN", "FLIGHT"}
+    assert {offer.tier for offer in result.hotel_offers} == {"HOMESTAY", "THREE_STAR", "FOUR_STAR"}
     assert all(offer.source == "MOCK" for offer in result.transport_offers + result.hotel_offers)
     assert result.warnings == []
 

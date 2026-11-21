@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field, model_validator
 
 ProviderSource = Literal["MOCK", "LIVE"]
 RouteStatus = Literal["ESTIMATED", "QUOTED", "UNKNOWN"]
+TransportMode = Literal["BUS", "TRAIN", "FLIGHT"]
+HotelTier = Literal["HOMESTAY", "THREE_STAR", "FOUR_STAR"]
 
 
 class TransportSearchRequest(BaseModel):
@@ -55,6 +57,7 @@ class TransportOffer(BaseModel):
     price_unit: Literal["VND_PER_PERSON_PER_LEG"]
     seats_available: int = Field(ge=0)
     booking_url: str | None = None
+    mode: TransportMode | None = None
 
 
 class HotelOffer(BaseModel):
@@ -69,6 +72,7 @@ class HotelOffer(BaseModel):
     price_per_room_night_vnd: int = Field(gt=0)
     price_unit: Literal["VND_PER_ROOM_PER_NIGHT"]
     booking_url: str | None = None
+    tier: HotelTier | None = None
 
     @property
     def nights(self) -> int:

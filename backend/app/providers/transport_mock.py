@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Literal
 
 from app.providers.base import ProviderTimeoutError
@@ -9,9 +10,16 @@ from app.schemas.offer import TransportOffer, TransportSearchRequest
 
 MockMode = Literal["normal", "empty", "timeout"]
 
+# (mode, provider name, price per person per leg in VND, id slug for "standard" bus)
+_FIXTURES: tuple[tuple[str, str, int, str], ...] = (
+    ("BUS", "Hue Sleeper Bus Demo", 400_000, "standard"),
+    ("TRAIN", "Reunification Train Demo", 800_000, "train"),
+    ("FLIGHT", "Hue Air Demo", 1_600_000, "flight"),
+)
+
 
 class MockTransportProvider:
-    """Return labelled mock bus offers for both legs of a Hue trip."""
+    """Return labelled mock bus, train and flight offers for both legs of a Hue trip."""
 
     def __init__(self, mode: MockMode = "normal") -> None:
         self.mode = mode
@@ -22,29 +30,40 @@ class MockTransportProvider:
         if self.mode == "empty":
             return []
 
-        return [
-            TransportOffer(
-                id="mock-transport-outbound-standard",
-                provider="Hue Express Demo",
-                source="MOCK",
-                origin=request.origin,
-                destination=request.destination,
-                departure_date=request.departure_date,
-                leg="OUTBOUND",
-                price_vnd=280_000,
-                price_unit="VND_PER_PERSON_PER_LEG",
-                seats_available=12,
-            ),
-            TransportOffer(
-                id="mock-transport-return-standard",
-                provider="Hue Express Demo",
-                source="MOCK",
-                origin=request.destination,
-                destination=request.origin,
-                departure_date=request.return_date,
-                leg="RETURN",
-                price_vnd=280_000,
-                price_unit="VND_PER_PERSON_PER_LEG",
-                seats_available=12,
-            ),
-        ]
+        offers: list[TransportOffer] = []
+        for leg, origin, destination, departure in (
+            ("OUTBOUND", request.origin, request.destination, request.departure_date),
+            ("RETURN", request.destination, request.origin, request.return_date),
+        ):
+            offers.extend(
+                _offer(request, leg, origin, destination, departure, mode, provider, price, slug)
+                for mode, provider, price, slug in _FIXTURES
+            )
+        return offers
+
+
+def _offer(
+    request: TransportSearchRequest,
+    leg: str,
+    origin: str,
+    destination: str,
+    departure: date,
+    mode: str,
+    provider: str,
+    price: int,
+    slug: str,
+) -> TransportOffer:
+    leg_slug = "outbound" if leg == "OUTBOUND" else "return"
+    return TransportOffer(
+        id=f"mock-transport-{leg_slug}-{slug}",
+        provider=provider,
+        source="MOCK",
+        origin=origin,
+        destination=destination,
+        departure_date=departure,
+        leg=leg,
+        price_vnd=price,
+        price_unit="VND_PER_PERSON_PER_LEG",
+        seats_available=12,
+        mode=mode,
+    )

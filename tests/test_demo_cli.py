@@ -39,3 +39,27 @@ def test_search_json_output_is_a_parseable_search_result(
     assert payload["status"] in {"READY", "PARTIAL"}
     assert payload["poi_candidates"]
     assert all(offer["source"] == "MOCK" for offer in payload["hotel_offers"])
+
+
+def test_budget_dod_scenario_prints_labelled_options_with_data_and_mock_tags(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["budget", "--scenario", "dod"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Tiết kiệm" in output
+    assert "[DATA]" in output
+    assert "[MOCK]" in output
+
+
+def test_budget_json_output_is_a_parseable_budget_result(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["budget", "--scenario", "dod", "--json"])
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert payload["options"]
+    assert "BUDGET" in {option["label"] for option in payload["options"]}
+    assert all(option["known_total_max_vnd"] >= option["known_total_vnd"] for option in payload["options"])

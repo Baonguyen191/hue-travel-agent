@@ -36,15 +36,28 @@ def _hotel_request() -> HotelSearchRequest:
 def test_mock_transport_has_explicit_mock_provenance_and_per_leg_unit() -> None:
     offers = MockTransportProvider().search(_transport_request())
 
-    assert [offer.leg for offer in offers] == ["OUTBOUND", "RETURN"]
+    modes_by_leg = {
+        leg: {offer.mode for offer in offers if offer.leg == leg} for leg in ("OUTBOUND", "RETURN")
+    }
+
+    assert len(offers) == 6
+    assert modes_by_leg == {
+        "OUTBOUND": {"BUS", "TRAIN", "FLIGHT"},
+        "RETURN": {"BUS", "TRAIN", "FLIGHT"},
+    }
     assert all(offer.source == "MOCK" for offer in offers)
     assert all(offer.price_unit == "VND_PER_PERSON_PER_LEG" for offer in offers)
-    assert sum(offer.price_vnd for offer in offers) == 560_000
+    bus_offers = [offer for offer in offers if offer.mode == "BUS"]
+    assert sum(offer.price_vnd for offer in bus_offers) == 800_000
 
 
 def test_mock_hotel_represents_two_nights_with_a_per_room_night_price() -> None:
-    offer = MockHotelProvider().search(_hotel_request())[0]
+    offers = MockHotelProvider().search(_hotel_request())
+    offer = next(item for item in offers if item.tier == "THREE_STAR")
 
+    assert {item.tier for item in offers} == {"HOMESTAY", "THREE_STAR", "FOUR_STAR"}
+    assert len(offers) == 3
+    assert offer.id == "mock-hotel-riverside-deluxe"
     assert offer.source == "MOCK"
     assert offer.nights == 2
     assert offer.price_unit == "VND_PER_ROOM_PER_NIGHT"

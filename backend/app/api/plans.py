@@ -18,7 +18,8 @@ from pydantic import BaseModel, Field
 
 router=APIRouter(prefix="/api/v1/plans",tags=["plans"])
 store=PlanStore(os.environ.get("DATABASE_URL", "sqlite:///backend/data/travel_state.sqlite"))
-orchestrator=Orchestrator(SearchAgent(HuePlacesRepository(hue_database_path()),MockTransportProvider(),MockHotelProvider()),BudgetAgent(),ItineraryAgent(),store)
+hue_places=HuePlacesRepository(hue_database_path())
+orchestrator=Orchestrator(SearchAgent(hue_places,MockTransportProvider(),MockHotelProvider()),BudgetAgent(places=hue_places),ItineraryAgent(),store)
 class NaturalLanguageRequest(BaseModel): text:str=Field(min_length=1,max_length=4000)
 @router.post("/parse")
 def parse_request(body:NaturalLanguageRequest): return TripRequestParser().parse(body.text)
