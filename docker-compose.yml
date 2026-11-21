@@ -10,6 +10,10 @@ services:
       HUE_SQLITE_PATH: /app/backend/data/hue.sqlite
       DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-travel}:${POSTGRES_PASSWORD:-travel}@postgres:5432/${POSTGRES_DB:-travel}
       CHECKPOINT_URL: postgresql://${POSTGRES_USER:-travel}:${POSTGRES_PASSWORD:-travel}@postgres:5432/${POSTGRES_DB:-travel}
+      # Ollama runs on the Docker host, not in the container. host-gateway maps the name below to the host.
+      OLLAMA_URL: http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports: ["8000:8000"]
     depends_on:
       postgres:

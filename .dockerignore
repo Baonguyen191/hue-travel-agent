@@ -8,6 +8,7 @@ backend/data/*.bak
 backend/data/travel_state.sqlite
 backend/data/checkpoints.sqlite*
 frontend/node_modules
+frontend/dist
 .env
 docs
 tests

@@ -148,6 +148,15 @@ copy .env.example .env
 docker compose up --build
 ```
 
+The image is multi-stage: a `node:24-alpine` stage builds the React app, and the
+Python image serves it from `/app/frontend/dist`. Open **http://localhost:8000**:
+chat at `/`, the request form at `/form`, Khám phá Huế at `/explore`.
+
+Ollama runs on the Docker host, not in the container. Compose sets
+`OLLAMA_URL=http://host.docker.internal:11434` and maps `host.docker.internal` to
+the host gateway, so the backend reaches the host's Ollama on port 11434. Without
+Ollama the chat still works on the rules (see [Chat](#chat)).
+
 Then check the stack:
 
 ```powershell
@@ -175,6 +184,57 @@ override them. `POSTGRES_USER`, `POSTGRES_PASSWORD` and `POSTGRES_DB` default to
 Stop the stack with `docker compose down`. `docker compose down -v` also deletes
 the `pgdata` volume, which removes all plans, approvals and checkpoints.
 
+## Frontend
+
+The UI is a React 18, Vite and TypeScript app in `frontend/`. The Docker build
+uses Node 24.
+
+```powershell
+cd frontend
+npm ci
+npm run dev        # http://localhost:5173; proxies /api to the backend on port 8000
+npm run build      # typecheck, then build to frontend/dist (FastAPI serves it)
+npx tsc --noEmit   # typecheck only
+npx vitest run     # component and unit tests (jsdom)
+```
+
+Start the backend on port 8000 before `npm run dev`. The chat tests use API
+responses recorded in `frontend/src/test/fixtures/chat/`, so they need neither the
+backend nor Ollama.
+
+## Chat
+
+The home page (`/`) is a chat. Write the trip in Vietnamese, one message at a time:
+
+- `Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người, ngân sách 8 triệu, thích di tích và đặc sản`
+  creates a plan and shows its summary card with the budget options (Tiết kiệm, Cân bằng, Thoải mái).
+- `Đại Nội mở cửa mấy giờ?` answers from the data. Opening hours are marked "chưa xác minh".
+- `Duyệt BUDGET`, or the Duyệt button on the card, asks for confirmation. `đồng ý` approves, `huỷ` cancels.
+- `Đặt vé và khách sạn` asks to book the approved option. `đồng ý` books it. Every booking is MÔ PHỎNG (mock).
+
+Enter sends; Shift+Enter starts a new line. The conversation id is kept in the
+browser (`localStorage`, key `hue.chatId`), so a refresh reloads the history.
+"Cuộc trò chuyện mới" starts a new one. "Nhập bằng form" opens the request form at `/form`.
+
+Each bot reply is tagged with what understood the message:
+`Hiểu bằng: LLM (qwen3.5:4b)` when Ollama read it, or
+`Hiểu bằng: luật (Ollama không chạy)` when the Vietnamese rules did.
+
+### Ollama
+
+The LLM step is optional. To use it, install Ollama and pull the model:
+
+```powershell
+ollama pull qwen3.5:4b
+ollama serve
+```
+
+`OLLAMA_URL` (default `http://localhost:11434`) and `QU_MODEL` (default
+`qwen3.5:4b`) choose the server and model. `QU_ENABLED=false` turns the LLM off.
+If Ollama is unreachable or its reply is invalid, the rules read the message and
+the reply notes why. Prices, hours and bookings always come from the data, never
+from the model.
+
 ## Tests
 
 From the repository root:
@@ -185,7 +245,7 @@ python -m pytest -q
 
 The suite takes about two minutes. The test configuration (`tests/conftest.py`)
 sets `DATABASE_URL=sqlite://` and `CHECKPOINT_URL=memory://`, so tests never
-touch `backend/data`.
+touch `backend/data`. The frontend tests run with `npx vitest run` in `frontend/`.
 
 ## Limitations
 

@@ -1,0 +1,4536 @@
+{
+  "meta": {
+    "extractor": "ollama",
+    "model": "qwen3.5:9b",
+    "split": "dev",
+    "eval_file": "C:\\Users\\baoba\\OneDrive\\Máy tính\\TravelAgent\\data\\eval\\query_eval_v2.jsonl",
+    "ref_date": "2026-11-18",
+    "generated_at": "2026-11-21T18:41:48+00:00"
+  },
+  "summary": {
+    "n": 100,
+    "errors": 0,
+    "source_rules_count": 0,
+    "intent_acc": 1.0,
+    "full_match": 0.71,
+    "clarify_precision": 1.0,
+    "clarify_recall": 1.0,
+    "start_acc": 1.0,
+    "num_days_acc": 1.0,
+    "categories_exact": 0.71,
+    "category_f1": 0.8794,
+    "people_acc": null,
+    "must_exact": 0.99,
+    "exclude_exact": 1.0,
+    "exclude_categories_exact": 1.0,
+    "changes_acc": null,
+    "place_acc": null,
+    "soft_recall": 1.0,
+    "latency_p50_ms": 3931.6,
+    "latency_p95_ms": 4617.1,
+    "per_group_full_match": {
+      "full": 0.6,
+      "missing": 0.84,
+      "no_diacritics": 0.65,
+      "relative_date": 0.76
+    }
+  },
+  "records": [
+    {
+      "id": "q001",
+      "group": "full",
+      "split": "dev",
+      "text": "Lên lịch đi Huế 2 ngày từ 20/12, đi xe máy, thích lăng tẩm và ẩm thực, đi vừa phải",
+      "latency_ms": 6654.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-20",
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "religious",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi xe máy",
+          "vừa phải"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q002",
+      "group": "full",
+      "split": "dev",
+      "text": "Mình muốn đi Huế 3 ngày bắt đầu 5/12, đi ô tô, lịch dày một chút, thích chùa chiền và chụp ảnh",
+      "latency_ms": 4520.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-05",
+        "num_days": 3,
+        "categories": [
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp ảnh",
+          "đi ô tô",
+          "lịch dày một chút"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q003",
+      "group": "full",
+      "split": "dev",
+      "text": "Đi Huế 1 ngày ngày 25/11, đi bộ thôi, thong thả, muốn uống cà phê và ngắm cảnh",
+      "latency_ms": 4748.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-25",
+        "num_days": 1,
+        "categories": [
+          "attraction",
+          "cafe",
+          "park"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ",
+          "thong thả"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q004",
+      "group": "full",
+      "split": "dev",
+      "text": "Cho tôi lịch trình Huế 2 ngày 1 đêm từ ngày 12 tháng 12, thuê xe máy, quan tâm lịch sử và bảo tàng",
+      "latency_ms": 4688.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-12",
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "museum",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "thuê xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q005",
+      "group": "full",
+      "split": "dev",
+      "text": "Lịch đi Huế 3 ngày từ 1/12, đi taxi, thích thiên nhiên, biển và đồ ăn địa phương, đi nhẹ nhàng",
+      "latency_ms": 4824.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-01",
+        "num_days": 3,
+        "categories": [
+          "attraction",
+          "park",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi nhẹ nhàng",
+          "đi taxi"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q006",
+      "group": "full",
+      "split": "dev",
+      "text": "Tôi đi Huế 4 ngày từ 10/1, xe máy, muốn đi được càng nhiều chỗ càng tốt, thích di tích và chợ",
+      "latency_ms": 4187.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2027-01-10",
+        "num_days": 4,
+        "categories": [
+          "historic",
+          "market",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy",
+          "muốn đi được càng nhiều chỗ càng tốt"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q007",
+      "group": "full",
+      "split": "dev",
+      "text": "Lên kế hoạch 1 ngày ở Huế ngày 30/11, đi từ 7h sáng đến 6h chiều, đi ô tô, thích lăng vua",
+      "latency_ms": 4289.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-30",
+        "num_days": 1,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi ô tô",
+          "từ 7h sáng đến 6h chiều"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q008",
+      "group": "full",
+      "split": "dev",
+      "text": "Mình đi Huế 2 ngày từ 15/12, đi bộ, bắt đầu 9h sáng tới 9h tối, thích cafe và ăn vặt",
+      "latency_ms": 4361.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-15",
+        "num_days": 2,
+        "categories": [
+          "cafe",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ",
+          "bắt đầu 9h sáng tới 9h tối"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q009",
+      "group": "full",
+      "split": "dev",
+      "text": "Xếp giúp lịch Huế 3 ngày 2 đêm, ngày 8/12 bắt đầu, đi xe hơi, nhịp vừa, thích văn hóa và tâm linh",
+      "latency_ms": 4484.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-08",
+        "num_days": 3,
+        "categories": [
+          "museum",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi xe hơi",
+          "nhịp vừa"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q010",
+      "group": "full",
+      "split": "dev",
+      "text": "Đi Huế 1 ngày 22/11 bằng xe máy, muốn tham quan Đại Nội và ăn đặc sản",
+      "latency_ms": 3940.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-22",
+        "num_days": 1,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [
+          {
+            "text": "Đại Nội",
+            "poi_id": "huetripo:531787",
+            "name": "Đại Nội Huế",
+            "score": 0.85
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q011",
+      "group": "full",
+      "split": "dev",
+      "text": "Kế hoạch 2 ngày ở Huế từ ngày 3 tháng 1 năm 2027, đi ô tô, lịch thoáng, thích chụp ảnh và thiên nhiên",
+      "latency_ms": 4613.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2027-01-03",
+        "num_days": 2,
+        "categories": [
+          "attraction",
+          "park"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp ảnh",
+          "đi ô tô",
+          "lịch thoáng"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q012",
+      "group": "full",
+      "split": "dev",
+      "text": "Lịch trình Huế 5 ngày từ 20/1, đi xe máy, muốn khám phá lịch sử, chùa và chợ địa phương",
+      "latency_ms": 4603.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2027-01-20",
+        "num_days": 5,
+        "categories": [
+          "historic",
+          "market",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q013",
+      "group": "full",
+      "split": "dev",
+      "text": "Tôi cần lịch 1 ngày ở Huế ngày 28/11, đi bộ, chậm rãi, chỉ muốn đi chùa và uống cà phê",
+      "latency_ms": 4543.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-28",
+        "num_days": 1,
+        "categories": [
+          "cafe",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ",
+          "chậm rãi"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q014",
+      "group": "full",
+      "split": "dev",
+      "text": "Lên lịch Huế 2 ngày từ 6/12, ô tô, tranh thủ đi nhiều điểm, thích lăng tẩm, bảo tàng, mua quà",
+      "latency_ms": 5360.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-06",
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "museum",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "mua quà",
+          "ô tô",
+          "tranh thủ đi nhiều điểm"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q015",
+      "group": "full",
+      "split": "dev",
+      "text": "Đi Huế 3 ngày từ 19/12, đi xe máy, thích ăn uống, cà phê và ngắm cảnh sông Hương",
+      "latency_ms": 4465.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-19",
+        "num_days": 3,
+        "categories": [
+          "attraction",
+          "cafe",
+          "park",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q016",
+      "group": "full",
+      "split": "dev",
+      "text": "Lịch Huế 1 ngày ngày 2/12, đi từ 8 giờ đến 5 giờ chiều, đi ô tô, xem di tích cung đình",
+      "latency_ms": 4492.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-02",
+        "num_days": 1,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi ô tô",
+          "từ 8 giờ đến 5 giờ chiều"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q017",
+      "group": "full",
+      "split": "dev",
+      "text": "Mình có 2 ngày ở Huế từ 27/11, thuê xe máy, đi vừa phải, thích văn hóa và đồ ăn",
+      "latency_ms": 4385.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-27",
+        "num_days": 2,
+        "categories": [
+          "museum",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "thuê xe máy",
+          "đi vừa phải"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q018",
+      "group": "full",
+      "split": "dev",
+      "text": "Kế hoạch đi Huế 3 ngày bắt đầu 14/2, đi xe hơi, thích tâm linh, thiên nhiên, lịch nhẹ",
+      "latency_ms": 4243.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2027-02-14",
+        "num_days": 3,
+        "categories": [
+          "attraction",
+          "park",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "lịch nhẹ",
+          "đi xe hơi"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q019",
+      "group": "full",
+      "split": "dev",
+      "text": "Đi Huế 2 ngày từ 9/12 bằng xe máy, muốn ghé Đại Nội, chùa Thiên Mụ và chợ Đông Ba",
+      "latency_ms": 4473.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-09",
+        "num_days": 2,
+        "categories": [],
+        "people": null,
+        "must_include": [
+          {
+            "text": "Đại Nội",
+            "poi_id": "huetripo:531787",
+            "name": "Đại Nội Huế",
+            "score": 0.85
+          },
+          {
+            "text": "chùa Thiên Mụ",
+            "poi_id": "huetripo:197559",
+            "name": "Chùa Thiên Mụ (Chùa Linh Mụ)",
+            "score": 1.0
+          },
+          {
+            "text": "chợ Đông Ba",
+            "poi_id": "huetripo:193028",
+            "name": "Chợ Đông Ba",
+            "score": 1.0
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "bằng xe máy"
+        ],
+        "notes": [
+          "Tên 'chợ Đông Ba' khớp nhiều địa điểm: huetripo:193028 (Chợ Đông Ba), huetripo:759007 (Chợ Đông Ba Huế)."
+        ]
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q020",
+      "group": "full",
+      "split": "dev",
+      "text": "Lịch Huế 1 ngày 24/11 đi bộ quanh thành phố, thích cafe, ăn vặt, tham quan",
+      "latency_ms": 4270.1,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-24",
+        "num_days": 1,
+        "categories": [
+          "attraction",
+          "cafe",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ quanh thành phố"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q021",
+      "group": "full",
+      "split": "dev",
+      "text": "Tôi muốn đi Huế 4 ngày từ ngày 18 tháng 12, ô tô, lịch dày, thích di tích, bảo tàng, ẩm thực",
+      "latency_ms": 4351.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-18",
+        "num_days": 4,
+        "categories": [
+          "historic",
+          "museum",
+          "religious",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "ô tô",
+          "lịch dày"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q022",
+      "group": "full",
+      "split": "dev",
+      "text": "Lên lịch 2 ngày ở Huế từ 11/12, đi xe máy, thong thả, thích chụp ảnh và cà phê",
+      "latency_ms": 4510.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-11",
+        "num_days": 2,
+        "categories": [
+          "cafe"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp ảnh",
+          "đi xe máy",
+          "thong thả"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q023",
+      "group": "full",
+      "split": "dev",
+      "text": "Đi Huế 3 ngày từ 26/12, đi ô tô, thích biển, thiên nhiên và hải sản",
+      "latency_ms": 4538.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-26",
+        "num_days": 3,
+        "categories": [
+          "attraction",
+          "park",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q024",
+      "group": "full",
+      "split": "dev",
+      "text": "Lịch trình Huế 1 ngày ngày 4/12 từ 6h sáng tới 8h tối, xe máy, càng nhiều điểm càng tốt",
+      "latency_ms": 4444.8,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-04",
+        "num_days": 1,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy",
+          "càng nhiều điểm càng tốt",
+          "từ 6h sáng tới 8h tối"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q025",
+      "group": "full",
+      "split": "dev",
+      "text": "Đi Huế 2 ngày bắt đầu 16/12, đi bộ và nhẹ nhàng, thích tâm linh và văn hóa",
+      "latency_ms": 4141.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-16",
+        "num_days": 2,
+        "categories": [
+          "museum",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ",
+          "nhẹ nhàng"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q026",
+      "group": "full",
+      "split": "dev",
+      "text": "Mình đi Huế 3 ngày từ 2/1, thuê xe máy, thích lăng tẩm, chợ và đặc sản",
+      "latency_ms": 4392.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2027-01-02",
+        "num_days": 3,
+        "categories": [
+          "historic",
+          "market",
+          "religious",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "thuê xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q027",
+      "group": "full",
+      "split": "dev",
+      "text": "Kế hoạch Huế 2 ngày từ 21/12, xe hơi, nhịp vừa phải, muốn ngắm cảnh và chụp hình",
+      "latency_ms": 4358.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-21",
+        "num_days": 2,
+        "categories": [
+          "attraction",
+          "park"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp hình",
+          "xe hơi",
+          "nhịp vừa phải"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q028",
+      "group": "full",
+      "split": "dev",
+      "text": "Lên lịch 1 ngày Huế ngày 29/11, đi bộ, thích bảo tàng và cà phê",
+      "latency_ms": 4163.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-29",
+        "num_days": 1,
+        "categories": [
+          "cafe",
+          "museum"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q029",
+      "group": "full",
+      "split": "dev",
+      "text": "Đi Huế 3 ngày từ 7/12, ô tô, muốn đi lăng Tự Đức và lăng Khải Định, thích lịch sử",
+      "latency_ms": 4462.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-07",
+        "num_days": 3,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [
+          {
+            "text": "lăng Tự Đức",
+            "poi_id": "huetripo:483480",
+            "name": "Lăng vua Tự Đức",
+            "score": 0.85
+          },
+          {
+            "text": "lăng Khải Định",
+            "poi_id": "huetripo:627150",
+            "name": "Lăng vua Khải Định",
+            "score": 0.85
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "ô tô"
+        ],
+        "notes": [
+          "Tên 'lăng Tự Đức' khớp nhiều địa điểm: huetripo:483480 (Lăng vua Tự Đức), huetripo:511996 (Lăng Dục Đức)."
+        ]
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q030",
+      "group": "full",
+      "split": "dev",
+      "text": "Lịch Huế 2 ngày từ 13/12, xe máy, đi dày, thích ẩm thực đường phố và mua sắm",
+      "latency_ms": 4414.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-13",
+        "num_days": 2,
+        "categories": [
+          "market",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy",
+          "đi dày"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q031",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế 2 ngày, thích lăng tẩm",
+      "latency_ms": 3523.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q032",
+      "group": "missing",
+      "split": "dev",
+      "text": "Lên lịch đi Huế cho mình với",
+      "latency_ms": 3362.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q033",
+      "group": "missing",
+      "split": "dev",
+      "text": "Mình định đi Huế từ 20/12, gợi ý lịch giúp",
+      "latency_ms": 3939.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "start_date": "2026-12-20",
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q034",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế 3 ngày bằng xe máy, thích ăn uống",
+      "latency_ms": 3860.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 3,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bằng xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q035",
+      "group": "missing",
+      "split": "dev",
+      "text": "Có lịch nào đi Huế hay không?",
+      "latency_ms": 3544.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q036",
+      "group": "missing",
+      "split": "dev",
+      "text": "Tháng 12 mình đi Huế, thích chùa",
+      "latency_ms": 3623.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q037",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế ngày 5/12, đi ô tô",
+      "latency_ms": 4330.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "start_date": "2026-12-05",
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q038",
+      "group": "missing",
+      "split": "dev",
+      "text": "Lịch trình Huế ngắn ngày cho người mê lịch sử",
+      "latency_ms": 3797.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q039",
+      "group": "missing",
+      "split": "dev",
+      "text": "Mình có vài ngày rảnh, muốn đi Huế",
+      "latency_ms": 3633.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "vài ngày rảnh"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q040",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế 2 ngày 1 đêm, đi bộ, thích cà phê",
+      "latency_ms": 4188.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 2,
+        "categories": [
+          "cafe"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q041",
+      "group": "missing",
+      "split": "dev",
+      "text": "Gợi ý lịch Huế từ 10/12 cho gia đình",
+      "latency_ms": 3626.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "start_date": "2026-12-10",
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "gia đình"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 1,
+        "soft_total": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q042",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế 1 ngày, muốn đi Đại Nội",
+      "latency_ms": 3504.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 1,
+        "categories": [],
+        "people": null,
+        "must_include": [
+          {
+            "text": "Đại Nội",
+            "poi_id": "huetripo:531787",
+            "name": "Đại Nội Huế",
+            "score": 0.85
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q043",
+      "group": "missing",
+      "split": "dev",
+      "text": "Lên lịch Huế dịp cuối năm",
+      "latency_ms": 3400.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q044",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế 4 ngày, lịch dày, ô tô",
+      "latency_ms": 3758.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 4,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "lịch dày",
+          "ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q045",
+      "group": "missing",
+      "split": "dev",
+      "text": "Cho xin lịch Huế bắt đầu ngày 1/12",
+      "latency_ms": 3685.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "start_date": "2026-12-01",
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q046",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế, thích thiên nhiên và chụp ảnh",
+      "latency_ms": 3778.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [
+          "attraction",
+          "park"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp ảnh"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q047",
+      "group": "missing",
+      "split": "dev",
+      "text": "Mình đi Huế ngày 15/12 bằng xe máy, thích ăn uống",
+      "latency_ms": 4140.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "start_date": "2026-12-15",
+        "num_days": null,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bằng xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q048",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế 3 hôm, thong thả thôi",
+      "latency_ms": 3780.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 3,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "thong thả"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q049",
+      "group": "missing",
+      "split": "dev",
+      "text": "Lên lịch Huế giúp tôi, đi cùng bạn bè",
+      "latency_ms": 3535.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi cùng bạn bè"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 1,
+        "soft_total": 1,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q050",
+      "group": "missing",
+      "split": "dev",
+      "text": "Huế 2 ngày, chùa và lăng",
+      "latency_ms": 3736.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q051",
+      "group": "missing",
+      "split": "dev",
+      "text": "Mình muốn đi Huế từ 22/12, thích cà phê",
+      "latency_ms": 3826.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "start_date": "2026-12-22",
+        "num_days": null,
+        "categories": [
+          "cafe"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q052",
+      "group": "missing",
+      "split": "dev",
+      "text": "Lịch Huế 1 ngày đi bộ",
+      "latency_ms": 3750.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 1,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q053",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế với người yêu, lãng mạn chút",
+      "latency_ms": 3683.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?",
+        "start_date": null,
+        "num_days": null,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi với người yêu",
+          "lãng mạn"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 2,
+        "soft_total": 2,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q054",
+      "group": "missing",
+      "split": "dev",
+      "text": "Đi Huế ngày 3/1 năm sau, xe hơi, thích lịch sử",
+      "latency_ms": 3790.1,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn định đi Huế mấy ngày?",
+        "start_date": "2027-01-03",
+        "num_days": null,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe hơi"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q055",
+      "group": "missing",
+      "split": "dev",
+      "text": "Lịch trình Huế 5 ngày cho người thích ẩm thực",
+      "latency_ms": 3542.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": "Bạn muốn đi Huế từ ngày nào?",
+        "start_date": null,
+        "num_days": 5,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q056",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Cuối tuần này mình đi Huế 2 ngày, xe máy, thích lăng tẩm",
+      "latency_ms": 4049.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-21",
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q057",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Mai đi Huế 1 ngày, đi bộ, thích cà phê",
+      "latency_ms": 3887.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-19",
+        "num_days": 1,
+        "categories": [
+          "cafe"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q058",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Thứ 7 tới đi Huế 2 ngày bằng ô tô, thích chùa",
+      "latency_ms": 3918.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-21",
+        "num_days": 2,
+        "categories": [
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bằng ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q059",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Tuần sau mình đi Huế 3 ngày, đi xe máy, thích ăn uống",
+      "latency_ms": 3804.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-23",
+        "num_days": 3,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q060",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Ngày kia đi Huế 1 ngày, xe máy, ngắm cảnh",
+      "latency_ms": 3780.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-20",
+        "num_days": 1,
+        "categories": [
+          "attraction",
+          "park"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q061",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Hôm nay đi Huế 1 ngày luôn, đi bộ, thích bảo tàng",
+      "latency_ms": 3887.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-18",
+        "num_days": 1,
+        "categories": [
+          "museum"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q062",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Cuối tuần sau đi Huế 2 ngày, ô tô, thích thiên nhiên",
+      "latency_ms": 4263.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-28",
+        "num_days": 2,
+        "categories": [
+          "attraction",
+          "park"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q063",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Chủ nhật này đi Huế 1 ngày, đi bộ, thích chùa và cà phê",
+      "latency_ms": 3990.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-22",
+        "num_days": 1,
+        "categories": [
+          "cafe",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q064",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Thứ 6 này mình đi Huế 3 ngày, xe máy, thích lịch sử",
+      "latency_ms": 3784.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-20",
+        "num_days": 3,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q065",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Tết dương lịch đi Huế 2 ngày, ô tô, thích tham quan",
+      "latency_ms": 3899.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2027-01-01",
+        "num_days": 2,
+        "categories": [
+          "attraction"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q066",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Noel này đi Huế 2 ngày, đi bộ, thích cà phê và chụp ảnh",
+      "latency_ms": 3940.1,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-24",
+        "num_days": 2,
+        "categories": [
+          "cafe"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp ảnh",
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q067",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Đầu tháng 12 đi Huế 3 ngày, xe máy, thích lăng tẩm và chợ",
+      "latency_ms": 4005.8,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-01",
+        "num_days": 3,
+        "categories": [
+          "historic",
+          "market",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q068",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Giữa tháng 12 mình đi Huế 2 ngày, ô tô, thích tâm linh",
+      "latency_ms": 3850.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-15",
+        "num_days": 2,
+        "categories": [
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q069",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Thứ 2 tới đi Huế 1 ngày, xe máy, thích ẩm thực",
+      "latency_ms": 3737.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-23",
+        "num_days": 1,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q070",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Ngày mai mình đi Huế 2 ngày, đi bộ, nhẹ nhàng thôi",
+      "latency_ms": 3965.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-19",
+        "num_days": 2,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ",
+          "nhẹ nhàng"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q071",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Tuần tới đi Huế 4 ngày, ô tô, dày lịch, thích di tích",
+      "latency_ms": 3925.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-23",
+        "num_days": 4,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "ô tô",
+          "dày lịch"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q072",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Cuối tháng 12 đi Huế 3 ngày bằng xe máy, thích ăn uống và cà phê",
+      "latency_ms": 4041.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-25",
+        "num_days": 3,
+        "categories": [
+          "cafe",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bằng xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q073",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Thứ 4 đi Huế 1 ngày, đi bộ, thích bảo tàng",
+      "latency_ms": 3760.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-25",
+        "num_days": 1,
+        "categories": [
+          "museum"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q074",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Mốt đi Huế 2 ngày, xe máy, thích chụp ảnh",
+      "latency_ms": 3797.6,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-20",
+        "num_days": 2,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp ảnh",
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q075",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Ngày 5 tháng 3 đi Huế 2 ngày, ô tô, thích thiên nhiên",
+      "latency_ms": 3771.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2027-03-05",
+        "num_days": 2,
+        "categories": [
+          "attraction",
+          "park"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q076",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Cuối tuần này đi Huế 1 ngày, đi bộ, chỉ muốn uống cà phê",
+      "latency_ms": 3940.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-21",
+        "num_days": 1,
+        "categories": [
+          "cafe"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q077",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Thứ bảy này mình đi Huế 2 ngày, xe máy, thích lăng và chùa",
+      "latency_ms": 3824.0,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-21",
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q078",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Giáng sinh đi Huế 3 ngày bằng ô tô, thích văn hóa",
+      "latency_ms": 3747.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-24",
+        "num_days": 3,
+        "categories": [
+          "museum"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bằng ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q079",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Thứ 5 tuần này đi Huế 1 ngày, xe máy, ăn đặc sản",
+      "latency_ms": 3788.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-19",
+        "num_days": 1,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q080",
+      "group": "relative_date",
+      "split": "dev",
+      "text": "Đầu tháng 1 đi Huế 2 ngày, đi bộ, thích tham quan và cà phê",
+      "latency_ms": 3937.8,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2027-01-01",
+        "num_days": 2,
+        "categories": [
+          "attraction",
+          "cafe"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q081",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "di hue 2 ngay tu 20/12, xe may, thich lang tam",
+      "latency_ms": 3850.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-20",
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe may"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q082",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "len lich hue 3 ngay tu 5/12 di o to, thich chua va chup anh",
+      "latency_ms": 3842.1,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-05",
+        "num_days": 3,
+        "categories": [
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp ảnh"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q083",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "cuoi tuan nay di hue 2n1d, xe may, thich an uong",
+      "latency_ms": 3891.8,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-21",
+        "num_days": 2,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe may"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q084",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "mai di hue 1 ngay di bo, thich cafe",
+      "latency_ms": 3580.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-19",
+        "num_days": 1,
+        "categories": [
+          "cafe"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q085",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "hue 3n2d tu 10/12, oto, thich di tich, bao tang",
+      "latency_ms": 3963.5,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-10",
+        "num_days": 3,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "oto",
+          "bao tang"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q086",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "di hue 2 ngay tu 15/12 xe may, muon di dai noi va chua thien mu",
+      "latency_ms": 4095.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-15",
+        "num_days": 2,
+        "categories": [],
+        "people": null,
+        "must_include": [
+          {
+            "text": "dai noi",
+            "poi_id": "huetripo:531787",
+            "name": "Đại Nội Huế",
+            "score": 0.85
+          },
+          {
+            "text": "chua thien mu",
+            "poi_id": "huetripo:197559",
+            "name": "Chùa Thiên Mụ (Chùa Linh Mụ)",
+            "score": 1.0
+          }
+        ],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe may"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q087",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "t7 toi di hue 1 ngay, di bo, thich cafe va an vat",
+      "latency_ms": 3866.2,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-21",
+        "num_days": 1,
+        "categories": [
+          "cafe",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "di bo"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q088",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "lich hue 2n1đ từ 12/12, thuê xm, thích lăng",
+      "latency_ms": 3870.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-12",
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "thuê xm"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q089",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "đi huế 3 ngày từ 1/12 bằng ô tô, lịch dày nha, thích chùa vs chợ",
+      "latency_ms": 4053.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-01",
+        "num_days": 3,
+        "categories": [
+          "market",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "lịch dày",
+          "bằng ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q090",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "tuan sau di hue 2 ngay, oto, thich thien nhien",
+      "latency_ms": 3697.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-23",
+        "num_days": 2,
+        "categories": [
+          "attraction",
+          "park"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "oto"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q091",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "hue 1 ngay 25/11 di bo, thong tha, thich chua",
+      "latency_ms": 3782.1,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-25",
+        "num_days": 1,
+        "categories": [
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "thong tha"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q092",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "cn này đi huế 1 ngày, xe máy, ăn đặc sản",
+      "latency_ms": 3710.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-22",
+        "num_days": 1,
+        "categories": [
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q093",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "di hue 4 ngay tu 18/12 bang xe may, muon di nhieu cho nhat co the",
+      "latency_ms": 3896.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-18",
+        "num_days": 4,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi nhiều",
+          "đi bằng xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q094",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "lên lịch huế 2 ngày từ 6/12 nhé, đi ô tô, mê cà fê",
+      "latency_ms": 4170.8,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-06",
+        "num_days": 2,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "cà fê",
+          "đi ô tô"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q095",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "di hue 2 ngay tu 9/12 xe may, thich lang tu duc",
+      "latency_ms": 3773.7,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-09",
+        "num_days": 2,
+        "categories": [
+          "historic",
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xe may"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": false,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    },
+    {
+      "id": "q096",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "hue 1 ngay hom nay, di bo, xem bao tang",
+      "latency_ms": 3780.8,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-18",
+        "num_days": 1,
+        "categories": [
+          "museum"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "di bo"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q097",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "đi huế 3 ngày từ 26/12, thuê xe máy, thik chụp hình sống ảo",
+      "latency_ms": 4120.9,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-26",
+        "num_days": 3,
+        "categories": [],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "chụp hình sống ảo",
+          "thuê xe máy"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q098",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "lich hue 2 ngay tu 13/12 oto, nhe nhang, thich tam linh",
+      "latency_ms": 3890.4,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-13",
+        "num_days": 2,
+        "categories": [
+          "religious"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "nhe nhang"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q099",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "thu 6 nay di hue 2 ngay, xm, thich an uong va cafe",
+      "latency_ms": 4295.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-11-20",
+        "num_days": 2,
+        "categories": [
+          "cafe",
+          "restaurant"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "xm"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": true,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": true
+      }
+    },
+    {
+      "id": "q100",
+      "group": "no_diacritics",
+      "split": "dev",
+      "text": "hue 2 ngày từ 21/12, đi bộ thôi, thích tham quan",
+      "latency_ms": 4009.3,
+      "error": null,
+      "source": "OLLAMA",
+      "pred": {
+        "intent": "plan_new",
+        "clarification": null,
+        "start_date": "2026-12-21",
+        "num_days": 2,
+        "categories": [
+          "attraction"
+        ],
+        "people": null,
+        "must_include": [],
+        "exclude": [],
+        "exclude_categories": [],
+        "changes": [],
+        "place_query": null,
+        "soft_preferences": [
+          "đi bộ"
+        ],
+        "notes": []
+      },
+      "score": {
+        "intent_ok": true,
+        "clarify_ok": true,
+        "must_ok": true,
+        "exclude_ok": true,
+        "exclude_categories_ok": true,
+        "start_ok": true,
+        "num_days_ok": true,
+        "categories_ok": false,
+        "people_ok": null,
+        "changes_ok": null,
+        "place_ok": null,
+        "soft_hits": 0,
+        "soft_total": 0,
+        "full_match": false
+      }
+    }
+  ]
+}

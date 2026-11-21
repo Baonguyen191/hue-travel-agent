@@ -14,6 +14,7 @@ Reproduce a row with, from `backend/`:
 | Rules | test | 0.74 | 0.28 | 0.00 / n/a | 0.54 | 0.82 / 0.94 | 0.1 ms |
 | qwen3.5:4b (final prompt) | dev | 1.00 | 0.68 | 0.96 / 1.00 | 0.87 | 0.99 / 1.00 | 2.4 s |
 | qwen3.5:4b (final prompt) | test | 0.96 | 0.68 | n/a / n/a | 0.65 | 0.96 / 0.98 | 2.4 s |
+| qwen3.5:9b | dev | 1.00 | 0.71 | 1.00 / 1.00 | 0.88 | 0.99 / 1.00 | 3.9 s |
 | qwen3.5:9b | test | 0.98 | 0.70 | n/a / n/a | 0.60 | 0.96 / 0.96 | 4.0 s |
 
 Notes:
@@ -23,8 +24,10 @@ Notes:
   match 0.55, clarify P/R 0.92/0.96, category F1 0.78 (`qwen3.5-4b_dev.json` was overwritten by
   the tuned run; the numbers are from the first run's console output).
 - qwen3.5:9b: the first test run was stopped by the operating system for low memory and wrote
-  nothing. The completed rerun is `qwen3.5-9b_test.json` (test only, no dev run): full match
-  0.70 against 0.68 for the 4b, but about 1.7 times the latency (p50 4.0 s against 2.4 s).
+  nothing. The completed rerun is `qwen3.5-9b_test.json`: full match 0.70 against 0.68 for the
+  4b, but about 1.7 times the latency (p50 4.0 s against 2.4 s). `qwen3.5-9b_dev.json` is the
+  dev run of the same model: full match 0.71 against 0.68 for the 4b, category F1 0.88 against
+  0.87, p50 3.9 s.
 - Old v1 result (88% full match) used a different gold (interests and PlanRequest fields) and
   is not directly comparable with these numbers.
 
