@@ -13,6 +13,7 @@ from app.schemas.place import Place
 from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
 from app.services.budget_optimizer import SIGHTSEEING_CATEGORIES
+from app.services.constraints import ConstraintConflictError, UnknownPoiError, is_allowed
 from app.services.itinerary_validator import validate_itinerary
 from app.services.meal_picker import MealPicker
 from app.services.poi_search import haversine_km, normalize_vietnamese
@@ -147,14 +148,19 @@ class ItineraryAgent:
     def plan(self, request: TripRequest, search: SearchResult) -> ItineraryResult:
         centre = self._centre(request)
         pool, excluded, merged = self._build_pool(request, search, centre)
-        meals = MealPicker(_food_candidates(search), self.places, self.config.meal_radius_km)
+        meals = MealPicker(
+            _food_candidates(search),
+            self.places,
+            self.config.meal_radius_km,
+            allowed=lambda place: is_allowed(place, request),
+        )
         days, unplanned = self._plan_days(request, pool, centre, meals)
         return ItineraryResult(
             days=days,
             unplanned_poi_ids=unplanned,
             excluded_poi_ids=excluded,
             merged_poi_ids=merged,
-            warnings=self._global_warnings(excluded, merged, unplanned),
+            warnings=self._global_warnings(excluded, merged, unplanned, request.must_include_poi_ids),
             validation=validate_itinerary(days),
         )
 
@@ -166,33 +172,50 @@ class ItineraryAgent:
     def _build_pool(
         self, request: TripRequest, search: SearchResult, centre: tuple[float, float]
     ) -> tuple[list[Place], list[str], list[str]]:
-        """Landmarks first, then sightseeing candidates.
+        """Must-include POIs, then landmarks, then sightseeing candidates.
 
-        Deduped by id and name, filtered by distance from the centre, and thinned so
-        every kept place is at least `min_separation_km` from the others (sub-sites
-        that share the citadel coordinate are merged into the first-chosen site).
+        Deduped by id and name, filtered by distance from the centre (never for a
+        must-include POI), and thinned so every kept place is at least `min_separation_km`
+        from the others. Excluded POIs and categories are skipped before anything else.
         """
         candidates = [item.place for item in search.poi_candidates]
         sightseeing = [place for place in candidates if place.category in SIGHTSEEING_CATEGORIES]
         keyword = normalize_vietnamese(request.keyword) if request.keyword else ""
+        must = self._must_include(request, candidates)
+        must_ids = set(request.must_include_poi_ids)
         kept: list[Place] = []
         excluded: list[str] = []
         merged: list[str] = []
         seen_ids: set[str] = set()
         seen_names: set[str] = set()
-        for place in self._landmarks(request, candidates) + sightseeing:
+        for place in must + self._landmarks(request, candidates) + sightseeing:
+            if not is_allowed(place, request):
+                continue
             name_key = normalize_vietnamese(place.name)
             if place.id in seen_ids or name_key in seen_names:
                 continue
             seen_ids.add(place.id)
             seen_names.add(name_key)
-            if self._is_too_far(place, name_key, centre, keyword):
+            if place.id not in must_ids and self._is_too_far(place, name_key, centre, keyword):
                 excluded.append(place.id)
             elif self._too_close(place, kept):
                 merged.append(place.id)
             else:
                 kept.append(place)
         return kept, excluded, merged
+
+    def _must_include(self, request: TripRequest, candidates: list[Place]) -> list[Place]:
+        """Resolve each must-include id from Search's candidates, else from the POI source."""
+        by_id = {place.id: place for place in candidates}
+        found: list[Place] = []
+        for poi_id in request.must_include_poi_ids:
+            place = by_id[poi_id] if poi_id in by_id else self._lookup(poi_id)
+            if place is None:
+                raise UnknownPoiError(f"Unknown poi_id in must_include_poi_ids: {poi_id}")
+            if not is_allowed(place, request):
+                raise ConstraintConflictError(f"{place.name} is excluded and cannot be included.")
+            found.append(place)
+        return found
 
     def _too_close(self, place: Place, kept: list[Place]) -> bool:
         return any(
@@ -238,13 +261,14 @@ class ItineraryAgent:
         meals: MealPicker,
     ) -> tuple[list[ItineraryDay], list[str]]:
         date_count = (request.end_date - request.start_date).days + 1
+        protected = _protected_ids(request, self.config)
         remaining = list(pool)
         days: list[ItineraryDay] = []
         for offset in range(date_count):
             day_date = request.start_date + timedelta(days=offset)
-            day_set = self._cluster_day(remaining)
+            day_set = self._cluster_day(remaining, protected)
             day, skipped, scheduled_set = self._schedule_with_landmarks(
-                day_date, day_set, pool, centre, meals
+                day_date, day_set, pool, centre, meals, protected
             )
             days.append(day)
             taken = {place.id for place in scheduled_set}
@@ -252,24 +276,23 @@ class ItineraryAgent:
             remaining = _in_priority_order(remaining + skipped, pool)
         return days, [place.id for place in remaining]
 
-    def _cluster_day(self, remaining: list[Place]) -> list[Place]:
-        """Seed with the highest-priority place; take nearby landmarks, then nearest others."""
+    def _cluster_day(self, remaining: list[Place], protected: frozenset[str]) -> list[Place]:
+        """Seed with the highest-priority place; take nearby protected places, then nearest others."""
         if not remaining:
             return []
         seed, rest = remaining[0], remaining[1:]
-        landmarks = set(self.config.landmark_ids)
         limit = self.config.max_visits_per_day - 1
 
         def distance(place: Place) -> float:
             return haversine_km(seed.lat, seed.lon, place.lat, place.lon)
 
         by_distance = sorted(rest, key=lambda place: (distance(place), place.id))
-        near_landmarks = [
+        near_protected = [
             place for place in by_distance
-            if place.id in landmarks and distance(place) <= self.config.cluster_radius_km
+            if place.id in protected and distance(place) <= self.config.cluster_radius_km
         ][:limit]
-        fillers = [place for place in by_distance if place.id not in landmarks]
-        return [seed] + near_landmarks + fillers[: limit - len(near_landmarks)]
+        fillers = [place for place in by_distance if place.id not in protected]
+        return [seed] + near_protected + fillers[: limit - len(near_protected)]
 
     def _schedule_with_landmarks(
         self,
@@ -278,26 +301,31 @@ class ItineraryAgent:
         pool: list[Place],
         centre: tuple[float, float],
         meals: MealPicker,
+        protected: frozenset[str],
     ) -> tuple[ItineraryDay, list[Place], list[Place]]:
-        """Schedule a day; while a landmark is skipped, drop the lowest-priority filler and retry."""
+        """Schedule a day; while a protected place is skipped, drop the lowest-priority filler and retry."""
         used_before = meals.used_ids()
         while True:
             route = self._nearest_route(day_set, centre)
             day, skipped = self._schedule_day(day_date, route, centre, meals)
-            filler = self._droppable_filler(day, day_set, skipped, pool)
+            filler = self._droppable_filler(day, day_set, skipped, pool, protected)
             if filler is None:
                 return day, skipped, day_set
             meals.restore(used_before)
             day_set = [place for place in day_set if place.id != filler.id]
 
     def _droppable_filler(
-        self, day: ItineraryDay, day_set: list[Place], skipped: list[Place], pool: list[Place]
+        self,
+        day: ItineraryDay,
+        day_set: list[Place],
+        skipped: list[Place],
+        pool: list[Place],
+        protected: frozenset[str],
     ) -> Place | None:
-        landmarks = set(self.config.landmark_ids)
-        if not any(place.id in landmarks for place in skipped):
+        if not any(place.id in protected for place in skipped):
             return None
         visited = {event.poi_id for event in day.events if event.kind == "VISIT"}
-        fillers = [place for place in day_set if place.id in visited and place.id not in landmarks]
+        fillers = [place for place in day_set if place.id in visited and place.id not in protected]
         if not fillers:
             return None
         return _in_priority_order(fillers, pool)[-1]
@@ -446,9 +474,15 @@ class ItineraryAgent:
         return datetime.combine(state.day, value)
 
     def _global_warnings(
-        self, excluded: list[str], merged: list[str], unplanned: list[str]
+        self,
+        excluded: list[str],
+        merged: list[str],
+        unplanned: list[str],
+        must_include: list[str],
     ) -> list[str]:
         warnings: list[str] = []
+        if set(must_include) & set(unplanned):
+            warnings.append("A must-include POI did not fit the itinerary time and is not scheduled.")
         if excluded:
             warnings.append(
                 f"{len(excluded)} places farther than {self.config.max_distance_km:g} km from the centre were skipped."
@@ -465,6 +499,11 @@ class ItineraryAgent:
         )
         warnings.append("Opening hours are source-provided or absent and require confirmation.")
         return warnings
+
+
+def _protected_ids(request: TripRequest, config: ItineraryConfig) -> frozenset[str]:
+    """POIs that fillers may never displace: the must-include ids and the landmarks."""
+    return frozenset(request.must_include_poi_ids) | frozenset(config.landmark_ids)
 
 
 def _food_candidates(search: SearchResult) -> list[Place]:

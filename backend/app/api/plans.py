@@ -26,6 +26,7 @@ from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.booking import ApprovalRequest, ApprovalResult
 from app.schemas.request import TripRequest
 from app.services.budget_optimizer import BudgetAgent
+from app.services.constraints import ConstraintConflictError, UnknownPoiError
 from app.services.itinerary_optimizer import ItineraryAgent
 from app.services.quote import UnknownOptionError
 from app.services.request_parser import TripRequestParser
@@ -91,6 +92,8 @@ async def create_or_edit(
         return await orchestrator.start(thread_id, request, owner_id=x_user_id)
     except PermissionError as error:
         raise HTTPException(403, str(error))
+    except (UnknownPoiError, ConstraintConflictError) as error:
+        raise HTTPException(422, str(error))
 
 
 @router.get("/{thread_id}")

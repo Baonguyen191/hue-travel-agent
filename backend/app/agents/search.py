@@ -11,6 +11,7 @@ from app.schemas.offer import HotelOffer, HotelSearchRequest, TransportSearchReq
 from app.schemas.place import Place, PlaceCategory, PlaceSearchResult
 from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
+from app.services.constraints import is_allowed
 from app.services.poi_search import normalize_vietnamese, search_places
 from app.services.preferences import (
     extract_keyword_hints,
@@ -110,7 +111,7 @@ class SearchAgent:
         )
 
     def _find_pois(self, request: TripRequest) -> list[PlaceSearchResult]:
-        places = self.places.list_all()
+        places = [place for place in self.places.list_all() if is_allowed(place, request)]
         hinted, residual = (
             extract_keyword_hints(request.keyword) if request.keyword else ([], None)
         )

@@ -25,6 +25,7 @@ from app.schemas.itinerary import ItineraryResult
 from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
 from app.services.budget_optimizer import BudgetAgent
+from app.services.constraints import check_constraints
 from app.services.itinerary_optimizer import ItineraryAgent, ItineraryConfig
 from app.services.quote import UnknownOptionError, approve_option
 
@@ -203,6 +204,7 @@ class Orchestrator:
     async def start(self, thread_id: str, request: TripRequest, owner_id: str = DEFAULT_OWNER) -> dict[str, Any]:
         """Run from search until the plan is waiting for approval, or until it fails."""
         self._refuse_other_owner(thread_id, owner_id)
+        check_constraints(request, self.itinerary.places)
         await self.graph.ainvoke(_initial_state(thread_id, request, owner_id), _config(thread_id))
         return await self.state(thread_id)
 
@@ -212,6 +214,8 @@ class Orchestrator:
         if _AWAIT_NODE not in snapshot.next:
             raise NotWaitingError("Plan is not waiting for approval.")
         _check_answer(value, snapshot.values)
+        if value.get("action") == "edit":
+            check_constraints(TripRequest.model_validate(value["request"]), self.itinerary.places)
         await self.graph.ainvoke(Command(resume=value), _config(thread_id))
         return await self.state(thread_id)
 

@@ -134,7 +134,7 @@ class BudgetAgent:
         local = self._local_transport_item(days)
         if local is not None:
             items.append(local)
-        items.extend(self._food_items(request.people, days, visits, medians))
+        items.extend(self._food_items(request, days, visits, medians))
         items.extend(self._admission_items(visits, request.people))
 
         known_total = sum(item.amount_vnd for item in items if item.amount_vnd is not None)
@@ -217,11 +217,12 @@ class BudgetAgent:
 
     def _food_items(
         self,
-        people: int,
+        request: TripRequest,
         days: int,
         visits: list[Place],
         medians: dict[str, tuple[int, int]],
     ) -> list[CostItem]:
+        people = request.people
         if not self.config.include_food:
             return [
                 CostItem(
@@ -236,15 +237,16 @@ class BudgetAgent:
             ]
         if self.config.food_per_person_per_day_vnd is not None:
             return [_fixed_food_item(self.config.food_per_person_per_day_vnd, people * days)]
-        return self._data_food_items(people, days, visits, medians)
+        return self._data_food_items(request, days, visits, medians)
 
     def _data_food_items(
         self,
-        people: int,
+        request: TripRequest,
         days: int,
         visits: list[Place],
         medians: dict[str, tuple[int, int]],
     ) -> list[CostItem]:
+        people = request.people
         items = [
             _meal_item(place, people, medians)
             for place in visits
@@ -256,6 +258,8 @@ class BudgetAgent:
             ("cafe", "food_cafe_other", "Other cafe visits", self.config.cafe_visits_per_day),
         )
         for category, code, label, per_day in plan:
+            if category in request.exclude_categories:
+                continue
             remaining = max(days * per_day - visited[category], 0)
             if remaining:
                 items.append(_remaining_item(code, label, category, remaining, people, medians))

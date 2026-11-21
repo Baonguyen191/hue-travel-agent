@@ -25,11 +25,16 @@ class TripRequest(BaseModel):
     center_lat: float | None = Field(default=None, ge=-90, le=90)
     center_lon: float | None = Field(default=None, ge=-180, le=180)
     radius_km: float | None = Field(default=None, gt=0, le=100)
+    must_include_poi_ids: list[str] = Field(default_factory=list, max_length=10)
+    exclude_poi_ids: list[str] = Field(default_factory=list, max_length=50)
+    exclude_categories: list[PlaceCategory] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def validate_dates_and_coordinates(self) -> "TripRequest":
         if self.end_date < self.start_date:
             raise ValueError("end_date must not be before start_date")
+        if set(self.must_include_poi_ids) & set(self.exclude_poi_ids):
+            raise ValueError("a POI cannot be both must-include and excluded")
         if (self.center_lat is None) != (self.center_lon is None):
             raise ValueError("center_lat and center_lon must be supplied together")
         if self.radius_km is not None and self.center_lat is None:

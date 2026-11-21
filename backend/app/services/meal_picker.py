@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 
 from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.place import Place
@@ -18,10 +18,12 @@ class MealPicker:
         candidates: Iterable[Place],
         places: HuePlacesRepository | None,
         radius_km: float,
+        allowed: Callable[[Place], bool] | None = None,
     ) -> None:
         self._candidates = list(candidates)
         self._places = places
         self._radius_km = radius_km
+        self._allowed = allowed or (lambda place: True)
         self._used: set[str] = set()
         self._pools: dict[str, list[Place]] = {}
 
@@ -50,11 +52,12 @@ class MealPicker:
     def _build_pool(self, category: str) -> list[Place]:
         pool: dict[str, Place] = {}
         for place in self._candidates:
-            if place.category == category:
+            if place.category == category and self._allowed(place):
                 pool.setdefault(place.id, place)
         if self._places is not None:
             for place in self._places.list_by_category(category):
-                pool.setdefault(place.id, place)
+                if self._allowed(place):
+                    pool.setdefault(place.id, place)
         return list(pool.values())
 
     def _rank(self, place: Place, lat: float, lon: float) -> tuple[object, ...]:
