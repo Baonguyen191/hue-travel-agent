@@ -7,7 +7,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-ItineraryEventKind = Literal["VISIT", "MEAL_BREAK", "BUFFER"]
+ItineraryEventKind = Literal["VISIT", "MEAL", "MEAL_BREAK", "BUFFER"]
+MealKind = Literal["LUNCH", "DINNER", "CAFE"]
 
 
 class ItineraryEvent(BaseModel):
@@ -17,6 +18,7 @@ class ItineraryEvent(BaseModel):
     poi_id: str | None = None
     name: str
     category: str | None = None
+    meal: MealKind | None = None
     lat: float | None = None
     lon: float | None = None
     visit_minutes: int | None = Field(default=None, gt=0)
@@ -30,6 +32,8 @@ class ItineraryEvent(BaseModel):
             raise ValueError("end_at must be after start_at")
         if self.kind == "VISIT" and self.poi_id is None:
             raise ValueError("VISIT events require poi_id")
+        if self.kind == "MEAL" and self.poi_id is None:
+            raise ValueError("MEAL events require poi_id")
         return self
 
 
@@ -47,5 +51,19 @@ class ItineraryValidation(BaseModel):
 class ItineraryResult(BaseModel):
     days: list[ItineraryDay]
     unplanned_poi_ids: list[str]
+    excluded_poi_ids: list[str] = Field(default_factory=list)
     warnings: list[str]
     validation: ItineraryValidation
+
+    def poi_ids(self) -> list[str]:
+        """Return VISIT and MEAL poi_ids in time order, each id once."""
+        scheduled = sorted(
+            (
+                event
+                for day in self.days
+                for event in day.events
+                if event.kind in ("VISIT", "MEAL") and event.poi_id is not None
+            ),
+            key=lambda event: event.start_at,
+        )
+        return list(dict.fromkeys(event.poi_id for event in scheduled))

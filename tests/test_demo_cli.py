@@ -63,3 +63,40 @@ def test_budget_json_output_is_a_parseable_budget_result(
     assert payload["options"]
     assert "BUDGET" in {option["label"] for option in payload["options"]}
     assert all(option["known_total_max_vnd"] >= option["known_total_vnd"] for option in payload["options"])
+
+
+def test_itinerary_dod_scenario_prints_days_named_meals_and_budget_block(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["itinerary", "--scenario", "dod"])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "Đại Nội Huế" in output
+    assert "[Ăn trưa]" in output
+    assert "[Ăn tối]" in output
+    assert "Tiết kiệm" in output
+    assert "(tham khảo)" in output
+
+
+def test_itinerary_hides_buffer_events_and_marks_source_data(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    main(["itinerary", "--scenario", "dod"])
+    output = capsys.readouterr().out
+
+    assert "Travel buffer" not in output
+    assert "[DATA]" in output
+    assert "(chưa xác minh)" in output
+
+
+def test_itinerary_json_output_is_a_parseable_itinerary_result(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    exit_code = main(["itinerary", "--scenario", "dod", "--json"])
+    payload = json.loads(capsys.readouterr().out)
+
+    assert exit_code == 0
+    assert len(payload["days"]) == 3
+    assert "huetripo:657208" in payload["excluded_poi_ids"]
+    assert payload["validation"]["valid"] is True
