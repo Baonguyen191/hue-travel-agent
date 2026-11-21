@@ -20,6 +20,7 @@ from sqlalchemy import (
     String,
     Text,
     create_engine,
+    event,
     func,
     select,
     update,
@@ -85,12 +86,26 @@ def _utcnow() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def enable_sqlite_foreign_keys(engine: Engine) -> None:
+    """Run `PRAGMA foreign_keys=ON` on every new SQLite connection; SQLite leaves it off by default."""
+
+    @event.listens_for(engine, "connect")
+    def _set_foreign_keys(dbapi_connection: Any, _record: Any) -> None:
+        """Turn on foreign-key checks for one DBAPI connection."""
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys=ON")
+        cursor.close()
+
+
 def _make_engine(url: str) -> Engine:
     if url == "sqlite://":
-        return create_engine(url, connect_args={"check_same_thread": False}, poolclass=StaticPool)
-    if url.startswith("sqlite"):
-        return create_engine(url, connect_args={"check_same_thread": False})
-    return create_engine(url)
+        engine = create_engine(url, connect_args={"check_same_thread": False}, poolclass=StaticPool)
+    elif url.startswith("sqlite"):
+        engine = create_engine(url, connect_args={"check_same_thread": False})
+    else:
+        return create_engine(url)
+    enable_sqlite_foreign_keys(engine)
+    return engine
 
 
 def _check_owner(trip: Trip, owner_id: str) -> None:
@@ -146,6 +161,7 @@ class PlanStore:
                     created_at=now,
                 )
                 session.add(trip)
+                session.flush()
                 version = 1
             else:
                 _check_owner(trip, owner_id)

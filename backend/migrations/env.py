@@ -14,7 +14,7 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 from app.core.config import database_url  # noqa: E402
-from app.db.store import Base  # noqa: E402
+from app.db.store import Base, enable_sqlite_foreign_keys  # noqa: E402
 
 config = context.config
 # Logging is configured from alembic.ini only for the CLI; the app opts out so that
@@ -45,6 +45,8 @@ def run_migrations_offline() -> None:
 def run_migrations_online() -> None:
     """Run the migrations on one connection; SQLite uses batch mode for ALTERs."""
     engine = create_engine(_database_url(), poolclass=pool.NullPool)
+    if engine.dialect.name == "sqlite":
+        enable_sqlite_foreign_keys(engine)
     try:
         with engine.connect() as connection:
             context.configure(
