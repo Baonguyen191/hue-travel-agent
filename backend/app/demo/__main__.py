@@ -89,7 +89,12 @@ def _overrides(args: argparse.Namespace) -> dict[str, Any]:
 
 def build_request(args: argparse.Namespace) -> TripRequest:
     """Merge the optional scenario preset with explicit flags into a TripRequest."""
-    values: dict[str, Any] = dict(SCENARIOS.get(args.scenario, {}))
+    if args.scenario:
+        values: dict[str, Any] = dict(SCENARIOS[args.scenario])
+    else:
+        # Without a scenario, reuse only the DoD trip basics so ad-hoc
+        # `--keyword`/`--category` runs work without five required flags.
+        values = {k: v for k, v in SCENARIOS["dod"].items() if k != "preferences"}
     values.update(_overrides(args))
     return TripRequest(**values)
 
