@@ -25,6 +25,7 @@ from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.place import Place, PlaceCategory
 from app.schemas.request import TripRequest
 from app.services.preferences import map_preferences
+from app.understanding.normalize import strip_diacritics
 from app.services.vi_request_parser import HUE_NAME, parse_vietnamese_request
 from app.understanding.dates import resolve_date_text
 from app.understanding.extract import Extraction, ExtractionError
@@ -44,6 +45,20 @@ DEFAULT_ORIGIN = HUE_NAME
 DEFAULT_PEOPLE = 1
 MAX_DAYS = 7
 MAX_PEOPLE = 20
+# Interest phrases the preference table does not cover (folded). Whole-word match, checked after
+# map_preferences; they only add categories the user clearly asked for.
+INTEREST_SYNONYMS: dict[str, tuple[PlaceCategory, ...]] = {
+    "ngam canh": ("park", "attraction"),
+    "tham quan": ("attraction",),
+    "bien": ("attraction",),
+    "van hoa": ("museum",),
+    "an vat": ("restaurant",),
+    "an sang": ("restaurant",),
+    "an trua": ("restaurant",),
+    "an toi": ("restaurant",),
+    "hai san": ("restaurant",),
+    "do an": ("restaurant",),
+}
 QUICK_START = ("Cuối tuần này", "Ngày mai", "Thứ 7 tới")
 QUICK_DAYS = ("2 ngày 1 đêm", "3 ngày 2 đêm")
 
@@ -134,6 +149,32 @@ def _rules_days(fields: dict[str, Any]) -> int | None:
     return None
 
 
+def _phrase_categories(phrase: str) -> list[PlaceCategory]:
+    """Categories of one interest phrase: the preference table first, then the synonyms."""
+    matched, _ = map_preferences([phrase])
+    if matched:
+        return matched
+    folded = f" {strip_diacritics(phrase)} "
+    for key, categories in INTEREST_SYNONYMS.items():
+        if f" {key} " in folded:
+            return list(categories)
+    return []
+
+
+def _map_interest_phrases(phrases: Sequence[str]) -> tuple[list[PlaceCategory], list[str]]:
+    """(categories in first-seen order, phrases that map to nothing)."""
+    categories: list[PlaceCategory] = []
+    unmapped: list[str] = []
+    for phrase in phrases:
+        found = _phrase_categories(phrase)
+        if not found:
+            unmapped.append(phrase)
+        for category in found:
+            if category not in categories:
+                categories.append(category)
+    return categories, unmapped
+
+
 def _is_other_city(destination: str | None) -> bool:
     return destination is not None and destination != HUE_NAME
 
@@ -149,7 +190,7 @@ def _draft_from_rules(text: str, ref: date) -> _Draft:
     draft.rooms = fields.get("rooms")
     draft.budget = fields.get("budget_vnd")
     draft.phrases = list(fields.get("preferences", []))
-    draft.categories, draft.soft = map_preferences(draft.phrases)
+    draft.categories, draft.soft = _map_interest_phrases(draft.phrases)
     if _is_other_city(draft.destination):
         draft.intent = Intent.OUT_OF_SCOPE
     return draft
@@ -193,7 +234,7 @@ def _draft_from_extraction(
     draft.rooms = extraction.rooms or rules.get("rooms")
     draft.budget = parse_budget_vnd(extraction.budget_text or "") or rules.get("budget_vnd")
     draft.phrases = list(extraction.interest_phrases)
-    draft.categories, unmapped = map_preferences(draft.phrases)
+    draft.categories, unmapped = _map_interest_phrases(draft.phrases)
     draft.soft = [*unmapped, *extraction.soft_preferences]
     draft.exclude_categories, _ = map_preferences(extraction.exclude_category_phrases)
     draft.must = link_places(extraction.must_include_mentions, catalog, draft.notes)

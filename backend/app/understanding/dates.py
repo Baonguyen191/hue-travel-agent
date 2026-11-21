@@ -77,7 +77,7 @@ _WEEKEND_RE = re.compile(r"cuoi tuan(?: (nay|toi|sau))?")
 _NEXT_WEEK_RE = re.compile(r"tuan (?:sau|toi)")
 _NEXT_YEAR_SUFFIX = " nam sau"
 _HOLIDAY_JAN_1 = "tet duong lich"
-_HOLIDAY_DEC_24 = frozenset({"giang sinh", "noel"})
+_HOLIDAY_DEC_24 = frozenset({"giang sinh", "noel", "giang sinh nay", "noel nay"})
 _NUMERIC_RE = re.compile(r"(?:ngay )?(\d{1,2})\s*[./-]\s*(\d{1,2})(?:\s*[./-]\s*(\d{4}))?")
 _WORDS_DATE_RE = re.compile(r"(?:ngay )?(\d{1,2}) thang (\d{1,2})(?: nam (\d{4}))?")
 _PART_OF_MONTH_RE = re.compile(r"(dau|giua|cuoi) thang (\d{1,2})(?: nam (\d{4}))?")
@@ -200,6 +200,11 @@ def _resolve(text: str, ref: dt.date) -> dt.date | None:
     if cleaned in _HOLIDAY_DEC_24:
         return _next_occurrence(12, 24, ref)
 
+    return _resolve_calendar(cleaned, ref)
+
+
+def _resolve_calendar(cleaned: str, ref: dt.date) -> dt.date | None:
+    """Numeric dates, 'ngày dd tháng mm', and 'đầu/giữa/cuối tháng mm' (with optional year)."""
     numeric_match = _NUMERIC_RE.fullmatch(cleaned)
     if numeric_match is not None:
         day, month, year_text = numeric_match.groups()

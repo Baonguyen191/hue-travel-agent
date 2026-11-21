@@ -124,7 +124,8 @@ Quy tắc chung:
 - Không suy diễn trường không được nhắc. Không có thì để null (chuỗi, số) hoặc [] (danh sách).
 
 Các trường:
-- intent: plan_new (xin lập lịch đi chơi), modify_plan (sửa lịch đã có: bỏ điểm, thêm ngày,
+- intent: plan_new (xin lập lịch đi chơi, kể cả khi chưa nêu ngày hay số ngày; câu hỏi chung về
+  việc đi Huế là plan_new), modify_plan (sửa lịch đã có: bỏ điểm, thêm ngày,
   đổi số người), place_info (hỏi giờ mở cửa, giá vé, vị trí của một địa điểm), approve (đồng ý
   một gói ngân sách), book (xin đặt chỗ), out_of_scope (không phải du lịch Huế: thành phố khác,
   thời tiết, đặt vé, viết văn...).
@@ -133,8 +134,10 @@ Các trường:
 - origin: nơi xuất phát nếu nêu rõ. city: thành phố đến nếu nêu rõ và không phải Huế.
 - people, rooms: số người, số phòng nếu nêu rõ.
 - budget_text: cụm ngân sách nguyên văn, ví dụ "khoảng 4 triệu".
-- interest_phrases: cụm thể hiện sở thích người dùng muốn, ví dụ "đi chùa", "đặc sản".
-  Chỉ ghi điều họ muốn, KHÔNG ghi điều họ không muốn. Tên địa điểm cụ thể không ghi ở đây.
+- interest_phrases: cụm thể hiện sở thích người dùng muốn làm, ví dụ "đi chùa", "đặc sản",
+  "ngắm cảnh". Chỉ ghi điều họ muốn, KHÔNG ghi điều họ không muốn. Không ghi không khí hay
+  người đi cùng (lãng mạn, yên tĩnh, đi với người yêu, cả nhà): những cụm đó vào soft_preferences.
+  Tên địa điểm cụ thể không ghi ở đây.
 - must_include_mentions: tên địa điểm cụ thể người dùng muốn đến, chép đúng cách họ viết.
   Với place_info, ghi tên địa điểm đang được hỏi vào đây.
 - exclude_mentions: tên địa điểm cụ thể người dùng không muốn đến, hoặc đã đi rồi.
@@ -265,6 +268,26 @@ _EXAMPLES: tuple[tuple[str, dict[str, Any]], ...] = (
             "must_include_mentions": [],
             "exclude_mentions": [],
             "exclude_category_phrases": ["chợ"],
+            "soft_preferences": [],
+            "changes": [],
+            "approve_option": None,
+        },
+    ),
+    (
+        "Bạn ơi, giúp mình xem đi Huế chơi được không nhỉ?",
+        {
+            "intent": "plan_new",
+            "date_text": None,
+            "duration_text": None,
+            "origin": None,
+            "people": None,
+            "rooms": None,
+            "budget_text": None,
+            "city": None,
+            "interest_phrases": [],
+            "must_include_mentions": [],
+            "exclude_mentions": [],
+            "exclude_category_phrases": [],
             "soft_preferences": [],
             "changes": [],
             "approve_option": None,
