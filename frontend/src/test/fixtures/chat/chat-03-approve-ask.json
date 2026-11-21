@@ -1,0 +1,23 @@
+{
+  "input": "Duyệt BUDGET",
+  "status": 200,
+  "body": {
+    "message_id": "120b0c5b-335b-422d-bac3-33fc596a1647",
+    "text": "Xác nhận duyệt phương án Tiết kiệm (version 1, tổng khoảng 6,350,000 – 7,760,000 VND). Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
+    "cards": [],
+    "quick_replies": [
+      "Đồng ý",
+      "Huỷ"
+    ],
+    "pending_confirmation": {
+      "kind": "approve",
+      "option": "BUDGET",
+      "version": 1
+    },
+    "understanding": {
+      "intent": "approve",
+      "source": "RULES",
+      "notes": []
+    }
+  }
+}

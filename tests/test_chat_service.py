@@ -282,8 +282,9 @@ def test_approve_asks_for_confirmation_and_only_a_confirming_message_approves() 
 
     assert asked.pending_confirmation == {"kind": "approve", "option": "BUDGET", "version": 1}
     assert asked.quick_replies == list(texts.YES_REPLIES)
+    assert "BUDGET" not in asked.text
     assert still_open is None
-    assert "Đã duyệt phương án BUDGET" in confirmed.text
+    assert "Đã duyệt phương án Tiết kiệm" in confirmed.text
     assert confirmed.pending_confirmation is None
 
 

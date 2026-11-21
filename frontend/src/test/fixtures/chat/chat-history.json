@@ -1,0 +1,606 @@
+{
+  "input": null,
+  "status": 200,
+  "body": {
+    "conversation_id": "c8a3bab0d51d491d958bc1052567919c",
+    "messages": [
+      {
+        "id": "c2ba2090-991f-48a7-af8d-ff1f5da96182",
+        "role": "user",
+        "text": "Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người, ngân sách 8 triệu, thích di tích và đặc sản",
+        "created_at": "2026-11-21T19:06:44.703006",
+        "payload": null
+      },
+      {
+        "id": "6a02e732-150f-4a8f-b400-52b47bb184f5",
+        "role": "assistant",
+        "text": "Mình đã lên lịch 3 ngày ở Huế (phương án version 1). Các phương án ngân sách: Tiết kiệm. Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh. Bạn muốn duyệt phương án nào?",
+        "created_at": "2026-11-21T19:06:44.862406",
+        "payload": {
+          "message_id": "",
+          "text": "Mình đã lên lịch 3 ngày ở Huế (phương án version 1). Các phương án ngân sách: Tiết kiệm. Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh. Bạn muốn duyệt phương án nào?",
+          "cards": [
+            {
+              "kind": "plan_summary",
+              "thread_id": "chat-a13152cfd973467f8a77cc9a4ac60442",
+              "status": "AWAITING_APPROVAL",
+              "version": 1,
+              "days": [
+                {
+                  "date": "2026-12-05",
+                  "items": [
+                    {
+                      "time": "08:01",
+                      "name": "Đại Nội Huế",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "11:30",
+                      "name": "Bún Bò Huế Kim Đồng 1",
+                      "kind": "MEAL",
+                      "meal": "LUNCH"
+                    },
+                    {
+                      "time": "12:47",
+                      "name": "Cầu Trường Tiền",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "14:04",
+                      "name": "Chợ Đông Ba Huế",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "15:20",
+                      "name": "P.P. Tea",
+                      "kind": "MEAL",
+                      "meal": "CAFE"
+                    },
+                    {
+                      "time": "18:00",
+                      "name": "Bánh canh Liên",
+                      "kind": "MEAL",
+                      "meal": "DINNER"
+                    }
+                  ]
+                },
+                {
+                  "date": "2026-12-06",
+                  "items": [
+                    {
+                      "time": "08:13",
+                      "name": "Chùa Thiên Mụ (Chùa Linh Mụ)",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "11:30",
+                      "name": "Bánh canh Mộc",
+                      "kind": "MEAL",
+                      "meal": "LUNCH"
+                    },
+                    {
+                      "time": "12:51",
+                      "name": "Chùa Phước Duyên",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "15:10",
+                      "name": "Mandarin Coffee & Restaurant",
+                      "kind": "MEAL",
+                      "meal": "CAFE"
+                    },
+                    {
+                      "time": "16:04",
+                      "name": "Lăng vua Tự Đức",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "18:00",
+                      "name": "Quán chay Hoa Từ Tâm",
+                      "kind": "MEAL",
+                      "meal": "DINNER"
+                    }
+                  ]
+                },
+                {
+                  "date": "2026-12-07",
+                  "items": [
+                    {
+                      "time": "08:24",
+                      "name": "Lăng vua Khải Định",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "09:58",
+                      "name": "Trung tâm Du lịch tâm linh Phật giáo Quán Thế Âm (Tượng Phật Đứng)",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "11:55",
+                      "name": "Eco Restaurant",
+                      "kind": "MEAL",
+                      "meal": "LUNCH"
+                    },
+                    {
+                      "time": "13:23",
+                      "name": "Lăng vua Minh Mạng",
+                      "kind": "VISIT",
+                      "meal": null
+                    },
+                    {
+                      "time": "18:00",
+                      "name": "Nhà hàng Lá Thông",
+                      "kind": "MEAL",
+                      "meal": "DINNER"
+                    }
+                  ]
+                }
+              ],
+              "budget_options": [
+                {
+                  "label": "BUDGET",
+                  "known_total_vnd": 6350000,
+                  "known_total_max_vnd": 7760000,
+                  "budget_status": "WITHIN_BUDGET_EXCLUDING_UNKNOWN"
+                }
+              ]
+            }
+          ],
+          "quick_replies": [
+            "Duyệt BUDGET"
+          ],
+          "pending_confirmation": null,
+          "understanding": {
+            "intent": "plan_new",
+            "source": "RULES",
+            "notes": []
+          }
+        }
+      },
+      {
+        "id": "4340f4b1-c49d-49b7-81f9-e0b0659e91d5",
+        "role": "user",
+        "text": "Đại Nội mở cửa mấy giờ?",
+        "created_at": "2026-11-21T19:06:44.881788",
+        "payload": null
+      },
+      {
+        "id": "be772dcf-7d9d-4809-80bf-fd974d8ab317",
+        "role": "assistant",
+        "text": "Đại Nội Huế (di tích)\nĐịa chỉ: Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế\nGiờ mở cửa (nguồn, chưa xác minh): 07:30-17:30\nGiá tham khảo: 200,000 – 200,000 VND (tham khảo, mỗi người)\nĐiện thoại: 0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)\nNguồn: https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787",
+        "created_at": "2026-11-21T19:06:44.887111",
+        "payload": {
+          "message_id": "",
+          "text": "Đại Nội Huế (di tích)\nĐịa chỉ: Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế\nGiờ mở cửa (nguồn, chưa xác minh): 07:30-17:30\nGiá tham khảo: 200,000 – 200,000 VND (tham khảo, mỗi người)\nĐiện thoại: 0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)\nNguồn: https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787",
+          "cards": [
+            {
+              "kind": "place",
+              "poi_id": "huetripo:531787",
+              "name": "Đại Nội Huế",
+              "category": "historic",
+              "address": "Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế",
+              "opening_hours_raw": "07:30-17:30",
+              "opening_hours_note": "chưa xác minh",
+              "price_min_vnd": 200000,
+              "price_max_vnd": 200000,
+              "phone": "0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)",
+              "source_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787"
+            }
+          ],
+          "quick_replies": [],
+          "pending_confirmation": null,
+          "understanding": {
+            "intent": "place_info",
+            "source": "RULES",
+            "notes": []
+          }
+        }
+      },
+      {
+        "id": "bdbe0d2b-5852-41d2-b340-2474f225cd30",
+        "role": "user",
+        "text": "Duyệt BUDGET",
+        "created_at": "2026-11-21T19:06:44.899301",
+        "payload": null
+      },
+      {
+        "id": "120b0c5b-335b-422d-bac3-33fc596a1647",
+        "role": "assistant",
+        "text": "Xác nhận duyệt phương án Tiết kiệm (version 1, tổng khoảng 6,350,000 – 7,760,000 VND). Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
+        "created_at": "2026-11-21T19:06:44.908075",
+        "payload": {
+          "message_id": "",
+          "text": "Xác nhận duyệt phương án Tiết kiệm (version 1, tổng khoảng 6,350,000 – 7,760,000 VND). Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
+          "cards": [],
+          "quick_replies": [
+            "Đồng ý",
+            "Huỷ"
+          ],
+          "pending_confirmation": {
+            "kind": "approve",
+            "option": "BUDGET",
+            "version": 1
+          },
+          "understanding": {
+            "intent": "approve",
+            "source": "RULES",
+            "notes": []
+          }
+        }
+      },
+      {
+        "id": "2c1c9642-7a81-4737-a852-e2e225ead761",
+        "role": "user",
+        "text": "đồng ý",
+        "created_at": "2026-11-21T19:06:44.914916",
+        "payload": null
+      },
+      {
+        "id": "29cd8df4-97f9-4f2f-8efb-a2d7952be98c",
+        "role": "assistant",
+        "text": "Đã duyệt phương án Tiết kiệm (version 1). Bạn có thể đặt vé xe và khách sạn (mô phỏng).",
+        "created_at": "2026-11-21T19:06:44.934510",
+        "payload": {
+          "message_id": "",
+          "text": "Đã duyệt phương án Tiết kiệm (version 1). Bạn có thể đặt vé xe và khách sạn (mô phỏng).",
+          "cards": [],
+          "quick_replies": [
+            "Đặt vé và khách sạn"
+          ],
+          "pending_confirmation": null,
+          "understanding": {
+            "intent": "plan_new",
+            "source": "RULES",
+            "notes": []
+          }
+        }
+      },
+      {
+        "id": "db390bd3-9c1e-497e-9dac-f5545f218341",
+        "role": "user",
+        "text": "Đặt vé và khách sạn",
+        "created_at": "2026-11-21T19:06:44.941483",
+        "payload": null
+      },
+      {
+        "id": "a75cca3a-411c-422f-a2f4-d2d464cfb439",
+        "role": "assistant",
+        "text": "Xác nhận đặt vé xe và khách sạn theo phương án Tiết kiệm đã duyệt? Đây là đặt chỗ MÔ PHỎNG. Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
+        "created_at": "2026-11-21T19:06:44.948463",
+        "payload": {
+          "message_id": "",
+          "text": "Xác nhận đặt vé xe và khách sạn theo phương án Tiết kiệm đã duyệt? Đây là đặt chỗ MÔ PHỎNG. Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
+          "cards": [],
+          "quick_replies": [
+            "Đồng ý",
+            "Huỷ"
+          ],
+          "pending_confirmation": {
+            "kind": "book",
+            "option": "BUDGET",
+            "quote_hash": "8d67d415e1ab8493971e17bf035b8ea29cbd4d6b8b9da4b7f67c2e2b0f799957"
+          },
+          "understanding": {
+            "intent": "book",
+            "source": "RULES",
+            "notes": []
+          }
+        }
+      },
+      {
+        "id": "268ec517-d1ad-4975-b774-7477372d43d0",
+        "role": "user",
+        "text": "đồng ý",
+        "created_at": "2026-11-21T19:06:44.960709",
+        "payload": null
+      },
+      {
+        "id": "ab67b5f6-f932-4eaf-9e33-4f016753bcb0",
+        "role": "assistant",
+        "text": "Chỉ đặt dịch vụ trong phương án đã duyệt (version 1, quote 8d67d415e1ab). Vé xe và khách sạn là đặt chỗ MÔ PHỎNG (MOCK); không có giao dịch thật. Điểm tham quan và quán ăn không đặt qua hệ thống; dùng thông tin liên hệ để tự đặt. Tất cả dịch vụ đã đặt. Hủy hoặc hoàn tiền theo chính sách của nhà cung cấp; hệ thống không tự hủy.",
+        "created_at": "2026-11-21T19:06:44.992239",
+        "payload": {
+          "message_id": "",
+          "text": "Chỉ đặt dịch vụ trong phương án đã duyệt (version 1, quote 8d67d415e1ab). Vé xe và khách sạn là đặt chỗ MÔ PHỎNG (MOCK); không có giao dịch thật. Điểm tham quan và quán ăn không đặt qua hệ thống; dùng thông tin liên hệ để tự đặt. Tất cả dịch vụ đã đặt. Hủy hoặc hoàn tiền theo chính sách của nhà cung cấp; hệ thống không tự hủy.",
+          "cards": [
+            {
+              "kind": "booking",
+              "result": {
+                "intent_id": "ad724955-dda5-4d2e-b220-d93d16a60d6c",
+                "status": "BOOKED",
+                "items": [
+                  {
+                    "offer_id": "mock-transport-outbound-standard",
+                    "poi_id": null,
+                    "kind": "TRANSPORT",
+                    "status": "BOOKED",
+                    "source": "MOCK",
+                    "reference": "MOCK-ad724955-mock-transport-outbound-standard",
+                    "price_vnd": 400000,
+                    "contact_url": null,
+                    "contact_address": null,
+                    "contact_phone": null,
+                    "message": null
+                  },
+                  {
+                    "offer_id": "mock-transport-return-standard",
+                    "poi_id": null,
+                    "kind": "TRANSPORT",
+                    "status": "BOOKED",
+                    "source": "MOCK",
+                    "reference": "MOCK-ad724955-mock-transport-return-standard",
+                    "price_vnd": 400000,
+                    "contact_url": null,
+                    "contact_address": null,
+                    "contact_phone": null,
+                    "message": null
+                  },
+                  {
+                    "offer_id": "mock-hotel-homestay",
+                    "poi_id": null,
+                    "kind": "HOTEL",
+                    "status": "BOOKED",
+                    "source": "MOCK",
+                    "reference": "MOCK-ad724955-mock-hotel-homestay",
+                    "price_vnd": 350000,
+                    "contact_url": null,
+                    "contact_address": null,
+                    "contact_phone": null,
+                    "message": null
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:531787",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787",
+                    "contact_address": "Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế",
+                    "contact_phone": "0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)",
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:528750",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-an-uong/quan-an/bun-bo-hue-kim-dong-1-528750",
+                    "contact_address": "07 Phạm Hồng Thái, Thuận Hóa, Huế 53000, Vietnam",
+                    "contact_phone": "0915088175",
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:664215",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/diem-tham-quan/khong-gian-cong-cong/cau-truong-tien-664215",
+                    "contact_address": "- Đường Trần Hưng Đạo – Lê Lợi, Phường Thuận Hóa, Thành phố Huế",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:759007",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-dich-vu/cho-/cho-dong-ba-hue-759007",
+                    "contact_address": "2 Trần Hưng Đạo, Phú Xuân, Huế, Vietnam",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:979626",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-an-uong/quan-ca-phetra/pp-tea-979626",
+                    "contact_address": "221 Trần Hưng Đạo",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:686876",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-an-uong/quan-an/banh-canh-lien-686876",
+                    "contact_address": "16 Tố Hữu Tố Hữu",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:197559",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/diem-tham-quan/tam-linh/chua-thien-mu-chua-linh-mu-197559",
+                    "contact_address": "Đường Nguyễn Phúc Nguyên",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:053040",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-an-uong/quan-an/banh-canh-moc-053040",
+                    "contact_address": "142 Phạm Thị Liên",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:238075",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/diem-tham-quan/tam-linh/chua-phuoc-duyen-238075",
+                    "contact_address": "Thôn An Ninh Thượng, số 79 Nguyễn Phúc Chu, Phường Kim Long, Thành phố Huế",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:919070",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-an-uong/quan-ca-phetra/mandarin-coffee-restaurant-919070",
+                    "contact_address": "6 Đường Bà Nguyễn Đình Chi, Phường Kim Long, Thành phố Huế",
+                    "contact_phone": "(+84) 366 340 366",
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:483480",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/lang-vua-tu-duc-483480",
+                    "contact_address": "Dương Xuân Thượng -, phường Thủy Xuân, Thành phố Huế",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:063827",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-an-uong/nha-hangquan-an-chay/quan-chay-hoa-tu-tam-063827",
+                    "contact_address": "90 Minh Mạng, Phường Thủy Xuân, Thành phố Huế",
+                    "contact_phone": "(+84) 935 679 822",
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:627150",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/lang-vua-khai-dinh-627150",
+                    "contact_address": "Đường Đại Nam, Núi Châu Chữ Đại Nam, phường Thủy Xuân, Thành phố Huế",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:238067",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/diem-tham-quan/tam-linh/trung-tam-du-lich-tam-linh-phat-giao-quan-the-am-tuong-phat-dung-238067",
+                    "contact_address": "Núi Tứ Tượng, Xã Thủy Xuân, Thành phố Huế",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:756222",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-an-uong/nha-hang/eco-restaurant-756222",
+                    "contact_address": "107 Minh Mạng",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:424131",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/lang-vua-minh-mang-424131",
+                    "contact_address": "Núi Cẩm Khê, Phường Kim Long, Thành phố Huế",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  },
+                  {
+                    "offer_id": null,
+                    "poi_id": "huetripo:572707",
+                    "kind": "POI",
+                    "status": "NOT_SUPPORTED_BY_DATASET",
+                    "source": "HUE_POI_SOURCE",
+                    "reference": null,
+                    "price_vnd": null,
+                    "contact_url": "https://huetripo.hue.gov.vn/co-so-an-uong/nha-hang/nha-hang-la-thong-572707",
+                    "contact_address": "96 Minh Mạng",
+                    "contact_phone": null,
+                    "message": "Đặt trực tiếp với cơ sở; hệ thống không đặt chỗ này."
+                  }
+                ],
+                "plan_version": 1,
+                "approval_id": "e9c81b1e-8d11-49fd-8e64-c9e37dd06d5d",
+                "quote_hash": "8d67d415e1ab8493971e17bf035b8ea29cbd4d6b8b9da4b7f67c2e2b0f799957",
+                "explanation": [
+                  "Chỉ đặt dịch vụ trong phương án đã duyệt (version 1, quote 8d67d415e1ab).",
+                  "Vé xe và khách sạn là đặt chỗ MÔ PHỎNG (MOCK); không có giao dịch thật.",
+                  "Điểm tham quan và quán ăn không đặt qua hệ thống; dùng thông tin liên hệ để tự đặt.",
+                  "Tất cả dịch vụ đã đặt.",
+                  "Hủy hoặc hoàn tiền theo chính sách của nhà cung cấp; hệ thống không tự hủy."
+                ],
+                "source": "MOCK"
+              }
+            }
+          ],
+          "quick_replies": [],
+          "pending_confirmation": null,
+          "understanding": {
+            "intent": "plan_new",
+            "source": "RULES",
+            "notes": []
+          }
+        }
+      }
+    ]
+  }
+}

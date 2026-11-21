@@ -32,6 +32,12 @@ _CATEGORY_NAMES = {
     "museum": "bảo tàng",
 }
 _EVENT_NAMES = {"VISIT": "tham quan", "MEAL": "ăn", "MEAL_BREAK": "nghỉ ăn trưa"}
+_OPTION_NAMES = {"BUDGET": "Tiết kiệm", "BALANCED": "Cân bằng", "COMFORT": "Thoải mái"}
+
+
+def option_name(label: str) -> str:
+    """The Vietnamese name of a budget option code (BUDGET -> Tiết kiệm)."""
+    return _OPTION_NAMES.get(label, label)
 
 
 def invalid(detail: str) -> str:
@@ -39,7 +45,7 @@ def invalid(detail: str) -> str:
 
 
 def plan_text(days: int, version: int, labels: Sequence[str]) -> str:
-    options = ", ".join(labels) if labels else "chưa có phương án ngân sách"
+    options = ", ".join(option_name(label) for label in labels) if labels else "chưa có phương án ngân sách"
     return (
         f"Mình đã lên lịch {days} ngày ở Huế (phương án version {version}). "
         f"Các phương án ngân sách: {options}. {UNVERIFIED} Bạn muốn duyệt phương án nào?"
@@ -63,23 +69,26 @@ def changes_not_applied(notes: Sequence[str]) -> str:
 
 
 def no_option(label: str) -> str:
-    return f"Phương án hiện tại không có lựa chọn {label}. Bạn chọn lại giúp mình nhé?"
+    return f"Phương án hiện tại không có lựa chọn {option_name(label)}. Bạn chọn lại giúp mình nhé?"
 
 
 def approve_question(label: str, version: int, total: str) -> str:
     return (
-        f"Xác nhận duyệt phương án {label} (version {version}, tổng khoảng {total}). "
+        f"Xác nhận duyệt phương án {option_name(label)} (version {version}, tổng khoảng {total}). "
         'Trả lời "đồng ý" để xác nhận; nói điều khác để huỷ.'
     )
 
 
 def approved_text(label: str, version: int) -> str:
-    return f"Đã duyệt phương án {label} (version {version}). Bạn có thể đặt vé xe và khách sạn (mô phỏng)."
+    return (
+        f"Đã duyệt phương án {option_name(label)} (version {version}). "
+        "Bạn có thể đặt vé xe và khách sạn (mô phỏng)."
+    )
 
 
 def book_question(label: str) -> str:
     return (
-        f"Xác nhận đặt vé xe và khách sạn theo phương án {label} đã duyệt? "
+        f"Xác nhận đặt vé xe và khách sạn theo phương án {option_name(label)} đã duyệt? "
         'Đây là đặt chỗ MÔ PHỎNG. Trả lời "đồng ý" để xác nhận; nói điều khác để huỷ.'
     )
 

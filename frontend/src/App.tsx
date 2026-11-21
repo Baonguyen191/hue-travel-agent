@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { BookingTab } from "./pages/BookingTab";
 import { BudgetTab } from "./pages/BudgetTab";
+import { ChatPage } from "./pages/ChatPage";
 import { ExplorePage } from "./pages/ExplorePage";
 import { ItineraryTab } from "./pages/ItineraryTab";
 import { NotFoundPage } from "./pages/NotFoundPage";
@@ -13,7 +14,8 @@ export function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<RequestPage />} />
+        <Route index element={<ChatPage />} />
+        <Route path="form" element={<RequestPage />} />
         <Route path="explore" element={<ExplorePage />} />
         <Route path="explore/:poiId" element={<PlaceDetailPage />} />
         <Route path="plan/:threadId" element={<PlanLayout />}>

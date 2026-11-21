@@ -4,6 +4,8 @@ import type {
   ApprovalResult,
   BookingRequest,
   BookingResult,
+  ChatHistory,
+  ChatReply,
   CheckpointState,
   ErrorBody,
   ParsedTrip,
@@ -124,4 +126,16 @@ export const api = {
 
   getPlace: (poiId: string, signal?: AbortSignal) =>
     apiRequest<Place>(`/places/${encodeURIComponent(poiId)}`, { signal }),
+
+  /** One chat turn: the reply carries its text, cards, quick replies and pending confirmation. */
+  chatSend: (conversationId: string, text: string, signal?: AbortSignal) =>
+    apiRequest<ChatReply>(`/chat/${encodeURIComponent(conversationId)}`, {
+      method: "POST",
+      body: { text },
+      signal,
+    }),
+
+  /** All messages of a conversation in time order. 404 when the conversation has no messages yet. */
+  chatHistory: (conversationId: string, signal?: AbortSignal) =>
+    apiRequest<ChatHistory>(`/chat/${encodeURIComponent(conversationId)}`, { signal }),
 };

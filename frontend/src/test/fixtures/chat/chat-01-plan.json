@@ -1,0 +1,152 @@
+{
+  "input": "Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người, ngân sách 8 triệu, thích di tích và đặc sản",
+  "status": 200,
+  "body": {
+    "message_id": "6a02e732-150f-4a8f-b400-52b47bb184f5",
+    "text": "Mình đã lên lịch 3 ngày ở Huế (phương án version 1). Các phương án ngân sách: Tiết kiệm. Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh. Bạn muốn duyệt phương án nào?",
+    "cards": [
+      {
+        "kind": "plan_summary",
+        "thread_id": "chat-a13152cfd973467f8a77cc9a4ac60442",
+        "status": "AWAITING_APPROVAL",
+        "version": 1,
+        "days": [
+          {
+            "date": "2026-12-05",
+            "items": [
+              {
+                "time": "08:01",
+                "name": "Đại Nội Huế",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "11:30",
+                "name": "Bún Bò Huế Kim Đồng 1",
+                "kind": "MEAL",
+                "meal": "LUNCH"
+              },
+              {
+                "time": "12:47",
+                "name": "Cầu Trường Tiền",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "14:04",
+                "name": "Chợ Đông Ba Huế",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "15:20",
+                "name": "P.P. Tea",
+                "kind": "MEAL",
+                "meal": "CAFE"
+              },
+              {
+                "time": "18:00",
+                "name": "Bánh canh Liên",
+                "kind": "MEAL",
+                "meal": "DINNER"
+              }
+            ]
+          },
+          {
+            "date": "2026-12-06",
+            "items": [
+              {
+                "time": "08:13",
+                "name": "Chùa Thiên Mụ (Chùa Linh Mụ)",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "11:30",
+                "name": "Bánh canh Mộc",
+                "kind": "MEAL",
+                "meal": "LUNCH"
+              },
+              {
+                "time": "12:51",
+                "name": "Chùa Phước Duyên",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "15:10",
+                "name": "Mandarin Coffee & Restaurant",
+                "kind": "MEAL",
+                "meal": "CAFE"
+              },
+              {
+                "time": "16:04",
+                "name": "Lăng vua Tự Đức",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "18:00",
+                "name": "Quán chay Hoa Từ Tâm",
+                "kind": "MEAL",
+                "meal": "DINNER"
+              }
+            ]
+          },
+          {
+            "date": "2026-12-07",
+            "items": [
+              {
+                "time": "08:24",
+                "name": "Lăng vua Khải Định",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "09:58",
+                "name": "Trung tâm Du lịch tâm linh Phật giáo Quán Thế Âm (Tượng Phật Đứng)",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "11:55",
+                "name": "Eco Restaurant",
+                "kind": "MEAL",
+                "meal": "LUNCH"
+              },
+              {
+                "time": "13:23",
+                "name": "Lăng vua Minh Mạng",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "18:00",
+                "name": "Nhà hàng Lá Thông",
+                "kind": "MEAL",
+                "meal": "DINNER"
+              }
+            ]
+          }
+        ],
+        "budget_options": [
+          {
+            "label": "BUDGET",
+            "known_total_vnd": 6350000,
+            "known_total_max_vnd": 7760000,
+            "budget_status": "WITHIN_BUDGET_EXCLUDING_UNKNOWN"
+          }
+        ]
+      }
+    ],
+    "quick_replies": [
+      "Duyệt BUDGET"
+    ],
+    "pending_confirmation": null,
+    "understanding": {
+      "intent": "plan_new",
+      "source": "RULES",
+      "notes": []
+    }
+  }
+}

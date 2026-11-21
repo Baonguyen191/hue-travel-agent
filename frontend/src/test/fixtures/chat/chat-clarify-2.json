@@ -1,0 +1,21 @@
+{
+  "input": "05/12",
+  "status": 200,
+  "body": {
+    "message_id": "c3449d04-378a-47f5-962d-32f7b00901eb",
+    "text": "Bạn xuất phát từ đâu và đi mấy người? (mặc định: Huế, 1 người)",
+    "cards": [],
+    "quick_replies": [
+      "Từ Hà Nội, 2 người",
+      "Dùng mặc định"
+    ],
+    "pending_confirmation": {
+      "kind": "defaults"
+    },
+    "understanding": {
+      "intent": "plan_new",
+      "source": "RULES",
+      "notes": []
+    }
+  }
+}

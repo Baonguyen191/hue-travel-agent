@@ -1,0 +1,111 @@
+{
+  "input": "Từ Hà Nội, 2 người",
+  "status": 200,
+  "body": {
+    "message_id": "622dd52b-d670-42f0-b638-0019d00c7da6",
+    "text": "Mình đã lên lịch 2 ngày ở Huế (phương án version 1). Các phương án ngân sách: Tiết kiệm. Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh. Bạn muốn duyệt phương án nào?",
+    "cards": [
+      {
+        "kind": "plan_summary",
+        "thread_id": "chat-68e3150bfcf449d69c2002f91ad93f28",
+        "status": "AWAITING_APPROVAL",
+        "version": 1,
+        "days": [
+          {
+            "date": "2026-12-05",
+            "items": [
+              {
+                "time": "08:01",
+                "name": "Đại Nội Huế",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "11:30",
+                "name": "Bún Bò Huế Kim Đồng 1",
+                "kind": "MEAL",
+                "meal": "LUNCH"
+              },
+              {
+                "time": "12:47",
+                "name": "Cầu Trường Tiền",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "14:04",
+                "name": "Chợ Đông Ba Huế",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "15:20",
+                "name": "P.P. Tea",
+                "kind": "MEAL",
+                "meal": "CAFE"
+              },
+              {
+                "time": "18:00",
+                "name": "Bánh canh Liên",
+                "kind": "MEAL",
+                "meal": "DINNER"
+              }
+            ]
+          },
+          {
+            "date": "2026-12-06",
+            "items": [
+              {
+                "time": "08:11",
+                "name": "Chùa Từ Hiếu",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "11:30",
+                "name": "Nhà hàng Hai Cây Xoài",
+                "kind": "MEAL",
+                "meal": "LUNCH"
+              },
+              {
+                "time": "12:53",
+                "name": "Lăng vua Tự Đức",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "14:33",
+                "name": "Chùa Thiên Mụ (Chùa Linh Mụ)",
+                "kind": "VISIT",
+                "meal": null
+              },
+              {
+                "time": "18:00",
+                "name": "Bánh canh Mộc",
+                "kind": "MEAL",
+                "meal": "DINNER"
+              }
+            ]
+          }
+        ],
+        "budget_options": [
+          {
+            "label": "BUDGET",
+            "known_total_vnd": 4550000,
+            "known_total_max_vnd": 5290000,
+            "budget_status": "UNKNOWN"
+          }
+        ]
+      }
+    ],
+    "quick_replies": [
+      "Duyệt BUDGET"
+    ],
+    "pending_confirmation": null,
+    "understanding": {
+      "intent": "plan_new",
+      "source": "RULES",
+      "notes": []
+    }
+  }
+}

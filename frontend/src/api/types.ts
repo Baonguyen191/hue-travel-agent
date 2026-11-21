@@ -343,3 +343,96 @@ export interface ValidationIssue {
 export interface ErrorBody {
   detail: string | ValidationIssue[];
 }
+
+// ---- Chat (/api/v1/chat) ----
+// Mirrors backend/app/chat/schemas.py (ChatReply, Card union) and the stored history payloads.
+
+/** "OLLAMA" when the LLM read the message; "RULES" for the Vietnamese rules (Ollama off or unavailable). */
+export type UnderstandingSource = "OLLAMA" | "RULES";
+
+export interface UnderstandingInfo {
+  intent: string;
+  source: UnderstandingSource;
+  notes: string[];
+}
+
+export interface ChatPlanItem {
+  time: string;
+  name: string;
+  kind: string;
+  meal: "LUNCH" | "DINNER" | "CAFE" | null;
+}
+
+export interface ChatPlanDay {
+  date: string;
+  items: ChatPlanItem[];
+}
+
+export interface ChatBudgetOption {
+  /** Option code (BUDGET, BALANCED, COMFORT); shown to users as Tiết kiệm, Cân bằng, Thoải mái. */
+  label: OptionLabel;
+  known_total_vnd: number;
+  known_total_max_vnd: number;
+  budget_status: string;
+}
+
+export interface ChatPlanCard {
+  kind: "plan_summary";
+  thread_id: string;
+  status: WorkflowStatus | string;
+  version: number;
+  days: ChatPlanDay[];
+  budget_options: ChatBudgetOption[];
+}
+
+export interface ChatPlaceCard {
+  kind: "place";
+  poi_id: string;
+  name: string;
+  category: PlaceCategory | string;
+  address: string | null;
+  opening_hours_raw: string | null;
+  opening_hours_note: string;
+  price_min_vnd: number | null;
+  price_max_vnd: number | null;
+  phone: string | null;
+  source_url: string | null;
+}
+
+export interface ChatBookingCard {
+  kind: "booking";
+  result: BookingResult;
+}
+
+export type ChatCard = ChatPlanCard | ChatPlaceCard | ChatBookingCard;
+
+/** Set while the bot waits for "đồng ý" (approve, book) or for an answer (defaults). */
+export interface PendingConfirmation {
+  kind: "approve" | "book" | "defaults" | (string & {});
+  option?: OptionLabel;
+  version?: number;
+  quote_hash?: string;
+}
+
+export interface ChatReply {
+  message_id: string;
+  text: string;
+  cards: ChatCard[];
+  quick_replies: string[];
+  pending_confirmation: PendingConfirmation | null;
+  understanding: UnderstandingInfo;
+}
+
+export interface ChatMessageRecord {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  created_at: string;
+  /** The full ChatReply for assistant messages; null for user messages. */
+  payload: ChatReply | null;
+}
+
+export interface ChatHistory {
+  conversation_id: string;
+  messages: ChatMessageRecord[];
+}

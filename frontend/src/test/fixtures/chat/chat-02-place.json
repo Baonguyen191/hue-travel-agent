@@ -1,0 +1,30 @@
+{
+  "input": "Đại Nội mở cửa mấy giờ?",
+  "status": 200,
+  "body": {
+    "message_id": "be772dcf-7d9d-4809-80bf-fd974d8ab317",
+    "text": "Đại Nội Huế (di tích)\nĐịa chỉ: Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế\nGiờ mở cửa (nguồn, chưa xác minh): 07:30-17:30\nGiá tham khảo: 200,000 – 200,000 VND (tham khảo, mỗi người)\nĐiện thoại: 0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)\nNguồn: https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787",
+    "cards": [
+      {
+        "kind": "place",
+        "poi_id": "huetripo:531787",
+        "name": "Đại Nội Huế",
+        "category": "historic",
+        "address": "Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế",
+        "opening_hours_raw": "07:30-17:30",
+        "opening_hours_note": "chưa xác minh",
+        "price_min_vnd": 200000,
+        "price_max_vnd": 200000,
+        "phone": "0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)",
+        "source_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787"
+      }
+    ],
+    "quick_replies": [],
+    "pending_confirmation": null,
+    "understanding": {
+      "intent": "place_info",
+      "source": "RULES",
+      "notes": []
+    }
+  }
+}

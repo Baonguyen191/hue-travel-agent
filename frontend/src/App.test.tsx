@@ -26,7 +26,7 @@ describe("app shell", () => {
     renderAt("/");
 
     const nav = screen.getByRole("navigation", { name: "Chính" });
-    expect(nav).toHaveTextContent("Lập kế hoạch");
+    expect(nav).toHaveTextContent("Trò chuyện");
     expect(nav).toHaveTextContent("Khám phá Huế");
     expect(screen.getByText(/Người dùng thử: 1a2b3c4d — chưa phải đăng nhập/)).toBeInTheDocument();
     expect(screen.getByText(/Xe, khách sạn và đặt chỗ là/)).toHaveTextContent("MÔ PHỎNG");
@@ -46,6 +46,12 @@ describe("app shell", () => {
     renderAt("/plan/e3d7c6b9-956b-42f7-9916-479fe993c969");
 
     expect(await screen.findByRole("heading", { level: 1, name: "Hà Nội → Huế" })).toBeInTheDocument();
+  });
+
+  it("keeps the request form at /form", () => {
+    renderAt("/form");
+
+    expect(screen.getByRole("heading", { level: 1, name: "Lập kế hoạch chuyến đi" })).toBeInTheDocument();
   });
 
   it("shows a 404 page for unknown paths", () => {

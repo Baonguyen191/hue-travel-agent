@@ -1,0 +1,18 @@
+{
+  "input": "đồng ý",
+  "status": 200,
+  "body": {
+    "message_id": "29cd8df4-97f9-4f2f-8efb-a2d7952be98c",
+    "text": "Đã duyệt phương án Tiết kiệm (version 1). Bạn có thể đặt vé xe và khách sạn (mô phỏng).",
+    "cards": [],
+    "quick_replies": [
+      "Đặt vé và khách sạn"
+    ],
+    "pending_confirmation": null,
+    "understanding": {
+      "intent": "plan_new",
+      "source": "RULES",
+      "notes": []
+    }
+  }
+}

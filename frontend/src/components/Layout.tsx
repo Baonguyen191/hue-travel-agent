@@ -19,7 +19,7 @@ export function Layout() {
             <span className="text-lg font-semibold text-teal-800">Hue Travel</span>
             <nav aria-label="Chính" className="flex flex-wrap gap-2">
               <NavLink to="/" end className={navClass}>
-                Lập kế hoạch
+                Trò chuyện
               </NavLink>
               <NavLink to="/explore" className={navClass}>
                 Khám phá Huế
