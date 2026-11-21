@@ -11,7 +11,7 @@ import {
   needsRecheck,
   saveStoredResult,
 } from "../lib/booking";
-import { effectiveStatus, isApproved, poiNameIndex, type StatusTone } from "../lib/plan";
+import { effectiveStatus, isApproved, poiNameIndex, statusLabel, type StatusTone } from "../lib/plan";
 import { usePlan } from "./PlanLayout";
 
 const TONE_CLASS: Record<StatusTone, string> = {
@@ -95,7 +95,7 @@ export function BookingTab() {
               Đặt chỗ mô phỏng
             </h2>
             <p className="text-sm text-slate-600">
-              Chỉ xe và khách sạn trong phương án đã duyệt được đặt, và đây là đặt chỗ MÔ PHỎNG. Trạng thái: {effectiveStatus(record)}.
+              Chỉ xe và khách sạn trong phương án đã duyệt được đặt, và đây là đặt chỗ MÔ PHỎNG. Trạng thái: {statusLabel(effectiveStatus(record))}.
             </p>
           </div>
           <button

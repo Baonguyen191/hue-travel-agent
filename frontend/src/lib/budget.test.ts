@@ -87,7 +87,7 @@ describe("fit and labels", () => {
 
     expect(budgetWarnings(budget)).toEqual([
       "Ngân sách không đủ cho lưu trú.",
-      "Known total excludes items with an unknown amount.",
+      "Tổng đã biết không gồm các mục chưa rõ giá.",
     ]);
   });
 });

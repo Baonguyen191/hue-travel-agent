@@ -14,7 +14,17 @@ import {
   timeRange,
   travelText,
 } from "../lib/plan";
+import { translateWarnings } from "../lib/warnings";
 import { usePlan } from "./PlanLayout";
+
+/** Notes that appear on at least two stops of the day: shown once above the timeline instead of on each card. */
+function sharedNotes(events: ItineraryEvent[]): Set<string> {
+  const counts = new Map<string, number>();
+  for (const event of events) {
+    for (const note of new Set(translateWarnings(event.warnings))) counts.set(note, (counts.get(note) ?? 0) + 1);
+  }
+  return new Set([...counts].filter(([, count]) => count >= 2).map(([note]) => note));
+}
 
 const FALLBACK_COLOR = "#475569";
 
@@ -25,7 +35,8 @@ function markerColor(event: ItineraryEvent): string {
   return FALLBACK_COLOR;
 }
 
-function EventItem({ event, place, priceText }: { event: ItineraryEvent; place: Place | undefined; priceText: string }) {
+function EventItem({ event, place, priceText, shared }: { event: ItineraryEvent; place: Place | undefined; priceText: string; shared: Set<string> }) {
+  const ownNotes = translateWarnings(event.warnings).filter((note) => !shared.has(note));
   const isPlace = event.kind === "VISIT" || event.kind === "MEAL";
   return (
     <li className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -62,9 +73,9 @@ function EventItem({ event, place, priceText }: { event: ItineraryEvent; place: 
           </>
         ) : null}
       </dl>
-      {event.warnings.length > 0 ? (
+      {ownNotes.length > 0 ? (
         <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-amber-900">
-          {event.warnings.map((warning) => (
+          {ownNotes.map((warning) => (
             <li key={warning}>{warning}</li>
           ))}
         </ul>
@@ -99,6 +110,7 @@ export function ItineraryTab() {
       color: markerColor(event),
     }));
 
+  const shared = sharedNotes(events);
   const priceFor = (event: ItineraryEvent): string => {
     if (event.poi_id && costs.has(event.poi_id)) return describePoiCost(costs.get(event.poi_id), people);
     const place = event.poi_id ? places.get(event.poi_id) : undefined;
@@ -133,6 +145,13 @@ export function ItineraryTab() {
         className="gap-6 md:grid md:grid-cols-[minmax(0,1fr)_minmax(260px,380px)]"
       >
         <div className="min-w-0 space-y-4">
+          {shared.size > 0 ? (
+            <ul aria-label="Ghi chú chung cho ngày" className="list-disc space-y-1 rounded-md bg-amber-50 p-3 pl-7 text-xs text-amber-900">
+              {[...shared].map((note) => (
+                <li key={note}>{note}</li>
+              ))}
+            </ul>
+          ) : null}
           {events.length === 0 ? (
             <p className="text-sm text-slate-600">Ngày này chưa có điểm đến.</p>
           ) : (
@@ -143,6 +162,7 @@ export function ItineraryTab() {
                   event={event}
                   place={event.poi_id ? places.get(event.poi_id) : undefined}
                   priceText={priceFor(event)}
+                  shared={shared}
                 />
               ))}
             </ol>

@@ -1,6 +1,7 @@
 // Budget presentation rules. Amounts are reference values; the API never sums money on the client.
 import type { BudgetOption, BudgetResult, CostItem } from "../api/types";
 import type { StatusTone } from "./plan";
+import { translateWarnings } from "./warnings";
 
 const STATUS_VN: Record<string, { label: string; tone: StatusTone }> = {
   WITHIN_BUDGET: { label: "Trong ngân sách", tone: "approved" },
@@ -67,5 +68,5 @@ export function anyOptionFits(budget: BudgetResult): boolean {
 /** Every warning on the budget, without repeats, for the shortfall banner. */
 export function budgetWarnings(budget: BudgetResult): string[] {
   const all = [...budget.warnings, ...budget.options.flatMap((option) => option.warnings)];
-  return [...new Set(all)];
+  return translateWarnings(all);
 }

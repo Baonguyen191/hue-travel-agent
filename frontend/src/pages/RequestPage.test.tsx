@@ -158,7 +158,8 @@ describe("RequestPage", () => {
 
     const alert = await screen.findByRole("alert");
     expect(within(alert).getByText("Chưa tạo được lịch trình hợp lệ")).toBeInTheDocument();
-    expect(within(alert).getAllByText("no budget option")).toHaveLength(2);
+    // The two identical attempt reasons are shown once.
+    expect(within(alert).getAllByText("Không có phương án ngân sách.")).toHaveLength(1);
     expect(within(alert).getByRole("list", { name: "Các bước đã chạy" })).toHaveTextContent("Dừng vì chưa đạt yêu cầu");
     expect(screen.getByLabelText("Điểm xuất phát")).toBeInTheDocument();
     expect(screen.queryByText(/Mã kế hoạch:/)).not.toBeInTheDocument();

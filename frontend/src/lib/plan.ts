@@ -2,6 +2,7 @@
 // updated after approval) and the checkpoint status (the live graph state). The checkpoint wins when present.
 import type { ItineraryEvent, PlanRecord, Place, SearchResult } from "../api/types";
 import { formatDate, formatKm, formatMinutes, formatTime } from "./format";
+import { translateWarnings } from "./warnings";
 import { CATEGORY_LABEL } from "./labels";
 
 export function effectiveStatus(record: PlanRecord): string {
@@ -68,10 +69,6 @@ export function dayTitle(index: number, date: string): string {
   return `Ngày ${index + 1} · ${formatDate(date)}`;
 }
 
-function unique(values: string[]): string[] {
-  return [...new Set(values.filter((value) => value.trim() !== ""))];
-}
-
 export interface WarningSummary {
   /** Every warning from itinerary, days, search, budget options and the checkpoint, without repeats. */
   messages: string[];
@@ -87,7 +84,7 @@ export function summarizeWarnings(record: PlanRecord): WarningSummary {
   const dayWarnings = itinerary.days.flatMap((day) => day.warnings);
   const optionWarnings = budget.options.flatMap((option) => option.warnings);
   return {
-    messages: unique([
+    messages: translateWarnings([
       ...itinerary.warnings,
       ...dayWarnings,
       ...itinerary.validation.warnings,
@@ -97,7 +94,7 @@ export function summarizeWarnings(record: PlanRecord): WarningSummary {
       ...(record.checkpoint?.warnings ?? []),
     ]),
     validationValid: itinerary.validation.valid,
-    validationMessages: unique(itinerary.validation.warnings),
+    validationMessages: translateWarnings(itinerary.validation.warnings),
     excluded: itinerary.excluded_poi_ids.length,
     merged: itinerary.merged_poi_ids.length,
     unplanned: itinerary.unplanned_poi_ids.length,

@@ -14,6 +14,7 @@ import {
   unitText,
 } from "../lib/budget";
 import { isApproved, isWaiting, type StatusTone } from "../lib/plan";
+import { translateWarning, translateWarnings } from "../lib/warnings";
 import { usePlan } from "./PlanLayout";
 
 const TONE_CLASS: Record<StatusTone, string> = {
@@ -46,7 +47,7 @@ function CostItemRow({ item }: { item: CostItem }) {
         <p className="text-xs text-slate-600">
           {item.quantity} × {unitText(item.price_unit)}
         </p>
-        {item.note ? <p className="text-xs text-slate-600">{item.note}</p> : null}
+        {item.note ? <p className="text-xs text-slate-600">{translateWarning(item.note)}</p> : null}
       </div>
       <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-end">
         <span className="font-medium">{formatVndRange(item.amount_vnd, item.amount_max_vnd)}</span>
@@ -226,7 +227,7 @@ export function BudgetTab() {
             )}
             {option.warnings.length > 0 ? (
               <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-amber-900">
-                {option.warnings.map((warning) => (
+                {translateWarnings(option.warnings).map((warning) => (
                   <li key={warning}>{warning}</li>
                 ))}
               </ul>

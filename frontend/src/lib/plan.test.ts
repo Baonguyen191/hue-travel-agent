@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { PlanRecord } from "../api/types";
 import planApproved from "../test/fixtures/plan-approved.json";
 import planWaiting from "../test/fixtures/plan.json";
+import { translateWarnings } from "./warnings";
 import { effectiveStatus, eventKindLabel, isApproved, isWaiting, placesById, summarizeWarnings, travelText } from "./plan";
 
 const waiting = planWaiting as unknown as PlanRecord;
@@ -39,7 +40,7 @@ describe("summarizeWarnings", () => {
 
     expect(summary.messages.length).toBeGreaterThan(0);
     expect(new Set(summary.messages).size).toBe(summary.messages.length);
-    for (const message of expected) expect(summary.messages).toContain(message);
+    for (const message of translateWarnings([...expected])) expect(summary.messages).toContain(message);
   });
 
   it("reports the validation result and the exclusion, merge and unplanned counts", () => {

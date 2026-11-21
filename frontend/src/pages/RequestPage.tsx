@@ -7,6 +7,7 @@ import { PlanProgress, TraceList } from "../components/PlanProgress";
 import { TripRequestForm } from "../components/TripRequestForm";
 import { newUuid } from "../lib/ids";
 import { EMPTY_VALUES, toTripRequest, valuesFromParsed, type FormValues } from "../lib/tripForm";
+import { translateWarnings } from "../lib/warnings";
 
 export const DOD_SENTENCE =
   "Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người, ngân sách 8 triệu, thích di tích và đặc sản";
@@ -149,7 +150,7 @@ export function RequestPage() {
 }
 
 function PlanFailure({ state }: { state: CheckpointState }) {
-  const reasons = state.attempts.length > 0 ? state.attempts : state.warnings;
+  const reasons = translateWarnings(state.attempts.length > 0 ? state.attempts : state.warnings);
   return (
     <section role="alert" aria-labelledby="failure-heading" className="space-y-3 rounded-lg border border-red-300 bg-red-50 p-4">
       <h3 id="failure-heading" className="text-base font-semibold text-red-900">
