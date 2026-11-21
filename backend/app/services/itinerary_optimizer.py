@@ -137,6 +137,7 @@ class ItineraryAgent:
         events: list[ItineraryEvent] = []
         unplanned: list[str] = []
         day_warnings: list[str] = []
+        meal_taken = False
 
         for place in route:
             distance = haversine_km(current_lat, current_lon, place.lat, place.lon)
@@ -146,7 +147,9 @@ class ItineraryAgent:
             if arrival < meal_end and arrival + timedelta(minutes=duration) > meal_start:
                 break_start = max(arrival, meal_start)
                 if break_start < meal_end:
-                    events.append(ItineraryEvent(kind="MEAL_BREAK", start_at=break_start, end_at=meal_end, name="Meal break"))
+                    if not meal_taken:
+                        events.append(ItineraryEvent(kind="MEAL_BREAK", start_at=break_start, end_at=meal_end, name="Meal break"))
+                        meal_taken = True
                     arrival = meal_end
             opening_window = parse_simple_opening_window(place.opening_hours_raw)
             if opening_window is not None:

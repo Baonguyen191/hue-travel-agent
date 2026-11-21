@@ -65,3 +65,12 @@ def test_opening_window_parser_only_accepts_unambiguous_same_day_ranges() -> Non
     assert parse_simple_opening_window("07:30-17:30") is not None
     assert parse_simple_opening_window("mở 16:00") is None
     assert parse_simple_opening_window("22:00-02:00") is None
+
+
+def test_no_day_has_more_than_one_meal_break() -> None:
+    # _search() uses the Search Agent default mix (no categories, keyword or preferences).
+    result = ItineraryAgent().plan(_request(), _search())
+
+    for day in result.days:
+        meal_breaks = [event for event in day.events if event.kind == "MEAL_BREAK"]
+        assert len(meal_breaks) <= 1, f"{day.date} has {len(meal_breaks)} meal breaks"

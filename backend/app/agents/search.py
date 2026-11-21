@@ -3,15 +3,32 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Iterable, Sequence
 
 from app.providers.base import HotelProvider, ProviderTimeoutError, TransportProvider
 from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.offer import HotelSearchRequest, TransportSearchRequest
+from app.schemas.place import Place, PlaceCategory, PlaceSearchResult
 from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
 from app.services.poi_search import normalize_vietnamese, search_places
+from app.services.preferences import (
+    extract_keyword_hints,
+    is_hue_specialty,
+    map_preferences,
+)
 
 _HUE_DESTINATIONS = frozenset({"hue", "thanh pho hue", "thua thien hue"})
+_MAX_CANDIDATES = 50
+_RESTAURANT_SCALE = 0.85
+_SPECIALTY_LIFT = 15.0
+_DEFAULT_TOURIST_MIX: tuple[PlaceCategory, ...] = (
+    "historic",
+    "restaurant",
+    "cafe",
+    "attraction",
+    "religious",
+)
 
 
 def is_hue_destination(destination: str) -> bool:
@@ -87,24 +104,28 @@ class SearchAgent:
             warnings=warnings,
         )
 
-    def _find_pois(self, request: TripRequest):
-        categories = request.categories or [None]
-        query = request.keyword or " ".join(request.preferences) or None
-        candidates = []
-        seen_ids: set[str] = set()
-        for category in categories:
-            for result in search_places(
-                self.places.list_all(),
-                query=query,
-                category=category,
-                lat=request.center_lat,
-                lon=request.center_lon,
-                radius_km=request.radius_km,
-            ):
-                if result.place.id not in seen_ids:
-                    seen_ids.add(result.place.id)
-                    candidates.append(result)
-        return sorted(candidates, key=lambda result: (-result.score, result.place.id))[:50]
+    def _find_pois(self, request: TripRequest) -> list[PlaceSearchResult]:
+        places = self.places.list_all()
+        hinted, residual = (
+            extract_keyword_hints(request.keyword) if request.keyword else ([], None)
+        )
+        preferred, unmapped = map_preferences(request.preferences)
+        query = residual or (" ".join(unmapped) or None)
+
+        explicit = _unique([*request.categories, *preferred])
+        categories = _unique([*explicit, *hinted])
+        if categories:
+            plan = [(category, category not in hinted) for category in categories]
+        elif query:
+            plan = [(None, False)]
+        else:
+            plan = [(category, False) for category in _DEFAULT_TOURIST_MIX]
+
+        lists = [
+            _search_category(places, request, category, query, allow_fallback)
+            for category, allow_fallback in plan
+        ]
+        return _interleave(lists, _MAX_CANDIDATES)
 
     @staticmethod
     def _result_or_warning(result: object, name: str, warnings: list[str]):
@@ -115,3 +136,84 @@ class SearchAgent:
             warnings.append(f"{name} failed; its offers were omitted.")
             return []
         return result
+
+
+def _unique(items: Iterable[PlaceCategory]) -> list[PlaceCategory]:
+    """Keep the first occurrence of each category, preserving order."""
+    ordered: list[PlaceCategory] = []
+    for item in items:
+        if item not in ordered:
+            ordered.append(item)
+    return ordered
+
+
+def _search_category(
+    places: Sequence[Place],
+    request: TripRequest,
+    category: PlaceCategory | None,
+    query: str | None,
+    allow_fallback: bool,
+) -> list[PlaceSearchResult]:
+    """Rank one category; retry without the query if an explicit category is empty."""
+    results = _rank(places, request, category, query)
+    if not results and query is not None and allow_fallback:
+        results = _rank(places, request, category, None)
+    return _apply_specialty_boost(results)
+
+
+def _rank(
+    places: Sequence[Place],
+    request: TripRequest,
+    category: PlaceCategory | None,
+    query: str | None,
+) -> list[PlaceSearchResult]:
+    return search_places(
+        places,
+        query=query,
+        category=category,
+        lat=request.center_lat,
+        lon=request.center_lon,
+        radius_km=request.radius_km,
+    )
+
+
+def _apply_specialty_boost(results: list[PlaceSearchResult]) -> list[PlaceSearchResult]:
+    """Rescore restaurants: score * 0.85, plus 15 for a Hue specialty.
+
+    The proportional scaling keeps every score at or below 100 without a cap,
+    so restaurants do not saturate and tie. Non-restaurant results are unchanged.
+    """
+    adjusted: list[PlaceSearchResult] = []
+    for result in results:
+        if result.place.category == "restaurant":
+            lift = _SPECIALTY_LIFT if is_hue_specialty(result.place) else 0.0
+            new_score = round(result.score * _RESTAURANT_SCALE + lift, 3)
+            result = result.model_copy(update={"score": new_score})
+        adjusted.append(result)
+    return sorted(adjusted, key=lambda result: (-result.score, result.place.id))
+
+
+def _interleave(lists: list[list[PlaceSearchResult]], limit: int) -> list[PlaceSearchResult]:
+    """Take rank 1 of each list, then rank 2, and so on.
+
+    Skips a POI already taken by id, or by normalized name (the first, higher
+    ranked, occurrence is kept).
+    """
+    merged: list[PlaceSearchResult] = []
+    seen_ids: set[str] = set()
+    seen_names: set[str] = set()
+    depth = max((len(items) for items in lists), default=0)
+    for rank in range(depth):
+        for items in lists:
+            if rank >= len(items):
+                continue
+            candidate = items[rank]
+            name_key = normalize_vietnamese(candidate.place.name)
+            if candidate.place.id in seen_ids or name_key in seen_names:
+                continue
+            seen_ids.add(candidate.place.id)
+            seen_names.add(name_key)
+            merged.append(candidate)
+            if len(merged) == limit:
+                return merged
+    return merged
