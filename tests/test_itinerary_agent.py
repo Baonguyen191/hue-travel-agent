@@ -250,15 +250,49 @@ def test_dod_plan_is_valid_and_every_visit_ends_by_sightseeing_end() -> None:
     assert all(visit.end_at.time() <= time(17, 30) for visit in _dod_visits())
 
 
-def test_cau_truong_tien_duration_is_clamped_to_180_minutes_with_warning() -> None:
+def test_implausible_cau_truong_tien_duration_uses_category_default_with_warning() -> None:
     from app.services.itinerary_optimizer import visit_duration_minutes
 
     place = _repo().get_by_id("huetripo:664215")
     minutes, warning = visit_duration_minutes(place, ItineraryConfig())
 
     assert place.visit_minutes == 600
-    assert minutes == 180
-    assert warning is not None and "600" in warning and "180" in warning
+    assert minutes == 60  # category default for `park`
+    assert warning is not None and "600" in warning and "category default" in warning
+
+
+def test_source_duration_below_minimum_is_clamped_up_to_minimum() -> None:
+    from app.services.itinerary_optimizer import visit_duration_minutes
+
+    place = _repo().get_by_id("huetripo:531787").model_copy(update={"visit_minutes": 10})
+    minutes, warning = visit_duration_minutes(place, ItineraryConfig())
+
+    assert minutes == 30
+    assert warning is not None and "clamped" in warning
+
+
+def test_meal_outside_radius_prefers_the_nearer_venue_over_a_rated_specialty() -> None:
+    from app.services.meal_picker import MealPicker
+
+    base = _repo().get_by_id("huetripo:528750")
+    config = ItineraryConfig()
+    # About 7 km north and 9 km south of the centre: both beyond the 2 km meal radius.
+    near = base.model_copy(update={
+        "id": "test:near", "name": "Quán A", "summary": None,
+        "lat": config.center_lat + 0.063, "lon": config.center_lon,
+        "rating_value": 3.0, "rating_count": 10,
+    })
+    far = base.model_copy(update={
+        "id": "test:far", "name": "Bún bò Huế Ngon", "summary": None,
+        "lat": config.center_lat - 0.081, "lon": config.center_lon,
+        "rating_value": 5.0, "rating_count": 500,
+    })
+
+    chosen = MealPicker([near, far], None, config.meal_radius_km).pick(
+        "restaurant", config.center_lat, config.center_lon
+    )
+
+    assert chosen is not None and chosen.id == "test:near"
 
 
 def test_missing_duration_uses_category_default_without_a_clamp_warning() -> None:

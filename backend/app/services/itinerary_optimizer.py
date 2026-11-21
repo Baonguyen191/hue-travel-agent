@@ -107,11 +107,14 @@ def parse_simple_opening_window(value: str | None) -> tuple[time, time] | None:
 
 def visit_duration_minutes(place: Place, config: ItineraryConfig) -> tuple[int, str | None]:
     """Return the clamped visit length and a warning when a source value was clamped."""
+    default = min(max(_DEFAULT_VISIT_MINUTES[place.category], config.min_visit_minutes), config.max_visit_minutes)
     source = place.visit_minutes
     if source is None:
-        source = _DEFAULT_VISIT_MINUTES[place.category]
-    minutes = min(max(source, config.min_visit_minutes), config.max_visit_minutes)
-    if place.visit_minutes is None or minutes == source:
+        return default, None
+    if source > config.max_visit_minutes:
+        return default, f"Source visit duration {source} min looks wrong; category default used."
+    minutes = max(source, config.min_visit_minutes)
+    if minutes == source:
         return minutes, None
     return minutes, f"Visit duration clamped from {source} to {minutes} minutes."
 

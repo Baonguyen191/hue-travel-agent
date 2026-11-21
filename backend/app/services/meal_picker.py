@@ -57,10 +57,13 @@ class MealPicker:
                 pool.setdefault(place.id, place)
         return list(pool.values())
 
-    def _rank(self, place: Place, lat: float, lon: float) -> tuple[bool, bool, float, float, str]:
+    def _rank(self, place: Place, lat: float, lon: float) -> tuple[object, ...]:
+        """Inside the radius: specialty, rating, then distance. Beyond it: nearest first."""
         distance = haversine_km(lat, lon, place.lat, place.lon)
+        if distance > self._radius_km:
+            return (True, distance, place.id)
         return (
-            distance > self._radius_km,
+            False,
             not is_hue_specialty(place),
             -(place.rating_value or 0.0),
             distance,
