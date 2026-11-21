@@ -245,3 +245,22 @@ def test_five_people_in_one_room_gets_a_room_warning() -> None:
     result = BudgetAgent(BudgetConfig(), places=REPO).build(_request(people=5, rooms=1), _search())
 
     assert "5 people may not fit in 1 room(s)" in result.warnings
+
+
+def test_hue_origin_has_no_transport_lines_and_says_no_intercity_transport_is_needed() -> None:
+    request = TripRequest(
+        origin="Huế", destination="Huế", start_date=date(2026, 12, 10), end_date=date(2026, 12, 12),
+        people=2, budget_vnd=None, categories=["historic"], keyword="dai noi",
+    )
+    search = asyncio.run(SearchAgent(REPO, MockTransportProvider(), MockHotelProvider()).search(request))
+
+    result = BudgetAgent(ALL_OPTIONS, places=REPO).build(request, search)
+
+    assert result.options
+    for option in result.options:
+        codes = {item.code for item in option.items}
+        assert not codes & {"transport_outbound", "transport_return"}
+        assert option.transport_outbound is None
+        assert option.transport_return is None
+        assert "Bạn đã ở Huế: không cần xe liên tỉnh." in option.warnings
+        assert option.hotel is not None

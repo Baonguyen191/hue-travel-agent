@@ -12,6 +12,7 @@ from typing import Any, Literal
 from app.providers.base import HotelProvider, TransportProvider
 from app.schemas.offer import HotelSearchRequest, TransportSearchRequest
 from app.schemas.request import TripRequest
+from app.services.origin import starts_in_hue
 
 CheckStatus = Literal["OK", "FAILED", "RECONFIRM_REQUIRED"]
 MISSING_OFFER_MESSAGE = "Offer no longer available"
@@ -38,16 +39,18 @@ class QuoteRevalidator:
         return [self._compare(offer, fresh) for offer in approved]
 
     def _fresh_prices(self, request: TripRequest) -> dict[str, int]:
-        transport = self.transport_provider.search(
-            TransportSearchRequest(
-                origin=request.origin,
-                destination=request.destination,
-                departure_date=request.start_date,
-                return_date=request.end_date,
-                passengers=request.people,
+        prices: dict[str, int] = {}
+        if not starts_in_hue(request):
+            transport = self.transport_provider.search(
+                TransportSearchRequest(
+                    origin=request.origin,
+                    destination=request.destination,
+                    departure_date=request.start_date,
+                    return_date=request.end_date,
+                    passengers=request.people,
+                )
             )
-        )
-        prices = {offer.id: offer.price_vnd for offer in transport}
+            prices.update({offer.id: offer.price_vnd for offer in transport})
         if not request.is_day_trip:
             hotels = self.hotel_provider.search(
                 HotelSearchRequest(

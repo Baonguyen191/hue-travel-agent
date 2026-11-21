@@ -124,3 +124,27 @@ def test_dod_candidates_have_no_duplicate_normalized_names() -> None:
 
     names = [normalize_vietnamese(item.place.name) for item in result.poi_candidates]
     assert len(names) == len(set(names))
+
+
+class _CountingTransport(MockTransportProvider):
+    """Counts provider calls so a test can prove the provider was never reached."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.calls = 0
+
+    def search(self, request):  # type: ignore[override]
+        self.calls += 1
+        return super().search(request)
+
+
+def test_hue_origin_skips_the_transport_provider_and_reports_no_transport_gap() -> None:
+    transport = _CountingTransport()
+    agent = SearchAgent(HuePlacesRepository(BACKEND / "data" / "hue.sqlite"), transport, MockHotelProvider())
+
+    result = asyncio.run(agent.search(_request(origin="Huế")))
+
+    assert transport.calls == 0
+    assert result.transport_offers == []
+    assert not any("transport" in warning.lower() for warning in result.warnings)
+    assert len(result.hotel_offers) == 3

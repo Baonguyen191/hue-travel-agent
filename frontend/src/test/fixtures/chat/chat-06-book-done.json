@@ -2,13 +2,13 @@
   "input": "đồng ý",
   "status": 200,
   "body": {
-    "message_id": "ab67b5f6-f932-4eaf-9e33-4f016753bcb0",
+    "message_id": "eb938265-1848-4a5c-afdd-b8c9e069d249",
     "text": "Chỉ đặt dịch vụ trong phương án đã duyệt (version 1, quote 8d67d415e1ab). Vé xe và khách sạn là đặt chỗ MÔ PHỎNG (MOCK); không có giao dịch thật. Điểm tham quan và quán ăn không đặt qua hệ thống; dùng thông tin liên hệ để tự đặt. Tất cả dịch vụ đã đặt. Hủy hoặc hoàn tiền theo chính sách của nhà cung cấp; hệ thống không tự hủy.",
     "cards": [
       {
         "kind": "booking",
         "result": {
-          "intent_id": "ad724955-dda5-4d2e-b220-d93d16a60d6c",
+          "intent_id": "76c618f7-f784-4a7f-8b11-06ea9bbcbc22",
           "status": "BOOKED",
           "items": [
             {
@@ -17,7 +17,7 @@
               "kind": "TRANSPORT",
               "status": "BOOKED",
               "source": "MOCK",
-              "reference": "MOCK-ad724955-mock-transport-outbound-standard",
+              "reference": "MOCK-76c618f7-mock-transport-outbound-standard",
               "price_vnd": 400000,
               "contact_url": null,
               "contact_address": null,
@@ -30,7 +30,7 @@
               "kind": "TRANSPORT",
               "status": "BOOKED",
               "source": "MOCK",
-              "reference": "MOCK-ad724955-mock-transport-return-standard",
+              "reference": "MOCK-76c618f7-mock-transport-return-standard",
               "price_vnd": 400000,
               "contact_url": null,
               "contact_address": null,
@@ -43,7 +43,7 @@
               "kind": "HOTEL",
               "status": "BOOKED",
               "source": "MOCK",
-              "reference": "MOCK-ad724955-mock-hotel-homestay",
+              "reference": "MOCK-76c618f7-mock-hotel-homestay",
               "price_vnd": 350000,
               "contact_url": null,
               "contact_address": null,
@@ -273,7 +273,7 @@
             }
           ],
           "plan_version": 1,
-          "approval_id": "e9c81b1e-8d11-49fd-8e64-c9e37dd06d5d",
+          "approval_id": "44e574d1-6e8b-459c-8f72-dd40d879f73b",
           "quote_hash": "8d67d415e1ab8493971e17bf035b8ea29cbd4d6b8b9da4b7f67c2e2b0f799957",
           "explanation": [
             "Chỉ đặt dịch vụ trong phương án đã duyệt (version 1, quote 8d67d415e1ab).",

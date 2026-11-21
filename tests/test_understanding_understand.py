@@ -400,3 +400,43 @@ def test_apply_changes_invalid_result_keeps_original_with_note() -> None:
     )
     assert changed == request
     assert notes
+
+
+# Rules fallback: place questions (no Ollama) use the real Hue catalog.
+
+
+def test_rules_place_question_with_a_linked_place_is_place_info() -> None:
+    query = understand("Đại Nội mở cửa mấy giờ?", REF)
+
+    assert query.intent is Intent.PLACE_INFO
+    assert query.source is QuSource.RULES
+    assert query.place_query is not None
+    assert query.place_query.poi_id == "huetripo:531787"
+
+
+def test_rules_ticket_price_question_is_place_info() -> None:
+    query = understand("Giá vé lăng Tự Đức bao nhiêu?", REF)
+
+    assert query.intent is Intent.PLACE_INFO
+    assert query.place_query is not None
+    assert query.place_query.poi_id is not None
+
+
+def test_rules_nearby_question_anchors_on_the_place_after_gan() -> None:
+    query = understand("quán bún bò gần Đại Nội", REF)
+
+    assert query.intent is Intent.PLACE_INFO
+    assert query.place_query is not None
+    assert query.place_query.poi_id == "huetripo:531787"
+
+
+def test_rules_trip_sentence_without_a_question_stays_plan_new() -> None:
+    query = understand("Tôi đi Huế 3 ngày từ 05/12", REF)
+
+    assert query.intent is Intent.PLAN_NEW
+
+
+def test_rules_trip_question_with_days_stays_plan_new() -> None:
+    query = understand("Lên lịch Huế 2 ngày từ 20/12, đi Đại Nội không?", REF)
+
+    assert query.intent is Intent.PLAN_NEW

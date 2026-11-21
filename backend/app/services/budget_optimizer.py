@@ -14,11 +14,13 @@ from app.schemas.offer import HotelOffer, TransportOffer
 from app.schemas.place import Place
 from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
+from app.services.origin import starts_in_hue
 
 SIGHTSEEING_CATEGORIES = frozenset({"historic", "attraction", "museum", "religious", "park", "market"})
 FOOD_CATEGORIES = ("restaurant", "cafe")
 HUE_SOURCE = "HUE_POI_SOURCE"
 DAY_TRIP_WARNING = "Chuyến đi trong ngày: không cần lưu trú."
+LOCAL_ORIGIN_WARNING = "Bạn đã ở Huế: không cần xe liên tỉnh."
 MEAL_UNIT = "VND_PER_PERSON_PER_MEAL_ASSUMED"
 ADMISSION_UNIT = "VND_PER_PERSON"
 _WITHIN_STATUSES = frozenset({"WITHIN_BUDGET", "WITHIN_BUDGET_EXCLUDING_UNKNOWN"})
@@ -126,11 +128,7 @@ class BudgetAgent:
         medians: dict[str, tuple[int, int]],
     ) -> BudgetOption:
         days = (request.end_date - request.start_date).days + 1
-        items: list[CostItem] = [
-            self._transport_item("transport_outbound", "Outbound transport", outbound, request.people),
-            self._transport_item("transport_return", "Return transport", returning, request.people),
-            *self._lodging_items(request, hotel),
-        ]
+        items: list[CostItem] = [*self._intercity_items(request, outbound, returning), *self._lodging_items(request, hotel)]
         local = self._local_transport_item(days)
         if local is not None:
             items.append(local)
@@ -144,6 +142,8 @@ class BudgetAgent:
             request.budget_vnd, known_total, known_max, unknown_count
         )
         warnings: list[str] = [DAY_TRIP_WARNING] if request.is_day_trip else []
+        if starts_in_hue(request):
+            warnings.append(LOCAL_ORIGIN_WARNING)
         if unknown_count:
             warnings.append("Known total excludes items with an unknown amount.")
         warnings.extend(status_warnings)
@@ -159,6 +159,20 @@ class BudgetAgent:
             budget_remaining_vnd=remaining,
             warnings=warnings,
         )
+
+    def _intercity_items(
+        self,
+        request: TripRequest,
+        outbound: TransportOffer | None,
+        returning: TransportOffer | None,
+    ) -> list[CostItem]:
+        """A trip that starts in Huế has no inter-city transport line at all."""
+        if starts_in_hue(request):
+            return []
+        return [
+            self._transport_item("transport_outbound", "Outbound transport", outbound, request.people),
+            self._transport_item("transport_return", "Return transport", returning, request.people),
+        ]
 
     @staticmethod
     def _transport_item(
@@ -349,7 +363,7 @@ class BudgetAgent:
         self, request: TripRequest, search: SearchResult, shortfall: int | None
     ) -> list[str]:
         warnings = list(search.warnings)
-        if not search.transport_offers:
+        if not search.transport_offers and not starts_in_hue(request):
             warnings.append("Transport costs are unknown because no provider offer was available.")
         if not search.hotel_offers and not request.is_day_trip:
             warnings.append("Lodging costs are unknown because no provider offer was available.")

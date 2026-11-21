@@ -2,27 +2,27 @@
   "input": null,
   "status": 200,
   "body": {
-    "conversation_id": "c8a3bab0d51d491d958bc1052567919c",
+    "conversation_id": "885db12100fd4693b3440e9112a14087",
     "messages": [
       {
-        "id": "c2ba2090-991f-48a7-af8d-ff1f5da96182",
+        "id": "e85ae499-cae4-4962-97e3-ada5ec285a9f",
         "role": "user",
         "text": "Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người, ngân sách 8 triệu, thích di tích và đặc sản",
-        "created_at": "2026-11-21T19:06:44.703006",
+        "created_at": "2026-11-21T19:15:58.229385",
         "payload": null
       },
       {
-        "id": "6a02e732-150f-4a8f-b400-52b47bb184f5",
+        "id": "04853c16-226a-41d3-945f-2d54f96afc7c",
         "role": "assistant",
         "text": "Mình đã lên lịch 3 ngày ở Huế (phương án version 1). Các phương án ngân sách: Tiết kiệm. Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh. Bạn muốn duyệt phương án nào?",
-        "created_at": "2026-11-21T19:06:44.862406",
+        "created_at": "2026-11-21T19:15:58.407240",
         "payload": {
           "message_id": "",
           "text": "Mình đã lên lịch 3 ngày ở Huế (phương án version 1). Các phương án ngân sách: Tiết kiệm. Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh. Bạn muốn duyệt phương án nào?",
           "cards": [
             {
               "kind": "plan_summary",
-              "thread_id": "chat-a13152cfd973467f8a77cc9a4ac60442",
+              "thread_id": "chat-b8b432a23c9640a393f6d38014333750",
               "status": "AWAITING_APPROVAL",
               "version": 1,
               "days": [
@@ -166,17 +166,17 @@
         }
       },
       {
-        "id": "4340f4b1-c49d-49b7-81f9-e0b0659e91d5",
+        "id": "87ad773c-2620-47ff-a42f-94f596269176",
         "role": "user",
         "text": "Đại Nội mở cửa mấy giờ?",
-        "created_at": "2026-11-21T19:06:44.881788",
+        "created_at": "2026-11-21T19:15:58.407240",
         "payload": null
       },
       {
-        "id": "be772dcf-7d9d-4809-80bf-fd974d8ab317",
+        "id": "fc1f89aa-8cd9-445b-81c7-d2dca5b73227",
         "role": "assistant",
         "text": "Đại Nội Huế (di tích)\nĐịa chỉ: Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế\nGiờ mở cửa (nguồn, chưa xác minh): 07:30-17:30\nGiá tham khảo: 200,000 – 200,000 VND (tham khảo, mỗi người)\nĐiện thoại: 0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)\nNguồn: https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787",
-        "created_at": "2026-11-21T19:06:44.887111",
+        "created_at": "2026-11-21T19:15:58.485470",
         "payload": {
           "message_id": "",
           "text": "Đại Nội Huế (di tích)\nĐịa chỉ: Đường 23 tháng 8, Phường Phú Xuân, Thành phố Huế\nGiờ mở cửa (nguồn, chưa xác minh): 07:30-17:30\nGiá tham khảo: 200,000 – 200,000 VND (tham khảo, mỗi người)\nĐiện thoại: 0234 3523 237 - Đơn vị quản lý (Trung tâm Bảo tồn Di tích Cố đô Huế)\nNguồn: https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787",
@@ -205,17 +205,17 @@
         }
       },
       {
-        "id": "bdbe0d2b-5852-41d2-b340-2474f225cd30",
+        "id": "e4f1a812-a280-43a4-b24f-8197fbb696f8",
         "role": "user",
         "text": "Duyệt BUDGET",
-        "created_at": "2026-11-21T19:06:44.899301",
+        "created_at": "2026-11-21T19:15:58.496223",
         "payload": null
       },
       {
-        "id": "120b0c5b-335b-422d-bac3-33fc596a1647",
+        "id": "956e7a52-f3ad-4e99-b3a9-9fda35129e28",
         "role": "assistant",
         "text": "Xác nhận duyệt phương án Tiết kiệm (version 1, tổng khoảng 6,350,000 – 7,760,000 VND). Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
-        "created_at": "2026-11-21T19:06:44.908075",
+        "created_at": "2026-11-21T19:15:58.508934",
         "payload": {
           "message_id": "",
           "text": "Xác nhận duyệt phương án Tiết kiệm (version 1, tổng khoảng 6,350,000 – 7,760,000 VND). Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
@@ -237,17 +237,17 @@
         }
       },
       {
-        "id": "2c1c9642-7a81-4737-a852-e2e225ead761",
+        "id": "62ed0b2d-8a86-442f-b662-5753d5e3321e",
         "role": "user",
         "text": "đồng ý",
-        "created_at": "2026-11-21T19:06:44.914916",
+        "created_at": "2026-11-21T19:15:58.516138",
         "payload": null
       },
       {
-        "id": "29cd8df4-97f9-4f2f-8efb-a2d7952be98c",
+        "id": "1422fa14-7eee-41a7-90e1-0e45be740271",
         "role": "assistant",
         "text": "Đã duyệt phương án Tiết kiệm (version 1). Bạn có thể đặt vé xe và khách sạn (mô phỏng).",
-        "created_at": "2026-11-21T19:06:44.934510",
+        "created_at": "2026-11-21T19:15:58.533618",
         "payload": {
           "message_id": "",
           "text": "Đã duyệt phương án Tiết kiệm (version 1). Bạn có thể đặt vé xe và khách sạn (mô phỏng).",
@@ -264,17 +264,17 @@
         }
       },
       {
-        "id": "db390bd3-9c1e-497e-9dac-f5545f218341",
+        "id": "761bf89f-84d2-4724-833a-e007531569b2",
         "role": "user",
         "text": "Đặt vé và khách sạn",
-        "created_at": "2026-11-21T19:06:44.941483",
+        "created_at": "2026-11-21T19:15:58.533618",
         "payload": null
       },
       {
-        "id": "a75cca3a-411c-422f-a2f4-d2d464cfb439",
+        "id": "d7951e6c-def7-4942-bbc9-d0f8ad668f54",
         "role": "assistant",
         "text": "Xác nhận đặt vé xe và khách sạn theo phương án Tiết kiệm đã duyệt? Đây là đặt chỗ MÔ PHỎNG. Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
-        "created_at": "2026-11-21T19:06:44.948463",
+        "created_at": "2026-11-21T19:15:58.551521",
         "payload": {
           "message_id": "",
           "text": "Xác nhận đặt vé xe và khách sạn theo phương án Tiết kiệm đã duyệt? Đây là đặt chỗ MÔ PHỎNG. Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
@@ -296,17 +296,17 @@
         }
       },
       {
-        "id": "268ec517-d1ad-4975-b774-7477372d43d0",
+        "id": "153f0423-8b7f-4642-ac08-b3668ea8042d",
         "role": "user",
         "text": "đồng ý",
-        "created_at": "2026-11-21T19:06:44.960709",
+        "created_at": "2026-11-21T19:15:58.551521",
         "payload": null
       },
       {
-        "id": "ab67b5f6-f932-4eaf-9e33-4f016753bcb0",
+        "id": "eb938265-1848-4a5c-afdd-b8c9e069d249",
         "role": "assistant",
         "text": "Chỉ đặt dịch vụ trong phương án đã duyệt (version 1, quote 8d67d415e1ab). Vé xe và khách sạn là đặt chỗ MÔ PHỎNG (MOCK); không có giao dịch thật. Điểm tham quan và quán ăn không đặt qua hệ thống; dùng thông tin liên hệ để tự đặt. Tất cả dịch vụ đã đặt. Hủy hoặc hoàn tiền theo chính sách của nhà cung cấp; hệ thống không tự hủy.",
-        "created_at": "2026-11-21T19:06:44.992239",
+        "created_at": "2026-11-21T19:15:58.592517",
         "payload": {
           "message_id": "",
           "text": "Chỉ đặt dịch vụ trong phương án đã duyệt (version 1, quote 8d67d415e1ab). Vé xe và khách sạn là đặt chỗ MÔ PHỎNG (MOCK); không có giao dịch thật. Điểm tham quan và quán ăn không đặt qua hệ thống; dùng thông tin liên hệ để tự đặt. Tất cả dịch vụ đã đặt. Hủy hoặc hoàn tiền theo chính sách của nhà cung cấp; hệ thống không tự hủy.",
@@ -314,7 +314,7 @@
             {
               "kind": "booking",
               "result": {
-                "intent_id": "ad724955-dda5-4d2e-b220-d93d16a60d6c",
+                "intent_id": "76c618f7-f784-4a7f-8b11-06ea9bbcbc22",
                 "status": "BOOKED",
                 "items": [
                   {
@@ -323,7 +323,7 @@
                     "kind": "TRANSPORT",
                     "status": "BOOKED",
                     "source": "MOCK",
-                    "reference": "MOCK-ad724955-mock-transport-outbound-standard",
+                    "reference": "MOCK-76c618f7-mock-transport-outbound-standard",
                     "price_vnd": 400000,
                     "contact_url": null,
                     "contact_address": null,
@@ -336,7 +336,7 @@
                     "kind": "TRANSPORT",
                     "status": "BOOKED",
                     "source": "MOCK",
-                    "reference": "MOCK-ad724955-mock-transport-return-standard",
+                    "reference": "MOCK-76c618f7-mock-transport-return-standard",
                     "price_vnd": 400000,
                     "contact_url": null,
                     "contact_address": null,
@@ -349,7 +349,7 @@
                     "kind": "HOTEL",
                     "status": "BOOKED",
                     "source": "MOCK",
-                    "reference": "MOCK-ad724955-mock-hotel-homestay",
+                    "reference": "MOCK-76c618f7-mock-hotel-homestay",
                     "price_vnd": 350000,
                     "contact_url": null,
                     "contact_address": null,
@@ -579,7 +579,7 @@
                   }
                 ],
                 "plan_version": 1,
-                "approval_id": "e9c81b1e-8d11-49fd-8e64-c9e37dd06d5d",
+                "approval_id": "44e574d1-6e8b-459c-8f72-dd40d879f73b",
                 "quote_hash": "8d67d415e1ab8493971e17bf035b8ea29cbd4d6b8b9da4b7f67c2e2b0f799957",
                 "explanation": [
                   "Chỉ đặt dịch vụ trong phương án đã duyệt (version 1, quote 8d67d415e1ab).",

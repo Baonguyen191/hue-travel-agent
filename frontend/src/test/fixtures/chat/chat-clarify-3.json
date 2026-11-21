@@ -2,12 +2,12 @@
   "input": "Từ Hà Nội, 2 người",
   "status": 200,
   "body": {
-    "message_id": "622dd52b-d670-42f0-b638-0019d00c7da6",
+    "message_id": "0b13c4a9-eb20-4b15-8145-e70e5d449c0d",
     "text": "Mình đã lên lịch 2 ngày ở Huế (phương án version 1). Các phương án ngân sách: Tiết kiệm. Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh. Bạn muốn duyệt phương án nào?",
     "cards": [
       {
         "kind": "plan_summary",
-        "thread_id": "chat-68e3150bfcf449d69c2002f91ad93f28",
+        "thread_id": "chat-1b425b93611f41f09c7b1df0bba559dd",
         "status": "AWAITING_APPROVAL",
         "version": 1,
         "days": [

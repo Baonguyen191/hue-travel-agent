@@ -7,11 +7,12 @@ from collections.abc import Iterable, Sequence
 
 from app.providers.base import HotelProvider, ProviderTimeoutError, TransportProvider
 from app.repositories.hue_places import HuePlacesRepository
-from app.schemas.offer import HotelOffer, HotelSearchRequest, TransportSearchRequest
+from app.schemas.offer import HotelOffer, HotelSearchRequest, TransportOffer, TransportSearchRequest
 from app.schemas.place import Place, PlaceCategory, PlaceSearchResult
 from app.schemas.request import TripRequest
 from app.schemas.search import SearchResult
 from app.services.constraints import is_allowed
+from app.services.origin import is_hue_name, starts_in_hue
 from app.services.poi_search import normalize_vietnamese, search_places
 from app.services.preferences import (
     extract_keyword_hints,
@@ -19,7 +20,6 @@ from app.services.preferences import (
     map_preferences,
 )
 
-_HUE_DESTINATIONS = frozenset({"hue", "thanh pho hue", "thua thien hue"})
 _MAX_CANDIDATES = 50
 _RESTAURANT_SCALE = 0.85
 _SPECIALTY_LIFT = 15.0
@@ -34,7 +34,7 @@ _DEFAULT_TOURIST_MIX: tuple[PlaceCategory, ...] = (
 
 def is_hue_destination(destination: str) -> bool:
     """Accept common Hue destination forms without treating other cities as Hue."""
-    return normalize_vietnamese(destination) in _HUE_DESTINATIONS
+    return is_hue_name(destination)
 
 
 class SearchAgent:
@@ -61,16 +61,7 @@ class SearchAgent:
             )
 
         poi_task = asyncio.to_thread(self._find_pois, request)
-        transport_task = asyncio.to_thread(
-            self.transport_provider.search,
-            TransportSearchRequest(
-                origin=request.origin,
-                destination=request.destination,
-                departure_date=request.start_date,
-                return_date=request.end_date,
-                passengers=request.people,
-            ),
-        )
+        transport_task = self._transport_offers(request)
         hotel_task = asyncio.to_thread(self._hotel_offers, request)
         poi_result, transport_result, hotel_result = await asyncio.gather(
             poi_task, transport_task, hotel_task, return_exceptions=True
@@ -83,7 +74,7 @@ class SearchAgent:
 
         if not poi_candidates:
             warnings.append("No Hue POIs matched the requested filters.")
-        if not transport_offers:
+        if not transport_offers and not starts_in_hue(request):
             warnings.append("No transport quote is available; no price was inferred.")
         if not hotel_offers and not request.is_day_trip:
             warnings.append("No hotel quote is available; no price was inferred.")
@@ -94,6 +85,21 @@ class SearchAgent:
             transport_offers=transport_offers,
             hotel_offers=hotel_offers,
             warnings=warnings,
+        )
+
+    async def _transport_offers(self, request: TripRequest) -> list[TransportOffer]:
+        """A trip that starts in Huế needs no inter-city quote, so the provider is not called."""
+        if starts_in_hue(request):
+            return []
+        return await asyncio.to_thread(
+            self.transport_provider.search,
+            TransportSearchRequest(
+                origin=request.origin,
+                destination=request.destination,
+                departure_date=request.start_date,
+                return_date=request.end_date,
+                passengers=request.people,
+            ),
         )
 
     def _hotel_offers(self, request: TripRequest) -> list[HotelOffer]:

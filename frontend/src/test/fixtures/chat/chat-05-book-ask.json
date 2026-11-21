@@ -2,7 +2,7 @@
   "input": "Đặt vé và khách sạn",
   "status": 200,
   "body": {
-    "message_id": "a75cca3a-411c-422f-a2f4-d2d464cfb439",
+    "message_id": "d7951e6c-def7-4942-bbc9-d0f8ad668f54",
     "text": "Xác nhận đặt vé xe và khách sạn theo phương án Tiết kiệm đã duyệt? Đây là đặt chỗ MÔ PHỎNG. Trả lời \"đồng ý\" để xác nhận; nói điều khác để huỷ.",
     "cards": [],
     "quick_replies": [

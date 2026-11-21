@@ -202,3 +202,34 @@ def test_new_plan_version_after_approval_blocks_booking() -> None:
         _agent(store, provider).book(THREAD, KEY)
 
     assert provider.book_calls == []
+
+
+def test_hue_origin_books_only_the_hotel_and_never_asks_for_transport_quotes() -> None:
+    from app.services.quote_revalidator import QuoteRevalidator as _Revalidator
+
+    class _CountingTransport(MockTransportProvider):
+        def __init__(self) -> None:
+            super().__init__()
+            self.calls = 0
+
+        def search(self, request):  # type: ignore[override]
+            self.calls += 1
+            return super().search(request)
+
+    store = PlanStore("sqlite://")
+    hue_trip = TripRequest(
+        origin="Huế", destination="Huế", start_date=date(2026, 12, 10), end_date=date(2026, 12, 12), people=2
+    )
+    plan = make_plan(store, THREAD, hue_trip)
+    approval = approve(store, plan)
+    hotel_id = _hotel_id(approval)
+    transport = _CountingTransport()
+    provider = MockBookingProvider()
+    agent = BookingAgent(store, provider, _Revalidator(transport, MockHotelProvider()), places=places())
+
+    result = agent.book(THREAD, KEY)
+
+    assert selected_ids(approval) == {hotel_id}
+    assert transport.calls == 0
+    assert {offer_id for offer_id, _ in provider.book_calls} == {hotel_id}
+    assert result.status == "BOOKED"

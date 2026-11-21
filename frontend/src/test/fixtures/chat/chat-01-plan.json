@@ -2,12 +2,12 @@
   "input": "Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người, ngân sách 8 triệu, thích di tích và đặc sản",
   "status": 200,
   "body": {
-    "message_id": "6a02e732-150f-4a8f-b400-52b47bb184f5",
+    "message_id": "04853c16-226a-41d3-945f-2d54f96afc7c",
     "text": "Mình đã lên lịch 3 ngày ở Huế (phương án version 1). Các phương án ngân sách: Tiết kiệm. Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh. Bạn muốn duyệt phương án nào?",
     "cards": [
       {
         "kind": "plan_summary",
-        "thread_id": "chat-a13152cfd973467f8a77cc9a4ac60442",
+        "thread_id": "chat-b8b432a23c9640a393f6d38014333750",
         "status": "AWAITING_APPROVAL",
         "version": 1,
         "days": [

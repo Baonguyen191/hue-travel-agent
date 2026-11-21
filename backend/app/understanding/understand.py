@@ -14,6 +14,7 @@ date and duration only; the chat asks to confirm `defaulted_fields` before it pl
 from __future__ import annotations
 
 import functools
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import date, timedelta
@@ -126,11 +127,11 @@ def understand(
     """Understand one message. Without an extractor the rule parser is used alone."""
     ref = ref_date or date.today()
     if extractor is None:
-        return _to_query(_draft_from_rules(text, ref), context)
+        return _to_query(_draft_from_rules(text, ref, places), context)
     try:
         extraction = extractor.extract(text, ref)
     except ExtractionError as error:
-        draft = _draft_from_rules(text, ref)
+        draft = _draft_from_rules(text, ref, places)
         draft.notes.append(f"Ollama không dùng được ({error}); hiểu bằng luật.")
         return _to_query(draft, context)
     catalog = load_places() if places is None else places
@@ -181,7 +182,7 @@ def _is_other_city(destination: str | None) -> bool:
     return destination is not None and destination != HUE_NAME
 
 
-def _draft_from_rules(text: str, ref: date) -> _Draft:
+def _draft_from_rules(text: str, ref: date, places: Sequence[Place] | None = None) -> _Draft:
     fields = parse_vietnamese_request(text, ref).fields
     draft = _Draft(source=QuSource.RULES)
     draft.origin = fields.get("origin")
@@ -195,7 +196,83 @@ def _draft_from_rules(text: str, ref: date) -> _Draft:
     draft.categories, draft.soft = _map_interest_phrases(draft.phrases)
     if _is_other_city(draft.destination):
         draft.intent = Intent.OUT_OF_SCOPE
+    elif _is_place_question(text, fields):
+        mention = _rules_place_query(text, load_places() if places is None else places)
+        if mention is not None:
+            draft.intent = Intent.PLACE_INFO
+            draft.place_query = mention
     return draft
+
+
+# ---------------------------------------------------------------------------
+# Rules place questions: a question cue, a linked place name, and no trip details
+# ---------------------------------------------------------------------------
+
+# Question cues (folded, whole words or phrases). A trailing "?" also counts.
+PLACE_CUES = ("mo cua", "may gio", "gio mo", "gia ve", "bao nhieu tien", "o dau", "dia chi", "gan", "so dien thoai", "sdt")
+_NEARBY_WORD = "gan"
+_TRIP_FIELDS = ("duration_days", "start_date", "end_date", "people")
+_MAX_NAME_WINDOW = 6
+_NON_WORD = re.compile(r"[^a-z0-9]+")
+_PARENTHESIS = re.compile(r"\([^)]*\)")
+
+
+def _fold_words(text: str) -> list[str]:
+    return _NON_WORD.sub(" ", strip_diacritics(text)).split()
+
+
+def _has_question_cue(text: str) -> bool:
+    if "?" in text:
+        return True
+    padded = f" {' '.join(_fold_words(text))} "
+    return any(f" {cue} " in padded for cue in PLACE_CUES)
+
+
+def _is_place_question(text: str, fields: dict[str, Any]) -> bool:
+    """A place question has a cue and no trip details (days, dates, people): those are a plan."""
+    if any(fields.get(name) is not None for name in _TRIP_FIELDS):
+        return False
+    return _has_question_cue(text)
+
+
+def _name_word_windows(catalog: Sequence[Place]) -> set[tuple[str, ...]]:
+    """Every run of two or more words inside a folded place name (with and without parentheses)."""
+    windows: set[tuple[str, ...]] = set()
+    for place in catalog:
+        for variant in {place.name, _PARENTHESIS.sub(" ", place.name)}:
+            words = _fold_words(variant)
+            for size in range(2, min(len(words), _MAX_NAME_WINDOW) + 1):
+                for start in range(len(words) - size + 1):
+                    windows.add(tuple(words[start : start + size]))
+    return windows
+
+
+def _rules_place_query(text: str, catalog: Sequence[Place]) -> PlaceMention | None:
+    """The linked place the message is about. A place after "gần" wins; otherwise the best link."""
+    words = _fold_words(text)
+    windows = _name_word_windows(catalog)
+    after_nearby: dict[str, bool] = {}
+    for start in range(len(words)):
+        for size in range(2, min(_MAX_NAME_WINDOW, len(words) - start) + 1):
+            window = tuple(words[start : start + size])
+            if window not in windows:
+                continue
+            phrase = " ".join(window)
+            follows = start > 0 and words[start - 1] == _NEARBY_WORD
+            after_nearby[phrase] = after_nearby.get(phrase, False) or follows
+    if not after_nearby:
+        return None
+    phrases = list(after_nearby)
+    linked = link_places(phrases, catalog)
+    best: PlaceMention | None = None
+    best_key: tuple[bool, float, int] = (False, -1.0, 0)
+    for phrase, mention in zip(phrases, linked, strict=True):
+        if mention.poi_id is None:
+            continue
+        key = (after_nearby[phrase], mention.score, len(phrase.split()))
+        if best is None or key > best_key:
+            best, best_key = mention, key
+    return best
 
 
 def _resolve_start(date_text: str | None, rules: dict[str, Any], ref: date) -> date | None:

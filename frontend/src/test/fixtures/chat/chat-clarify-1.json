@@ -2,7 +2,7 @@
   "input": "Đi Huế 2 ngày",
   "status": 200,
   "body": {
-    "message_id": "c171155f-8e07-4c46-8d23-86ecf00aa7ea",
+    "message_id": "0211e086-e01c-42b7-92ed-9c3c80d5e56a",
     "text": "Bạn muốn đi Huế từ ngày nào?",
     "cards": [],
     "quick_replies": [
