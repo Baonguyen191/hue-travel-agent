@@ -2,28 +2,46 @@
 
 from __future__ import annotations
 
-import sqlite3
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
+from typing import Any
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.agents.checkpoint import open_checkpointer
 from app.api.places import router as places_router
-from app.api.plans import build_orchestrator, router as plans_router
+from app.api.plans import build_orchestrator, store as state_store, router as plans_router
 from app.api.bookings import router as bookings_router
-from app.core.config import hue_database_path
+from app.core.config import checkpoint_url, database_url, hue_database_path, settings_notes, validate_settings
+from app.core.health import checkpoint_status, hue_source_status, state_db_status
+from app.db.migrate import upgrade_to_head
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Open the checkpointer for the app's lifetime and build the orchestrator on it."""
-    async with open_checkpointer() as checkpointer:
+    """Validate settings, migrate the state DB, then open the checkpointer and build the orchestrator."""
+    problems = validate_settings()
+    if problems:
+        raise RuntimeError("Invalid configuration: " + "; ".join(problems))
+    for note in settings_notes():
+        logger.info(note)
+    upgrade_to_head(database_url())
+    target = checkpoint_url()
+    async with open_checkpointer(target) as checkpointer:
+        app.state.checkpointer = checkpointer
+        app.state.checkpoint_url = target
         app.state.orchestrator = build_orchestrator(checkpointer)
-        yield
+        try:
+            yield
+        finally:
+            app.state.checkpointer = None
+            app.state.checkpoint_url = None
 
 
 app = FastAPI(title="Hue Travel Multi-Agent", version="0.0.1", lifespan=lifespan)
@@ -34,32 +52,22 @@ app.include_router(bookings_router)
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
 
-def can_open_read_only(database_path: Path) -> tuple[bool, str | None]:
-    """Confirm that SQLite can read the database without creating side files."""
-    if not database_path.is_file():
-        return False, "Hue SQLite source file is missing."
-
-    try:
-        connection = sqlite3.connect(database_path.resolve().as_uri() + "?mode=ro", uri=True)
-        try:
-            connection.execute("SELECT 1").fetchone()
-        finally:
-            connection.close()
-    except sqlite3.Error:
-        return False, "Hue SQLite source file cannot be opened read-only."
-    return True, None
-
-
 @app.get("/health", response_model=None)
-def health() -> dict[str, str] | JSONResponse:
-    """Report whether the required read-only POI source is available."""
-    available, detail = can_open_read_only(hue_database_path())
-    if not available:
-        return JSONResponse(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            content={"status": "unavailable", "database": "hue.sqlite", "detail": detail},
-        )
-    return {"status": "ok", "database": "hue.sqlite", "access": "read-only"}
+def health(request: Request) -> dict[str, Any] | JSONResponse:
+    """Report each component; any component down makes the whole service 503."""
+    components = {
+        "hue_source": hue_source_status(hue_database_path()),
+        "state_db": state_db_status(state_store.engine),
+        "checkpoint": checkpoint_status(
+            getattr(request.app.state, "checkpointer", None),
+            getattr(request.app.state, "checkpoint_url", None),
+        ),
+    }
+    healthy = all(item["ok"] for item in components.values())
+    body = {"status": "ok" if healthy else "unavailable", "components": components}
+    if healthy:
+        return body
+    return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content=body)
 
 
 # Mount last: a "/" mount registered before API routes would shadow them (e.g. /health).

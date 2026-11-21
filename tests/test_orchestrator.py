@@ -140,7 +140,7 @@ def test_o01_always_failing_validation_stops_after_exactly_three_retries(
 
 
 def test_r01_approval_survives_a_new_orchestrator_on_the_same_checkpoint_file(tmp_path: Path) -> None:
-    store = PlanStore(f"sqlite:///{tmp_path / 'plans.sqlite'}")
+    store = PlanStore(f"sqlite:///{tmp_path / 'plans.sqlite'}", create_schema=True)
     checkpoint_file = str(tmp_path / "checkpoints.sqlite")
 
     async def first_process() -> dict[str, Any]:

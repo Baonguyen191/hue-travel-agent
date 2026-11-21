@@ -106,7 +106,7 @@ def test_update_intent_rewrites_status_and_payload() -> None:
 
 
 def test_concurrent_claims_on_a_file_database_have_exactly_one_winner(tmp_path: Path) -> None:
-    store = PlanStore(f"sqlite:///{(tmp_path / 'race.sqlite').as_posix()}")
+    store = PlanStore(f"sqlite:///{(tmp_path / 'race.sqlite').as_posix()}", create_schema=True)
     store.save_plan("thread-race", {"n": 1})
     trip_id = store.latest("thread-race")["trip_id"]
     outcomes: list[tuple[dict, bool]] = []

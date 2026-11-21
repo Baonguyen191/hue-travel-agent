@@ -90,7 +90,7 @@ def test_k03_same_key_twice_returns_identical_result_and_books_once() -> None:
 
 
 def test_k03_two_threads_racing_one_key_make_exactly_one_set_of_book_calls(tmp_path) -> None:
-    store = PlanStore(f"sqlite:///{(tmp_path / 'race.sqlite').as_posix()}")
+    store = PlanStore(f"sqlite:///{(tmp_path / 'race.sqlite').as_posix()}", create_schema=True)
     _approved(store)
     provider = MockBookingProvider()
     agent = _agent(store, provider)

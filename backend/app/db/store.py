@@ -1,7 +1,8 @@
 """Plan, approval and booking-intent persistence.
 
-Each public method opens its own short session. Tables come from `create_all`;
-migrations are out of scope until Alembic lands with the infra sub-project.
+Each public method opens its own short session. Production schemas come from the
+Alembic migrations (`app.db.migrate`); `create_all` runs only for the in-memory
+SQLite used by tests and demos, or when a caller passes `create_schema=True`.
 """
 
 from __future__ import annotations
@@ -120,9 +121,13 @@ def _approval_dict(row: Approval) -> dict[str, Any]:
 class PlanStore:
     """Versioned plans, active approvals and idempotent booking intents."""
 
-    def __init__(self, url: str) -> None:
+    def __init__(self, url: str, create_schema: bool | None = None) -> None:
+        """Open the engine; `create_schema=None` creates tables only for `sqlite://` (in memory)."""
         self.engine = _make_engine(url)
-        Base.metadata.create_all(self.engine)
+        if create_schema is None:
+            create_schema = url == "sqlite://"
+        if create_schema:
+            Base.metadata.create_all(self.engine)
 
     def save_plan(
         self, thread_id: str, payload: dict[str, Any], owner_id: str = DEFAULT_OWNER

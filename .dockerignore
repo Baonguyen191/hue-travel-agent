@@ -1,0 +1,13 @@
+.venv
+.git
+**/__pycache__
+**/*.pyc
+.pytest_cache
+pytest-cache-files-*
+backend/data/*.bak
+backend/data/travel_state.sqlite
+backend/data/checkpoints.sqlite*
+frontend/node_modules
+.env
+docs
+tests

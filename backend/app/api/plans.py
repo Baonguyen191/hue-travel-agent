@@ -10,7 +10,6 @@ The orchestrator and its checkpointer are created in the FastAPI lifespan (see
 from __future__ import annotations
 
 import asyncio
-import os
 from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -19,7 +18,7 @@ from pydantic import BaseModel, Field
 
 from app.agents.orchestrator import NotWaitingError, Orchestrator, StalePlanError
 from app.agents.search import SearchAgent
-from app.core.config import hue_database_path
+from app.core.config import database_url, hue_database_path
 from app.db.store import DEFAULT_OWNER, PlanStore
 from app.providers.hotel_mock import MockHotelProvider
 from app.providers.transport_mock import MockTransportProvider
@@ -32,7 +31,7 @@ from app.services.quote import UnknownOptionError
 from app.services.request_parser import TripRequestParser
 
 router = APIRouter(prefix="/api/v1/plans", tags=["plans"])
-store = PlanStore(os.environ.get("DATABASE_URL", "sqlite:///backend/data/travel_state.sqlite"))
+store = PlanStore(database_url())
 hue_places = HuePlacesRepository(hue_database_path())
 
 

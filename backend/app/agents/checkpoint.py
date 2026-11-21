@@ -9,7 +9,6 @@ URL forms:
 
 from __future__ import annotations
 
-import os
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -19,13 +18,10 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 
-DEFAULT_CHECKPOINT_PATH = Path(__file__).resolve().parents[2] / "data" / "checkpoints.sqlite"
+from app.core.config import DATA_DIR, checkpoint_url
+
+DEFAULT_CHECKPOINT_PATH = DATA_DIR / "checkpoints.sqlite"
 _SQLITE_PREFIX = "sqlite:///"
-
-
-def checkpoint_url() -> str:
-    """Return the configured checkpoint URL, or the default SQLite file path."""
-    return os.environ.get("CHECKPOINT_URL") or str(DEFAULT_CHECKPOINT_PATH)
 
 
 def checkpoint_kind(url: str) -> str:
