@@ -59,8 +59,9 @@ describe("budget tab", () => {
     const table = await screen.findByRole("table");
     const rows = within(table).getAllByRole("row").slice(1);
     expect(rows).toHaveLength(planJson.payload.budget.options.length);
-    expect(screen.getAllByRole("button", { name: /^Duyệt / })).toHaveLength(1);
-    expect(screen.getByRole("button", { name: "Duyệt Tiết kiệm" })).toBeInTheDocument();
+    // Each option shows its approve control in the card list and in the table.
+    expect(screen.getAllByRole("button", { name: /^Duyệt / })).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: "Duyệt Tiết kiệm" }).length).toBeGreaterThan(0);
     expect(screen.getAllByText("chưa có nhãn").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Không thể duyệt").length).toBeGreaterThan(0);
   });
@@ -77,7 +78,7 @@ describe("budget tab", () => {
 
   it("approves the labelled option with the plan version and then shows the quote", async () => {
     const fetchMock = renderBudget(planJson);
-    await userEvent.click(await screen.findByRole("button", { name: "Duyệt Tiết kiệm" }));
+    await userEvent.click((await screen.findAllByRole("button", { name: "Duyệt Tiết kiệm" }))[0]);
 
     expect(await screen.findByRole("heading", { name: "Đã duyệt phương án Tiết kiệm" })).toBeInTheDocument();
     expect(screen.getByText(/mã báo giá/)).toHaveTextContent(approveJson.quote_hash.slice(0, 16));
@@ -88,7 +89,7 @@ describe("budget tab", () => {
 
   it("asks the user to reload when the plan version has moved on (409)", async () => {
     renderBudget(planJson, () => jsonReply(409, { detail: "Plan version is stale; approve the latest version." }));
-    await userEvent.click(await screen.findByRole("button", { name: "Duyệt Tiết kiệm" }));
+    await userEvent.click((await screen.findAllByRole("button", { name: "Duyệt Tiết kiệm" }))[0]);
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Kế hoạch đã có phiên bản mới — tải lại để xem.");
     expect(screen.getByRole("button", { name: "Tải lại kế hoạch" })).toBeInTheDocument();

@@ -89,6 +89,25 @@ export function BudgetTab() {
     }
   }
 
+  /** Approve only labelled options while waiting; unlabelled options are for comparison only. */
+  function approveControl(option: BudgetOption) {
+    if (option.label !== null && waiting) {
+      return (
+        <button
+          type="button"
+          disabled={approving !== null}
+          onClick={() => approve(option.label as OptionLabel)}
+          className="rounded-md bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
+        >
+          {approving === option.label ? "Đang duyệt…" : `Duyệt ${optionLabelText(option.label)}`}
+        </button>
+      );
+    }
+    return (
+      <span className="text-xs text-slate-500">{option.label === null ? "Không thể duyệt" : approved ? "" : "Không chờ duyệt"}</span>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {!fits && budget.options.length > 0 ? (
@@ -147,8 +166,45 @@ export function BudgetTab() {
         </div>
       ) : null}
 
-      <div className="-mx-4 overflow-x-auto px-4">
-        <table className="w-full min-w-[46rem] border-separate border-spacing-0 text-left text-sm">
+      {/* Below md: one card per option, with the approve control always in view. */}
+      <ul aria-label="Các phương án ngân sách" className="space-y-3 md:hidden">
+        {budget.options.map((option, index) => (
+          <li key={`card-${option.label ?? "none"}-${index}`} className="space-y-3 rounded-lg border border-slate-200 bg-white p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="font-semibold">Phương án {optionLabelText(option.label)}</p>
+              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${TONE_CLASS[budgetStatusTone(option.budget_status)]}`}>
+                {budgetStatusLabel(option.budget_status)}
+              </span>
+            </div>
+            <div>
+              <p className="text-xs text-slate-600">Tổng (tham khảo)</p>
+              <p className="font-medium">{formatVndRange(option.known_total_vnd, option.known_total_max_vnd)}</p>
+              <p className="text-xs text-slate-600">
+                {remainingText(option)} · {option.unknown_item_count} mục chưa rõ
+              </p>
+            </div>
+            <dl className="space-y-1 text-sm">
+              <div>
+                <dt className="inline text-slate-600">Xe đi: </dt>
+                <dd className="inline">{transportText(option.transport_outbound)}</dd>
+              </div>
+              <div>
+                <dt className="inline text-slate-600">Xe về: </dt>
+                <dd className="inline">{transportText(option.transport_return)}</dd>
+              </div>
+              <div>
+                <dt className="inline text-slate-600">Khách sạn: </dt>
+                <dd className="inline">{hotelText(option.hotel)}</dd>
+              </div>
+            </dl>
+            <div>{approveControl(option)}</div>
+          </li>
+        ))}
+      </ul>
+
+      {/* md and up: the comparison table. */}
+      <div className="hidden md:block">
+        <table className="w-full border-separate border-spacing-0 text-left text-sm">
           <caption className="sr-only">Các phương án ngân sách</caption>
           <thead>
             <tr className="text-xs uppercase tracking-wide text-slate-600">
@@ -162,47 +218,29 @@ export function BudgetTab() {
             </tr>
           </thead>
           <tbody>
-            {budget.options.map((option, index) => {
-              const statusClass = TONE_CLASS[budgetStatusTone(option.budget_status)];
-              return (
-                <tr key={`${option.label ?? "none"}-${index}`} className="align-top">
-                  <td className="border-b border-slate-100 py-3 pr-3">
-                    <p className="font-semibold">{optionLabelText(option.label)}</p>
-                    {option.label === null ? <p className="text-xs text-slate-500">chưa có nhãn</p> : null}
-                  </td>
-                  <td className="border-b border-slate-100 py-3 pr-3">{transportText(option.transport_outbound)}</td>
-                  <td className="border-b border-slate-100 py-3 pr-3">{transportText(option.transport_return)}</td>
-                  <td className="border-b border-slate-100 py-3 pr-3">{hotelText(option.hotel)}</td>
-                  <td className="border-b border-slate-100 py-3 pr-3">
-                    <p className="font-medium">{formatVndRange(option.known_total_vnd, option.known_total_max_vnd)}</p>
-                    <p className="text-xs text-slate-600">
-                      {remainingText(option)} · {option.unknown_item_count} mục chưa rõ
-                    </p>
-                  </td>
-                  <td className="border-b border-slate-100 py-3 pr-3">
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${statusClass}`}>
-                      {budgetStatusLabel(option.budget_status)}
-                    </span>
-                  </td>
-                  <td className="border-b border-slate-100 py-3">
-                    {option.label !== null && waiting ? (
-                      <button
-                        type="button"
-                        disabled={approving !== null}
-                        onClick={() => approve(option.label as OptionLabel)}
-                        className="rounded-md bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
-                      >
-                        {approving === option.label ? "Đang duyệt…" : `Duyệt ${optionLabelText(option.label)}`}
-                      </button>
-                    ) : (
-                      <span className="text-xs text-slate-500">
-                        {option.label === null ? "Không thể duyệt" : approved ? "" : "Không chờ duyệt"}
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+            {budget.options.map((option, index) => (
+              <tr key={`${option.label ?? "none"}-${index}`} className="align-top">
+                <td className="border-b border-slate-100 py-3 pr-3">
+                  <p className="font-semibold">{optionLabelText(option.label)}</p>
+                  {option.label === null ? <p className="text-xs text-slate-500">chưa có nhãn</p> : null}
+                </td>
+                <td className="border-b border-slate-100 py-3 pr-3">{transportText(option.transport_outbound)}</td>
+                <td className="border-b border-slate-100 py-3 pr-3">{transportText(option.transport_return)}</td>
+                <td className="border-b border-slate-100 py-3 pr-3">{hotelText(option.hotel)}</td>
+                <td className="border-b border-slate-100 py-3 pr-3">
+                  <p className="font-medium">{formatVndRange(option.known_total_vnd, option.known_total_max_vnd)}</p>
+                  <p className="text-xs text-slate-600">
+                    {remainingText(option)} · {option.unknown_item_count} mục chưa rõ
+                  </p>
+                </td>
+                <td className="border-b border-slate-100 py-3 pr-3">
+                  <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${TONE_CLASS[budgetStatusTone(option.budget_status)]}`}>
+                    {budgetStatusLabel(option.budget_status)}
+                  </span>
+                </td>
+                <td className="border-b border-slate-100 py-3">{approveControl(option)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

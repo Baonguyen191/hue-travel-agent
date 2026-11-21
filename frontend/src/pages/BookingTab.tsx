@@ -126,7 +126,40 @@ export function BookingTab() {
             </span>
           </div>
 
-          <div className="-mx-4 overflow-x-auto px-4">
+          {/* Below md: one card per service. */}
+          <ul aria-label="Xe và khách sạn đã đặt" className="space-y-3 md:hidden">
+            {result.items
+              .filter((item) => item.kind !== "POI")
+              .map((item) => {
+                const offerName = offerNames.get(item.offer_id ?? "") ?? item.offer_id ?? "";
+                return (
+                  <li key={`card-${item.kind}-${item.offer_id ?? ""}`} className="space-y-2 rounded-lg border border-slate-200 p-4 text-sm">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="font-semibold">
+                        {KIND_VN[item.kind]}
+                        <span className="block text-xs font-normal text-slate-600">{offerName}</span>
+                      </p>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${TONE_CLASS[bookingStatusTone(item.status)]}`}>
+                        {bookingStatusLabel(item.status)}
+                      </span>
+                    </div>
+                    {item.reference ? (
+                      <p className="flex flex-wrap items-center gap-1">
+                        <code className="break-all text-xs">{item.reference}</code>
+                        {item.source === "MOCK" ? (
+                          <span className="rounded bg-violet-100 px-1.5 py-0.5 text-[11px] font-semibold text-violet-900 ring-1 ring-violet-300">MÔ PHỎNG</span>
+                        ) : null}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-slate-500">chưa có mã</p>
+                    )}
+                    <p>Giá: {item.price_vnd === null ? "—" : formatVnd(item.price_vnd)}</p>
+                    {item.message ? <p className="text-xs text-slate-700">{item.message}</p> : null}
+                  </li>
+                );
+              })}
+          </ul>
+          <div className="hidden md:block -mx-4 overflow-x-auto px-4">
             <table className="w-full min-w-[40rem] text-left text-sm">
               <caption className="sr-only">Xe và khách sạn đã đặt</caption>
               <thead>

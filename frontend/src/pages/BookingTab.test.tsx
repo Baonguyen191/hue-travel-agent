@@ -51,7 +51,7 @@ describe("booking tab", () => {
     const result = await screen.findByRole("heading", { name: "Kết quả đặt chỗ" });
     const section = result.closest("section")!;
     expect(within(section).getAllByText("Đã đặt (MÔ PHỎNG)").length).toBeGreaterThan(0);
-    expect(within(section).getByText("MOCK-b70cf864-mock-transport-outbound-standard")).toBeInTheDocument();
+    expect(within(section).getAllByText("MOCK-b70cf864-mock-transport-outbound-standard").length).toBeGreaterThan(0);
     expect(within(section).getAllByText("MÔ PHỎNG").length).toBeGreaterThan(0);
 
     expect(screen.getByRole("heading", { name: "Tự liên hệ với các điểm đến" })).toBeInTheDocument();
