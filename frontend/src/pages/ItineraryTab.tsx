@@ -4,6 +4,7 @@ import type { ItineraryEvent, Place } from "../api/types";
 import { ItineraryMap, type ItineraryPoint } from "../components/ItineraryMap";
 import { placeDetailPath, openingHoursText } from "../components/PlaceCard";
 import { describePrice, formatMinutes } from "../lib/format";
+import { describePoiCost, poiCostIndex } from "../lib/poiCost";
 import { CATEGORY_COLOR } from "../lib/labels";
 import {
   categoryLabel,
@@ -24,7 +25,7 @@ function markerColor(event: ItineraryEvent): string {
   return FALLBACK_COLOR;
 }
 
-function EventItem({ event, place }: { event: ItineraryEvent; place: Place | undefined }) {
+function EventItem({ event, place, priceText }: { event: ItineraryEvent; place: Place | undefined; priceText: string }) {
   const isPlace = event.kind === "VISIT" || event.kind === "MEAL";
   return (
     <li className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
@@ -55,7 +56,7 @@ function EventItem({ event, place }: { event: ItineraryEvent; place: Place | und
         {isPlace ? (
           <>
             <dt className="text-slate-500">Giá tham khảo</dt>
-            <dd>{place ? describePrice(place) : "chưa có thông tin giá"}</dd>
+            <dd>{priceText}</dd>
             <dt className="text-slate-500">Giờ mở cửa</dt>
             <dd>{place ? openingHoursText(place) : "chưa xác minh"}</dd>
           </>
@@ -77,6 +78,8 @@ export function ItineraryTab() {
   const days = record.payload.itinerary.days;
   const [selected, setSelected] = useState(0);
   const places = placesById(record.payload.search);
+  const costs = poiCostIndex(record);
+  const people = record.payload.request.people;
 
   if (days.length === 0) {
     return <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">Kế hoạch chưa có ngày nào.</p>;
@@ -95,6 +98,12 @@ export function ItineraryTab() {
       lon: event.lon as number,
       color: markerColor(event),
     }));
+
+  const priceFor = (event: ItineraryEvent): string => {
+    if (event.poi_id && costs.has(event.poi_id)) return describePoiCost(costs.get(event.poi_id), people);
+    const place = event.poi_id ? places.get(event.poi_id) : undefined;
+    return place ? describePrice(place) : "chưa có thông tin giá";
+  };
 
   return (
     <div className="space-y-4">
@@ -133,6 +142,7 @@ export function ItineraryTab() {
                   key={`${event.start_at}-${position}`}
                   event={event}
                   place={event.poi_id ? places.get(event.poi_id) : undefined}
+                  priceText={priceFor(event)}
                 />
               ))}
             </ol>

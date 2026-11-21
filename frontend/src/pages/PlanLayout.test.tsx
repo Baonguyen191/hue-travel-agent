@@ -44,6 +44,8 @@ describe("plan page", () => {
     expect(screen.getAllByRole("tab")).toHaveLength(planJson.payload.itinerary.days.length);
     expect(screen.getByRole("link", { name: "Đại Nội Huế" })).toHaveAttribute("href", "/explore/huetripo%3A531787");
     expect(screen.getByText("Bữa trưa")).toBeInTheDocument();
+    // The Đại Nội line is 400.000 for 2 people in the source; the stop shows 200.000 per person.
+    expect(screen.getByText("Vé: 200.000 ₫/người (tham khảo) [DATA]")).toBeInTheDocument();
     expect(screen.queryByText("Travel buffer")).not.toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Bản đồ ngày đã chọn" })).toBeInTheDocument();
   });
