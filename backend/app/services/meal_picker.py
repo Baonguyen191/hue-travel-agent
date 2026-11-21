@@ -35,6 +35,13 @@ class MealPicker:
     def mark_used(self, place: Place) -> None:
         self._used.add(place.id)
 
+    def used_ids(self) -> frozenset[str]:
+        """Snapshot of venues already used, so a discarded day attempt can be undone."""
+        return frozenset(self._used)
+
+    def restore(self, snapshot: frozenset[str]) -> None:
+        self._used = set(snapshot)
+
     def _pool(self, category: str) -> list[Place]:
         if category not in self._pools:
             self._pools[category] = self._build_pool(category)

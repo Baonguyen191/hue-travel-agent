@@ -52,6 +52,7 @@ class ItineraryResult(BaseModel):
     days: list[ItineraryDay]
     unplanned_poi_ids: list[str]
     excluded_poi_ids: list[str] = Field(default_factory=list)
+    merged_poi_ids: list[str] = Field(default_factory=list)
     warnings: list[str]
     validation: ItineraryValidation
 

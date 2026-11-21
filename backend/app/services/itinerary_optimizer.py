@@ -56,6 +56,8 @@ class ItineraryConfig:
     center_lon: float = 107.5786
     max_distance_km: float = 15.0
     meal_radius_km: float = 2.0
+    min_separation_km: float = 0.3
+    cluster_radius_km: float = 6.0
     landmark_ids: tuple[str, ...] = (
         "huetripo:531787",  # Đại Nội Huế
         "huetripo:197559",  # Chùa Thiên Mụ
@@ -81,6 +83,8 @@ class ItineraryConfig:
             raise ValueError("travel speed and max visits per day must be positive")
         if self.buffer_minutes < 0 or self.meal_radius_km < 0 or self.max_distance_km <= 0:
             raise ValueError("buffer, meal radius and max distance are out of range")
+        if self.min_separation_km < 0 or self.cluster_radius_km <= 0:
+            raise ValueError("min separation must be non-negative and cluster radius positive")
 
 
 def parse_simple_opening_window(value: str | None) -> tuple[time, time] | None:
@@ -139,14 +143,15 @@ class ItineraryAgent:
 
     def plan(self, request: TripRequest, search: SearchResult) -> ItineraryResult:
         centre = self._centre(request)
-        pool, excluded = self._build_pool(request, search, centre)
+        pool, excluded, merged = self._build_pool(request, search, centre)
         meals = MealPicker(_food_candidates(search), self.places, self.config.meal_radius_km)
         days, unplanned = self._plan_days(request, pool, centre, meals)
         return ItineraryResult(
             days=days,
             unplanned_poi_ids=unplanned,
             excluded_poi_ids=excluded,
-            warnings=self._global_warnings(excluded, unplanned),
+            merged_poi_ids=merged,
+            warnings=self._global_warnings(excluded, merged, unplanned),
             validation=validate_itinerary(days),
         )
 
@@ -157,13 +162,19 @@ class ItineraryAgent:
 
     def _build_pool(
         self, request: TripRequest, search: SearchResult, centre: tuple[float, float]
-    ) -> tuple[list[Place], list[str]]:
-        """Landmarks first, then sightseeing candidates; deduped and distance-filtered."""
+    ) -> tuple[list[Place], list[str], list[str]]:
+        """Landmarks first, then sightseeing candidates.
+
+        Deduped by id and name, filtered by distance from the centre, and thinned so
+        every kept place is at least `min_separation_km` from the others (sub-sites
+        that share the citadel coordinate are merged into the first-chosen site).
+        """
         candidates = [item.place for item in search.poi_candidates]
         sightseeing = [place for place in candidates if place.category in SIGHTSEEING_CATEGORIES]
         keyword = normalize_vietnamese(request.keyword) if request.keyword else ""
         kept: list[Place] = []
         excluded: list[str] = []
+        merged: list[str] = []
         seen_ids: set[str] = set()
         seen_names: set[str] = set()
         for place in self._landmarks(request, candidates) + sightseeing:
@@ -174,9 +185,17 @@ class ItineraryAgent:
             seen_names.add(name_key)
             if self._is_too_far(place, name_key, centre, keyword):
                 excluded.append(place.id)
+            elif self._too_close(place, kept):
+                merged.append(place.id)
             else:
                 kept.append(place)
-        return kept, excluded
+        return kept, excluded, merged
+
+    def _too_close(self, place: Place, kept: list[Place]) -> bool:
+        return any(
+            haversine_km(place.lat, place.lon, other.lat, other.lon) < self.config.min_separation_km
+            for other in kept
+        )
 
     def _landmarks(self, request: TripRequest, candidates: list[Place]) -> list[Place]:
         if not self._landmarks_wanted(request):
@@ -221,24 +240,64 @@ class ItineraryAgent:
         for offset in range(date_count):
             day_date = request.start_date + timedelta(days=offset)
             day_set = self._cluster_day(remaining)
-            taken = {place.id for place in day_set}
-            remaining = [place for place in remaining if place.id not in taken]
-            route = self._nearest_route(day_set, centre)
-            day, skipped = self._schedule_day(day_date, route, centre, meals)
+            day, skipped, scheduled_set = self._schedule_with_landmarks(
+                day_date, day_set, pool, centre, meals
+            )
             days.append(day)
+            taken = {place.id for place in scheduled_set}
+            remaining = [place for place in remaining if place.id not in taken]
             remaining = _in_priority_order(remaining + skipped, pool)
         return days, [place.id for place in remaining]
 
     def _cluster_day(self, remaining: list[Place]) -> list[Place]:
-        """Seed with the highest-priority place, then add the nearest places to it."""
+        """Seed with the highest-priority place; take nearby landmarks, then nearest others."""
         if not remaining:
             return []
         seed, rest = remaining[0], remaining[1:]
-        nearest = sorted(
-            rest,
-            key=lambda place: (haversine_km(seed.lat, seed.lon, place.lat, place.lon), place.id),
-        )
-        return [seed] + nearest[: self.config.max_visits_per_day - 1]
+        landmarks = set(self.config.landmark_ids)
+        limit = self.config.max_visits_per_day - 1
+
+        def distance(place: Place) -> float:
+            return haversine_km(seed.lat, seed.lon, place.lat, place.lon)
+
+        by_distance = sorted(rest, key=lambda place: (distance(place), place.id))
+        near_landmarks = [
+            place for place in by_distance
+            if place.id in landmarks and distance(place) <= self.config.cluster_radius_km
+        ][:limit]
+        fillers = [place for place in by_distance if place.id not in landmarks]
+        return [seed] + near_landmarks + fillers[: limit - len(near_landmarks)]
+
+    def _schedule_with_landmarks(
+        self,
+        day_date: date,
+        day_set: list[Place],
+        pool: list[Place],
+        centre: tuple[float, float],
+        meals: MealPicker,
+    ) -> tuple[ItineraryDay, list[Place], list[Place]]:
+        """Schedule a day; while a landmark is skipped, drop the lowest-priority filler and retry."""
+        used_before = meals.used_ids()
+        while True:
+            route = self._nearest_route(day_set, centre)
+            day, skipped = self._schedule_day(day_date, route, centre, meals)
+            filler = self._droppable_filler(day, day_set, skipped, pool)
+            if filler is None:
+                return day, skipped, day_set
+            meals.restore(used_before)
+            day_set = [place for place in day_set if place.id != filler.id]
+
+    def _droppable_filler(
+        self, day: ItineraryDay, day_set: list[Place], skipped: list[Place], pool: list[Place]
+    ) -> Place | None:
+        landmarks = set(self.config.landmark_ids)
+        if not any(place.id in landmarks for place in skipped):
+            return None
+        visited = {event.poi_id for event in day.events if event.kind == "VISIT"}
+        fillers = [place for place in day_set if place.id in visited and place.id not in landmarks]
+        if not fillers:
+            return None
+        return _in_priority_order(fillers, pool)[-1]
 
     @staticmethod
     def _nearest_route(places: list[Place], centre: tuple[float, float]) -> list[Place]:
@@ -383,11 +442,18 @@ class ItineraryAgent:
     def _at(state: _DayState, value: time) -> datetime:
         return datetime.combine(state.day, value)
 
-    def _global_warnings(self, excluded: list[str], unplanned: list[str]) -> list[str]:
+    def _global_warnings(
+        self, excluded: list[str], merged: list[str], unplanned: list[str]
+    ) -> list[str]:
         warnings: list[str] = []
         if excluded:
             warnings.append(
                 f"{len(excluded)} places farther than {self.config.max_distance_km:g} km from the centre were skipped."
+            )
+        if merged:
+            warnings.append(
+                f"{len(merged)} places sharing a location with an already chosen site were merged "
+                "(for example inside Đại Nội)."
             )
         if unplanned:
             warnings.append("Some selected POIs did not fit in the available itinerary time.")

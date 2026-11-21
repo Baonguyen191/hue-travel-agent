@@ -136,6 +136,7 @@ def test_result_poi_ids_are_visit_and_meal_ids_in_order_without_duplicates() -> 
     )
 
     assert result.excluded_poi_ids == []
+    assert result.merged_poi_ids == []
     assert result.poi_ids() == ["huetripo:A", "huetripo:B", "huetripo:C"]
 
 
@@ -286,3 +287,52 @@ def test_config_rejects_inverted_ranges() -> None:
         ItineraryConfig(cafe_earliest=time(16, 30), cafe_latest=time(15, 0))
     with pytest.raises(ValueError):
         ItineraryConfig(day_start=time(18, 0), sightseeing_end=time(17, 0))
+    with pytest.raises(ValueError):
+        ItineraryConfig(min_separation_km=-0.1)
+    with pytest.raises(ValueError):
+        ItineraryConfig(cluster_radius_km=0)
+
+
+def test_dod_no_two_visits_are_closer_than_the_minimum_separation() -> None:
+    separation = ItineraryConfig().min_separation_km
+    visits = _dod_visits()
+    for index, first in enumerate(visits):
+        for second in visits[index + 1:]:
+            distance = haversine_km(first.lat, first.lon, second.lat, second.lon)
+            assert distance >= separation, (first.name, second.name, distance)
+
+
+def test_dod_merges_sub_sites_co_located_with_dai_noi() -> None:
+    scheduled = {visit.poi_id for visit in _dod_visits()}
+    plan = _dod_plan()
+
+    assert "huetripo:531787" in scheduled
+    assert "huetripo:860594" not in scheduled  # Kinh Thành Huế, 0.04 km from Đại Nội
+    assert "huetripo:200310" not in scheduled  # Điện Thái Hòa, 0.06 km from Đại Nội
+    assert {"huetripo:860594", "huetripo:200310"} <= set(plan.merged_poi_ids)
+    assert any("sharing a location" in warning for warning in plan.warnings)
+
+
+def test_dod_schedules_all_three_tombs_plus_dai_noi_and_thien_mu() -> None:
+    scheduled = {visit.poi_id for visit in _dod_visits()}
+
+    for poi_id in (
+        "huetripo:531787",  # Đại Nội Huế
+        "huetripo:197559",  # Chùa Thiên Mụ
+        "huetripo:483480",  # Lăng vua Tự Đức
+        "huetripo:627150",  # Lăng vua Khải Định
+        "huetripo:424131",  # Lăng vua Minh Mạng
+    ):
+        assert poi_id in scheduled, poi_id
+
+
+def test_no_landmark_is_reported_unfit_while_a_non_landmark_is_scheduled_that_day() -> None:
+    config = ItineraryConfig()
+    repo = _repo()
+    landmark_names = {repo.get_by_id(poi_id).name for poi_id in config.landmark_ids}
+    for day in _dod_plan().days:
+        visits = [event for event in day.events if event.kind == "VISIT"]
+        if not any(visit.poi_id not in config.landmark_ids for visit in visits):
+            continue
+        for warning in day.warnings:
+            assert not any(name in warning for name in landmark_names), (day.date, warning)
