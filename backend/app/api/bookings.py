@@ -16,14 +16,19 @@ from app.services.quote_revalidator import QuoteRevalidator
 router = APIRouter(prefix="/api/v1/plans", tags=["bookings"])
 
 
-def get_booking_agent(store: PlanStore = Depends(get_store)) -> BookingAgent:
-    """Build the booking agent over the lifespan's plan store."""
+def build_booking_agent(store: PlanStore) -> BookingAgent:
+    """The booking agent over a plan store, with the mock providers (shared with the chat)."""
     return BookingAgent(
         store,
         MockBookingProvider(),
         QuoteRevalidator(MockTransportProvider(), MockHotelProvider()),
         places=hue_places,
     )
+
+
+def get_booking_agent(store: PlanStore = Depends(get_store)) -> BookingAgent:
+    """Build the booking agent over the lifespan's plan store."""
+    return build_booking_agent(store)
 
 
 @router.post("/{thread_id}/book", response_model=BookingResult)

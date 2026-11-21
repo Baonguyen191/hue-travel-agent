@@ -15,6 +15,7 @@ from app.agents.checkpoint import open_checkpointer
 from app.api.places import router as places_router
 from app.api.plans import build_orchestrator, router as plans_router
 from app.api.bookings import router as bookings_router
+from app.api.chat import router as chat_router
 from app.core.config import checkpoint_url, database_url, hue_database_path, settings_notes, validate_settings
 from app.core.health import checkpoint_status, hue_source_status, state_db_status
 from app.db.migrate import upgrade_to_head
@@ -52,6 +53,7 @@ app = FastAPI(title="Hue Travel Multi-Agent", version="0.0.1", lifespan=lifespan
 app.include_router(places_router)
 app.include_router(plans_router)
 app.include_router(bookings_router)
+app.include_router(chat_router)
 
 FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 
