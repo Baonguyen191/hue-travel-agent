@@ -1,6 +1,50 @@
 @import "tailwindcss";
 
+@theme {
+  --color-son: #7a1f1f;
+  --color-son-dark: #5e1616;
+  --color-son-soft: #f6e1dc;
+  --color-kim: #b8913f;
+  --color-kim-soft: #efe3c8;
+  --color-giay: #f6efe1;
+  --color-nga: #fffaf0;
+  --color-vien: #ead9b0;
+  --color-muc: #2b1a12;
+  --color-muc-soft: #6d5a43;
+  --color-reu: #3f5a3a;
+  --color-reu-soft: #e3e9dc;
+  --color-on-son: #fbecc8;
+  --color-canh-bao: #fbf1dc;
+  --font-serif: "Noto Serif", Georgia, serif;
+  --font-sans: "Be Vietnam Pro", system-ui, sans-serif;
+}
+
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--color-giay);
+  color: var(--color-muc);
+  font-family: var(--font-sans);
+}
+
+/* Hồi văn band: son and kim stripes. */
+.ornament-band {
+  height: 6px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-kim) 0 10px,
+    transparent 10px 14px,
+    var(--color-son) 14px 18px,
+    transparent 18px 22px
+  );
+}
+
+/* Ô hộc grid: faint kim lines for heroes and empty states. */
+.o-hoc {
+  background-image:
+    linear-gradient(90deg, rgb(184 145 63 / 0.14) 1px, transparent 1px),
+    linear-gradient(rgb(184 145 63 / 0.14) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+.leaflet-container {
+  font-family: var(--font-sans);
 }
