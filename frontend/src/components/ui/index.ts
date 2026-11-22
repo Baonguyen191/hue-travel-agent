@@ -6,3 +6,5 @@ export { Notice, type NoticeVariant } from "./Notice";
 export { Ornament } from "./Ornament";
 export { SectionHeading } from "./SectionHeading";
 export { LINK, PILL, TONE_CLASS } from "./tone";
+export { PHOTO_WIDTH, PlacePhoto, photoUrl, type PhotoAspect, type PhotoSize } from "./PlacePhoto";
+export { PlaceIllustration } from "./PlaceIllustration";
