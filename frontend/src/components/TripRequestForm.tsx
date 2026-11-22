@@ -24,9 +24,9 @@ interface TripRequestFormProps {
 }
 
 const INPUT =
-  "mt-1 w-full rounded-xl border bg-nga px-3 py-2 text-base text-muc focus:outline-none focus:ring-2 focus:ring-kim/40 disabled:bg-giay";
-const INPUT_OK = `${INPUT} border-vien focus:border-kim`;
-const INPUT_BAD = `${INPUT} border-son focus:border-kim`;
+  "mt-1 w-full rounded-xl border bg-nga px-3 py-2 text-base text-muc focus:outline-none focus:ring-2 focus:ring-son/30 disabled:bg-giay";
+const INPUT_OK = `${INPUT} border-vien focus:border-son`;
+const INPUT_BAD = `${INPUT} border-son focus:border-son`;
 
 interface FieldProps {
   id: string;

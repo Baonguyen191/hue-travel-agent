@@ -133,7 +133,7 @@ export function ChatPage() {
           ))}
           {waiting ? (
             <div role="status" className="flex justify-start">
-              <p className="animate-pulse rounded-2xl rounded-bl-sm bg-son px-4 py-2 text-sm text-on-son">
+              <p className="motion-safe:animate-pulse rounded-2xl rounded-bl-sm bg-son px-4 py-2 text-sm text-on-son">
                 đang suy nghĩ…
               </p>
             </div>

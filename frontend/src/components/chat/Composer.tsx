@@ -46,7 +46,7 @@ export function Composer({ disabled, onSend, prefill }: ComposerProps) {
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={onKeyDown}
         placeholder="Ví dụ: Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người"
-        className="min-h-[3rem] w-full flex-1 resize-y rounded-2xl border border-vien bg-nga px-4 py-2.5 text-base text-muc placeholder:text-muc-soft/70 focus:border-kim focus:outline-none focus:ring-2 focus:ring-kim/40"
+        className="min-h-[3rem] w-full flex-1 resize-y rounded-2xl border border-vien bg-nga px-4 py-2.5 text-base text-muc placeholder:text-muc-soft focus:border-son focus:outline-none focus:ring-2 focus:ring-son/30"
       />
       <button type="submit" disabled={!canSend} className={buttonClass("primary")}>
         Gửi

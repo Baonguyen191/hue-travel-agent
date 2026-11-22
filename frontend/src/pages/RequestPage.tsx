@@ -97,7 +97,7 @@ export function RequestPage() {
               placeholder={DOD_SENTENCE}
               onChange={(event) => setText(event.target.value)}
               disabled={parsing || submitting}
-              className="mt-1 w-full rounded-xl border border-vien bg-nga px-3 py-2 text-base text-muc focus:border-kim focus:outline-none focus:ring-2 focus:ring-kim/40 disabled:bg-giay"
+              className="mt-1 w-full rounded-xl border border-vien bg-nga px-3 py-2 text-base text-muc focus:border-son focus:outline-none focus:ring-2 focus:ring-son/30 disabled:bg-giay"
             />
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">

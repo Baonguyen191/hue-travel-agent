@@ -88,7 +88,7 @@ export function ExplorePage() {
             onChange={(event) => setInput(event.target.value)}
             placeholder="ví dụ: đại nội, chợ đông ba"
             autoComplete="off"
-            className="mt-1 w-full rounded-xl border border-vien bg-nga px-3 py-2 text-base text-muc placeholder:text-muc-soft/70 focus:border-kim focus:outline-none focus:ring-2 focus:ring-kim/40"
+            className="mt-1 w-full rounded-xl border border-vien bg-nga px-3 py-2 text-base text-muc placeholder:text-muc-soft focus:border-son focus:outline-none focus:ring-2 focus:ring-son/30"
           />
         </div>
         <CategoryChips
