@@ -23,11 +23,11 @@ export function ItineraryMap({ points }: ItineraryMapProps) {
   const latlngs = points.map((point): LatLngTuple => [point.lat, point.lon]);
   return (
     <div className="space-y-2">
-      <div role="region" aria-label="Bản đồ ngày đã chọn" className="overflow-hidden rounded-lg border border-slate-200">
+      <div role="region" aria-label="Bản đồ ngày đã chọn" className="overflow-hidden rounded-2xl border border-vien">
         <MapContainer center={HUE_CENTER} zoom={13} scrollWheelZoom={false} className="h-72 w-full md:h-[420px]">
           <TileLayer attribution={OSM_ATTRIBUTION} url="https://tile.openstreetmap.org/{z}/{x}/{y}.png" />
           {latlngs.length > 1 ? (
-            <Polyline positions={latlngs} pathOptions={{ color: "#334155", weight: 3, dashArray: "6 6" }}>
+            <Polyline positions={latlngs} pathOptions={{ color: "#b8913f", weight: 3, dashArray: "6 8" }}>
               <Tooltip sticky>đường chim bay (ước lượng)</Tooltip>
             </Polyline>
           ) : null}
@@ -35,8 +35,8 @@ export function ItineraryMap({ points }: ItineraryMapProps) {
             <CircleMarker
               key={point.key}
               center={[point.lat, point.lon]}
-              radius={8}
-              pathOptions={{ color: "#ffffff", weight: 2, fillColor: point.color, fillOpacity: 0.95 }}
+              radius={9}
+              pathOptions={{ color: "#b8913f", weight: 2, fillColor: point.color, fillOpacity: 0.95 }}
             >
               <Popup>{point.name}</Popup>
             </CircleMarker>
@@ -44,7 +44,7 @@ export function ItineraryMap({ points }: ItineraryMapProps) {
           <FitToPoints points={latlngs} />
         </MapContainer>
       </div>
-      <p className="text-xs text-slate-600">Đường nối là đường chim bay (ước lượng), không phải đường đi thực tế.</p>
+      <p className="text-xs text-muc-soft">Đường nối là đường chim bay (ước lượng), không phải đường đi thực tế.</p>
     </div>
   );
 }

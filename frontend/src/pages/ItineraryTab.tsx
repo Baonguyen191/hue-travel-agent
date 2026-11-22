@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { ItineraryEvent, Place } from "../api/types";
+import { Chip, Notice, PlacePhoto, cardClass } from "../components/ui";
 import { ItineraryMap, type ItineraryPoint } from "../components/ItineraryMap";
 import { placeDetailPath, openingHoursText } from "../components/PlaceCard";
 import { describePrice, formatMinutes } from "../lib/format";
 import { describePoiCost, poiCostIndex } from "../lib/poiCost";
-import { CATEGORY_COLOR } from "../lib/labels";
 import {
   categoryLabel,
   dayTitle,
@@ -26,60 +26,78 @@ function sharedNotes(events: ItineraryEvent[]): Set<string> {
   return new Set([...counts].filter(([, count]) => count >= 2).map(([note]) => note));
 }
 
-const FALLBACK_COLOR = "#475569";
-
-function markerColor(event: ItineraryEvent): string {
-  if (event.category && event.category in CATEGORY_COLOR) {
-    return CATEGORY_COLOR[event.category as keyof typeof CATEGORY_COLOR];
-  }
-  return FALLBACK_COLOR;
+/** Every stop is a burgundy marker on the day map; category colours stay on the explore map. */
+function markerColor(_event: ItineraryEvent): string {
+  return "#7a1f1f";
 }
 
-function EventItem({ event, place, priceText, shared }: { event: ItineraryEvent; place: Place | undefined; priceText: string; shared: Set<string> }) {
+function EventItem({ event, number, place, priceText, shared }: { event: ItineraryEvent; number: number; place: Place | undefined; priceText: string; shared: Set<string> }) {
   const ownNotes = translateWarnings(event.warnings).filter((note) => !shared.has(note));
   const isPlace = event.kind === "VISIT" || event.kind === "MEAL";
+  const showPhoto = Boolean(event.poi_id) && isPlace;
   return (
-    <li className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <time className="text-sm font-semibold text-slate-800">{timeRange(event)}</time>
-        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">{eventKindLabel(event)}</span>
+    <li className={cardClass("relative overflow-visible p-3 sm:flex sm:gap-4")}>
+      <span
+        aria-hidden="true"
+        className="absolute -left-[2.3rem] top-4 flex h-6 w-6 items-center justify-center rounded-full bg-son text-xs font-bold text-on-son ring-2 ring-kim"
+      >
+        {number}
+      </span>
+      {showPhoto ? (
+        <PlacePhoto
+          poiId={event.poi_id}
+          name={event.name}
+          category={event.category}
+          size="md"
+          className="mb-3 w-full shrink-0 rounded-xl sm:mb-0 sm:w-44"
+        />
+      ) : (
+        <div aria-hidden="true" className="mb-3 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-kim-soft text-2xl sm:mb-0">
+          {event.kind === "MEAL" || event.kind === "MEAL_BREAK" ? "🍜" : "•"}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <time className="text-sm font-semibold text-son">{timeRange(event)}</time>
+          <Chip tone="soft">{eventKindLabel(event)}</Chip>
+        </div>
+        <h3 className="mt-1 font-serif text-base font-semibold leading-snug text-muc">
+          {event.poi_id ? (
+            <Link to={placeDetailPath(event.poi_id)} className="hover:text-son hover:underline decoration-kim">
+              {event.name}
+            </Link>
+          ) : (
+            event.name
+          )}
+        </h3>
+        <dl className="mt-2 grid grid-cols-[7.5rem_1fr] gap-x-2 gap-y-1 text-sm">
+          <dt className="text-muc-soft">Loại</dt>
+          <dd>{categoryLabel(event.category)}</dd>
+          <dt className="text-muc-soft">Di chuyển</dt>
+          <dd>{travelText(event)}</dd>
+          {event.kind === "VISIT" ? (
+            <>
+              <dt className="text-muc-soft">Thời gian tham quan</dt>
+              <dd>{formatMinutes(event.visit_minutes)}</dd>
+            </>
+          ) : null}
+          {isPlace ? (
+            <>
+              <dt className="text-muc-soft">Giá tham khảo</dt>
+              <dd>{priceText}</dd>
+              <dt className="text-muc-soft">Giờ mở cửa</dt>
+              <dd>{place ? openingHoursText(place) : "chưa xác minh"}</dd>
+            </>
+          ) : null}
+        </dl>
+        {ownNotes.length > 0 ? (
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-muc marker:text-kim">
+            {ownNotes.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
+        ) : null}
       </div>
-      <h3 className="mt-1 text-base font-semibold leading-snug">
-        {event.poi_id ? (
-          <Link to={placeDetailPath(event.poi_id)} className="hover:text-teal-800 hover:underline">
-            {event.name}
-          </Link>
-        ) : (
-          event.name
-        )}
-      </h3>
-      <dl className="mt-2 grid grid-cols-[7.5rem_1fr] gap-x-2 gap-y-1 text-sm">
-        <dt className="text-slate-500">Loại</dt>
-        <dd>{categoryLabel(event.category)}</dd>
-        <dt className="text-slate-500">Di chuyển</dt>
-        <dd>{travelText(event)}</dd>
-        {event.kind === "VISIT" ? (
-          <>
-            <dt className="text-slate-500">Thời gian tham quan</dt>
-            <dd>{formatMinutes(event.visit_minutes)}</dd>
-          </>
-        ) : null}
-        {isPlace ? (
-          <>
-            <dt className="text-slate-500">Giá tham khảo</dt>
-            <dd>{priceText}</dd>
-            <dt className="text-slate-500">Giờ mở cửa</dt>
-            <dd>{place ? openingHoursText(place) : "chưa xác minh"}</dd>
-          </>
-        ) : null}
-      </dl>
-      {ownNotes.length > 0 ? (
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-xs text-amber-900">
-          {ownNotes.map((warning) => (
-            <li key={warning}>{warning}</li>
-          ))}
-        </ul>
-      ) : null}
     </li>
   );
 }
@@ -93,7 +111,7 @@ export function ItineraryTab() {
   const people = record.payload.request.people;
 
   if (days.length === 0) {
-    return <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">Kế hoạch chưa có ngày nào.</p>;
+    return <p className="rounded-2xl border border-dashed border-vien bg-nga p-6 text-sm text-muc-soft">Kế hoạch chưa có ngày nào.</p>;
   }
 
   const index = Math.min(selected, days.length - 1);
@@ -129,8 +147,8 @@ export function ItineraryTab() {
             aria-selected={position === index}
             aria-controls="day-panel"
             onClick={() => setSelected(position)}
-            className={`shrink-0 rounded-full border px-3 py-1.5 text-sm font-medium ${
-              position === index ? "border-teal-700 bg-teal-700 text-white" : "border-slate-300 bg-white text-slate-700"
+            className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${
+              position === index ? "bg-son text-on-son ring-son" : "bg-nga text-son ring-vien"
             }`}
           >
             {dayTitle(position, item.date)}
@@ -146,20 +164,23 @@ export function ItineraryTab() {
       >
         <div className="min-w-0 space-y-4">
           {shared.size > 0 ? (
-            <ul aria-label="Ghi chú chung cho ngày" className="list-disc space-y-1 rounded-md bg-amber-50 p-3 pl-7 text-xs text-amber-900">
-              {[...shared].map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
+            <Notice variant="warning">
+              <ul aria-label="Ghi chú chung cho ngày" className="list-disc space-y-1 pl-5 text-xs">
+                {[...shared].map((note) => (
+                  <li key={note}>{note}</li>
+                ))}
+              </ul>
+            </Notice>
           ) : null}
           {events.length === 0 ? (
-            <p className="text-sm text-slate-600">Ngày này chưa có điểm đến.</p>
+            <p className="text-sm text-muc-soft">Ngày này chưa có điểm đến.</p>
           ) : (
-            <ol className="space-y-3">
+            <ol className="relative ml-3 space-y-3 border-l-2 border-dashed border-kim pl-6">
               {events.map((event, position) => (
                 <EventItem
                   key={`${event.start_at}-${position}`}
                   event={event}
+                  number={position + 1}
                   place={event.poi_id ? places.get(event.poi_id) : undefined}
                   priceText={priceFor(event)}
                   shared={shared}
