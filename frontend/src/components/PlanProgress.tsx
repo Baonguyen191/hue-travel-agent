@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { cardClass } from "./ui";
 
 /** The graph nodes in run order (backend/app/agents/orchestrator.py). */
 export const PIPELINE_STEPS: ReadonlyArray<{ node: string; label: string }> = [
@@ -39,11 +40,11 @@ export function PlanProgress({ active }: PlanProgressProps) {
   if (!active) return null;
 
   return (
-    <section aria-labelledby="progress-heading" role="status" className="rounded-lg border border-teal-200 bg-teal-50 p-4">
-      <h2 id="progress-heading" className="text-base font-semibold text-teal-900">
+    <section aria-labelledby="progress-heading" role="status" className={cardClass("p-4")}>
+      <h2 id="progress-heading" className="font-serif text-base font-semibold text-son">
         Đang tạo lịch trình…
       </h2>
-      <p className="mt-1 text-sm text-teal-900">Quá trình thường mất vài giây.</p>
+      <p className="mt-1 text-sm text-muc-soft">Quá trình thường mất vài giây.</p>
       <ol className="mt-3 space-y-2 text-sm">
         {PIPELINE_STEPS.map((step, index) => {
           const done = index < current;
@@ -53,12 +54,12 @@ export function PlanProgress({ active }: PlanProgressProps) {
               <span
                 aria-hidden="true"
                 className={`flex size-5 items-center justify-center rounded-full text-xs font-bold ${
-                  done ? "bg-teal-700 text-white" : running ? "animate-pulse bg-teal-300 text-teal-900" : "bg-white text-slate-400 ring-1 ring-slate-300"
+                  done ? "bg-kim text-muc" : running ? "animate-pulse bg-son text-on-son ring-2 ring-kim" : "bg-vien text-muc-soft"
                 }`}
               >
                 {done ? "✓" : index + 1}
               </span>
-              <span className={running ? "font-semibold text-teal-900" : done ? "text-teal-800" : "text-slate-500"}>
+              <span className={running ? "font-semibold text-son" : "text-muc-soft"}>
                 {step.label}
               </span>
             </li>
@@ -71,13 +72,13 @@ export function PlanProgress({ active }: PlanProgressProps) {
 
 /** The steps the graph actually ran, from the server's trace (repeats appear on retries). */
 export function TraceList({ trace }: { trace: string[] }) {
-  if (trace.length === 0) return <p className="text-sm text-slate-600">Máy chủ không trả về các bước đã chạy.</p>;
+  if (trace.length === 0) return <p className="text-sm text-muc-soft">Máy chủ không trả về các bước đã chạy.</p>;
   return (
-    <ol aria-label="Các bước đã chạy" className="flex flex-wrap items-center gap-1 text-sm text-slate-700">
+    <ol aria-label="Các bước đã chạy" className="flex flex-wrap items-center gap-1 text-sm text-muc-soft">
       {trace.map((node, index) => (
         <li key={`${node}-${index}`} className="flex items-center gap-1">
-          {index > 0 ? <span aria-hidden="true" className="text-slate-400">→</span> : null}
-          <span className="rounded bg-slate-100 px-2 py-0.5">{TRACE_LABEL[node] ?? node}</span>
+          {index > 0 ? <span aria-hidden="true" className="text-muc-soft">→</span> : null}
+          <span className="rounded bg-nga px-2 py-0.5 ring-1 ring-vien">{TRACE_LABEL[node] ?? node}</span>
         </li>
       ))}
     </ol>

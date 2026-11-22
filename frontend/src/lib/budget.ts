@@ -50,10 +50,10 @@ export function sourceTag(item: CostItem): SourceTag {
 }
 
 export const SOURCE_TAG_CLASS: Record<SourceTag["tone"], string> = {
-  mock: "bg-violet-100 text-violet-900 ring-violet-300",
-  data: "bg-sky-100 text-sky-900 ring-sky-300",
-  estimate: "bg-amber-100 text-amber-900 ring-amber-300",
-  unknown: "bg-slate-200 text-slate-800 ring-slate-400",
+  mock: "bg-muc text-on-son ring-muc",
+  data: "bg-nga text-muc-soft ring-vien",
+  estimate: "bg-canh-bao text-muc ring-kim/50",
+  unknown: "bg-vien text-muc ring-muc-soft/40",
 };
 
 /** An option fits when its status is within budget, including the version that excludes unknown items. */

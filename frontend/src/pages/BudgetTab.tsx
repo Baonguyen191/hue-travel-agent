@@ -2,6 +2,7 @@ import { useState } from "react";
 import { api, errorMessage, isStale } from "../api/client";
 import type { ApprovalResult, BudgetOption, CostItem, OptionLabel, TransportOffer, HotelOffer } from "../api/types";
 import { ErrorBanner } from "../components/ErrorBanner";
+import { LINK, Notice, PILL, TONE_CLASS, buttonClass, cardClass } from "../components/ui";
 import { formatVnd, formatVndRange } from "../lib/format";
 import {
   SOURCE_TAG_CLASS,
@@ -13,16 +14,9 @@ import {
   sourceTag,
   unitText,
 } from "../lib/budget";
-import { isApproved, isWaiting, type StatusTone } from "../lib/plan";
+import { isApproved, isWaiting } from "../lib/plan";
 import { translateWarning, translateWarnings } from "../lib/warnings";
 import { usePlan } from "./PlanLayout";
-
-const TONE_CLASS: Record<StatusTone, string> = {
-  approved: "bg-emerald-100 text-emerald-900 ring-emerald-300",
-  waiting: "bg-amber-100 text-amber-900 ring-amber-300",
-  failed: "bg-red-100 text-red-900 ring-red-300",
-  neutral: "bg-slate-100 text-slate-800 ring-slate-300",
-};
 
 function transportText(offer: TransportOffer | null): string {
   return offer ? `${offer.provider} · ${formatVnd(offer.price_vnd)}` : "—";
@@ -41,13 +35,13 @@ function remainingText(option: BudgetOption): string {
 function CostItemRow({ item }: { item: CostItem }) {
   const tag = sourceTag(item);
   return (
-    <li className="flex flex-col gap-1 border-t border-slate-100 py-2 text-sm sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+    <li className="flex flex-col gap-1 py-2 text-sm sm:flex-row sm:items-start sm:justify-between sm:gap-3">
       <div className="min-w-0">
-        <p className="font-medium text-slate-800">{item.label}</p>
-        <p className="text-xs text-slate-600">
+        <p className="font-medium text-muc">{item.label}</p>
+        <p className="text-xs text-muc-soft">
           {item.quantity} × {unitText(item.price_unit)}
         </p>
-        {item.note ? <p className="text-xs text-slate-600">{translateWarning(item.note)}</p> : null}
+        {item.note ? <p className="text-xs text-muc-soft">{translateWarning(item.note)}</p> : null}
       </div>
       <div className="flex shrink-0 items-center gap-2 sm:flex-col sm:items-end">
         <span className="font-medium">{formatVndRange(item.amount_vnd, item.amount_max_vnd)}</span>
@@ -97,48 +91,48 @@ export function BudgetTab() {
           type="button"
           disabled={approving !== null}
           onClick={() => approve(option.label as OptionLabel)}
-          className="rounded-md bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-800 disabled:opacity-50"
+          className={buttonClass("primary", "sm")}
         >
           {approving === option.label ? "Đang duyệt…" : `Duyệt ${optionLabelText(option.label)}`}
         </button>
       );
     }
     return (
-      <span className="text-xs text-slate-500">{option.label === null ? "Không thể duyệt" : approved ? "" : "Không chờ duyệt"}</span>
+      <span className="text-xs text-muc-soft">{option.label === null ? "Không thể duyệt" : approved ? "" : "Không chờ duyệt"}</span>
     );
   }
 
   return (
     <div className="space-y-6">
       {!fits && budget.options.length > 0 ? (
-        <section role="alert" aria-labelledby="shortfall-heading" className="space-y-2 rounded-lg border border-red-300 bg-red-50 p-4">
-          <h2 id="shortfall-heading" className="text-base font-semibold text-red-900">
+        <Notice variant="error" role="alert" aria-labelledby="shortfall-heading" className="space-y-2">
+          <h2 id="shortfall-heading" className="font-serif text-base font-semibold text-son">
             Không phương án nào nằm trong ngân sách
           </h2>
           {budget.shortfall_vnd !== null ? (
-            <p className="text-sm font-medium text-red-900">
+            <p className="text-sm font-medium text-muc">
               Thiếu {formatVnd(budget.shortfall_vnd)} so với ngân sách {formatVnd(record.payload.request.budget_vnd)}.
             </p>
           ) : null}
           {warnings.length > 0 ? (
-            <ul className="list-disc space-y-1 pl-5 text-sm text-red-900">
+            <ul className="list-disc space-y-1 pl-5 text-sm text-muc">
               {warnings.map((warning) => (
                 <li key={warning}>{warning}</li>
               ))}
             </ul>
           ) : null}
-        </section>
+        </Notice>
       ) : null}
 
       {approved && approval ? (
-        <section aria-labelledby="approved-heading" className="space-y-2 rounded-lg border border-emerald-300 bg-emerald-50 p-4">
-          <h2 id="approved-heading" className="text-base font-semibold text-emerald-900">
+        <Notice variant="success" role="region" aria-labelledby="approved-heading" className="space-y-2">
+          <h2 id="approved-heading" className="font-serif text-base font-semibold text-reu">
             Đã duyệt phương án {optionLabelText(approval.option)}
           </h2>
-          <p className="text-sm text-emerald-900">
+          <p className="text-sm text-muc">
             Phiên bản {approval.version} · mã báo giá <code className="break-all">{approval.quote_hash.slice(0, 16)}</code>
           </p>
-          <ul className="text-sm text-emerald-900">
+          <ul className="text-sm text-muc">
             {approval.selected_offers.map((offer) => (
               <li key={`${offer.kind}-${offer.id}-${offer.leg ?? ""}`}>
                 {offer.kind === "TRANSPORT" ? `Xe ${offer.leg === "RETURN" ? "về" : "đi"}` : "Khách sạn"}: {offer.name} ·{" "}
@@ -146,11 +140,11 @@ export function BudgetTab() {
               </li>
             ))}
           </ul>
-        </section>
+        </Notice>
       ) : null}
 
       {waiting ? (
-        <p className="text-sm text-slate-700">
+        <p className="text-sm text-muc-soft">
           Chỉ phương án có nhãn mới duyệt được. Các phương án chưa có nhãn để bạn so sánh.
         </p>
       ) : null}
@@ -159,7 +153,7 @@ export function BudgetTab() {
         <div className="space-y-2">
           <ErrorBanner message={approveError.stale ? "Kế hoạch đã có phiên bản mới — tải lại để xem." : approveError.message} />
           {approveError.stale ? (
-            <button type="button" onClick={reload} className="text-sm font-medium text-teal-800 underline">
+            <button type="button" onClick={reload} className={`text-sm ${LINK}`}>
               Tải lại kế hoạch
             </button>
           ) : null}
@@ -167,33 +161,33 @@ export function BudgetTab() {
       ) : null}
 
       {/* Below md: one card per option, with the approve control always in view. */}
-      <ul aria-label="Các phương án ngân sách" className="space-y-3 md:hidden">
+      <ul aria-label="Các phương án ngân sách" className="grid gap-3 md:hidden">
         {budget.options.map((option, index) => (
-          <li key={`card-${option.label ?? "none"}-${index}`} className="space-y-3 rounded-lg border border-slate-200 bg-white p-4">
+          <li key={`card-${option.label ?? "none"}-${index}`} className={`space-y-3 ${cardClass("p-4")}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-semibold">Phương án {optionLabelText(option.label)}</p>
-              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${TONE_CLASS[budgetStatusTone(option.budget_status)]}`}>
+              <p className="font-serif font-semibold text-son">Phương án {optionLabelText(option.label)}</p>
+              <span className={`${PILL} ${TONE_CLASS[budgetStatusTone(option.budget_status)]}`}>
                 {budgetStatusLabel(option.budget_status)}
               </span>
             </div>
             <div>
-              <p className="text-xs text-slate-600">Tổng (tham khảo)</p>
+              <p className="text-xs text-muc-soft">Tổng (tham khảo)</p>
               <p className="font-medium">{formatVndRange(option.known_total_vnd, option.known_total_max_vnd)}</p>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-muc-soft">
                 {remainingText(option)} · {option.unknown_item_count} mục chưa rõ
               </p>
             </div>
             <dl className="space-y-1 text-sm">
               <div>
-                <dt className="inline text-slate-600">Xe đi: </dt>
+                <dt className="inline text-muc-soft">Xe đi: </dt>
                 <dd className="inline">{transportText(option.transport_outbound)}</dd>
               </div>
               <div>
-                <dt className="inline text-slate-600">Xe về: </dt>
+                <dt className="inline text-muc-soft">Xe về: </dt>
                 <dd className="inline">{transportText(option.transport_return)}</dd>
               </div>
               <div>
-                <dt className="inline text-slate-600">Khách sạn: </dt>
+                <dt className="inline text-muc-soft">Khách sạn: </dt>
                 <dd className="inline">{hotelText(option.hotel)}</dd>
               </div>
             </dl>
@@ -207,38 +201,38 @@ export function BudgetTab() {
         <table className="w-full border-separate border-spacing-0 text-left text-sm">
           <caption className="sr-only">Các phương án ngân sách</caption>
           <thead>
-            <tr className="text-xs uppercase tracking-wide text-slate-600">
-              <th scope="col" className="border-b border-slate-200 py-2 pr-3 font-semibold">Phương án</th>
-              <th scope="col" className="border-b border-slate-200 py-2 pr-3 font-semibold">Xe đi</th>
-              <th scope="col" className="border-b border-slate-200 py-2 pr-3 font-semibold">Xe về</th>
-              <th scope="col" className="border-b border-slate-200 py-2 pr-3 font-semibold">Khách sạn</th>
-              <th scope="col" className="border-b border-slate-200 py-2 pr-3 font-semibold">Tổng (tham khảo)</th>
-              <th scope="col" className="border-b border-slate-200 py-2 pr-3 font-semibold">Trạng thái</th>
-              <th scope="col" className="border-b border-slate-200 py-2 font-semibold">Duyệt</th>
+            <tr className="text-xs uppercase tracking-wide text-muc-soft">
+              <th scope="col" className="border-b border-vien py-2 pr-3 font-semibold">Phương án</th>
+              <th scope="col" className="border-b border-vien py-2 pr-3 font-semibold">Xe đi</th>
+              <th scope="col" className="border-b border-vien py-2 pr-3 font-semibold">Xe về</th>
+              <th scope="col" className="border-b border-vien py-2 pr-3 font-semibold">Khách sạn</th>
+              <th scope="col" className="border-b border-vien py-2 pr-3 font-semibold">Tổng (tham khảo)</th>
+              <th scope="col" className="border-b border-vien py-2 pr-3 font-semibold">Trạng thái</th>
+              <th scope="col" className="border-b border-vien py-2 font-semibold">Duyệt</th>
             </tr>
           </thead>
           <tbody>
             {budget.options.map((option, index) => (
               <tr key={`${option.label ?? "none"}-${index}`} className="align-top">
-                <td className="border-b border-slate-100 py-3 pr-3">
+                <td className="border-b border-vien py-3 pr-3">
                   <p className="font-semibold">{optionLabelText(option.label)}</p>
-                  {option.label === null ? <p className="text-xs text-slate-500">chưa có nhãn</p> : null}
+                  {option.label === null ? <p className="text-xs text-muc-soft">chưa có nhãn</p> : null}
                 </td>
-                <td className="border-b border-slate-100 py-3 pr-3">{transportText(option.transport_outbound)}</td>
-                <td className="border-b border-slate-100 py-3 pr-3">{transportText(option.transport_return)}</td>
-                <td className="border-b border-slate-100 py-3 pr-3">{hotelText(option.hotel)}</td>
-                <td className="border-b border-slate-100 py-3 pr-3">
+                <td className="border-b border-vien py-3 pr-3">{transportText(option.transport_outbound)}</td>
+                <td className="border-b border-vien py-3 pr-3">{transportText(option.transport_return)}</td>
+                <td className="border-b border-vien py-3 pr-3">{hotelText(option.hotel)}</td>
+                <td className="border-b border-vien py-3 pr-3">
                   <p className="font-medium">{formatVndRange(option.known_total_vnd, option.known_total_max_vnd)}</p>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-muc-soft">
                     {remainingText(option)} · {option.unknown_item_count} mục chưa rõ
                   </p>
                 </td>
-                <td className="border-b border-slate-100 py-3 pr-3">
-                  <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ${TONE_CLASS[budgetStatusTone(option.budget_status)]}`}>
+                <td className="border-b border-vien py-3 pr-3">
+                  <span className={`${PILL} ${TONE_CLASS[budgetStatusTone(option.budget_status)]}`}>
                     {budgetStatusLabel(option.budget_status)}
                   </span>
                 </td>
-                <td className="border-b border-slate-100 py-3">{approveControl(option)}</td>
+                <td className="border-b border-vien py-3">{approveControl(option)}</td>
               </tr>
             ))}
           </tbody>
@@ -246,25 +240,25 @@ export function BudgetTab() {
       </div>
 
       <section aria-labelledby="items-heading" className="space-y-3">
-        <h2 id="items-heading" className="text-base font-semibold">
+        <h2 id="items-heading" className="font-serif text-base font-semibold text-son">
           Chi tiết chi phí
         </h2>
         {budget.options.map((option, index) => (
-          <details key={`items-${index}`} className="rounded-lg border border-slate-200 bg-white p-4">
-            <summary className="cursor-pointer text-sm font-semibold">
+          <details key={`items-${index}`} className={cardClass("p-4")}>
+            <summary className="cursor-pointer text-sm font-semibold text-muc">
               Phương án {optionLabelText(option.label)} · {option.items.length} mục
             </summary>
             {option.items.length === 0 ? (
-              <p className="pt-2 text-sm text-slate-600">Không có mục chi phí.</p>
+              <p className="pt-2 text-sm text-muc-soft">Không có mục chi phí.</p>
             ) : (
-              <ul className="pt-2">
+              <ul className="divide-y divide-vien pt-2">
                 {option.items.map((item, itemIndex) => (
                   <CostItemRow key={`${item.code}-${itemIndex}`} item={item} />
                 ))}
               </ul>
             )}
             {option.warnings.length > 0 ? (
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-amber-900">
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muc-soft">
                 {translateWarnings(option.warnings).map((warning) => (
                   <li key={warning}>{warning}</li>
                 ))}
@@ -274,7 +268,7 @@ export function BudgetTab() {
         ))}
       </section>
 
-      <p className="text-xs text-slate-600">
+      <p className="text-xs text-muc-soft">
         Mọi giá là tham khảo; đơn vị của giá nguồn chưa rõ. Mục MOCK là đặt chỗ mô phỏng.
       </p>
     </div>
