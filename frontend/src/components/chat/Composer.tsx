@@ -1,14 +1,21 @@
-import { useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useState, type FormEvent, type KeyboardEvent } from "react";
+import { buttonClass } from "../ui";
 
 interface ComposerProps {
   disabled: boolean;
   onSend: (text: string) => void;
+  /** Text to put in the field (not sent). A new nonce refills even with the same text. */
+  prefill?: { text: string; nonce: number };
 }
 
 /** Message input. Enter sends; Shift+Enter starts a new line; IME composition never sends. */
-export function Composer({ disabled, onSend }: ComposerProps) {
-  const [draft, setDraft] = useState("");
+export function Composer({ disabled, onSend, prefill }: ComposerProps) {
+  const [draft, setDraft] = useState(prefill?.text ?? "");
   const canSend = !disabled && draft.trim() !== "";
+
+  useEffect(() => {
+    if (prefill) setDraft(prefill.text);
+  }, [prefill?.nonce, prefill?.text]);
 
   function send() {
     if (!canSend) return;
@@ -39,16 +46,12 @@ export function Composer({ disabled, onSend }: ComposerProps) {
         onChange={(event) => setDraft(event.target.value)}
         onKeyDown={onKeyDown}
         placeholder="Ví dụ: Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người"
-        className="min-h-[3rem] w-full flex-1 resize-y rounded-md border border-slate-300 bg-white px-3 py-2 text-base focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-200"
+        className="min-h-[3rem] w-full flex-1 resize-y rounded-2xl border border-vien bg-nga px-4 py-2.5 text-base text-muc placeholder:text-muc-soft/70 focus:border-kim focus:outline-none focus:ring-2 focus:ring-kim/40"
       />
-      <button
-        type="submit"
-        disabled={!canSend}
-        className="rounded-md bg-teal-700 px-5 py-2.5 font-medium text-white hover:bg-teal-800 disabled:opacity-50"
-      >
+      <button type="submit" disabled={!canSend} className={buttonClass("primary")}>
         Gửi
       </button>
-      <p className="text-xs text-slate-500">Enter để gửi, Shift+Enter để xuống dòng.</p>
+      <p className="text-xs text-muc-soft">Enter để gửi, Shift+Enter để xuống dòng.</p>
     </form>
   );
 }

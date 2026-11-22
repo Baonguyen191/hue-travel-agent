@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { api, errorMessage, isForbidden, isNotFound } from "../api/client";
 import { ErrorBanner } from "../components/ErrorBanner";
+import { ChatWelcome } from "../components/chat/ChatWelcome";
 import { Composer } from "../components/chat/Composer";
 import { MessageBubble } from "../components/chat/MessageBubble";
 import {
@@ -11,6 +12,7 @@ import {
   type ChatMessage,
 } from "../lib/chat";
 import { newUuid } from "../lib/ids";
+import { LINK, SectionHeading, buttonClass } from "../components/ui";
 
 const FORBIDDEN_NOTICE =
   "Cuộc trò chuyện đã lưu thuộc về người dùng khác, nên mình đã mở cuộc trò chuyện mới.";
@@ -24,6 +26,12 @@ export function ChatPage() {
   const [error, setError] = useState<string | null>(null);
   const currentId = useRef(conversationId);
   const endRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const [prefill, setPrefill] = useState<{ text: string; nonce: number } | undefined>(() => {
+    const text = (location.state as { prefill?: unknown } | null)?.prefill;
+    return typeof text === "string" && text ? { text, nonce: 0 } : undefined;
+  });
+  const pick = (text: string) => setPrefill((current) => ({ text, nonce: (current?.nonce ?? 0) + 1 }));
 
   useEffect(() => {
     let active = true;
@@ -93,15 +101,15 @@ export function ChatPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold text-slate-900">Trò chuyện</h1>
-        <div className="flex flex-wrap gap-2">
-          <Link to="/form" className="rounded-md px-3 py-2 text-sm font-medium text-teal-800 underline">
+        <SectionHeading as="h1">Trò chuyện</SectionHeading>
+        <div className="flex flex-wrap items-center gap-3">
+          <Link to="/form" className={`${LINK} text-sm`}>
             Nhập bằng form
           </Link>
           <button
             type="button"
             onClick={() => switchConversation(startNewConversation())}
-            className="rounded-md border border-slate-400 bg-white px-3 py-2 text-sm font-medium text-slate-800 hover:bg-slate-100"
+            className={buttonClass("outline", "sm")}
           >
             Cuộc trò chuyện mới
           </button>
@@ -110,14 +118,9 @@ export function ChatPage() {
 
       {error ? <ErrorBanner message={error} /> : null}
 
-      <section aria-label="Nội dung trò chuyện" className="flex min-h-[12rem] flex-col gap-3 rounded-lg bg-slate-100/60 p-3 md:p-4">
-        {loading && messages.length === 0 ? <p className="text-sm text-slate-600">Đang tải lịch sử…</p> : null}
-        {!loading && messages.length === 0 ? (
-          <p className="text-sm leading-relaxed text-slate-700">
-            Hãy kể chuyến đi Huế của bạn: ngày đi, số ngày, xuất phát từ đâu, số người và ngân sách. Bạn cũng có thể hỏi
-            giờ mở cửa của một địa điểm.
-          </p>
-        ) : null}
+      <section aria-label="Nội dung trò chuyện" className="flex min-h-[12rem] flex-col gap-3 rounded-2xl p-1 md:p-2">
+        {loading && messages.length === 0 ? <p className="text-sm text-muc-soft">Đang tải lịch sử…</p> : null}
+        {!loading && messages.length === 0 ? <ChatWelcome onPick={pick} /> : null}
         <div role="log" aria-live="polite" className="flex flex-col gap-3">
           {messages.map((message, index) => (
             <MessageBubble
@@ -130,7 +133,7 @@ export function ChatPage() {
           ))}
           {waiting ? (
             <div role="status" className="flex justify-start">
-              <p className="rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
+              <p className="animate-pulse rounded-2xl rounded-bl-sm bg-son px-4 py-2 text-sm text-on-son">
                 đang suy nghĩ…
               </p>
             </div>
@@ -139,7 +142,7 @@ export function ChatPage() {
         <div ref={endRef} />
       </section>
 
-      <Composer disabled={waiting} onSend={(text) => void send(text)} />
+      <Composer disabled={waiting} onSend={(text) => void send(text)} prefill={prefill} />
     </div>
   );
 }

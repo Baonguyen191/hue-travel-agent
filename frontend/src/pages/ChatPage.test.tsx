@@ -12,6 +12,7 @@ import chatClarify1 from "../test/fixtures/chat/chat-clarify-1.json";
 import chatClarify2 from "../test/fixtures/chat/chat-clarify-2.json";
 import chatPlaceFixture from "../test/fixtures/chat/chat-02-place.json";
 import chatPlanFixture from "../test/fixtures/chat/chat-01-plan.json";
+import { SAMPLE_QUESTIONS } from "../components/chat/ChatWelcome";
 import { ChatPage } from "./ChatPage";
 
 /** A captured API response: the status and body the real backend returned. */
@@ -93,9 +94,9 @@ function historyOf(turns: Capture[]): Capture {
   return { status: 200, body: { conversation_id: CONVERSATION, messages } };
 }
 
-function renderChat() {
+function renderChat(state?: { prefill: string }) {
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[{ pathname: "/", state }]}>
       <ChatPage />
     </MemoryRouter>,
   );
@@ -207,7 +208,8 @@ describe("ChatPage", () => {
 
     const card = await screen.findByRole("region", { name: "Lịch trình" });
     expect(within(card).getByText("Ngày 1 · 05/12/2026")).toBeInTheDocument();
-    expect(within(card).getByText("Đại Nội Huế")).toBeInTheDocument();
+    // The fixture predates poi_id, so the item falls back to an illustration that also names the place.
+    expect(within(card).getAllByText("Đại Nội Huế").length).toBeGreaterThan(0);
     expect(within(card).getByText("08:01")).toBeInTheDocument();
     expect(within(card).getByRole("link", { name: "Xem chi tiết" })).toHaveAttribute(
       "href",
@@ -274,5 +276,22 @@ describe("ChatPage", () => {
     renderChat();
 
     expect(screen.getByRole("link", { name: "Nhập bằng form" })).toHaveAttribute("href", "/form");
+  });
+
+  it("fills the composer from a sample question without sending", async () => {
+    const stub = stubChatApi(null, []);
+    renderChat();
+
+    await userEvent.click(await screen.findByRole("button", { name: SAMPLE_QUESTIONS[1] }));
+
+    expect(screen.getByRole("textbox", { name: "Tin nhắn" })).toHaveValue(SAMPLE_QUESTIONS[1]);
+    expect(stub.sent).toEqual([]);
+  });
+
+  it("fills the composer from router state", async () => {
+    stubChatApi(null, []);
+    renderChat({ prefill: "Đại Nội Huế có gì hay?" });
+
+    expect(await screen.findByRole("textbox", { name: "Tin nhắn" })).toHaveValue("Đại Nội Huế có gì hay?");
   });
 });

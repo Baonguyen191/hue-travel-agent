@@ -361,6 +361,8 @@ export interface ChatPlanItem {
   name: string;
   kind: string;
   meal: "LUNCH" | "DINNER" | "CAFE" | null;
+  /** Null for breaks and stops without a source POI. */
+  poi_id: string | null;
 }
 
 export interface ChatPlanDay {

@@ -7,6 +7,7 @@ import {
   visibleQuickReplies,
   type ChatMessage,
 } from "../../lib/chat";
+import { buttonClass } from "../ui";
 import { ChatCardView } from "./ChatCards";
 
 interface MessageBubbleProps {
@@ -17,15 +18,16 @@ interface MessageBubbleProps {
   onSend: (text: string) => void;
 }
 
-const CHIP =
-  "rounded-full border border-teal-700 bg-white px-3 py-1.5 text-sm font-medium text-teal-800 hover:bg-teal-50 disabled:opacity-50";
+/** Outline button for use directly on the dark red bot bubble (the shared outline variant is son-on-son there). */
+const ON_SON_OUTLINE =
+  "inline-flex items-center justify-center rounded-full border-[1.5px] border-kim px-3 py-1.5 text-sm font-semibold text-on-son transition-colors hover:bg-son-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kim disabled:cursor-not-allowed disabled:opacity-50";
 
 /** One message of the transcript: a user bubble, or a bot bubble with its cards, buttons and source tag. */
 export function MessageBubble({ message, isLast, disabled, onSend }: MessageBubbleProps) {
   if (message.role === "user") {
     return (
       <div className="flex justify-end">
-        <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-sm bg-teal-700 px-4 py-2 text-white md:max-w-[75%]">
+        <p className="max-w-[85%] whitespace-pre-wrap break-words rounded-2xl rounded-br-sm border border-vien bg-nga px-4 py-2 text-muc md:max-w-[75%]">
           {message.text}
         </p>
       </div>
@@ -38,7 +40,7 @@ export function MessageBubble({ message, isLast, disabled, onSend }: MessageBubb
 
   return (
     <article aria-label="Trợ lý" className="flex justify-start">
-      <div className="max-w-[92%] rounded-2xl rounded-bl-sm border border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm md:max-w-[80%]">
+      <div className="max-w-[92%] rounded-2xl rounded-bl-sm bg-son px-4 py-3 text-on-son md:max-w-[80%]">
         <p className="whitespace-pre-wrap break-words">{message.text}</p>
         {reply?.cards.map((card, index) => (
           <ChatCardView
@@ -55,7 +57,7 @@ export function MessageBubble({ message, isLast, disabled, onSend }: MessageBubb
               type="button"
               disabled={disabled}
               onClick={() => onSend(CONFIRM_BUTTON.text)}
-              className="rounded-md bg-teal-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-teal-800 disabled:opacity-50"
+              className={buttonClass("secondary", "sm")}
             >
               {CONFIRM_BUTTON.label}
             </button>
@@ -63,7 +65,7 @@ export function MessageBubble({ message, isLast, disabled, onSend }: MessageBubb
               type="button"
               disabled={disabled}
               onClick={() => onSend(CANCEL_BUTTON.text)}
-              className="rounded-md border border-slate-400 bg-white px-3 py-1.5 text-sm font-medium text-slate-800 hover:bg-slate-100 disabled:opacity-50"
+              className={ON_SON_OUTLINE}
             >
               {CANCEL_BUTTON.label}
             </button>
@@ -72,14 +74,14 @@ export function MessageBubble({ message, isLast, disabled, onSend }: MessageBubb
         {chips.length > 0 ? (
           <div className="mt-3 flex flex-wrap gap-2">
             {chips.map((text) => (
-              <button key={text} type="button" disabled={disabled} onClick={() => onSend(text)} className={CHIP}>
+              <button key={text} type="button" disabled={disabled} onClick={() => onSend(text)} className={ON_SON_OUTLINE}>
                 {quickReplyLabel(text)}
               </button>
             ))}
           </div>
         ) : null}
         {reply ? (
-          <p className="mt-2 text-xs text-slate-500">{sourceTagText(reply.understanding.source)}</p>
+          <p className="mt-2 text-xs text-on-son/75">{sourceTagText(reply.understanding.source)}</p>
         ) : null}
       </div>
     </article>
