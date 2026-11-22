@@ -34,10 +34,10 @@ fully code-generated.
 ### 1.1 Index — `index.py`
 
 - One document per POI, no chunking. `document_text(place)` joins, in this order: name,
-  category label, type (theo nguồn), address, opening hours, price, rating, free flag,
-  summary. Missing fields are skipped.
+  category label, type (theo nguồn), address, opening hours, price (or "miễn phí" for a
+  free place), phone, rating, summary. Missing fields are skipped.
 - Embeddings: `bge-m3` through Ollama `POST /api/embed`, batches of 32.
-- Storage: a separate file `data/rag_index.sqlite` (git-ignored, rebuilt by the command
+- Storage: a separate file `backend/data/rag_index.sqlite` (git-ignored, rebuilt by the command
   below), table `place_embeddings(poi_id TEXT PRIMARY KEY, model TEXT, text_hash TEXT,
   dim INTEGER, vector BLOB)`, float32 little endian. `index.py` creates the table with
   `CREATE TABLE IF NOT EXISTS`. Alembic is not used: it manages the plan store
@@ -55,7 +55,8 @@ fully code-generated.
   into memory once (1587 × 1024 float32 ≈ 6.5 MB).
 - BM25 (Okapi, k1=1.5, b=0.75, written in the module, no new dependency) over
   `normalize_vietnamese(document_text)` tokens.
-- Dense: cosine between the query embedding and all vectors (numpy).
+- Dense: cosine between the query embedding and all vectors (numpy; `numpy>=1.26,<3` is
+  added to `backend/requirements.txt`, the only new dependency).
 - Fusion: reciprocal rank fusion, `score = Σ 1 / (60 + rank)` over the BM25 and dense
   top-50 lists.
 - Filters from `ParsedQuery`, applied before fusion:
@@ -63,7 +64,9 @@ fully code-generated.
   - anchor: if the question contains "gần" and a place after it links (the existing
     `link.py` rule from commit 392fbec), keep POIs within 2 km of the anchor and add
     `1 / (60 + distance_rank)` as a third RRF list. The anchor itself is removed from
-    the results.
+    the results;
+  - linked place without "gần": a one-item RRF list with that POI, so a single-place
+    question ranks its place first.
 - `retrieve(question, parsed, k=5) -> RetrievalResult {hits: [ {poi_id, score,
   bm25_rank, dense_rank, distance_km} ], mode: "hybrid" | "bm25"}`.
 - When the embedding table is empty, `bge-m3` is missing, or the embed call fails:
@@ -118,11 +121,13 @@ fully code-generated.
     `relevant_poi_ids` empty.
 - `scenarios_v1.jsonl`, 40 multi-turn chat scenarios, dev 25 / test 15. Each has `turns`
   (user texts) and `expect`:
-  - `handlers`: one handler name per turn (`plan_new`, `start_plan`, `modify`,
-    `place_info`, `ask_approve`, `run_approve`, `ask_book`, `run_book`, `clarify`,
-    `out_of_scope`);
+  - `handlers`: one handler name per turn (`plan_new`, `modify`, `place_info`,
+    `ask_approve`, `ask_book`, `out_of_scope`, `confirm_defaults`, `run_approve`,
+    `run_book`, `cancel`). A clarification question is `plan_new` with final state
+    `clarifying`;
   - `final_state`: `awaiting_approval | approved | booked | answered | clarifying |
-    refused | failed`;
+    confirming | refused | failed` (`confirming` = the bot asked to confirm an approval or
+    a booking);
   - `trace`: expected orchestrator node list for each plan run, including retries;
   - `tools_called` and `tools_not_called` (from `transport`, `hotel`, `booking`,
     `poi_search`, `rag`);
@@ -158,8 +163,9 @@ fully code-generated.
 ### 2.3 Fact checker — `app/rag/facts.py`
 
 Shared by the generator (production) and the evaluator. For each cited POI, find in the
-answer: times (`HH:MM`, `HHh`, `H giờ`), prices (`50.000đ`, `50k`, `50 nghìn`), phone
-numbers, and the address string. Each found value must match the cited POI's DB value
+answer: clock times (`HH:MM`, `HHhMM`; durations such as "2 giờ" are not checked, to avoid
+false alarms), prices with a unit (`50.000đ`, `50k`, `50 nghìn`), phone numbers, and the
+text after "địa chỉ". A fact is checked against the POIs cited in the same sentence. Each found value must match the cited POI's DB value
 (times inside the opening window string, prices inside `[price_min, price_max]`, phone
 digits equal, address token overlap ≥ 0.6). Returns a list of mismatches.
 
@@ -179,13 +185,15 @@ digits equal, address token overlap ≥ 0.6). Returns a list of mismatches.
 
 ### 2.5 Travel Planning metrics (every plan the scenarios produce)
 
-- **Budget Compliance Rate**: over plans with `budget_vnd`. Pass when the recommended
-  option has `known_total_max_vnd ≤ budget_vnd`, or, when gold says the budget is not
-  feasible, when the result reports `shortfall_vnd` and no option claims to fit.
+- **Budget Compliance Rate**: over scenarios with a budget, on the final plan. The budget
+  result has no "recommended" option, so: when gold says the budget is feasible, pass when
+  at least one option has `known_total_max_vnd ≤ budget_vnd` and no option labelled
+  `WITHIN_BUDGET` exceeds it; when gold says it is not feasible, pass when the result
+  reports `shortfall_vnd` and no option claims a `WITHIN_*` status.
 - **Schedule Feasibility Rate**: pass when `validate_itinerary` is valid, every VISIT
   lies inside its POI's opening window (`parse_simple_opening_window`; POIs without a
-  parsable window are not checked and are counted), and no day ends after the itinerary
-  day end in `ItineraryConfig`.
+  parsable window are not checked and are counted), and no event ends after 21:00
+  (`ItineraryConfig` has no day-end field; dinner starts from 18:00 and lasts 75 minutes).
 - **Constraint Satisfaction Rate**: pass when all of these hold: every `must_include`
   POI is scheduled; no `exclude` POI and no `exclude_categories` category appears as a
   visit, meal or cafe; number of days and start date equal the gold; each requested
@@ -195,7 +203,10 @@ digits equal, address token overlap ≥ 0.6). Returns a list of mismatches.
 
 - **End-to-End Latency**: wall time of `ChatService.handle` per turn, with the LLM on,
   turns run one after another (no concurrency). p50, p95 and mean, overall and per
-  handler. Measured on the scenario suite and on the RAG suite.
+  handler, on the scenario suite. On the RAG suite, latency is the time of understanding
+  plus `RagAnswerer.answer` for the question (the same work a `place_info` turn does).
+  The RAG suite calls understanding and the answerer directly, so RAG metrics do not
+  depend on routing; routing is measured on the scenario suite.
 - **Average Token Usage**: mean prompt, completion and total tokens per turn, split into
   extractor and RAG generator. Judge tokens and embedding tokens are reported separately
   and are not part of the headline.
