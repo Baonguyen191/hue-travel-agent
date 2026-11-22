@@ -70,7 +70,7 @@ export function PlaceDetailPage() {
 
   return (
     <div className="space-y-6">
-      <Link to="/explore" className={`${LINK} text-sm`}>
+      <Link to="/explore" className={`${LINK} mb-3 text-sm`}>
         ← Khám phá Huế
       </Link>
 
@@ -105,8 +105,7 @@ function PlaceDetail({ place }: { place: Place }) {
             name={place.name}
             category={place.category}
             size="lg"
-            aspect="16/9"
-            className="max-h-80"
+            aspect="banner"
           />
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-muc/85 via-muc/20 to-transparent" />
           <h1 className="absolute inset-x-4 bottom-3 font-serif text-2xl font-semibold leading-snug text-nga md:text-3xl">

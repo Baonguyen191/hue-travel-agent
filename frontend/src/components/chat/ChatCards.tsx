@@ -65,7 +65,7 @@ function PlanCardView({ card, live, disabled, onSend }: { card: ChatPlanCard; li
               <h4 className="font-serif font-medium text-son">
                 Ngày {index + 1} · {formatDate(day.date)}
               </h4>
-              <ol className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4">
+              <ol className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
                 {day.items.map((item, itemIndex) => (
                   <li key={`${day.date}-${itemIndex}`} className="min-w-0">
                     <PlacePhoto poiId={item.poi_id} name={item.name} category={null} size="sm" className="rounded-lg" />

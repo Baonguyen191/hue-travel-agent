@@ -121,8 +121,7 @@ export function PlanLayout() {
             name={hero?.name ?? `${request.origin} → ${request.destination}`}
             category={hero?.category ?? "historic"}
             size="lg"
-            aspect="16/9"
-            className="max-h-72"
+            aspect="banner"
           />
           <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-muc/85 via-muc/25 to-transparent" />
           <div className="absolute inset-x-4 bottom-3 text-nga">

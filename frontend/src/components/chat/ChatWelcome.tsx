@@ -14,7 +14,7 @@ export function ChatWelcome({ onPick }: { onPick: (text: string) => void }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-vien bg-nga">
       <div className="relative">
-        <PlacePhoto poiId={HERO_POI} name="Đại Nội Huế" category="historic" size="lg" aspect="16/9" />
+        <PlacePhoto poiId={HERO_POI} name="Đại Nội Huế" category="historic" size="lg" aspect="banner" />
         <div className="absolute inset-0 bg-gradient-to-t from-muc/80 via-muc/20 to-transparent" aria-hidden="true" />
         <p className="absolute bottom-3 left-4 right-4 font-serif text-xl font-semibold text-nga md:text-2xl">
           Chào bạn, mình là trợ lý du lịch Huế

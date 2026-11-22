@@ -3,7 +3,7 @@ import { API_BASE } from "../../api/client";
 import { PlaceIllustration } from "./PlaceIllustration";
 
 export type PhotoSize = "sm" | "md" | "lg";
-export type PhotoAspect = "4/3" | "16/9" | "1/1";
+export type PhotoAspect = "4/3" | "16/9" | "1/1" | "banner";
 
 export const PHOTO_WIDTH: Record<PhotoSize, number> = { sm: 160, md: 480, lg: 960 };
 
@@ -11,6 +11,7 @@ const ASPECT: Record<PhotoAspect, string> = {
   "4/3": "aspect-[4/3]",
   "16/9": "aspect-video",
   "1/1": "aspect-square",
+  banner: "h-48 w-full sm:h-64 md:h-80",
 };
 
 export function photoUrl(poiId: string, size: PhotoSize): string {

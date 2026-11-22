@@ -29,4 +29,11 @@ describe("PlacePhoto", () => {
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
     expect(screen.getByTestId("place-illustration")).toHaveAttribute("data-category", "default");
   });
+
+  it("fills the full width at fixed heights for the banner aspect", () => {
+    render(<PlacePhoto poiId="huetripo:1" name="Banner" category="historic" size="lg" aspect="banner" />);
+    const wrapper = screen.getByRole("img", { name: "Banner" }).parentElement;
+    expect(wrapper).toHaveClass("h-48", "w-full");
+    expect(wrapper).not.toHaveClass("aspect-video");
+  });
 });

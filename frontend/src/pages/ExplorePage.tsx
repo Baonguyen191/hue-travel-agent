@@ -112,7 +112,7 @@ export function ExplorePage() {
               Không có địa điểm nào khớp bộ lọc.
             </p>
           ) : (
-            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-4 sm:grid-cols-2">
               {load.items.map((place) => (
                 <li key={place.id}>
                   <PlaceCard place={place} />
