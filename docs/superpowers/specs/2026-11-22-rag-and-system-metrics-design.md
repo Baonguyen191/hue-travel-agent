@@ -116,7 +116,9 @@ fully code-generated.
   (`single_place` 15, `near_place` 15, `by_category` 15, `unanswerable` 15), `question`,
   `relevant_poi_ids` (set), `reference_answer`.
   - Gold POIs come from structured SQL (exact name, category plus distance from an
-    anchor, attribute filters), never from the retriever.
+    anchor, attribute filters), never from the retriever. `near_place` gold is every POI
+    of the asked category within 1 km of the anchor; `by_category` gold is every POI
+    that matches the filter. Both can hold dozens of ids.
   - `unanswerable`: hotel questions, places outside Huế, facts the DB lacks (e.g. Wi-Fi);
     `relevant_poi_ids` empty.
 - `scenarios_v1.jsonl`, 40 multi-turn chat scenarios, dev 25 / test 15. Each has `turns`
@@ -144,8 +146,9 @@ fully code-generated.
 - **Context Precision**: `Σ_k (P@k · rel_k) / |relevant ∩ top-K|` over the retrieved ids
   (RAGAS form, id-based, no LLM). 0 when nothing relevant is retrieved. Items with empty
   gold are skipped.
-- **Context Recall**: `|relevant ∩ top-K| / |relevant|`. Items with empty gold are
-  skipped.
+- **Context Recall**: `|relevant ∩ top-K| / min(|relevant|, K)`. The `min` keeps the
+  score reachable when the gold set is larger than K (near_place and by_category);
+  for gold sets of size ≤ K this is the usual recall. Items with empty gold are skipped.
 - **Faithfulness**: supported claims / all claims in the answer.
   - The judge (`qwen3.5:9b`) splits the answer into atomic claims, then labels each claim
     supported or not supported by the retrieved context.
