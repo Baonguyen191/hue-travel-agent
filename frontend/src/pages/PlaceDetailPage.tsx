@@ -70,7 +70,7 @@ export function PlaceDetailPage() {
 
   return (
     <div className="space-y-6">
-      <Link to="/explore" className={`${LINK} mb-3 text-sm`}>
+      <Link to="/explore" className={`${LINK} mb-3 inline-block text-sm`}>
         ← Khám phá Huế
       </Link>
 
