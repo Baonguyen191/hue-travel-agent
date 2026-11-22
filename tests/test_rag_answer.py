@@ -64,10 +64,13 @@ def test_ids_outside_the_context_are_dropped_and_no_valid_id_means_refusal() -> 
     assert result.text == REFUSAL_TEXT
 
 
-def test_model_refusal_keeps_its_sentence() -> None:
-    answerer, _ = _answerer([{"answer": "Dữ liệu không có thông tin wifi.", "cited_poi_ids": [], "answerable": False}])
+def test_model_refusal_shows_the_fixed_refusal_not_its_own_text() -> None:
+    model_text = "Chùa Thiên Mụ nằm ở đường Trần Phú, nhưng ngữ cảnh không có thông tin."
+    answerer, _ = _answerer([{"answer": model_text, "cited_poi_ids": [], "answerable": False}])
     result = answerer.answer("chùa Thiên Mụ có wifi không")
-    assert (result.source, result.text) == ("refusal", "Dữ liệu không có thông tin wifi.")
+    assert result.text == REFUSAL_TEXT
+    assert (result.source, result.answerable) == ("refusal", False)
+    assert result.raw_text == model_text
 
 
 def test_empty_retrieval_refuses_without_calling_the_llm() -> None:
@@ -122,6 +125,21 @@ def test_malformed_ollama_message_falls_back_without_raising() -> None:
 
 def test_strip_citations() -> None:
     assert strip_citations("A [huetripo:1]. B [huetripo:2] và C.") == "A. B và C."
+
+
+def test_strip_citations_removes_a_multi_id_bracket() -> None:
+    assert strip_citations("Bún bò Mệ Kéo [huetripo:1, huetripo:2].") == "Bún bò Mệ Kéo."
+
+
+def test_multi_id_citation_counts_every_valid_id() -> None:
+    answerer, _ = _answerer([{
+        "answer": "Chùa Thiên Mụ là chùa cổ [huetripo:3, huetripo:999].",
+        "cited_poi_ids": [], "answerable": True,
+    }])
+    result = answerer.answer("chùa Thiên Mụ có gì")
+    assert result.source == "llm"
+    assert result.cited_poi_ids == ["huetripo:3"]
+    assert result.text == "Chùa Thiên Mụ là chùa cổ."
 
 
 def test_build_context_shows_distance_to_the_anchor() -> None:

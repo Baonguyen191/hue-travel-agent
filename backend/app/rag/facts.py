@@ -17,7 +17,7 @@ from app.rag.index import PHONE_KEY
 from app.schemas.place import Place
 from app.services.poi_search import normalize_vietnamese
 
-CITE_RE = re.compile(r"\[([a-z]+:\d+)\]")
+CITE_RE = re.compile(r"\[([a-z]+:\d+(?:\s*,\s*[a-z]+:\d+)*)\]")
 _TIME = re.compile(r"(?<![\d.,])([01]?\d|2[0-3])\s*[:h]\s*([0-5]\d)(?!\d)")
 _PRICE = re.compile(
     r"(?<![\d.,])(\d{1,3}(?:[.,]\d{3})+|\d+)\s*(nghìn|ngàn|đồng|vnđ|vnd|đ|k)(?![a-zA-Zà-ỹÀ-Ỹ])",
@@ -74,11 +74,16 @@ def _address_ok(found: str, place: Place) -> bool:
     return len(words & known) / len(words) >= ADDRESS_OVERLAP
 
 
+def cited_ids(text: str) -> list[str]:
+    """Every id in every citation bracket of `text`, in order: '[a:1, a:2]' gives ['a:1', 'a:2']."""
+    return [poi_id.strip() for match in CITE_RE.findall(text) for poi_id in match.split(",")]
+
+
 def check_facts(answer: str, places: Sequence[Place]) -> list[FactMismatch]:
     by_id = {place.id: place for place in places}
     mismatches: list[FactMismatch] = []
     for sentence in _SENTENCE.split(answer):
-        cited = [by_id[i] for i in CITE_RE.findall(sentence) if i in by_id]
+        cited = [by_id[i] for i in cited_ids(sentence) if i in by_id]
         targets = cited or list(places)
         if not targets:
             continue

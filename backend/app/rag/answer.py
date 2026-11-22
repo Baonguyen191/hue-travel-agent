@@ -17,7 +17,7 @@ import httpx
 from pydantic import BaseModel, ValidationError
 
 from app.core.usage import add_usage
-from app.rag.facts import CITE_RE, FactMismatch, check_facts
+from app.rag.facts import CITE_RE, FactMismatch, check_facts, cited_ids
 from app.rag.index import document_text
 from app.rag.retrieve import Hit, RetrievalResult, Retriever
 from app.schemas.place import Place
@@ -114,12 +114,10 @@ class RagAnswerer:
             output = self._generate(question, build_context(retrieval.hits, by_id, retrieval.anchor_name))
         except RagError as error:
             return self._fallback(retrieval, str(error))
-        listed = CITE_RE.findall(output.answer) + output.cited_poi_ids
+        listed = cited_ids(output.answer) + output.cited_poi_ids
         cited = [poi_id for poi_id in dict.fromkeys(listed) if poi_id in context_ids]
         if not output.answerable or not cited:
-            own = strip_citations(output.answer) if not output.answerable else ""
-            text = own or REFUSAL_TEXT
-            return RagAnswer(text, output.answer, [], False, "refusal", retrieval)
+            return RagAnswer(REFUSAL_TEXT, output.answer, [], False, "refusal", retrieval)
         mismatches = check_facts(output.answer, [by_id[poi_id] for poi_id in cited])
         if mismatches:
             result = self._fallback(retrieval, "fact mismatch")

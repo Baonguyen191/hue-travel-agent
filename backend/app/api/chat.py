@@ -7,6 +7,7 @@ conversation belongs to the user who wrote its first message; another user gets 
 from __future__ import annotations
 
 import functools
+import logging
 from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
@@ -35,6 +36,7 @@ from app.understanding.extract import OllamaExtractor
 from app.understanding.understand import understand as understand_query
 
 router = APIRouter(prefix="/api/v1/chat", tags=["chat"])
+logger = logging.getLogger(__name__)
 
 
 @functools.cache
@@ -48,9 +50,13 @@ def _rag() -> RagAnswerer | None:
     """One answerer per process; None when RAG or the LLM is switched off."""
     if not (rag_enabled() and qu_enabled()):
         return None
-    client = EmbedClient(ollama_url(), rag_embed_model())
-    retriever = Retriever(hue_places.list_all(), EmbeddingStore(rag_index_path()), client)
-    return RagAnswerer(retriever, lambda place: texts.place_text(place, phone_of(place)), ollama_url(), rag_gen_model())
+    try:
+        client = EmbedClient(ollama_url(), rag_embed_model())
+        retriever = Retriever(hue_places.list_all(), EmbeddingStore(rag_index_path()), client)
+        return RagAnswerer(retriever, lambda place: texts.place_text(place, phone_of(place)), ollama_url(), rag_gen_model())
+    except Exception:
+        logger.exception("RAG disabled: could not build the answerer")
+        return None
 
 
 def get_rag() -> RagAnswerer | None:

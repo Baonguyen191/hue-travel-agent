@@ -12,7 +12,7 @@ _TESTS = _Path(__file__).resolve().parent
 if str(_TESTS) not in _sys.path:
     _sys.path.insert(0, str(_TESTS))
 
-from app.rag.facts import CITE_RE, check_facts  # noqa: E402
+from app.rag.facts import CITE_RE, check_facts, cited_ids  # noqa: E402
 from test_rag_index import make_place  # noqa: E402
 
 PLACE = make_place("huetripo:1")  # 06:00-21:00, 30.000-50.000đ, 0234 3826 123, 20 Bạch Đằng
@@ -20,7 +20,15 @@ OTHER = make_place("huetripo:2", opening_hours_raw="07:30-17:30", price_min_vnd=
 
 
 def test_cite_re_finds_ids() -> None:
-    assert CITE_RE.findall("A [huetripo:1]. B [huetripo:22].") == ["huetripo:1", "huetripo:22"]
+    assert cited_ids("A [huetripo:1]. B [huetripo:22].") == ["huetripo:1", "huetripo:22"]
+
+
+def test_cited_ids_reads_every_id_of_a_multi_id_bracket_in_order() -> None:
+    assert cited_ids("A [huetripo:1, huetripo:2]. B [huetripo:3].") == ["huetripo:1", "huetripo:2", "huetripo:3"]
+
+
+def test_cited_ids_ignores_brackets_that_are_not_ids() -> None:
+    assert cited_ids("[06:00-21:00]") == []
 
 
 def test_correct_facts_pass() -> None:
@@ -47,6 +55,13 @@ def test_bracketed_times_are_not_citations_and_are_checked() -> None:
     assert CITE_RE.findall("Mở [06:00-21:00] [huetripo:1].") == ["huetripo:1"]
     mismatches = check_facts("Mở cửa [05:00-06:00] [huetripo:1].", [PLACE])
     assert [(m.kind, m.value) for m in mismatches] == [("time", "05:00")]
+
+
+def test_a_sentence_citing_two_places_is_checked_against_both() -> None:
+    wrong = "Mở cửa 05:00 [huetripo:1, huetripo:2]."
+    assert [m.kind for m in check_facts(wrong, [PLACE, OTHER])] == ["time"]
+    right = "Mở cửa 07:30 [huetripo:1, huetripo:2]."
+    assert check_facts(right, [PLACE, OTHER]) == []
 
 
 def test_durations_and_distances_are_not_facts() -> None:

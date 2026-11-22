@@ -15,12 +15,38 @@ BACKEND = ROOT / "backend"
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
+from app.api import chat as chat_module  # noqa: E402
 from app.api.chat import get_understand  # noqa: E402
 from app.main import app  # noqa: E402
 
 ALICE = {"X-User-Id": "alice"}
 BOB = {"X-User-Id": "bob"}
 PLAN_TRIP = "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12"
+
+
+def test_rag_construction_failure_disables_rag_instead_of_raising(monkeypatch: pytest.MonkeyPatch) -> None:
+    def broken_retriever(*args: object, **kwargs: object) -> None:
+        raise RuntimeError("boom")
+
+    monkeypatch.setattr(chat_module, "rag_enabled", lambda: True)
+    monkeypatch.setattr(chat_module, "qu_enabled", lambda: True)
+    monkeypatch.setattr(chat_module, "EmbeddingStore", lambda path: None)
+    monkeypatch.setattr(chat_module, "Retriever", broken_retriever)
+    chat_module._rag.cache_clear()
+    try:
+        assert chat_module._rag() is None
+    finally:
+        chat_module._rag.cache_clear()
+
+
+def test_rag_switched_off_gives_no_answerer(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(chat_module, "rag_enabled", lambda: False)
+    monkeypatch.setattr(chat_module, "qu_enabled", lambda: True)
+    chat_module._rag.cache_clear()
+    try:
+        assert chat_module._rag() is None
+    finally:
+        chat_module._rag.cache_clear()
 
 
 @pytest.fixture(scope="module")
