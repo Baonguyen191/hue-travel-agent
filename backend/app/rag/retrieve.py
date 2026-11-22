@@ -31,6 +31,8 @@ CANDIDATES = 50
 ANCHOR_RADIUS_KM = 2.0
 _TOKEN = re.compile(r"[a-z0-9]+")
 _GAN_WORD = re.compile(r"\bgần\b", re.IGNORECASE)
+# "chỗ" (place) folds to "cho" (market) in map_preferences; it is not a market word here.
+_CHO_WORD = re.compile(r"\bchỗ\b", re.IGNORECASE)
 _FOOD_QUESTION = re.compile(r"\b(an gi|an trua|an toi|an sang|quan an|cho an|an uong)\b")
 _warned = False
 
@@ -187,16 +189,22 @@ class Retriever:
                 if self.places[i].id != anchor.id
                 and haversine_km(anchor.lat, anchor.lon, self.places[i].lat, self.places[i].lon) <= ANCHOR_RADIUS_KM
             ]
-            # The anchor's own name may name a category ("chùa" for a pagoda); it is not a filter.
-            categories, _ = map_preferences([question])
-            categories = [category for category in categories if category != anchor.category]
-            category_text = question
+            # The anchor's own name words ("chùa", "lăng") name categories; they are not a filter.
+            category_text = _CHO_WORD.sub(" ", question)
+            categories, _ = map_preferences([category_text])
+            own_categories, _ = map_preferences([anchor.name])
+            categories = [
+                category
+                for category in categories
+                if category not in own_categories and category != anchor.category
+            ]
         else:
             category_text = question
             if parsed is not None and parsed.place_query is not None and parsed.place_query.text:
                 category_text = re.sub(
                     re.escape(parsed.place_query.text), " ", category_text, flags=re.IGNORECASE
                 )
+            category_text = _CHO_WORD.sub(" ", category_text)
             categories, _ = map_preferences([category_text])
         if not categories and _FOOD_QUESTION.search(normalize_vietnamese(category_text)):
             categories = ["restaurant"]

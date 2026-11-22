@@ -39,12 +39,13 @@ NEAR_PLACES = [
     make_place("huetripo:20", name="Chợ Đông Ba Huế", category="market", lat=16.4716, lon=107.5865),
     make_place("huetripo:21", name="Quán Cà phê Chiều", category="cafe", lat=16.4725, lon=107.5872),
     make_place("huetripo:22", name="Bún bò Đông Ba", category="restaurant", lat=16.4720, lon=107.5860),
-    make_place("huetripo:23", name="Ga Huế", category="attraction", lat=16.4440, lon=107.5940),
-    make_place("huetripo:24", name="Cà phê Sân Ga", category="cafe", lat=16.4445, lon=107.5945),
+    make_place("huetripo:23", name="Ga Huế", category="attraction", lat=16.4594, lon=107.5910),
+    make_place("huetripo:24", name="Cà phê Sân Ga", category="cafe", lat=16.4600, lon=107.5915),
     make_place("huetripo:25", name="Bún hến Bến Ngự", category="restaurant", lat=16.4660, lon=107.5850),
     make_place("huetripo:26", name="Chùa Bảo Quốc", category="religious", lat=16.4655, lon=107.5835),
     make_place("huetripo:27", name="Lăng Vua Tự Đức", category="historic", lat=16.4103, lon=107.5714),
     make_place("huetripo:28", name="Bún bò Tự Đức", category="restaurant", lat=16.4115, lon=107.5725),
+    make_place("huetripo:29", name="Chùa Tự Đức", category="religious", lat=16.4120, lon=107.5700),
 ]
 
 
@@ -248,5 +249,23 @@ def test_food_question_with_anchor_on_the_way_filters_to_restaurants() -> None:
     result = retriever.retrieve(
         "Gần lăng vua Tự Đức có chỗ nào ăn trưa?", _parsed_without_poi("lăng vua Tự Đức"), k=5
     )
+    assert result.hits
+    assert _categories(retriever, result) == {"restaurant"}
+
+
+def test_chỗ_is_not_a_category_word_in_the_anchor_filter() -> None:
+    retriever = Retriever(NEAR_PLACES)
+    result = retriever.retrieve("Cà phê gần Ga Huế chỗ nào?", _parsed_without_poi("Cà phê gần Ga Huế"), k=5)
+    assert result.anchor_name == "Ga Huế"
+    assert result.hits
+    assert _categories(retriever, result) == {"cafe"}
+
+
+def test_anchor_name_words_do_not_add_categories() -> None:
+    retriever = Retriever(NEAR_PLACES)
+    result = retriever.retrieve(
+        "Gần lăng vua Tự Đức có chỗ nào ăn trưa?", _parsed_without_poi("lăng vua Tự Đức"), k=5
+    )
+    assert result.anchor_name == "Lăng Vua Tự Đức"
     assert result.hits
     assert _categories(retriever, result) == {"restaurant"}
