@@ -17,6 +17,7 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
+from app.core.usage import add_usage
 from app.understanding.models import ApproveOption, Intent, PlanChangeKind
 
 MAX_ATTEMPTS = 2
@@ -377,6 +378,8 @@ class OllamaExtractor:
             payload = response.json()
         except (httpx.HTTPError, ValueError) as error:
             raise ExtractionError(f"Ollama không trả lời: {error}") from error
+        if isinstance(payload, dict):
+            add_usage("extractor", payload)
         content = payload.get("message", {}).get("content") if isinstance(payload, dict) else None
         if not isinstance(content, str):
             raise ExtractionError("Ollama trả về thiếu message.content")
