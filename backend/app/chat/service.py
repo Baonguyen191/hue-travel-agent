@@ -4,15 +4,16 @@ Gates:
 - A plan starts only when origin and party size are stated or confirmed (no guessed defaults).
 - Approve and book always ask first and run only on a confirming message; any other message
   cancels the pending step, and that message is then handled as new.
-- Facts about places, prices and plans come from the data; the LLM only classifies text.
+- Facts about places, prices and plans come from the data. A RAG place answer is LLM text, shown only when every checked fact matches the cited POIs.
 """
 
 from __future__ import annotations
 
 import asyncio
+import logging
 import re
 from collections.abc import Callable, Sequence
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from uuid import uuid4
 
 from app.agents.booking import ApprovalRequiredError, BookingAgent
@@ -31,6 +32,10 @@ from app.services.quote import UnknownOptionError
 from app.understanding.models import ApproveOption, Intent, ParsedQuery, PlanChange, PlanChangeKind
 from app.understanding.understand import ConversationContext, apply_changes
 
+if TYPE_CHECKING:
+    from app.rag.answer import RagAnswer, RagAnswerer
+
+logger = logging.getLogger(__name__)
 Understand = Callable[[str, ConversationContext | None], ParsedQuery]
 _OPTION_RE = re.compile(r"\b(BUDGET|BALANCED|COMFORT)\b")
 _BOOK_PHRASES = ("dat ve", "dat khach san", "dat cho")
@@ -43,6 +48,7 @@ _CHANGE_FORMS: dict[PlanChangeKind, str] = {
     PlanChangeKind.INCLUDE_CATEGORY: "thêm loại {value}",
     PlanChangeKind.EXCLUDE_CATEGORY: "bỏ loại {value}",
 }
+MAX_PLACE_CARDS = 3
 
 
 class ChatService:
@@ -56,6 +62,7 @@ class ChatService:
         booking: BookingAgent,
         places: HuePlacesRepository,
         chats: ChatStore,
+        rag: RagAnswerer | None = None,
     ) -> None:
         self.understand = understand
         self.orchestrator = orchestrator
@@ -63,9 +70,18 @@ class ChatService:
         self.booking = booking
         self.places = places
         self.chats = chats
+        self.rag = rag
+        self.handler_log: list[str] | None = None
+        self.last_rag: RagAnswer | None = None
+
+    def _note(self, handler: str) -> None:
+        """Record which handler answered the turn (read by the evaluator)."""
+        if self.handler_log is not None:
+            self.handler_log.append(handler)
 
     async def handle(self, conversation_id: str, user_id: str, text: str) -> ChatReply:
         """Store the turn, answer it, store the reply; PermissionError for another owner."""
+        self.last_rag = None
         self.chats.ensure_owned(conversation_id, user_id)
         context = self.chats.context(conversation_id)
         self.chats.add_message(conversation_id, "user", text)
@@ -104,29 +120,39 @@ class ChatService:
         if confirms:
             return await self._execute(user_id, pending, parsed, context)
         if folded in texts.CANCEL_WORDS:
+            self._note("cancel")
             return self._reply(parsed, texts.CANCELLED)
         return None
 
     async def _execute(self, user_id: str, pending: dict[str, Any], parsed: ParsedQuery, context: ChatContext) -> ChatReply:
         if pending.get("kind") == "defaults":
             context.draft = confirm_defaults(context.draft)
+            self._note("confirm_defaults")
             return await self._start_plan(user_id, parsed, context)
         if pending.get("kind") == "approve":
+            self._note("run_approve")
             return await self._run_approve(user_id, pending, parsed, context)
+        self._note("run_book")
         return await self._run_book(user_id, pending, parsed, context)
 
     async def _dispatch(self, user_id: str, text: str, parsed: ParsedQuery, context: ChatContext) -> ChatReply:
         intent = parsed.intent
         if intent is Intent.PLAN_NEW:
+            self._note("plan_new")
             return await self._plan_new(user_id, parsed, context)
         if intent is Intent.MODIFY_PLAN:
+            self._note("modify")
             return await self._modify(user_id, parsed, context)
         if intent is Intent.PLACE_INFO:
-            return self._place_info(text, parsed)
+            self._note("place_info")
+            return await self._place_info(text, parsed)
         if intent is Intent.APPROVE:
+            self._note("ask_approve")
             return self._ask_approve(text, parsed, context)
         if intent is Intent.BOOK:
+            self._note("ask_book")
             return self._ask_book(parsed, context)
+        self._note("out_of_scope")
         return self._reply(parsed, texts.OUT_OF_SCOPE, replies=["Lên kế hoạch đi Huế"])
 
     async def _plan_new(self, user_id: str, parsed: ParsedQuery, context: ChatContext) -> ChatReply:
@@ -178,7 +204,20 @@ class ChatService:
         prefix = texts.changes_applied(_change_lines(parsed.changes), notes)
         return self._plan_reply(parsed, state, prefix)
 
-    def _place_info(self, text: str, parsed: ParsedQuery) -> ChatReply:
+    async def _place_info(self, text: str, parsed: ParsedQuery) -> ChatReply:
+        """RAG answer when configured; the template answer otherwise or when RAG fails."""
+        if self.rag is not None:
+            try:
+                answer = await asyncio.to_thread(self.rag.answer, text, parsed)
+            except Exception:  # RAG must never break the chat; the template path answers instead
+                logger.exception("RAG answer failed; using the template answer")
+            else:
+                self.last_rag = answer
+                found = (self.places.get_by_id(poi_id) for poi_id in answer.cited_poi_ids[:MAX_PLACE_CARDS])
+                return self._reply(parsed, answer.text, cards=[place_card(p) for p in found if p is not None])
+        return self._template_place_info(text, parsed)
+
+    def _template_place_info(self, text: str, parsed: ParsedQuery) -> ChatReply:
         mention = parsed.place_query
         place = self.places.get_by_id(mention.poi_id) if mention is not None and mention.poi_id else None
         if place is None:

@@ -547,3 +547,68 @@ def test_context_round_trips_through_json() -> None:
 
     assert ChatContext.from_json(context.to_json()) == context
     assert ChatContext.from_json(None) == ChatContext()
+
+
+# ---------------------------------------------------------------------------
+# place_info through RAG, handler log
+# ---------------------------------------------------------------------------
+
+
+class FakeRag:
+    """Returns a fixed RagAnswer, or raises, and records the questions it got."""
+
+    def __init__(self, answer: Any = None, error: Exception | None = None) -> None:
+        self.answer_value, self.error, self.questions = answer, error, []
+
+    def answer(self, question: str, parsed: Any = None) -> Any:
+        self.questions.append(question)
+        if self.error is not None:
+            raise self.error
+        return self.answer_value
+
+
+def _rag_answer(cited: list[str], text: str = "Đại Nội mở 07:30-17:30.") -> Any:
+    from app.rag.answer import RagAnswer
+    from app.rag.retrieve import Hit, RetrievalResult
+
+    retrieval = RetrievalResult(hits=[Hit(poi_id=i, score=1.0) for i in cited], mode="bm25")
+    return RagAnswer(text, text, cited, bool(cited), "llm" if cited else "refusal", retrieval)
+
+
+def test_place_info_uses_rag_and_shows_cards_for_cited_places() -> None:
+    async def scenario():
+        h = Harness()
+        h.service.rag = FakeRag(_rag_answer([DAI_NOI]))
+        h.fake.script("Đại Nội mấy giờ mở cửa?", _scripted(Intent.PLACE_INFO))
+        reply = await h.say("c-rag", "Đại Nội mấy giờ mở cửa?")
+        assert reply.text == "Đại Nội mở 07:30-17:30."
+        assert [card.poi_id for card in reply.cards if isinstance(card, PlaceCard)] == [DAI_NOI]
+        assert h.service.last_rag is not None and h.service.last_rag.source == "llm"
+        assert h.service.rag.questions == ["Đại Nội mấy giờ mở cửa?"]
+
+    _run(scenario)
+
+
+def test_place_info_falls_back_to_the_template_when_rag_raises() -> None:
+    async def scenario():
+        h = Harness()
+        h.service.rag = FakeRag(error=RuntimeError("boom"))
+        mention = PlaceMention(text="Đại Nội", poi_id=DAI_NOI, name="Đại Nội", score=1.0)
+        h.fake.script("Đại Nội ở đâu?", _scripted(Intent.PLACE_INFO, place_query=mention))
+        reply = await h.say("c-rag-fail", "Đại Nội ở đâu?")
+        assert DAI_NOI_HOURS in reply.text
+        assert h.service.last_rag is None
+
+    _run(scenario)
+
+
+def test_handler_log_records_one_name_per_turn() -> None:
+    async def scenario():
+        h = Harness()
+        h.service.handler_log = []
+        h.fake.script("Thời tiết thế nào?", _scripted(Intent.OUT_OF_SCOPE))
+        await h.say("c-log", "Thời tiết thế nào?")
+        await h.say("c-log", PLAN_TRIP)
+        assert h.service.handler_log == ["out_of_scope", "plan_new"]
+
+    _run(scenario)
