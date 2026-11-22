@@ -1,6 +1,10 @@
 # System metrics — Huế travel chat
 
-Run date: 2026-11-22. Code at commit `3d1aac8` (branch `feat/hue-multi-agent`).
+Run date: 2026-11-22. The numbers were measured at commit `3d1aac8` (branch `feat/hue-multi-agent`).
+The later commit `d3f43a9` came from the final review. It always shows the fixed refusal text, strips
+citation brackets that list several ids, and keeps chat working when the RAG build fails. It does
+not change retrieval, but unanswerable correctness and the citation counts may move slightly on a
+rerun. Failure example 4 is fixed by it.
 
 How to reproduce, from `backend/`:
 
@@ -51,12 +55,16 @@ Dev was used for the one tuning round. Test was run once, after tuning, and neve
 | Planning | Constraint satisfaction rate | 0.778 (n=18) | 0.778 (n=18) | **0.636 (n=11)** |
 | Performance | Chat turn latency p50 / p95 | 2.35 s / 4.54 s | 2.35 s / 4.54 s | **2.37 s / 4.65 s** |
 | Performance | RAG answer latency p50 / p95 (see caveat 3) | 22.6 s / 26.1 s | 22.5 s / 24.1 s | 23.3 s / 28.3 s |
-| Performance | Tokens per chat turn (prompt + completion) | 2099 | 2099 | **2109** |
+| Performance | Tokens per chat turn (prompt + completion) | 2099 | 2100 | **2109** |
 | Performance | Tokens per RAG answer | 3025 | 3082 | **3084** |
 
 The agent numbers did not change between dev runs because the tuning round touched only the RAG
-code. The judge used 37k tokens on dev and 22k on test. These tokens are not counted in the
-per-answer numbers.
+code. The judge used 37k tokens on dev before tuning, 44k on dev after tuning and 22k on test.
+These tokens are not counted in the per-answer numbers.
+
+Faithfulness leaves out refusals, because a refusal has no claims to check. The spec scored
+refusals as 1.0. With that rule the values would be 0.902 (dev before), 0.925 (dev after) and
+0.991 (test). The table keeps the stricter number.
 
 ### RAG by question group
 
@@ -126,8 +134,9 @@ unfixed, because Task 8 was allowed to tune only the RAG components.
 1. **Local judge.** `qwen3.5:9b` labels the claims and support. Hard fact checks override it for
    times, prices, phones and addresses. The judge failed on 1 dev answer and 2 test answers; those
    are excluded from faithfulness and correctness (see `n_scored` in the JSON). The judge is not
-   deterministic, so expect a few points of run-to-run noise, for example unanswerable faithfulness
-   1.00 → 0.78 between dev runs with no code change for that group.
+   deterministic, so expect a few points of run-to-run noise. The drop in unanswerable
+   faithfulness on dev (1.00 → 0.78) is not noise. The tuning changed the prompt for every group,
+   and un05 went from a template fallback to an LLM answer that scored 0.67.
 2. **Small samples.** Test has 20 RAG questions and 15 scenarios. Budget compliance on test has
    n=2. Treat differences under about 0.1 as noise.
 3. **RAG latency includes model swaps.** The 4b generator and the 9b judge do not both fit in
