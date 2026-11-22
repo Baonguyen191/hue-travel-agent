@@ -32,6 +32,13 @@ _TOKEN = re.compile(r"[a-z0-9]+")
 _warned = False
 
 
+def _warn_once(reason: str) -> None:
+    global _warned
+    if not _warned:
+        logger.warning("Dense retrieval off, using BM25 only: %s", reason)
+        _warned = True
+
+
 def tokenize(text: str) -> list[str]:
     return _TOKEN.findall(normalize_vietnamese(text))
 
@@ -99,14 +106,18 @@ class Retriever:
         self.bm25 = BM25([tokenize(document_text(place)) for place in self.places])
         self.client = client
         self.matrix: np.ndarray | None = None
+        self.has_vector = np.zeros(len(self.places), dtype=bool)
         if store is not None and client is not None:
             ids, vectors = store.load(client.model)
-            if ids:
+            if not ids:
+                _warn_once(f"no vectors for model {client.model}")
+            else:
                 row_of = {poi_id: row for row, poi_id in enumerate(ids)}
                 matrix = np.zeros((len(self.places), vectors.shape[1]), dtype=np.float32)
                 for index, place in enumerate(self.places):
                     if place.id in row_of:
                         matrix[index] = vectors[row_of[place.id]]
+                        self.has_vector[index] = True
                 self.matrix = matrix
 
     def retrieve(self, question: str, parsed: ParsedQuery | None = None, k: int = 5) -> RetrievalResult:
@@ -176,20 +187,18 @@ class Retriever:
         return allowed
 
     def _dense(self, question: str, allowed: list[int]) -> tuple[list[str], Literal["hybrid", "bm25"]]:
-        global _warned
         if self.matrix is None or self.client is None:
             return [], "bm25"
-        if not allowed:
+        candidates = [i for i in allowed if self.has_vector[i]]
+        if not candidates:
             return [], "hybrid"
         try:
             vector = np.asarray(self.client.embed([question])[0], dtype=np.float32)
         except EmbedError as error:
-            if not _warned:
-                logger.warning("Dense retrieval off, using BM25 only: %s", error)
-                _warned = True
+            _warn_once(str(error))
             return [], "bm25"
         norm = float(np.linalg.norm(vector)) or 1.0
-        rows = np.asarray(allowed)
+        rows = np.asarray(candidates)
         scores = self.matrix[rows] @ (vector / norm)
         order = np.argsort(-scores, kind="stable")[:CANDIDATES]
         return [self.places[int(rows[i])].id for i in order], "hybrid"

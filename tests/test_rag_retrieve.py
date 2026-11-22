@@ -12,8 +12,12 @@ _TESTS = _Path(__file__).resolve().parent
 if str(_TESTS) not in _sys.path:
     _sys.path.insert(0, str(_TESTS))
 
-import httpx  # noqa: E402
+import logging  # noqa: E402
 
+import httpx  # noqa: E402
+import pytest  # noqa: E402
+
+from app.rag import retrieve as retrieve_module  # noqa: E402
 from app.rag.index import EmbedClient, EmbeddingStore  # noqa: E402
 from app.rag.retrieve import BM25, Retriever, rrf, tokenize  # noqa: E402
 from app.understanding.models import Intent, ParsedQuery, PlaceMention, QuSource  # noqa: E402
@@ -27,6 +31,22 @@ PLACES = [
                summary="Ngôi chùa cổ yên tĩnh bên sông Hương."),
     make_place("huetripo:4", name="Bún bò xa", category="restaurant", lat=16.30, lon=107.70),
 ]
+
+
+@pytest.fixture(autouse=True)
+def _reset_warned(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(retrieve_module, "_warned", False)
+
+
+def _failing_client() -> EmbedClient:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(500)
+
+    return EmbedClient("http://ollama.test", "bge-m3", transport=httpx.MockTransport(handler))
+
+
+def _retrieve_warnings(caplog: pytest.LogCaptureFixture) -> list[logging.LogRecord]:
+    return [r for r in caplog.records if r.name == retrieve_module.logger.name and r.levelno == logging.WARNING]
 
 
 def _parsed(poi_id: str | None = None, text: str = "Đại Nội") -> ParsedQuery:
@@ -63,7 +83,9 @@ def test_no_lexical_match_and_no_dense_gives_no_hits() -> None:
 
 def test_category_filter_keeps_only_restaurants() -> None:
     result = Retriever(PLACES).retrieve("quán ăn bún bò ngon", None, k=5)
-    assert {hit.poi_id for hit in result.hits} <= {"huetripo:2", "huetripo:4"}
+    ids = {hit.poi_id for hit in result.hits}
+    assert ids <= {"huetripo:2", "huetripo:4"}
+    assert "huetripo:2" in ids
 
 
 def test_anchor_keeps_places_within_radius_and_removes_the_anchor() -> None:
@@ -94,6 +116,49 @@ def test_hybrid_mode_uses_dense_ranking(tmp_path) -> None:
     assert result.mode == "hybrid"
     assert result.hits[0].poi_id == "huetripo:3"
     assert result.hits[0].dense_rank == 1
+
+
+def test_only_places_with_stored_vectors_get_dense_ranks(tmp_path) -> None:
+    store = EmbeddingStore(tmp_path / "rag.sqlite")
+    store.upsert("bge-m3", [("huetripo:3", "h", [1.0, 0.0])])
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"embeddings": [[1.0, 0.0]]})
+
+    client = EmbedClient("http://ollama.test", "bge-m3", transport=httpx.MockTransport(handler))
+    result = Retriever(PLACES, store, client).retrieve("nơi yên bình để tĩnh tâm", None, k=4)
+    assert result.mode == "hybrid"
+    ranked = {hit.poi_id: hit.dense_rank for hit in result.hits if hit.dense_rank is not None}
+    assert ranked == {"huetripo:3": 1}
+
+
+def test_empty_store_warns_once_and_uses_bm25(tmp_path, caplog) -> None:
+    store = EmbeddingStore(tmp_path / "rag.sqlite")
+    with caplog.at_level(logging.WARNING, logger=retrieve_module.logger.name):
+        retriever = Retriever(PLACES, store, _failing_client())
+        result = retriever.retrieve("chùa Thiên Mụ", None)
+        retriever.retrieve("chùa Thiên Mụ", None)
+    assert result.mode == "bm25"
+    records = _retrieve_warnings(caplog)
+    assert len(records) == 1
+    assert "BM25 only" in records[0].getMessage()
+
+
+def test_embed_failure_warns_once_across_calls(tmp_path, caplog) -> None:
+    store = EmbeddingStore(tmp_path / "rag.sqlite")
+    store.upsert("bge-m3", [("huetripo:3", "h", [1.0, 0.0])])
+    retriever = Retriever(PLACES, store, _failing_client())
+    with caplog.at_level(logging.WARNING, logger=retrieve_module.logger.name):
+        first = retriever.retrieve("chùa Thiên Mụ", None)
+        second = retriever.retrieve("chùa Thiên Mụ", None)
+    assert first.mode == second.mode == "bm25"
+    assert len(_retrieve_warnings(caplog)) == 1
+
+
+def test_plain_retriever_without_store_is_quiet(caplog) -> None:
+    with caplog.at_level(logging.WARNING, logger=retrieve_module.logger.name):
+        Retriever(PLACES).retrieve("chùa Thiên Mụ", None)
+    assert _retrieve_warnings(caplog) == []
 
 
 def test_embed_failure_falls_back_to_bm25(tmp_path) -> None:
