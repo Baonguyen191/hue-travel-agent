@@ -43,6 +43,12 @@ def test_facts_are_checked_against_the_place_cited_in_the_same_sentence() -> Non
     assert [m.kind for m in check_facts(wrong, [PLACE, OTHER])] == ["time"]
 
 
+def test_bracketed_times_are_not_citations_and_are_checked() -> None:
+    assert CITE_RE.findall("Mở [06:00-21:00] [huetripo:1].") == ["huetripo:1"]
+    mismatches = check_facts("Mở cửa [05:00-06:00] [huetripo:1].", [PLACE])
+    assert [(m.kind, m.value) for m in mismatches] == [("time", "05:00")]
+
+
 def test_durations_and_distances_are_not_facts() -> None:
     assert check_facts("Tham quan khoảng 2 giờ, cách 1.5 km [huetripo:1].", [PLACE]) == []
 

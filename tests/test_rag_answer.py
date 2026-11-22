@@ -102,5 +102,23 @@ def test_fact_mismatch_falls_back_to_the_template() -> None:
     assert [m.kind for m in result.mismatches] == ["time"]
 
 
+def test_malformed_ollama_message_falls_back_without_raising() -> None:
+    bodies: list[dict] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        bodies.append(json.loads(request.content))
+        return httpx.Response(200, json={"message": None, "prompt_eval_count": 1, "eval_count": 1})
+
+    answerer = RagAnswerer(
+        Retriever(PLACES), lambda place: f"TEMPLATE {place.name}", "http://ollama.test", "qwen3.5:4b",
+        transport=httpx.MockTransport(handler),
+    )
+    result = answerer.answer("chùa Thiên Mụ")
+    assert len(bodies) == 2
+    assert result.source == "fallback"
+    assert result.text == "TEMPLATE Chùa Thiên Mụ"
+    assert result.error
+
+
 def test_strip_citations() -> None:
     assert strip_citations("A [huetripo:1]. B [huetripo:2] và C.") == "A. B và C."

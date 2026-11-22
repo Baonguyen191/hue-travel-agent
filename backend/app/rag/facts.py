@@ -17,7 +17,7 @@ from app.rag.index import PHONE_KEY
 from app.schemas.place import Place
 from app.services.poi_search import normalize_vietnamese
 
-CITE_RE = re.compile(r"\[([^\[\]\s]+:[^\[\]\s]+)\]")
+CITE_RE = re.compile(r"\[([a-z]+:\d+)\]")
 _TIME = re.compile(r"(?<![\d.,])([01]?\d|2[0-3])\s*[:h]\s*([0-5]\d)(?!\d)")
 _PRICE = re.compile(
     r"(?<![\d.,])(\d{1,3}(?:[.,]\d{3})+|\d+)\s*(nghìn|ngàn|đồng|vnđ|vnd|đ|k)(?![a-zA-Zà-ỹÀ-Ỹ])",

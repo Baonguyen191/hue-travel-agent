@@ -153,7 +153,8 @@ class RagAnswerer:
             raise RagError(f"Ollama không trả lời: {error}") from error
         if isinstance(payload, dict):
             add_usage("rag_generator", payload)
-        content = payload.get("message", {}).get("content") if isinstance(payload, dict) else None
+        message = payload.get("message") if isinstance(payload, dict) else None
+        content = message.get("content") if isinstance(message, dict) else None
         if not isinstance(content, str):
             raise RagError("Ollama trả về thiếu message.content")
         return content
