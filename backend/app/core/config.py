@@ -89,9 +89,35 @@ def qu_model() -> str:
     return os.environ.get("QU_MODEL") or "qwen3.5:4b"
 
 
-def qu_enabled() -> bool:
-    """False turns the LLM step off so the rule parser answers alone (tests and offline use)."""
-    value = os.environ.get("QU_ENABLED")
+def _flag(name: str) -> bool:
+    """An on/off environment flag that is on unless set to 0, false, no or off."""
+    value = os.environ.get(name)
     if value is None or not value.strip():
         return True
     return value.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def qu_enabled() -> bool:
+    """False turns the LLM step off so the rule parser answers alone (tests and offline use)."""
+    return _flag("QU_ENABLED")
+
+
+def rag_enabled() -> bool:
+    """False keeps place answers on the template path (tests and offline use)."""
+    return _flag("RAG_ENABLED")
+
+
+def rag_embed_model() -> str:
+    """Ollama embedding model for the place index."""
+    return os.environ.get("RAG_EMBED_MODEL") or "bge-m3"
+
+
+def rag_gen_model() -> str:
+    """Ollama model that writes place answers; defaults to the understanding model."""
+    return os.environ.get("RAG_GEN_MODEL") or qu_model()
+
+
+def rag_index_path() -> Path:
+    """SQLite file with the place embeddings; separate from the read-only POI source."""
+    configured = os.environ.get("RAG_INDEX_PATH")
+    return Path(configured).expanduser() if configured else DATA_DIR / "rag_index.sqlite"
