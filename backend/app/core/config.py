@@ -32,6 +32,12 @@ def hue_database_path() -> Path:
     return DATA_DIR / "hue.sqlite"
 
 
+def photo_cache_dir() -> Path:
+    """Where resized place photos are cached; PHOTO_CACHE_DIR overrides it."""
+    configured = os.environ.get("PHOTO_CACHE_DIR")
+    return Path(configured) if configured else DATA_DIR / "photo_cache"
+
+
 def database_url() -> str:
     """Return the state database URL: `DATABASE_URL`, or the absolute default SQLite file."""
     configured = os.environ.get("DATABASE_URL")

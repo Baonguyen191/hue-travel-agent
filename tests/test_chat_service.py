@@ -231,6 +231,19 @@ def test_stated_origin_and_people_start_the_plan_at_once_with_plan_card_and_quic
     assert reply.understanding.source == "RULES"
 
 
+def test_plan_items_carry_poi_ids_for_places_and_none_for_meal_breaks() -> None:
+    h = Harness()
+
+    async def scenario():
+        return await _planned(h, "c-poi-ids")
+
+    card = _run(scenario)
+
+    items = [item for day in card.days for item in day.items]
+    assert any(item.poi_id is not None and item.poi_id.startswith("huetripo:") for item in items)
+    assert all(item.poi_id is None for item in items if item.kind == "MEAL_BREAK")
+
+
 def test_defaults_answer_with_a_stated_origin_is_merged_and_starts_the_plan() -> None:
     async def scenario():
         h = Harness()

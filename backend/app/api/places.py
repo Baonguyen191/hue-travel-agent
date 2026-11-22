@@ -2,16 +2,21 @@
 
 from __future__ import annotations
 
+import functools
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import FileResponse
 
-from app.core.config import hue_database_path
+from app.core.config import hue_database_path, photo_cache_dir
 from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.place import Place, PlaceCategory, PlacePage, PlaceSearchPage
+from app.services.photos import WIDTHS, PhotoService, PhotoUnavailable, PhotoUpstreamError
 from app.services.poi_search import search_places
 
 router = APIRouter(prefix="/api/v1/places", tags=["places"])
+logger = logging.getLogger(__name__)
 
 
 def get_repository() -> HuePlacesRepository:
@@ -90,3 +95,37 @@ def get_place(poi_id: str, repository: Repository) -> Place:
     if place is None:
         raise HTTPException(status_code=404, detail="POI was not found in the Hue source.")
     return place
+
+
+@functools.cache
+def get_photo_service() -> PhotoService:
+    return PhotoService(photo_cache_dir())
+
+
+PHOTO_CACHE_CONTROL = "public, max-age=2592000, immutable"
+
+
+@router.get("/{poi_id}/photo", response_class=FileResponse)
+def get_place_photo(
+    poi_id: str,
+    repository: Repository,
+    photos: Annotated[PhotoService, Depends(get_photo_service)],
+    w: Annotated[int, Query(description="Width in pixels: 160, 480 or 960")],
+) -> FileResponse:
+    """A resized WebP copy of the POI's source photo, cached on disk after the first request."""
+    if w not in WIDTHS:
+        raise HTTPException(status_code=422, detail=f"w must be one of {list(WIDTHS)}.")
+    try:
+        place = repository.get_by_id(poi_id)
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=503, detail="Hue SQLite source file is unavailable.") from error
+    if place is None:
+        raise HTTPException(status_code=404, detail="POI was not found in the Hue source.")
+    try:
+        path = photos.get(poi_id, place.photo_url, w)
+    except PhotoUnavailable as error:
+        raise HTTPException(status_code=404, detail="This place has no photo.") from error
+    except PhotoUpstreamError as error:
+        logger.warning("photo for %s unavailable: %s", poi_id, error)
+        raise HTTPException(status_code=502, detail="The source photo could not be loaded.") from error
+    return FileResponse(path, media_type="image/webp", headers={"Cache-Control": PHOTO_CACHE_CONTROL})

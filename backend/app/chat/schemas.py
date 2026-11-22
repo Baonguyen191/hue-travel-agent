@@ -23,6 +23,7 @@ class PlanItem(BaseModel):
     name: str
     kind: str
     meal: str | None = None
+    poi_id: str | None = None
 
 
 class PlanDay(BaseModel):

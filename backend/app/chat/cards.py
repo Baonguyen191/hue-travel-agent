@@ -74,4 +74,6 @@ def nearby_places(place: Place, places: list[Place]) -> list[tuple[Place, float]
 
 
 def _item(event: ItineraryEvent) -> PlanItem:
-    return PlanItem(time=event.start_at.strftime("%H:%M"), name=event.name, kind=event.kind, meal=event.meal)
+    return PlanItem(
+        time=event.start_at.strftime("%H:%M"), name=event.name, kind=event.kind, meal=event.meal, poi_id=event.poi_id
+    )
