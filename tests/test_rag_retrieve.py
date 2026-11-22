@@ -46,6 +46,7 @@ NEAR_PLACES = [
     make_place("huetripo:27", name="Lăng Vua Tự Đức", category="historic", lat=16.4103, lon=107.5714),
     make_place("huetripo:28", name="Bún bò Tự Đức", category="restaurant", lat=16.4115, lon=107.5725),
     make_place("huetripo:29", name="Chùa Tự Đức", category="religious", lat=16.4120, lon=107.5700),
+    make_place("huetripo:30", name="Chùa Diệu Đế", category="religious", lat=16.4640, lon=107.5800),
 ]
 
 
@@ -267,5 +268,15 @@ def test_anchor_name_words_do_not_add_categories() -> None:
         "Gần lăng vua Tự Đức có chỗ nào ăn trưa?", _parsed_without_poi("lăng vua Tự Đức"), k=5
     )
     assert result.anchor_name == "Lăng Vua Tự Đức"
+    assert result.hits
+    assert _categories(retriever, result) == {"restaurant"}
+
+
+def test_food_question_with_cho_an_matches_before_chỗ_is_dropped() -> None:
+    retriever = Retriever(NEAR_PLACES)
+    result = retriever.retrieve(
+        "Gần chùa Bảo Quốc có chỗ ăn nào không?", _parsed_without_poi("chùa Bảo Quốc"), k=5
+    )
+    assert result.anchor_name == "Chùa Bảo Quốc"
     assert result.hits
     assert _categories(retriever, result) == {"restaurant"}

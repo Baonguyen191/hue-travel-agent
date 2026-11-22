@@ -190,8 +190,8 @@ class Retriever:
                 and haversine_km(anchor.lat, anchor.lon, self.places[i].lat, self.places[i].lon) <= ANCHOR_RADIUS_KM
             ]
             # The anchor's own name words ("chùa", "lăng") name categories; they are not a filter.
-            category_text = _CHO_WORD.sub(" ", question)
-            categories, _ = map_preferences([category_text])
+            raw_text = question
+            categories, _ = map_preferences([_CHO_WORD.sub(" ", raw_text)])
             own_categories, _ = map_preferences([anchor.name])
             categories = [
                 category
@@ -199,14 +199,14 @@ class Retriever:
                 if category not in own_categories and category != anchor.category
             ]
         else:
-            category_text = question
+            raw_text = question
             if parsed is not None and parsed.place_query is not None and parsed.place_query.text:
-                category_text = re.sub(
-                    re.escape(parsed.place_query.text), " ", category_text, flags=re.IGNORECASE
+                raw_text = re.sub(
+                    re.escape(parsed.place_query.text), " ", raw_text, flags=re.IGNORECASE
                 )
-            category_text = _CHO_WORD.sub(" ", category_text)
-            categories, _ = map_preferences([category_text])
-        if not categories and _FOOD_QUESTION.search(normalize_vietnamese(category_text)):
+            categories, _ = map_preferences([_CHO_WORD.sub(" ", raw_text)])
+        # Checked before "chỗ" is dropped, so "chỗ ăn" ("cho an" once folded) still reads as food.
+        if not categories and _FOOD_QUESTION.search(normalize_vietnamese(raw_text)):
             categories = ["restaurant"]
         if categories:
             narrowed = [i for i in allowed if self.places[i].category in categories]
