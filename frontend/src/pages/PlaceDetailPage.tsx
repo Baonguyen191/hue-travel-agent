@@ -6,7 +6,7 @@ import { ErrorBanner } from "../components/ErrorBanner";
 import { PlacesMap } from "../components/PlacesMap";
 import { openingHoursText } from "../components/PlaceCard";
 import { describePrice, describeRating, formatDate, formatMinutes, formatTime } from "../lib/format";
-import { CATEGORY_LABEL } from "../lib/labels";
+import { CategoryChip, LINK, Notice, Ornament, PlaceIllustration, PlacePhoto, SectionHeading, buttonClass, cardClass } from "../components/ui";
 
 /** Warnings about this POI's data. Always shown, even when the list is short. */
 export function placeWarnings(place: Place): string[] {
@@ -31,6 +31,11 @@ export function placeWarnings(place: Place): string[] {
   return warnings;
 }
 
+/** Question sent to the chat when the user asks the assistant about a place. */
+export function askAssistantText(name: string): string {
+  return `${name} có gì hay? Giờ mở cửa và giá vé thế nào?`;
+}
+
 type DetailState =
   | { status: "loading" }
   | { status: "ready"; place: Place }
@@ -40,8 +45,8 @@ type DetailState =
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="grid grid-cols-[8rem_1fr] gap-2 py-2 text-sm sm:grid-cols-[10rem_1fr]">
-      <dt className="text-slate-500">{label}</dt>
-      <dd className="min-w-0 break-words">{children}</dd>
+      <dt className="text-muc-soft">{label}</dt>
+      <dd className="min-w-0 break-words text-muc">{children}</dd>
     </div>
   );
 }
@@ -65,18 +70,19 @@ export function PlaceDetailPage() {
 
   return (
     <div className="space-y-6">
-      <Link to="/explore" className="text-sm font-medium text-teal-700 underline">
+      <Link to="/explore" className={`${LINK} text-sm`}>
         ← Khám phá Huế
       </Link>
 
       {state.status === "loading" ? (
-        <div role="status" aria-label="Đang tải chi tiết" className="h-64 animate-pulse rounded-lg bg-slate-100" />
+        <div role="status" aria-label="Đang tải chi tiết" className="h-64 animate-pulse rounded-2xl bg-kim-soft" />
       ) : null}
 
       {state.status === "not-found" ? (
-        <section className="rounded-lg border border-slate-200 bg-white p-6">
-          <h1 className="text-xl font-semibold">Không tìm thấy địa điểm</h1>
-          <p className="mt-2 text-sm text-slate-600">Mã {poiId} không có trong nguồn dữ liệu Huế.</p>
+        <section className={cardClass("p-6")}>
+          <PlaceIllustration category={null} className="mb-4 h-32 rounded-xl" />
+          <SectionHeading as="h1">Không tìm thấy địa điểm</SectionHeading>
+          <p className="mt-2 text-sm text-muc-soft">Mã {poiId} không có trong nguồn dữ liệu Huế.</p>
         </section>
       ) : null}
 
@@ -92,32 +98,47 @@ function PlaceDetail({ place }: { place: Place }) {
 
   return (
     <article className="space-y-6">
-      <header className="space-y-2">
-        <span className="inline-block rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
-          {CATEGORY_LABEL[place.category]}
-        </span>
-        <h1 className="text-2xl font-semibold leading-snug">{place.name}</h1>
-        {place.address ? <p className="text-sm text-slate-600">{place.address}</p> : null}
-      </header>
+      <div className={cardClass()}>
+        <div className="relative">
+          <PlacePhoto
+            poiId={place.id}
+            name={place.name}
+            category={place.category}
+            size="lg"
+            aspect="16/9"
+            className="max-h-80"
+          />
+          <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-muc/85 via-muc/20 to-transparent" />
+          <h1 className="absolute inset-x-4 bottom-3 font-serif text-2xl font-semibold leading-snug text-nga md:text-3xl">
+            {place.name}
+          </h1>
+        </div>
+        <Ornament />
+        <div className="flex flex-wrap items-center gap-3 p-4">
+          <CategoryChip category={place.category} />
+          <Link to="/" state={{ prefill: askAssistantText(place.name) }} className={buttonClass("primary", "sm")}>
+            Hỏi trợ lý về nơi này
+          </Link>
+          {place.address ? <p className="w-full text-sm text-muc-soft">{place.address}</p> : null}
+        </div>
+      </div>
 
-      <section aria-labelledby="warnings-heading" className="rounded-lg border border-amber-300 bg-amber-50 p-4">
-        <h2 id="warnings-heading" className="text-sm font-semibold text-amber-900">
+      <Notice variant="warning" aria-labelledby="warnings-heading" role="region">
+        <h2 id="warnings-heading" className="font-serif text-sm font-semibold text-son">
           Cảnh báo về dữ liệu
         </h2>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-amber-900">
+        <ul className="mt-2 list-disc space-y-1 pl-5">
           {warnings.map((warning) => (
             <li key={warning}>{warning}</li>
           ))}
         </ul>
-      </section>
+      </Notice>
 
       <div className="gap-6 md:grid md:grid-cols-[minmax(0,1fr)_minmax(260px,360px)]">
         <div className="min-w-0 space-y-6">
-          <section aria-labelledby="info-heading" className="rounded-lg border border-slate-200 bg-white p-4">
-            <h2 id="info-heading" className="text-base font-semibold">
-              Thông tin đã chuẩn hóa
-            </h2>
-            <dl className="mt-2 divide-y divide-slate-100">
+          <section aria-labelledby="info-heading" className={cardClass("p-4")}>
+            <SectionHeading id="info-heading">Thông tin đã chuẩn hóa</SectionHeading>
+            <dl className="mt-2 divide-y divide-vien">
               <Field label="Đánh giá">
                 {describeRating(place.rating_value, place.rating_count)}
                 {place.rating_source ? ` (${place.rating_source})` : ""}
@@ -133,12 +154,7 @@ function PlaceDetail({ place }: { place: Place }) {
                 {place.source_url ? (
                   <>
                     {" · "}
-                    <a
-                      href={place.source_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium text-teal-700 underline"
-                    >
+                    <a href={place.source_url} target="_blank" rel="noopener noreferrer" className={LINK}>
                       Mở trang nguồn
                     </a>
                   </>
@@ -152,20 +168,16 @@ function PlaceDetail({ place }: { place: Place }) {
           </section>
 
           {place.summary ? (
-            <section aria-labelledby="summary-heading" className="rounded-lg border border-slate-200 bg-white p-4">
-              <h2 id="summary-heading" className="text-base font-semibold">
-                Giới thiệu từ nguồn
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-700">{place.summary}</p>
+            <section aria-labelledby="summary-heading" className={cardClass("p-4")}>
+              <SectionHeading id="summary-heading">Giới thiệu từ nguồn</SectionHeading>
+              <p className="mt-2 text-sm leading-relaxed text-muc-soft">{place.summary}</p>
             </section>
           ) : null}
 
-          <section aria-labelledby="raw-heading" className="rounded-lg border border-slate-200 bg-white p-4">
-            <h2 id="raw-heading" className="text-base font-semibold">
-              Thuộc tính gốc từ nguồn
-            </h2>
+          <section aria-labelledby="raw-heading" className={cardClass("p-4")}>
+            <SectionHeading id="raw-heading">Thuộc tính gốc từ nguồn</SectionHeading>
             {Object.keys(place.raw_attributes).length === 0 ? (
-              <p className="mt-2 text-sm text-slate-600">Nguồn không có thuộc tính bổ sung.</p>
+              <p className="mt-2 text-sm text-muc-soft">Nguồn không có thuộc tính bổ sung.</p>
             ) : (
               <div className="mt-2 overflow-x-auto">
                 <table className="w-full text-left text-sm">
@@ -175,13 +187,13 @@ function PlaceDetail({ place }: { place: Place }) {
                       <th scope="col">Giá trị</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-vien">
                     {Object.entries(place.raw_attributes).map(([key, value]) => (
                       <tr key={key} className="align-top">
-                        <th scope="row" className="w-1/3 py-2 pr-3 font-medium text-slate-600">
+                        <th scope="row" className="w-1/3 py-2 pr-3 font-medium text-muc-soft">
                           {key}
                         </th>
-                        <td className="break-words py-2">{String(value)}</td>
+                        <td className="break-words py-2 text-muc">{String(value)}</td>
                       </tr>
                     ))}
                   </tbody>

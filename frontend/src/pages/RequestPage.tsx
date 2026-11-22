@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api, errorMessage } from "../api/client";
 import type { CheckpointState, ParsedTrip, TripRequest } from "../api/types";
 import { ErrorBanner } from "../components/ErrorBanner";
+import { SectionHeading, buttonClass, cardClass, Notice } from "../components/ui";
 import { PlanProgress, TraceList } from "../components/PlanProgress";
 import { TripRequestForm } from "../components/TripRequestForm";
 import { newUuid } from "../lib/ids";
@@ -76,19 +77,17 @@ export function RequestPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold">Lập kế hoạch chuyến đi</h1>
-        <p className="text-sm text-slate-600">
+        <SectionHeading as="h1">Lập kế hoạch chuyến đi</SectionHeading>
+        <p className="text-sm text-muc-soft">
           Mô tả chuyến đi bằng tiếng Việt. Hệ thống sẽ điền sẵn biểu mẫu để bạn kiểm tra trước khi tạo lịch trình.
         </p>
       </header>
 
-      <section aria-labelledby="describe-heading" className="space-y-3 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
-        <h2 id="describe-heading" className="text-base font-semibold">
-          1. Mô tả chuyến đi
-        </h2>
+      <section aria-labelledby="describe-heading" className={cardClass("space-y-3 p-4 sm:p-6")}>
+        <SectionHeading id="describe-heading">1. Mô tả chuyến đi</SectionHeading>
         <form onSubmit={parse} className="space-y-3">
           <div>
-            <label htmlFor="request-text" className="block text-sm font-medium text-slate-800">
+            <label htmlFor="request-text" className="block text-sm font-medium text-muc">
               Yêu cầu của bạn
             </label>
             <textarea
@@ -98,15 +97,15 @@ export function RequestPage() {
               placeholder={DOD_SENTENCE}
               onChange={(event) => setText(event.target.value)}
               disabled={parsing || submitting}
-              className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-200 disabled:bg-slate-100"
+              className="mt-1 w-full rounded-xl border border-vien bg-nga px-3 py-2 text-base text-muc focus:border-kim focus:outline-none focus:ring-2 focus:ring-kim/40 disabled:bg-giay"
             />
           </div>
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-slate-500">Bạn cũng có thể bỏ qua bước này và điền trực tiếp biểu mẫu bên dưới.</p>
+            <p className="text-xs text-muc-soft">Bạn cũng có thể bỏ qua bước này và điền trực tiếp biểu mẫu bên dưới.</p>
             <button
               type="submit"
               disabled={text.trim() === "" || parsing || submitting}
-              className="rounded-md border border-teal-700 px-4 py-2 font-medium text-teal-800 hover:bg-teal-50 disabled:cursor-not-allowed disabled:opacity-50"
+              className={buttonClass("outline")}
             >
               {parsing ? "Đang phân tích…" : "Phân tích yêu cầu"}
             </button>
@@ -114,12 +113,12 @@ export function RequestPage() {
         </form>
         {parseError ? <ErrorBanner message={parseError} /> : null}
         {parsed ? (
-          <div className="space-y-2 text-sm text-slate-700">
+          <div className="space-y-2 text-sm text-muc-soft">
             <p>
-              Nguồn phân tích: <span className="font-medium">{SOURCE_LABEL[parsed.source] ?? parsed.source}</span>
+              Nguồn phân tích: <span className="font-medium text-muc">{SOURCE_LABEL[parsed.source] ?? parsed.source}</span>
             </p>
             {parsed.notes.length > 0 ? (
-              <ul className="list-disc space-y-1 pl-5 text-amber-900">
+              <ul className="list-disc space-y-1 pl-5 text-muc">
                 {parsed.notes.map((note) => (
                   <li key={note}>{note}</li>
                 ))}
@@ -129,10 +128,8 @@ export function RequestPage() {
         ) : null}
       </section>
 
-      <section aria-labelledby="form-heading" className="space-y-4 rounded-lg border border-slate-200 bg-white p-4 sm:p-6">
-        <h2 id="form-heading" className="text-base font-semibold">
-          2. Kiểm tra và chỉnh sửa
-        </h2>
+      <section aria-labelledby="form-heading" className={cardClass("space-y-4 p-4 sm:p-6")}>
+        <SectionHeading id="form-heading">2. Kiểm tra và chỉnh sửa</SectionHeading>
         <TripRequestForm
           key={seed.key}
           initial={seed.values}
@@ -152,22 +149,22 @@ export function RequestPage() {
 function PlanFailure({ state }: { state: CheckpointState }) {
   const reasons = translateWarnings(state.attempts.length > 0 ? state.attempts : state.warnings);
   return (
-    <section role="alert" aria-labelledby="failure-heading" className="space-y-3 rounded-lg border border-red-300 bg-red-50 p-4">
-      <h3 id="failure-heading" className="text-base font-semibold text-red-900">
+    <Notice variant="error" role="alert" aria-labelledby="failure-heading" className="space-y-3">
+      <h3 id="failure-heading" className="font-serif text-base font-semibold text-son">
         Chưa tạo được lịch trình hợp lệ
       </h3>
       {state.status === "FAILED_VALIDATION" ? (
-        <p className="text-sm text-red-900">
+        <p className="text-sm text-muc">
           Hệ thống đã thử lại {state.retries} lần nhưng lịch trình vẫn chưa đạt. Hãy điều chỉnh yêu cầu (ngân sách, số ngày,
           sở thích) rồi thử lại.
         </p>
       ) : (
-        <p className="text-sm text-red-900">Trạng thái không mong đợi: {state.status}.</p>
+        <p className="text-sm text-muc">Trạng thái không mong đợi: {state.status}.</p>
       )}
       {reasons.length > 0 ? (
         <div>
-          <p className="text-sm font-medium text-red-900">Lý do từ hệ thống:</p>
-          <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-red-900">
+          <p className="text-sm font-medium text-muc">Lý do từ hệ thống:</p>
+          <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-muc">
             {reasons.map((reason) => (
               <li key={reason}>{reason}</li>
             ))}
@@ -175,9 +172,9 @@ function PlanFailure({ state }: { state: CheckpointState }) {
         </div>
       ) : null}
       <div>
-        <p className="mb-1 text-sm font-medium text-red-900">Các bước đã chạy:</p>
+        <p className="mb-1 text-sm font-medium text-muc">Các bước đã chạy:</p>
         <TraceList trace={state.trace} />
       </div>
-    </section>
+    </Notice>
   );
 }

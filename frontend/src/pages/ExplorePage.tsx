@@ -6,6 +6,7 @@ import { ErrorBanner } from "../components/ErrorBanner";
 import { PlaceCard } from "../components/PlaceCard";
 import { PlacesMap } from "../components/PlacesMap";
 import { CardSkeletons } from "../components/Skeletons";
+import { SectionHeading, buttonClass } from "../components/ui";
 import { useDebouncedValue } from "../hooks/useDebouncedValue";
 
 export const PAGE_SIZE = 24;
@@ -69,15 +70,15 @@ export function ExplorePage() {
   return (
     <div className="space-y-6">
       <header className="space-y-1">
-        <h1 className="text-2xl font-semibold">Khám phá Huế</h1>
-        <p className="text-sm text-slate-600">
+        <SectionHeading as="h1">Khám phá Huế</SectionHeading>
+        <p className="text-sm text-muc-soft">
           Dữ liệu từ huetripo.hue.gov.vn. Giá là giá tham khảo, giờ mở cửa chưa được xác minh.
         </p>
       </header>
 
       <div className="space-y-3">
         <div>
-          <label htmlFor="explore-search" className="block text-sm font-medium text-slate-800">
+          <label htmlFor="explore-search" className="block text-sm font-medium text-muc">
             Tìm theo tên hoặc địa chỉ
           </label>
           <input
@@ -87,7 +88,7 @@ export function ExplorePage() {
             onChange={(event) => setInput(event.target.value)}
             placeholder="ví dụ: đại nội, chợ đông ba"
             autoComplete="off"
-            className="mt-1 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-base shadow-sm focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-200"
+            className="mt-1 w-full rounded-xl border border-vien bg-nga px-3 py-2 text-base text-muc placeholder:text-muc-soft/70 focus:border-kim focus:outline-none focus:ring-2 focus:ring-kim/40"
           />
         </div>
         <CategoryChips
@@ -100,18 +101,18 @@ export function ExplorePage() {
 
       <div className="gap-6 md:grid md:grid-cols-[minmax(0,1fr)_minmax(260px,380px)]">
         <section aria-label="Kết quả" className="min-w-0 space-y-4">
-          <p aria-live="polite" className="text-sm text-slate-600">
+          <p aria-live="polite" className="text-sm text-muc-soft">
             {summary}
           </p>
 
           {load.status === "loading" && load.items.length === 0 ? (
             <CardSkeletons count={6} label="Đang tải địa điểm" />
           ) : load.items.length === 0 && load.status === "ready" ? (
-            <p className="rounded-lg border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
+            <p className="rounded-2xl border border-dashed border-vien bg-nga p-6 text-sm text-muc-soft">
               Không có địa điểm nào khớp bộ lọc.
             </p>
           ) : (
-            <ul className="grid gap-3 sm:grid-cols-2">
+            <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {load.items.map((place) => (
                 <li key={place.id}>
                   <PlaceCard place={place} />
@@ -121,12 +122,12 @@ export function ExplorePage() {
           )}
 
           {load.total > PAGE_SIZE ? (
-            <nav aria-label="Phân trang" className="flex items-center justify-between gap-3 text-sm">
+            <nav aria-label="Phân trang" className="flex items-center justify-between gap-3 text-sm text-muc-soft">
               <button
                 type="button"
                 disabled={filters.offset === 0 || load.status === "loading"}
                 onClick={() => setFilters((current) => ({ ...current, offset: Math.max(0, current.offset - PAGE_SIZE) }))}
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                className={buttonClass("outline", "sm")}
               >
                 Trang trước
               </button>
@@ -137,7 +138,7 @@ export function ExplorePage() {
                 type="button"
                 disabled={currentPage >= pageCount || load.status === "loading"}
                 onClick={() => setFilters((current) => ({ ...current, offset: current.offset + PAGE_SIZE }))}
-                className="rounded-md border border-slate-300 bg-white px-3 py-2 font-medium disabled:cursor-not-allowed disabled:opacity-50"
+                className={buttonClass("outline", "sm")}
               >
                 Trang sau
               </button>

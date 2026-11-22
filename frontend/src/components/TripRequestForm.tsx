@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import type { PlaceCategory } from "../api/types";
+import { Notice, buttonClass } from "./ui";
 import { formatVnd } from "../lib/format";
 import { CATEGORY_OPTIONS } from "../lib/labels";
 import {
@@ -23,9 +24,9 @@ interface TripRequestFormProps {
 }
 
 const INPUT =
-  "mt-1 w-full rounded-md border bg-white px-3 py-2 text-base shadow-sm focus:outline-none focus:ring-2 disabled:bg-slate-100";
-const INPUT_OK = `${INPUT} border-slate-300 focus:border-teal-600 focus:ring-teal-200`;
-const INPUT_BAD = `${INPUT} border-red-500 bg-red-50 focus:border-red-600 focus:ring-red-200`;
+  "mt-1 w-full rounded-xl border bg-nga px-3 py-2 text-base text-muc focus:outline-none focus:ring-2 focus:ring-kim/40 disabled:bg-giay";
+const INPUT_OK = `${INPUT} border-vien focus:border-kim`;
+const INPUT_BAD = `${INPUT} border-son focus:border-kim`;
 
 interface FieldProps {
   id: string;
@@ -38,16 +39,16 @@ interface FieldProps {
 function Field({ id, label, error, hint, children }: FieldProps) {
   return (
     <div>
-      <label htmlFor={id} className="block text-sm font-medium text-slate-800">
+      <label htmlFor={id} className="block text-sm font-medium text-muc">
         {label}
       </label>
       {children}
       {error ? (
-        <p id={`${id}-error`} className="mt-1 text-sm font-medium text-red-700">
+        <p id={`${id}-error`} className="mt-1 text-sm font-medium text-son">
           {error}
         </p>
       ) : hint ? (
-        <p className="mt-1 text-xs text-slate-500">{hint}</p>
+        <p className="mt-1 text-xs text-muc-soft">{hint}</p>
       ) : null}
     </div>
   );
@@ -127,9 +128,9 @@ export function TripRequestForm({ initial, missing = [], submitLabel, pending = 
         <legend className="sr-only">Thông tin chuyến đi</legend>
 
         {missingLabels.length > 0 ? (
-          <p role="note" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+          <Notice variant="error" role="note">
             Còn thiếu: {missingLabels.join(", ")}. Hãy điền các mục này trước khi tạo lịch trình.
-          </p>
+          </Notice>
         ) : null}
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -235,7 +236,7 @@ export function TripRequestForm({ initial, missing = [], submitLabel, pending = 
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="trip-preference" className="block text-sm font-medium text-slate-800">
+          <label htmlFor="trip-preference" className="block text-sm font-medium text-muc">
             Sở thích
           </label>
           <div className="flex gap-2">
@@ -252,7 +253,7 @@ export function TripRequestForm({ initial, missing = [], submitLabel, pending = 
               type="button"
               onClick={addPreference}
               disabled={values.preferences.length >= MAX_PREFERENCES}
-              className="mt-1 shrink-0 rounded-md border border-teal-700 px-3 py-2 text-sm font-medium text-teal-800 disabled:opacity-50"
+              className={`${buttonClass("outline", "sm")} mt-1 shrink-0`}
             >
               Thêm
             </button>
@@ -262,14 +263,14 @@ export function TripRequestForm({ initial, missing = [], submitLabel, pending = 
               {values.preferences.map((preference) => (
                 <li
                   key={preference}
-                  className="flex items-center gap-1 rounded-full bg-teal-50 py-1 pl-3 pr-1 text-sm text-teal-900"
+                  className="flex items-center gap-1 rounded-full bg-kim-soft py-1 pl-3 pr-1 text-sm text-son"
                 >
                   {preference}
                   <button
                     type="button"
                     aria-label={`Xóa sở thích ${preference}`}
                     onClick={() => update("preferences", values.preferences.filter((item) => item !== preference))}
-                    className="flex size-6 items-center justify-center rounded-full hover:bg-teal-100"
+                    className="flex size-6 items-center justify-center rounded-full hover:bg-vien"
                   >
                     ×
                   </button>
@@ -278,20 +279,20 @@ export function TripRequestForm({ initial, missing = [], submitLabel, pending = 
             </ul>
           ) : null}
           {shownError("preferences") ? (
-            <p className="text-sm font-medium text-red-700">{shownError("preferences")}</p>
+            <p className="text-sm font-medium text-son">{shownError("preferences")}</p>
           ) : null}
         </div>
 
         <fieldset className="space-y-2">
-          <legend className="text-sm font-medium text-slate-800">Loại địa điểm ưu tiên (tùy chọn)</legend>
+          <legend className="text-sm font-medium text-muc">Loại địa điểm ưu tiên (tùy chọn)</legend>
           <div className="flex flex-wrap gap-2">
             {CATEGORY_OPTIONS.map((option) => {
               const checked = values.categories.includes(option.value);
               return (
                 <label
                   key={option.value}
-                  className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-teal-300 ${
-                    checked ? "border-teal-700 bg-teal-700 text-white" : "border-slate-300 bg-white text-slate-700"
+                  className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-kim ${
+                    checked ? "border-son bg-son text-on-son" : "border-vien bg-nga text-muc-soft"
                   }`}
                 >
                   <input
@@ -307,14 +308,14 @@ export function TripRequestForm({ initial, missing = [], submitLabel, pending = 
           </div>
         </fieldset>
 
-        <div className="flex flex-col gap-2 border-t border-slate-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-slate-600">
+        <div className="flex flex-col gap-2 border-t border-vien pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muc-soft">
             {valid ? "Sẵn sàng tạo lịch trình." : "Nhập đủ thông tin bắt buộc để tạo lịch trình."}
           </p>
           <button
             type="submit"
             disabled={!valid || pending}
-            className="rounded-md bg-teal-700 px-5 py-2.5 font-semibold text-white shadow-sm hover:bg-teal-800 disabled:cursor-not-allowed disabled:bg-slate-400"
+            className={buttonClass("primary")}
           >
             {submitLabel}
           </button>

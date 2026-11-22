@@ -1,10 +1,11 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { describe, expect, it, vi } from "vitest";
 import type { Place } from "../api/types";
 import placeJson from "../test/fixtures/place-531787.json";
 import { calledUrls, routeFetch } from "../test/fetchMock";
-import { PlaceDetailPage, placeWarnings } from "./PlaceDetailPage";
+import { PlaceDetailPage, askAssistantText, placeWarnings } from "./PlaceDetailPage";
 
 vi.mock("../components/PlacesMap", async () => {
   const { createElement } = await import("react");
@@ -15,11 +16,16 @@ vi.mock("../components/PlacesMap", async () => {
 
 const place = placeJson as Place;
 
+function LocationProbe() {
+  return <p data-testid="probe">{JSON.stringify(useLocation().state)}</p>;
+}
+
 function renderDetail(poiId: string) {
   return render(
     <MemoryRouter initialEntries={[`/explore/${encodeURIComponent(poiId)}`]}>
       <Routes>
         <Route path="/explore/:poiId" element={<PlaceDetailPage />} />
+        <Route path="/" element={<LocationProbe />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -56,6 +62,15 @@ describe("PlaceDetailPage", () => {
     expect(await screen.findByRole("cell", { name: /Đường 23 tháng 8/ })).toBeInTheDocument();
     expect(screen.getByRole("rowheader", { name: "Điện thoại" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Mở trang nguồn" })).toHaveAttribute("href", place.source_url);
+  });
+
+  it("sends the user to the chat with a prefilled question about this place", async () => {
+    routeFetch(() => ({ body: place }));
+    renderDetail("huetripo:531787");
+
+    await userEvent.click(await screen.findByRole("link", { name: "Hỏi trợ lý về nơi này" }));
+
+    expect(screen.getByTestId("probe")).toHaveTextContent(JSON.stringify({ prefill: askAssistantText(place.name) }));
   });
 
   it("says the POI is not in the source on 404", async () => {

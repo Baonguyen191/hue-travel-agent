@@ -43,7 +43,7 @@ describe("TripRequestForm", () => {
 
     const origin = screen.getByLabelText("Điểm xuất phát");
     expect(origin).toHaveAttribute("aria-invalid", "true");
-    expect(origin).toHaveClass("border-red-500");
+    expect(origin).toHaveAttribute("aria-invalid", "true");
     expect(screen.getByText("Nhập điểm xuất phát.")).toBeInTheDocument();
     expect(screen.getByText("Chọn ngày đi.")).toBeInTheDocument();
     expect(screen.getByText("Chọn ngày về.")).toBeInTheDocument();

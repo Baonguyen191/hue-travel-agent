@@ -1,11 +1,13 @@
 import { Link } from "react-router-dom";
+import { PlaceIllustration, buttonClass, cardClass } from "../components/ui";
 
 export function NotFoundPage() {
   return (
-    <section className="rounded-lg border border-slate-200 bg-white p-6">
-      <h1 className="text-xl font-semibold">Không tìm thấy trang</h1>
-      <p className="mt-2 text-sm text-slate-600">Đường dẫn này không tồn tại.</p>
-      <Link to="/" className="mt-4 inline-block text-sm font-medium text-teal-700 underline">
+    <section className={cardClass("p-8 text-center")}>
+      <PlaceIllustration category="historic" className="mx-auto mb-4 h-32 w-48 rounded-xl" />
+      <h1 className="font-serif text-xl font-semibold text-son">Không tìm thấy trang</h1>
+      <p className="mt-2 text-sm text-muc-soft">Đường dẫn này không tồn tại.</p>
+      <Link to="/" className={`${buttonClass("outline")} mt-4`}>
         Về trang chủ
       </Link>
     </section>

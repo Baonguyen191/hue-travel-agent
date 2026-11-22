@@ -24,6 +24,13 @@ describe("PlaceCard", () => {
     expect(screen.getByRole("link", { name: "Đại Nội Huế" })).toHaveAttribute("href", "/explore/huetripo%3A531787");
   });
 
+  it("shows a photo named after the place from the photo endpoint", () => {
+    renderCard(place);
+
+    const photo = screen.getByRole("img", { name: "Đại Nội Huế" });
+    expect(photo.getAttribute("src")).toMatch(/\?w=480$/);
+  });
+
   it("shows rating, reference price with the unit caveat, and unverified hours", () => {
     renderCard(place);
 

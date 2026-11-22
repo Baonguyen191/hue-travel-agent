@@ -38,7 +38,7 @@ export function PlacesMap({ places, heightClass = "h-72 md:h-[480px]" }: PlacesM
 
   return (
     <div className="space-y-2">
-      <div role="region" aria-label="Bản đồ địa điểm" className="overflow-hidden rounded-lg border border-slate-200">
+      <div role="region" aria-label="Bản đồ địa điểm" className="overflow-hidden rounded-2xl border border-vien">
         <MapContainer
           center={HUE_CENTER}
           zoom={13}
@@ -51,13 +51,13 @@ export function PlacesMap({ places, heightClass = "h-72 md:h-[480px]" }: PlacesM
               key={place.id}
               center={[place.lat, place.lon]}
               radius={8}
-              pathOptions={{ color: "#ffffff", weight: 2, fillColor: CATEGORY_COLOR[place.category], fillOpacity: 0.95 }}
+              pathOptions={{ color: "#fffaf0", weight: 1.5, fillColor: CATEGORY_COLOR[place.category], fillOpacity: 0.95 }}
             >
               <Popup>
-                <Link to={placeDetailPath(place.id)} className="font-semibold text-teal-800 underline">
+                <Link to={placeDetailPath(place.id)} className="font-semibold text-son underline">
                   {place.name}
                 </Link>
-                <div className="text-xs text-slate-600">{CATEGORY_LABEL[place.category]}</div>
+                <div className="text-xs text-muc-soft">{CATEGORY_LABEL[place.category]}</div>
               </Popup>
             </CircleMarker>
           ))}
@@ -65,7 +65,7 @@ export function PlacesMap({ places, heightClass = "h-72 md:h-[480px]" }: PlacesM
         </MapContainer>
       </div>
       {legend.length > 0 ? (
-        <ul aria-label="Chú giải bản đồ" className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-700">
+        <ul aria-label="Chú giải bản đồ" className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muc-soft">
           {legend.map((option) => (
             <li key={option.value} className="flex items-center gap-1">
               <span aria-hidden="true" className="inline-block size-2.5 rounded-full" style={{ backgroundColor: option.color }} />
