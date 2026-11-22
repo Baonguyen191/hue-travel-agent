@@ -1,0 +1,1876 @@
+{
+  "config": {
+    "models": {
+      "extractor": "qwen3.5:4b",
+      "generator": "qwen3.5:4b",
+      "embedding": "bge-m3",
+      "judge": "qwen3.5:9b"
+    },
+    "k": 5,
+    "split": "dev",
+    "date": "2026-11-22",
+    "eval_ref": "2026-11-18",
+    "extractor": "ollama"
+  },
+  "summary": {
+    "n": 25,
+    "task_success_rate": 0.88,
+    "routing_accuracy": 1.0,
+    "trace_accuracy": 0.8571,
+    "tool_exact_rate": 0.92,
+    "tool_precision": 1.0,
+    "tool_recall": 0.9333,
+    "budget_compliance_rate": 0.75,
+    "budget_n": 4,
+    "schedule_feasibility_rate": 1.0,
+    "plans_n": 20,
+    "unchecked_visits": 0,
+    "constraint_satisfaction_rate": 0.7778,
+    "constraint_n": 18,
+    "constraint_by_type": {
+      "categories": 1.0,
+      "exclude": 1.0,
+      "exclude_categories": 0.3333,
+      "must_include": 1.0,
+      "num_days": 0.8889,
+      "start_date": 0.8889
+    },
+    "latency_p50_ms": 2349.2,
+    "latency_p95_ms": 4539.4,
+    "latency_mean_ms": 2594.8143,
+    "latency_by_handler": {
+      "ask_approve": {
+        "n": 3,
+        "latency_p50_ms": 2062.5,
+        "latency_p95_ms": 2073.1,
+        "latency_mean_ms": 2064.2
+      },
+      "ask_book": {
+        "n": 1,
+        "latency_p50_ms": 2042.2,
+        "latency_p95_ms": 2042.2,
+        "latency_mean_ms": 2042.2
+      },
+      "confirm_defaults": {
+        "n": 1,
+        "latency_p50_ms": 2132.5,
+        "latency_p95_ms": 2132.5,
+        "latency_mean_ms": 2132.5
+      },
+      "modify": {
+        "n": 2,
+        "latency_p50_ms": 2468.4,
+        "latency_p95_ms": 2521.6,
+        "latency_mean_ms": 2468.4
+      },
+      "out_of_scope": {
+        "n": 1,
+        "latency_p50_ms": 4409.7,
+        "latency_p95_ms": 4409.7,
+        "latency_mean_ms": 4409.7
+      },
+      "place_info": {
+        "n": 1,
+        "latency_p50_ms": 8137.1,
+        "latency_p95_ms": 8137.1,
+        "latency_mean_ms": 8137.1
+      },
+      "plan_new": {
+        "n": 23,
+        "latency_p50_ms": 2395.7,
+        "latency_p95_ms": 2584.0,
+        "latency_mean_ms": 2474.1783
+      },
+      "run_approve": {
+        "n": 2,
+        "latency_p50_ms": 2035.9,
+        "latency_p95_ms": 2053.8,
+        "latency_mean_ms": 2035.9
+      },
+      "run_book": {
+        "n": 1,
+        "latency_p50_ms": 1989.7,
+        "latency_p95_ms": 1989.7,
+        "latency_mean_ms": 1989.7
+      }
+    },
+    "tokens_per_turn": {
+      "prompt": 2002.6857,
+      "completion": 96.6,
+      "total": 2099.2857,
+      "by_component": {
+        "embedding": 0.2571,
+        "extractor": 2074.8571,
+        "rag_generator": 24.4286
+      }
+    },
+    "errors": 0
+  },
+  "records": [
+    {
+      "id": "s01",
+      "group": "plan_full",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "0198e4b8-14d6-4f46-8ba5-8d3126ffd604",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 4842.0,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1984,
+              "completion_tokens": 95,
+              "total_tokens": 2079,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s02",
+      "group": "plan_full",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "777a3276-b49e-4349-a176-5d8955605759",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Mình ở Đà Nẵng, 3 người, muốn đi Huế 3 ngày bắt đầu 5/12",
+          "handler": "plan_new",
+          "latency_ms": 2492.3,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1986,
+              "completion_tokens": 99,
+              "total_tokens": 2085,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s03",
+      "group": "plan_full",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "62526725-0407-4429-bb2e-a37d68843678",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Đi Huế 2 ngày từ 12/12, xuất phát từ Sài Gòn, 1 người",
+          "handler": "plan_new",
+          "latency_ms": 2587.0,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1986,
+              "completion_tokens": 98,
+              "total_tokens": 2084,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s04",
+      "group": "plan_full",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "f2a992c9-cd6b-4b74-b1be-450145455c8e",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Lên lịch Huế 3 ngày từ 1/1, đi từ Hà Nội, 4 người, thích lăng tẩm",
+          "handler": "plan_new",
+          "latency_ms": 2461.7,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1989,
+              "completion_tokens": 100,
+              "total_tokens": 2089,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s05",
+      "group": "plan_full",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "7a21561a-76a5-41b6-bfee-a8114a529155",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Quảng Trị, 2 người, đi Huế 2 ngày từ 27/12, thích ẩm thực và cà phê",
+          "handler": "plan_new",
+          "latency_ms": 2500.2,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1991,
+              "completion_tokens": 104,
+              "total_tokens": 2095,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s09",
+      "group": "plan_clarify",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "clarifying",
+      "expected_final_state": "clarifying",
+      "task_success": true,
+      "trace": null,
+      "trace_ok": null,
+      "tools_called": [],
+      "tools_exact": true,
+      "tool_counts": [
+        0,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [],
+      "constraints": {},
+      "turns": [
+        {
+          "text": "Đi Huế chơi vui",
+          "handler": "plan_new",
+          "latency_ms": 2244.2,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1968,
+              "completion_tokens": 88,
+              "total_tokens": 2056,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s10",
+      "group": "plan_clarify",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "clarifying",
+      "expected_final_state": "clarifying",
+      "task_success": true,
+      "trace": null,
+      "trace_ok": null,
+      "tools_called": [],
+      "tools_exact": true,
+      "tool_counts": [
+        0,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [],
+      "constraints": {},
+      "turns": [
+        {
+          "text": "Đi Huế 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 2164.9,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1976,
+              "completion_tokens": 94,
+              "total_tokens": 2070,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s11",
+      "group": "plan_clarify",
+      "split": "dev",
+      "handlers": [
+        "plan_new",
+        "confirm_defaults"
+      ],
+      "expected_handlers": [
+        "plan_new",
+        "confirm_defaults"
+      ],
+      "handler_hits": [
+        2,
+        2
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        2,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "7a955471-97d4-4812-9b29-f47806221dec",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Đi Huế 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 1823.6,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1976,
+              "completion_tokens": 94,
+              "total_tokens": 2070,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Dùng mặc định",
+          "handler": "confirm_defaults",
+          "latency_ms": 2132.5,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1967,
+              "completion_tokens": 86,
+              "total_tokens": 2053,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s14",
+      "group": "local_origin",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "clarifying",
+      "expected_final_state": "awaiting_approval",
+      "task_success": false,
+      "trace": null,
+      "trace_ok": false,
+      "tools_called": [],
+      "tools_exact": false,
+      "tool_counts": [
+        0,
+        0,
+        2
+      ],
+      "budget_ok": null,
+      "feasibility": [],
+      "constraints": {
+        "num_days": false,
+        "start_date": false
+      },
+      "turns": [
+        {
+          "text": "Mình ở Huế, 2 người, đi chơi 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 2254.0,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1984,
+              "completion_tokens": 95,
+              "total_tokens": 2079,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s15",
+      "group": "local_origin",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "poi_search"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        1,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "27d97762-67e0-4823-ab80-7c29bef8a403",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Huế, 1 người, đi chơi 1 ngày 28/11",
+          "handler": "plan_new",
+          "latency_ms": 2494.2,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1982,
+              "completion_tokens": 98,
+              "total_tokens": 2080,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s18",
+      "group": "budget",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": true,
+      "feasibility": [
+        {
+          "plan_id": "ee631256-5519-4ad4-bab5-b5ef93eb53ea",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12, ngân sách 20 triệu",
+          "handler": "plan_new",
+          "latency_ms": 2344.5,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1991,
+              "completion_tokens": 98,
+              "total_tokens": 2089,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s19",
+      "group": "budget",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": true,
+      "feasibility": [
+        {
+          "plan_id": "36fb9e86-75d6-45dc-b3ba-a169ba634df3",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 3 ngày từ 20/12, ngân sách 1 triệu",
+          "handler": "plan_new",
+          "latency_ms": 2378.0,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1990,
+              "completion_tokens": 97,
+              "total_tokens": 2087,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s20",
+      "group": "budget",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "clarifying",
+      "expected_final_state": "awaiting_approval",
+      "task_success": false,
+      "trace": null,
+      "trace_ok": false,
+      "tools_called": [],
+      "tools_exact": false,
+      "tool_counts": [
+        0,
+        0,
+        2
+      ],
+      "budget_ok": false,
+      "feasibility": [],
+      "constraints": {
+        "num_days": false,
+        "start_date": false
+      },
+      "turns": [
+        {
+          "text": "Ở Huế, 2 người, chơi 2 ngày từ 6/12, ngân sách 5 triệu",
+          "handler": "plan_new",
+          "latency_ms": 2244.1,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1987,
+              "completion_tokens": 96,
+              "total_tokens": 2083,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s21",
+      "group": "budget",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": true,
+      "feasibility": [
+        {
+          "plan_id": "cf917034-ba90-44e9-a1b2-ad886075f10b",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Sài Gòn, 4 người, đi Huế 3 ngày từ 1/12, tổng ngân sách 2 triệu",
+          "handler": "plan_new",
+          "latency_ms": 2445.6,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1990,
+              "completion_tokens": 104,
+              "total_tokens": 2094,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s24",
+      "group": "constraints",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "cdcc3800-1d5f-4ec3-86b8-e15ecf8cd3d3",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "must_include": true,
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12, phải đến Đại Nội và lăng vua Tự Đức",
+          "handler": "plan_new",
+          "latency_ms": 2557.4,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1994,
+              "completion_tokens": 105,
+              "total_tokens": 2099,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s25",
+      "group": "constraints",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "9dd9fb73-762c-4eaf-9fb7-b0727e9f49bf",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "exclude_categories": false,
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 22/12, không đi chùa",
+          "handler": "plan_new",
+          "latency_ms": 2423.4,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1988,
+              "completion_tokens": 98,
+              "total_tokens": 2086,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s26",
+      "group": "constraints",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "cbf36f20-4a1a-49cd-8344-0f54660ecb88",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "exclude": true,
+        "categories": true,
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Đà Nẵng, 2 người, đi Huế 3 ngày từ 5/12, thích lăng tẩm, bỏ qua lăng Khải Định",
+          "handler": "plan_new",
+          "latency_ms": 2527.6,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1994,
+              "completion_tokens": 105,
+              "total_tokens": 2099,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s27",
+      "group": "constraints",
+      "split": "dev",
+      "handlers": [
+        "plan_new"
+      ],
+      "expected_handlers": [
+        "plan_new"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "159c227b-0828-4e9d-a439-d21f058176a2",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "must_include": true,
+        "exclude_categories": true,
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 3 người, đi Huế 2 ngày từ 12/12, bắt buộc có chùa Thiên Mụ, không đi chợ",
+          "handler": "plan_new",
+          "latency_ms": 2489.5,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1996,
+              "completion_tokens": 104,
+              "total_tokens": 2100,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s30",
+      "group": "modify",
+      "split": "dev",
+      "handlers": [
+        "plan_new",
+        "modify"
+      ],
+      "expected_handlers": [
+        "plan_new",
+        "modify"
+      ],
+      "handler_hits": [
+        2,
+        2
+      ],
+      "final_state": "awaiting_approval",
+      "expected_final_state": "awaiting_approval",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval",
+        "await_approval",
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "e6313660-c068-4f7d-8430-b76ad46cdbff",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        },
+        {
+          "plan_id": "54e69b0d-1ce7-4775-9c4f-0fe0cd157b63",
+          "version": 2,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 2395.7,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1984,
+              "completion_tokens": 95,
+              "total_tokens": 2079,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Thêm 1 ngày nữa",
+          "handler": "modify",
+          "latency_ms": 2527.5,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1969,
+              "completion_tokens": 108,
+              "total_tokens": 2077,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s31",
+      "group": "modify",
+      "split": "dev",
+      "handlers": [
+        "plan_new",
+        "modify"
+      ],
+      "expected_handlers": [
+        "plan_new",
+        "modify"
+      ],
+      "handler_hits": [
+        2,
+        2
+      ],
+      "final_state": "failed",
+      "expected_final_state": "awaiting_approval",
+      "task_success": false,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": false,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "30517aae-65ea-4366-9687-1387d75eb49f",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {
+        "exclude_categories": false,
+        "num_days": true,
+        "start_date": true
+      },
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 2273.8,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1984,
+              "completion_tokens": 95,
+              "total_tokens": 2079,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Bỏ chùa ra khỏi lịch",
+          "handler": "modify",
+          "latency_ms": 2409.3,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1970,
+              "completion_tokens": 107,
+              "total_tokens": 2077,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s34",
+      "group": "approve_book",
+      "split": "dev",
+      "handlers": [
+        "plan_new",
+        "ask_approve"
+      ],
+      "expected_handlers": [
+        "plan_new",
+        "ask_approve"
+      ],
+      "handler_hits": [
+        2,
+        2
+      ],
+      "final_state": "confirming",
+      "expected_final_state": "confirming",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "e640222d-289a-4974-8c7d-5d9dbb115422",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {},
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 2349.2,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1984,
+              "completion_tokens": 95,
+              "total_tokens": 2079,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Duyệt BUDGET",
+          "handler": "ask_approve",
+          "latency_ms": 2062.5,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1969,
+              "completion_tokens": 87,
+              "total_tokens": 2056,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s35",
+      "group": "approve_book",
+      "split": "dev",
+      "handlers": [
+        "plan_new",
+        "ask_approve",
+        "run_approve"
+      ],
+      "expected_handlers": [
+        "plan_new",
+        "ask_approve",
+        "run_approve"
+      ],
+      "handler_hits": [
+        3,
+        3
+      ],
+      "final_state": "approved",
+      "expected_final_state": "approved",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval",
+        "await_approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        3,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "087ff4ba-68f2-4a3f-8794-99cefab2f621",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {},
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 2322.6,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1984,
+              "completion_tokens": 95,
+              "total_tokens": 2079,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Duyệt BUDGET",
+          "handler": "ask_approve",
+          "latency_ms": 2055.8,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1969,
+              "completion_tokens": 87,
+              "total_tokens": 2056,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Đồng ý",
+          "handler": "run_approve",
+          "latency_ms": 2055.8,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1966,
+              "completion_tokens": 84,
+              "total_tokens": 2050,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s36",
+      "group": "approve_book",
+      "split": "dev",
+      "handlers": [
+        "plan_new",
+        "ask_approve",
+        "run_approve",
+        "ask_book",
+        "run_book"
+      ],
+      "expected_handlers": [
+        "plan_new",
+        "ask_approve",
+        "run_approve",
+        "ask_book",
+        "run_book"
+      ],
+      "handler_hits": [
+        5,
+        5
+      ],
+      "final_state": "booked",
+      "expected_final_state": "booked",
+      "task_success": true,
+      "trace": [
+        "search",
+        "itinerary",
+        "budget",
+        "validate",
+        "approval",
+        "await_approval"
+      ],
+      "trace_ok": true,
+      "tools_called": [
+        "booking",
+        "hotel",
+        "poi_search",
+        "transport"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        4,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [
+        {
+          "plan_id": "dcbc95de-028b-4910-83ba-4b03200f5115",
+          "version": 1,
+          "ok": true,
+          "unchecked": 0,
+          "problems": []
+        }
+      ],
+      "constraints": {},
+      "turns": [
+        {
+          "text": "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12",
+          "handler": "plan_new",
+          "latency_ms": 2290.6,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1984,
+              "completion_tokens": 95,
+              "total_tokens": 2079,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Duyệt BUDGET",
+          "handler": "ask_approve",
+          "latency_ms": 2074.3,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1969,
+              "completion_tokens": 87,
+              "total_tokens": 2056,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Đồng ý",
+          "handler": "run_approve",
+          "latency_ms": 2016.0,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1966,
+              "completion_tokens": 84,
+              "total_tokens": 2050,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Đặt vé và khách sạn",
+          "handler": "ask_book",
+          "latency_ms": 2042.2,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1969,
+              "completion_tokens": 86,
+              "total_tokens": 2055,
+              "calls": 1
+            }
+          },
+          "error": null
+        },
+        {
+          "text": "Đồng ý",
+          "handler": "run_book",
+          "latency_ms": 1989.7,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1966,
+              "completion_tokens": 84,
+              "total_tokens": 2050,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s38",
+      "group": "place_and_other",
+      "split": "dev",
+      "handlers": [
+        "place_info"
+      ],
+      "expected_handlers": [
+        "place_info"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "answered",
+      "expected_final_state": "answered",
+      "task_success": true,
+      "trace": null,
+      "trace_ok": null,
+      "tools_called": [
+        "rag"
+      ],
+      "tools_exact": true,
+      "tool_counts": [
+        1,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [],
+      "constraints": {},
+      "turns": [
+        {
+          "text": "Đại Nội mấy giờ mở cửa?",
+          "handler": "place_info",
+          "latency_ms": 8137.1,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1971,
+              "completion_tokens": 88,
+              "total_tokens": 2059,
+              "calls": 1
+            },
+            "embedding": {
+              "prompt_tokens": 9,
+              "completion_tokens": 0,
+              "total_tokens": 9,
+              "calls": 1
+            },
+            "rag_generator": {
+              "prompt_tokens": 799,
+              "completion_tokens": 56,
+              "total_tokens": 855,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    },
+    {
+      "id": "s39",
+      "group": "place_and_other",
+      "split": "dev",
+      "handlers": [
+        "out_of_scope"
+      ],
+      "expected_handlers": [
+        "out_of_scope"
+      ],
+      "handler_hits": [
+        1,
+        1
+      ],
+      "final_state": "refused",
+      "expected_final_state": "refused",
+      "task_success": true,
+      "trace": null,
+      "trace_ok": null,
+      "tools_called": [],
+      "tools_exact": true,
+      "tool_counts": [
+        0,
+        0,
+        0
+      ],
+      "budget_ok": null,
+      "feasibility": [],
+      "constraints": {},
+      "turns": [
+        {
+          "text": "Thời tiết Đà Nẵng mai thế nào?",
+          "handler": "out_of_scope",
+          "latency_ms": 4409.7,
+          "usage": {
+            "extractor": {
+              "prompt_tokens": 1972,
+              "completion_tokens": 90,
+              "total_tokens": 2062,
+              "calls": 1
+            }
+          },
+          "error": null
+        }
+      ],
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,3351 @@
+{
+  "config": {
+    "models": {
+      "extractor": "qwen3.5:4b",
+      "generator": "qwen3.5:4b",
+      "embedding": "bge-m3",
+      "judge": "qwen3.5:9b"
+    },
+    "k": 5,
+    "split": "dev",
+    "date": "2026-11-22",
+    "eval_ref": "2026-11-18",
+    "extractor": "ollama"
+  },
+  "summary": {
+    "n": 40,
+    "context_precision": 0.7644,
+    "context_recall": 0.6717,
+    "faithfulness": 0.8526,
+    "answer_correctness": 0.5667,
+    "citation_hit_rate": 0.8,
+    "refusal_precision": 0.6154,
+    "refusal_recall": 0.8,
+    "judge_errors": 1,
+    "errors": 0,
+    "refusal_count": 13,
+    "n_scored": {
+      "context_precision": 30,
+      "context_recall": 30,
+      "faithfulness": 26,
+      "answer_correctness": 39
+    },
+    "fallback_count": 1,
+    "mode_counts": {
+      "hybrid": 39,
+      "bm25": 1
+    },
+    "latency_p50_ms": 22625.3,
+    "latency_p95_ms": 26130.0,
+    "latency_mean_ms": 19962.9125,
+    "tokens_per_turn": {
+      "prompt": 2860.6,
+      "completion": 164.075,
+      "total": 3024.675,
+      "by_component": {
+        "embedding": 11.15,
+        "extractor": 2062.625,
+        "rag_generator": 962.05
+      }
+    },
+    "judge_tokens_total": 37063,
+    "per_group": {
+      "by_category": {
+        "context_precision": 0.9117,
+        "context_recall": 0.61,
+        "faithfulness": 0.85,
+        "answer_correctness": 0.3413
+      },
+      "near_place": {
+        "context_precision": 0.4317,
+        "context_recall": 0.405,
+        "faithfulness": 0.5333,
+        "answer_correctness": 0.1524
+      },
+      "single_place": {
+        "context_precision": 0.95,
+        "context_recall": 1.0,
+        "faithfulness": 1.0,
+        "answer_correctness": 0.9167
+      },
+      "unanswerable": {
+        "context_precision": null,
+        "context_recall": null,
+        "faithfulness": 1.0,
+        "answer_correctness": 0.8889
+      }
+    }
+  },
+  "records": [
+    {
+      "id": "si01",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Đại Nội Huế mấy giờ mở cửa?",
+      "retrieved": [
+        "huetripo:531787",
+        "huetripo:749012",
+        "huetripo:067276",
+        "huetripo:039509",
+        "huetripo:604306"
+      ],
+      "relevant": [
+        "huetripo:531787"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:531787"
+      ],
+      "answerable": true,
+      "text": "Đại Nội Huế mở cửa từ 07:30 đến 17:30.",
+      "claims": [
+        "Đại Nội Huế mở cửa lúc 07:30.",
+        "Đại Nội Huế đóng cửa lúc 17:30."
+      ],
+      "supported": [
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 1.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 27684.4,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 89,
+          "total_tokens": 2061,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 802,
+          "completion_tokens": 56,
+          "total_tokens": 858,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 942,
+          "completion_tokens": 194,
+          "total_tokens": 1136,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si02",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Vé vào lăng vua Tự Đức bao nhiêu tiền?",
+      "retrieved": [
+        "huetripo:483480",
+        "huetripo:511996",
+        "huetripo:300955",
+        "huetripo:424131",
+        "huetripo:689381"
+      ],
+      "relevant": [
+        "huetripo:483480"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:483480"
+      ],
+      "answerable": true,
+      "text": "Vé vào Lăng vua Tự Đức là 150.000đ.",
+      "claims": [
+        "Giá vé vào Lăng vua Tự Đức là 150.000 đồng."
+      ],
+      "supported": [
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 1.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 24249.5,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1974,
+          "completion_tokens": 91,
+          "total_tokens": 2065,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 13,
+          "completion_tokens": 0,
+          "total_tokens": 13,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 799,
+          "completion_tokens": 54,
+          "total_tokens": 853,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 906,
+          "completion_tokens": 127,
+          "total_tokens": 1033,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si03",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Chè Hẻm ở đâu vậy?",
+      "retrieved": [
+        "huetripo:811386",
+        "huetripo:963244",
+        "huetripo:147978",
+        "huetripo:134193",
+        "huetripo:117679"
+      ],
+      "relevant": [
+        "huetripo:811386"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:811386",
+        "huetripo:963244"
+      ],
+      "answerable": true,
+      "text": "Chè Hẻm có hai địa điểm tại Huế.",
+      "claims": [
+        "Chè Hẻm có hai địa điểm.",
+        "Hai địa điểm của Chè Hẻm nằm tại Huế."
+      ],
+      "supported": [
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.5,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 23838.1,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 90,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 11,
+          "completion_tokens": 0,
+          "total_tokens": 11,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 754,
+          "completion_tokens": 72,
+          "total_tokens": 826,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 874,
+          "completion_tokens": 225,
+          "total_tokens": 1099,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si04",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Cho mình số điện thoại nhà hàng chay Tĩnh",
+      "retrieved": [
+        "huetripo:170220",
+        "huetripo:588308",
+        "huetripo:161214",
+        "huetripo:596425",
+        "huetripo:991652"
+      ],
+      "relevant": [
+        "huetripo:588308"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:588308"
+      ],
+      "answerable": true,
+      "text": "Số điện thoại của Nhà hàng chay Tĩnh là (+84) 234 3896 686.",
+      "claims": [
+        "Số điện thoại của Nhà hàng chay Tĩnh là (+84) 234 3896 686."
+      ],
+      "supported": [
+        true
+      ],
+      "context_precision": 0.5,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 1.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22954.1,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1973,
+          "completion_tokens": 91,
+          "total_tokens": 2064,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 914,
+          "completion_tokens": 66,
+          "total_tokens": 980,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1057,
+          "completion_tokens": 144,
+          "total_tokens": 1201,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si05",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Chợ Đông Ba Huế mở cửa lúc mấy giờ?",
+      "retrieved": [
+        "huetripo:759007",
+        "huetripo:187639",
+        "huetripo:193028",
+        "huetripo:642849",
+        "huetripo:274179"
+      ],
+      "relevant": [
+        "huetripo:759007"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:759007",
+        "huetripo:187639",
+        "huetripo:193028",
+        "huetripo:274179"
+      ],
+      "answerable": true,
+      "text": "Chợ Đông Ba có hai mã khác nhau với giờ mở cửa khác nhau.",
+      "claims": [
+        "Chợ Đông Ba có hai mã khác nhau.",
+        "Chợ Đông Ba có giờ mở cửa khác nhau."
+      ],
+      "supported": [
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.6666666666666666,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 23294.9,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1974,
+          "completion_tokens": 91,
+          "total_tokens": 2065,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 13,
+          "completion_tokens": 0,
+          "total_tokens": 13,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 937,
+          "completion_tokens": 91,
+          "total_tokens": 1028,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1059,
+          "completion_tokens": 166,
+          "total_tokens": 1225,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si06",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Giá vé Hải Vân Quan là bao nhiêu?",
+      "retrieved": [
+        "huetripo:657208",
+        "huetripo:301075",
+        "huetripo:528862",
+        "huetripo:566964",
+        "huetripo:627150"
+      ],
+      "relevant": [
+        "huetripo:657208"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:657208"
+      ],
+      "answerable": true,
+      "text": "Giá vé Hải Vân Quan là 70.000đ.",
+      "claims": [
+        "Giá vé Hải Vân Quan là 70.000 đồng."
+      ],
+      "supported": [
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 1.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22936.7,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1973,
+          "completion_tokens": 90,
+          "total_tokens": 2063,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 11,
+          "completion_tokens": 0,
+          "total_tokens": 11,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1181,
+          "completion_tokens": 51,
+          "total_tokens": 1232,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1278,
+          "completion_tokens": 122,
+          "total_tokens": 1400,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si07",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Cơm hến Hoa Đông bán giờ nào?",
+      "retrieved": [
+        "huetripo:422267",
+        "huetripo:810669",
+        "huetripo:492610",
+        "huetripo:302985",
+        "huetripo:547922"
+      ],
+      "relevant": [
+        "huetripo:422267"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:422267"
+      ],
+      "answerable": true,
+      "text": "Cơm hến Hoa Đông mở cửa từ 06:00 đến 11:00.",
+      "claims": [
+        "Cơm hến Hoa Đông mở cửa lúc 06:00.",
+        "Cơm hến Hoa Đông đóng cửa lúc 11:00."
+      ],
+      "supported": [
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 1.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22816.0,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1974,
+          "completion_tokens": 92,
+          "total_tokens": 2066,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 840,
+          "completion_tokens": 59,
+          "total_tokens": 899,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 996,
+          "completion_tokens": 206,
+          "total_tokens": 1202,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si08",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Nina's Café nằm ở địa chỉ nào?",
+      "retrieved": [
+        "huetripo:173018",
+        "huetripo:876014",
+        "huetripo:562031",
+        "huetripo:953253",
+        "huetripo:247938"
+      ],
+      "relevant": [
+        "huetripo:173018"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:173018"
+      ],
+      "answerable": true,
+      "text": "Nina's Café có địa chỉ là 16 Kiệt 34 Nguyễn Tri Phương, Phường Thuận Hóa, Thành phố Huế.",
+      "claims": [
+        "Nina's Café có địa chỉ là 16 Kiệt 34 Nguyễn Tri Phương.",
+        "Địa chỉ của Nina's Café thuộc Phường Thuận Hóa.",
+        "Nina's Café nằm ở Thành phố Huế."
+      ],
+      "supported": [
+        true,
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 1.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22679.0,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1973,
+          "completion_tokens": 90,
+          "total_tokens": 2063,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 773,
+          "completion_tokens": 63,
+          "total_tokens": 836,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 949,
+          "completion_tokens": 274,
+          "total_tokens": 1223,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si09",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Cầu Đập Đá mở đến mấy giờ?",
+      "retrieved": [
+        "huetripo:948370",
+        "huetripo:893269",
+        "huetripo:237950",
+        "huetripo:922167",
+        "huetripo:362387"
+      ],
+      "relevant": [
+        "huetripo:948370"
+      ],
+      "mode": "bm25",
+      "source": "llm",
+      "cited": [
+        "huetripo:948370"
+      ],
+      "answerable": true,
+      "text": "Cầu Đập Đá mở cửa từ 07:30 đến 21:30.",
+      "claims": [
+        "Cầu Đập Đá mở cửa lúc 07:30.",
+        "Cầu Đập Đá đóng cửa lúc 21:30."
+      ],
+      "supported": [
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 1.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 41415.3,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1973,
+          "completion_tokens": 91,
+          "total_tokens": 2064,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 708,
+          "completion_tokens": 58,
+          "total_tokens": 766,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 855,
+          "completion_tokens": 202,
+          "total_tokens": 1057,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "si10",
+      "group": "single_place",
+      "split": "dev",
+      "question": "Vé lăng vua Thiệu Trị giá bao nhiêu?",
+      "retrieved": [
+        "huetripo:300955",
+        "huetripo:424131",
+        "huetripo:689381",
+        "huetripo:702970",
+        "huetripo:447592"
+      ],
+      "relevant": [
+        "huetripo:300955"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:300955"
+      ],
+      "answerable": true,
+      "text": "Vé Lăng vua Thiệu Trị có giá 50.000đ.",
+      "claims": [
+        "Giá vé vào Lăng vua Thiệu Trị là 50.000 đồng."
+      ],
+      "supported": [
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 1.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22786.5,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1974,
+          "completion_tokens": 92,
+          "total_tokens": 2066,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 13,
+          "completion_tokens": 0,
+          "total_tokens": 13,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 882,
+          "completion_tokens": 58,
+          "total_tokens": 940,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 989,
+          "completion_tokens": 127,
+          "total_tokens": 1116,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "ne01",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Gần Đại Nội Huế có quán ăn nào?",
+      "retrieved": [
+        "huetripo:374894",
+        "huetripo:509157",
+        "huetripo:231374",
+        "huetripo:590262",
+        "huetripo:833143"
+      ],
+      "relevant": [
+        "huetripo:509157",
+        "huetripo:557300",
+        "huetripo:755120",
+        "huetripo:835734",
+        "huetripo:710902",
+        "huetripo:025716",
+        "huetripo:903953",
+        "huetripo:559187",
+        "huetripo:986093",
+        "huetripo:383425",
+        "huetripo:054890",
+        "huetripo:881937",
+        "huetripo:995229",
+        "huetripo:993096",
+        "huetripo:170056",
+        "huetripo:523406",
+        "huetripo:017950",
+        "huetripo:544647",
+        "huetripo:691469",
+        "huetripo:558069",
+        "huetripo:941923",
+        "huetripo:365110",
+        "huetripo:333531",
+        "huetripo:237896",
+        "huetripo:743905",
+        "huetripo:844513",
+        "huetripo:070678",
+        "huetripo:802985",
+        "huetripo:833143",
+        "huetripo:213432",
+        "huetripo:537273",
+        "huetripo:952596",
+        "huetripo:403419",
+        "huetripo:426584",
+        "huetripo:182011",
+        "huetripo:444246",
+        "huetripo:374894",
+        "huetripo:283899",
+        "huetripo:838220",
+        "huetripo:661968",
+        "huetripo:404132",
+        "huetripo:779162",
+        "huetripo:685911",
+        "huetripo:005896",
+        "huetripo:281866",
+        "huetripo:221624",
+        "huetripo:781196",
+        "huetripo:117679",
+        "huetripo:530642",
+        "huetripo:990157",
+        "huetripo:901527",
+        "huetripo:060979",
+        "huetripo:134239",
+        "huetripo:155427",
+        "huetripo:723283",
+        "huetripo:105157",
+        "huetripo:713931",
+        "huetripo:456587",
+        "huetripo:648664",
+        "huetripo:141103",
+        "huetripo:278383",
+        "huetripo:134193",
+        "huetripo:338888",
+        "huetripo:013539",
+        "huetripo:109725",
+        "huetripo:061073",
+        "huetripo:467577",
+        "huetripo:458313",
+        "huetripo:035874",
+        "huetripo:984770",
+        "huetripo:203064",
+        "huetripo:468063",
+        "huetripo:952313",
+        "huetripo:606704",
+        "huetripo:804422",
+        "huetripo:749063",
+        "huetripo:205769"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:509157"
+      ],
+      "answerable": true,
+      "text": "Gần Đại Nội Huế có Trung tâm ẩm thực Festival- Nhà hát Duyệt Thị Đường.",
+      "claims": [
+        "Trung tâm ẩm thực Festival nằm gần Đại Nội Huế.",
+        "Nhà hát Duyệt Thị Đường nằm gần Đại Nội Huế."
+      ],
+      "supported": [
+        true,
+        true
+      ],
+      "context_precision": 0.8666666666666667,
+      "context_recall": 0.6,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.6666666666666666,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 23007.4,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1973,
+          "completion_tokens": 91,
+          "total_tokens": 2064,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 13,
+          "completion_tokens": 0,
+          "total_tokens": 13,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1056,
+          "completion_tokens": 65,
+          "total_tokens": 1121,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1199,
+          "completion_tokens": 254,
+          "total_tokens": 1453,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "ne02",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Quán cà phê nào gần Đại Nội Huế?",
+      "retrieved": [
+        "huetripo:254866",
+        "huetripo:284715",
+        "huetripo:119916",
+        "huetripo:389732",
+        "huetripo:426600"
+      ],
+      "relevant": [
+        "huetripo:314094",
+        "huetripo:865193",
+        "huetripo:119916",
+        "huetripo:190722",
+        "huetripo:855775",
+        "huetripo:284715",
+        "huetripo:548659",
+        "huetripo:596164",
+        "huetripo:475649",
+        "huetripo:064689",
+        "huetripo:776041",
+        "huetripo:455402",
+        "huetripo:266349",
+        "huetripo:406004",
+        "huetripo:485253",
+        "huetripo:109101",
+        "huetripo:738584",
+        "huetripo:406926",
+        "huetripo:254866",
+        "huetripo:679490",
+        "huetripo:591121",
+        "huetripo:389732",
+        "huetripo:321976",
+        "huetripo:037230",
+        "huetripo:476837",
+        "huetripo:991055",
+        "huetripo:426600",
+        "huetripo:965753",
+        "huetripo:238093",
+        "huetripo:514529",
+        "huetripo:021166",
+        "huetripo:204705",
+        "huetripo:212922",
+        "huetripo:035420",
+        "huetripo:195957",
+        "huetripo:130209",
+        "huetripo:151879",
+        "huetripo:655863",
+        "huetripo:772857",
+        "huetripo:039771",
+        "huetripo:448759",
+        "huetripo:561302",
+        "huetripo:338473",
+        "huetripo:354906",
+        "huetripo:760414",
+        "huetripo:143996",
+        "huetripo:191196",
+        "huetripo:462334",
+        "huetripo:984303",
+        "huetripo:609313",
+        "huetripo:890433",
+        "huetripo:745840"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:254866",
+        "huetripo:284715",
+        "huetripo:119916"
+      ],
+      "answerable": true,
+      "text": "Đại Nội Huế nằm trong khu vực trung tâm thành phố, nên nhiều quán cà phê xung quanh đều khá gần như Cà Phê Muối Huế, Quán Cà phê Chiều và Highlands Coffee 27 Lê Huân.",
+      "claims": [
+        "Đại Nội Huế nằm trong khu vực trung tâm thành phố.",
+        "Cà Phê Muối Huế là một quán cà phê gần Đại Nội Huế.",
+        "Quán Cà phê Chiều là một quán cà phê gần Đại Nội Huế.",
+        "Highlands Coffee 27 Lê Huân là một quán cà phê gần Đại Nội Huế."
+      ],
+      "supported": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 0.0,
+      "answer_correctness": 0.2857142857142857,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 24157.2,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1973,
+          "completion_tokens": 89,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 867,
+          "completion_tokens": 144,
+          "total_tokens": 1011,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1107,
+          "completion_tokens": 322,
+          "total_tokens": 1429,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "ne03",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Có quán cà phê nào gần chợ Đông Ba Huế không?",
+      "retrieved": [
+        "huetripo:138403",
+        "huetripo:759007",
+        "huetripo:193028",
+        "huetripo:642849",
+        "huetripo:043179"
+      ],
+      "relevant": [
+        "huetripo:872148",
+        "huetripo:973110",
+        "huetripo:979626",
+        "huetripo:633944",
+        "huetripo:040876",
+        "huetripo:039771",
+        "huetripo:191196",
+        "huetripo:462334",
+        "huetripo:760414",
+        "huetripo:143996",
+        "huetripo:491850",
+        "huetripo:537451",
+        "huetripo:972057",
+        "huetripo:021166",
+        "huetripo:204705",
+        "huetripo:212922",
+        "huetripo:213010",
+        "huetripo:609449",
+        "huetripo:039998",
+        "huetripo:851838",
+        "huetripo:246699",
+        "huetripo:799432",
+        "huetripo:130209",
+        "huetripo:485253",
+        "huetripo:687894",
+        "huetripo:561742",
+        "huetripo:655863",
+        "huetripo:011377",
+        "huetripo:064689",
+        "huetripo:745840",
+        "huetripo:776041",
+        "huetripo:455402",
+        "huetripo:109101",
+        "huetripo:151879",
+        "huetripo:480210",
+        "huetripo:302901",
+        "huetripo:811121",
+        "huetripo:925003",
+        "huetripo:266349",
+        "huetripo:406004",
+        "huetripo:393677",
+        "huetripo:651141",
+        "huetripo:830181",
+        "huetripo:061551",
+        "huetripo:527285",
+        "huetripo:591121",
+        "huetripo:126213",
+        "huetripo:506028",
+        "huetripo:044510",
+        "huetripo:611779",
+        "huetripo:901823",
+        "huetripo:965753",
+        "huetripo:476837",
+        "huetripo:991055",
+        "huetripo:087203",
+        "huetripo:851697",
+        "huetripo:161709",
+        "huetripo:127875",
+        "huetripo:542353",
+        "huetripo:307830",
+        "huetripo:165043",
+        "huetripo:195957",
+        "huetripo:953253"
+      ],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về quán cà phê gần chợ Đông Ba Huế.",
+      "claims": [],
+      "supported": [],
+      "context_precision": 0.0,
+      "context_recall": 0.0,
+      "faithfulness": null,
+      "answer_correctness": 0.0,
+      "citation_hit": false,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22361.3,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1976,
+          "completion_tokens": 90,
+          "total_tokens": 2066,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 14,
+          "completion_tokens": 0,
+          "total_tokens": 14,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1115,
+          "completion_tokens": 39,
+          "total_tokens": 1154,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "ne04",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Ăn gì gần chợ Đông Ba Huế?",
+      "retrieved": [
+        "huetripo:973110",
+        "huetripo:274179",
+        "huetripo:872148",
+        "huetripo:193028",
+        "huetripo:799262"
+      ],
+      "relevant": [
+        "huetripo:460728",
+        "huetripo:593425",
+        "huetripo:507856",
+        "huetripo:884324",
+        "huetripo:264100",
+        "huetripo:746164",
+        "huetripo:767055",
+        "huetripo:035874",
+        "huetripo:207642",
+        "huetripo:984770",
+        "huetripo:620420",
+        "huetripo:155427",
+        "huetripo:723283",
+        "huetripo:343741",
+        "huetripo:799262",
+        "huetripo:679775",
+        "huetripo:606704",
+        "huetripo:117679",
+        "huetripo:530642",
+        "huetripo:990157",
+        "huetripo:675334",
+        "huetripo:094008",
+        "huetripo:404132",
+        "huetripo:661968",
+        "huetripo:426584",
+        "huetripo:403419",
+        "huetripo:952596",
+        "huetripo:182011",
+        "huetripo:444246",
+        "huetripo:374894",
+        "huetripo:283899",
+        "huetripo:467577",
+        "huetripo:458313",
+        "huetripo:581302",
+        "huetripo:743905",
+        "huetripo:844513",
+        "huetripo:060979",
+        "huetripo:134239",
+        "huetripo:749063",
+        "huetripo:685911",
+        "huetripo:719204",
+        "huetripo:535174",
+        "huetripo:464669",
+        "huetripo:481321",
+        "huetripo:617884",
+        "huetripo:881937",
+        "huetripo:995229",
+        "huetripo:133247",
+        "huetripo:383225",
+        "huetripo:526328",
+        "huetripo:989865",
+        "huetripo:987636",
+        "huetripo:437382",
+        "huetripo:054890",
+        "huetripo:761118",
+        "huetripo:499556",
+        "huetripo:193173",
+        "huetripo:623011",
+        "huetripo:488875",
+        "huetripo:915686",
+        "huetripo:013539",
+        "huetripo:213432",
+        "huetripo:678691",
+        "huetripo:934395",
+        "huetripo:333531",
+        "huetripo:328925",
+        "huetripo:997411",
+        "huetripo:142479",
+        "huetripo:093299",
+        "huetripo:738150",
+        "huetripo:441527",
+        "huetripo:127409",
+        "huetripo:468063",
+        "huetripo:171371",
+        "huetripo:605161",
+        "huetripo:368669",
+        "huetripo:333763",
+        "huetripo:100418",
+        "huetripo:236567",
+        "huetripo:742890",
+        "huetripo:893269",
+        "huetripo:804422",
+        "huetripo:338888",
+        "huetripo:702640",
+        "huetripo:952313",
+        "huetripo:332100",
+        "huetripo:214413",
+        "huetripo:975754",
+        "huetripo:102328",
+        "huetripo:494945",
+        "huetripo:031179",
+        "huetripo:365393",
+        "huetripo:019992",
+        "huetripo:776244",
+        "huetripo:952789",
+        "huetripo:119606",
+        "huetripo:098197",
+        "huetripo:126566",
+        "huetripo:219714",
+        "huetripo:025716",
+        "huetripo:391295",
+        "huetripo:020929",
+        "huetripo:949501",
+        "huetripo:940412",
+        "huetripo:207754",
+        "huetripo:703823",
+        "huetripo:937980",
+        "huetripo:552716",
+        "huetripo:141042",
+        "huetripo:884925",
+        "huetripo:459835",
+        "huetripo:931714",
+        "huetripo:680689",
+        "huetripo:684471",
+        "huetripo:822662",
+        "huetripo:091004",
+        "huetripo:108247",
+        "huetripo:647027",
+        "huetripo:545138",
+        "huetripo:390853",
+        "huetripo:568297",
+        "huetripo:763349",
+        "huetripo:970953",
+        "huetripo:075442",
+        "huetripo:528750",
+        "huetripo:892115",
+        "huetripo:957846",
+        "huetripo:863024",
+        "huetripo:486048",
+        "huetripo:590649",
+        "huetripo:136860",
+        "huetripo:412837",
+        "huetripo:466598",
+        "huetripo:723817",
+        "huetripo:893623",
+        "huetripo:213296",
+        "huetripo:995000",
+        "huetripo:664720",
+        "huetripo:212233",
+        "huetripo:465966",
+        "huetripo:093385",
+        "huetripo:090955",
+        "huetripo:523614",
+        "huetripo:239441",
+        "huetripo:894312",
+        "huetripo:243140",
+        "huetripo:769132",
+        "huetripo:882255",
+        "huetripo:942888",
+        "huetripo:410479",
+        "huetripo:538250",
+        "huetripo:340449",
+        "huetripo:403044",
+        "huetripo:309985",
+        "huetripo:902744",
+        "huetripo:000288",
+        "huetripo:635199",
+        "huetripo:802985",
+        "huetripo:357230",
+        "huetripo:085561",
+        "huetripo:552909",
+        "huetripo:755120",
+        "huetripo:870913",
+        "huetripo:986093",
+        "huetripo:948421",
+        "huetripo:977695",
+        "huetripo:302985",
+        "huetripo:067599",
+        "huetripo:721094",
+        "huetripo:737785",
+        "huetripo:854479",
+        "huetripo:230893",
+        "huetripo:566906",
+        "huetripo:102876",
+        "huetripo:373405",
+        "huetripo:901196",
+        "huetripo:025890",
+        "huetripo:422267",
+        "huetripo:568785",
+        "huetripo:757632",
+        "huetripo:469927",
+        "huetripo:758778",
+        "huetripo:091689",
+        "huetripo:855005",
+        "huetripo:702069",
+        "huetripo:615115",
+        "huetripo:622298",
+        "huetripo:061073",
+        "huetripo:051177",
+        "huetripo:392012",
+        "huetripo:719119",
+        "huetripo:010663",
+        "huetripo:084614",
+        "huetripo:422641",
+        "huetripo:467517",
+        "huetripo:402904",
+        "huetripo:942160",
+        "huetripo:275453",
+        "huetripo:704299",
+        "huetripo:249781",
+        "huetripo:664207",
+        "huetripo:308080",
+        "huetripo:955959",
+        "huetripo:355218",
+        "huetripo:575981",
+        "huetripo:191104",
+        "huetripo:876531",
+        "huetripo:822655",
+        "huetripo:693049",
+        "huetripo:948725",
+        "huetripo:684212",
+        "huetripo:060066",
+        "huetripo:064104",
+        "huetripo:391882",
+        "huetripo:948522",
+        "huetripo:120891",
+        "huetripo:693709",
+        "huetripo:673942",
+        "huetripo:469230",
+        "huetripo:567214",
+        "huetripo:890351",
+        "huetripo:231374",
+        "huetripo:697969",
+        "huetripo:207976",
+        "huetripo:811386",
+        "huetripo:963244"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:799262",
+        "huetripo:872148"
+      ],
+      "answerable": true,
+      "text": "Bạn có thể ăn bún bò o Bê hoặc cà phê tại Đề-Pô Cafe gần chợ Đông Ba.",
+      "claims": [
+        "Bạn có thể ăn bún bò hến ở Đề-Pô Cafe.",
+        "Đề-Pô Cafe nằm gần chợ Đông Ba.",
+        "Bạn có thể uống cà phê ở Đề-Pô Cafe."
+      ],
+      "supported": [
+        false,
+        true,
+        true
+      ],
+      "context_precision": 0.2,
+      "context_recall": 0.2,
+      "faithfulness": 0.6666666666666666,
+      "answer_correctness": 0.2857142857142857,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10968.6,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 91,
+          "total_tokens": 2063,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 751,
+          "completion_tokens": 83,
+          "total_tokens": 834,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 921,
+          "completion_tokens": 275,
+          "total_tokens": 1196,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "ne05",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Quán ăn gần Ga Huế",
+      "retrieved": [
+        "huetripo:937980",
+        "huetripo:704299",
+        "huetripo:098197",
+        "huetripo:260047",
+        "huetripo:352234"
+      ],
+      "relevant": [
+        "huetripo:763807",
+        "huetripo:886219",
+        "huetripo:377228",
+        "huetripo:862962",
+        "huetripo:387810",
+        "huetripo:832840",
+        "huetripo:273223",
+        "huetripo:473832",
+        "huetripo:493382",
+        "huetripo:633725",
+        "huetripo:727727",
+        "huetripo:364983",
+        "huetripo:364833",
+        "huetripo:239668",
+        "huetripo:000816",
+        "huetripo:349052",
+        "huetripo:647879",
+        "huetripo:992963",
+        "huetripo:338032",
+        "huetripo:282232",
+        "huetripo:378900",
+        "huetripo:059055",
+        "huetripo:847216",
+        "huetripo:116402",
+        "huetripo:704727",
+        "huetripo:066374",
+        "huetripo:126845",
+        "huetripo:744893",
+        "huetripo:442030",
+        "huetripo:890452",
+        "huetripo:974376",
+        "huetripo:589446",
+        "huetripo:378430",
+        "huetripo:384172",
+        "huetripo:938280",
+        "huetripo:680901",
+        "huetripo:909211",
+        "huetripo:323855",
+        "huetripo:588308",
+        "huetripo:483023",
+        "huetripo:897020",
+        "huetripo:187139",
+        "huetripo:813963",
+        "huetripo:589337",
+        "huetripo:719836",
+        "huetripo:582897",
+        "huetripo:696544",
+        "huetripo:415026",
+        "huetripo:839584",
+        "huetripo:239009",
+        "huetripo:958351",
+        "huetripo:779162",
+        "huetripo:155687",
+        "huetripo:281843",
+        "huetripo:105157",
+        "huetripo:124347",
+        "huetripo:416067",
+        "huetripo:710902",
+        "huetripo:365110",
+        "huetripo:932012",
+        "huetripo:170056",
+        "huetripo:523406",
+        "huetripo:559187"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:937980",
+        "huetripo:704299",
+        "huetripo:098197"
+      ],
+      "answerable": true,
+      "text": "Bạn có thể thử các quán ăn như Bún Bò Huế Sen, Hẻm Huế hoặc Nhà hàng Chez Maïs.",
+      "claims": [
+        "Bạn có thể thử quán ăn Bún Bò Huế Sen.",
+        "Bạn có thể thử quán ăn Hẻm Huế.",
+        "Bạn có thể thử nhà hàng Chez Maïs."
+      ],
+      "supported": [
+        true,
+        true,
+        true
+      ],
+      "context_precision": 0.0,
+      "context_recall": 0.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.0,
+      "citation_hit": false,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 24008.1,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1969,
+          "completion_tokens": 89,
+          "total_tokens": 2058,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 8,
+          "completion_tokens": 0,
+          "total_tokens": 8,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 994,
+          "completion_tokens": 125,
+          "total_tokens": 1119,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1161,
+          "completion_tokens": 261,
+          "total_tokens": 1422,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "ne06",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Cà phê gần Ga Huế chỗ nào?",
+      "retrieved": [
+        "huetripo:138403",
+        "huetripo:642849",
+        "huetripo:033595",
+        "huetripo:668126",
+        "huetripo:771272"
+      ],
+      "relevant": [
+        "huetripo:458735",
+        "huetripo:967406",
+        "huetripo:995392",
+        "huetripo:657899",
+        "huetripo:342621",
+        "huetripo:544744",
+        "huetripo:659480",
+        "huetripo:516867",
+        "huetripo:998909",
+        "huetripo:859896",
+        "huetripo:203713",
+        "huetripo:130256",
+        "huetripo:227575",
+        "huetripo:345813",
+        "huetripo:109957",
+        "huetripo:360304",
+        "huetripo:669664",
+        "huetripo:787169",
+        "huetripo:040635",
+        "huetripo:786445",
+        "huetripo:051725",
+        "huetripo:842599",
+        "huetripo:637147",
+        "huetripo:993823",
+        "huetripo:837150",
+        "huetripo:238093",
+        "huetripo:514529",
+        "huetripo:389732",
+        "huetripo:551675",
+        "huetripo:321976",
+        "huetripo:426600",
+        "huetripo:254750",
+        "huetripo:679490",
+        "huetripo:589081",
+        "huetripo:041637",
+        "huetripo:214243",
+        "huetripo:595981",
+        "huetripo:692263",
+        "huetripo:284101",
+        "huetripo:313307",
+        "huetripo:488394",
+        "huetripo:181379"
+      ],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về quán cà phê gần Ga Huế.",
+      "claims": [],
+      "supported": [],
+      "context_precision": 0.0,
+      "context_recall": 0.0,
+      "faithfulness": null,
+      "answer_correctness": 0.0,
+      "citation_hit": false,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22399.8,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 92,
+          "total_tokens": 2064,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 568,
+          "completion_tokens": 37,
+          "total_tokens": 605,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "ne07",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Gần lăng vua Tự Đức có chỗ nào ăn trưa?",
+      "retrieved": [
+        "huetripo:702970",
+        "huetripo:235246",
+        "huetripo:300955",
+        "huetripo:318963",
+        "huetripo:487864"
+      ],
+      "relevant": [
+        "huetripo:755289",
+        "huetripo:175326",
+        "huetripo:318963",
+        "huetripo:586446"
+      ],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Gần Lăng vua Tự Đức không có thông tin về địa điểm ăn trưa trong dữ liệu hiện có.",
+      "claims": [],
+      "supported": [],
+      "context_precision": 0.25,
+      "context_recall": 0.25,
+      "faithfulness": null,
+      "answer_correctness": 0.0,
+      "citation_hit": false,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10013.5,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1975,
+          "completion_tokens": 92,
+          "total_tokens": 2067,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 16,
+          "completion_tokens": 0,
+          "total_tokens": 16,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 657,
+          "completion_tokens": 42,
+          "total_tokens": 699,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "ne08",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Quán cà phê gần lăng vua Tự Đức",
+      "retrieved": [
+        "huetripo:419863",
+        "huetripo:064162",
+        "huetripo:793429",
+        "huetripo:699588",
+        "huetripo:726348"
+      ],
+      "relevant": [
+        "huetripo:745419",
+        "huetripo:128891",
+        "huetripo:574451",
+        "huetripo:658058"
+      ],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về quán cà phê gần Lăng vua Tự Đức.",
+      "claims": [],
+      "supported": [],
+      "context_precision": 0.0,
+      "context_recall": 0.0,
+      "faithfulness": null,
+      "answer_correctness": 0.0,
+      "citation_hit": false,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10122.4,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 90,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 661,
+          "completion_tokens": 38,
+          "total_tokens": 699,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "ne09",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Quán ăn gần chùa Bảo Quốc",
+      "retrieved": [
+        "huetripo:890452",
+        "huetripo:155687",
+        "huetripo:000816",
+        "huetripo:483023",
+        "huetripo:377228"
+      ],
+      "relevant": [
+        "huetripo:349052",
+        "huetripo:000816",
+        "huetripo:647879",
+        "huetripo:763807",
+        "huetripo:588308",
+        "huetripo:727727",
+        "huetripo:126845",
+        "huetripo:473832",
+        "huetripo:886219",
+        "huetripo:847216",
+        "huetripo:273223",
+        "huetripo:862962",
+        "huetripo:442030",
+        "huetripo:890452",
+        "huetripo:387810",
+        "huetripo:239668",
+        "huetripo:364983",
+        "huetripo:719836",
+        "huetripo:582897",
+        "huetripo:938280",
+        "huetripo:696544",
+        "huetripo:680901",
+        "huetripo:415026",
+        "huetripo:059055",
+        "huetripo:992963",
+        "huetripo:338032",
+        "huetripo:282232",
+        "huetripo:744893",
+        "huetripo:378900",
+        "huetripo:909211",
+        "huetripo:832840",
+        "huetripo:589446",
+        "huetripo:116402",
+        "huetripo:704727",
+        "huetripo:364833",
+        "huetripo:066374",
+        "huetripo:377228",
+        "huetripo:483023",
+        "huetripo:493382",
+        "huetripo:633725",
+        "huetripo:124347",
+        "huetripo:378430",
+        "huetripo:589337",
+        "huetripo:839584",
+        "huetripo:974376",
+        "huetripo:384172",
+        "huetripo:416067",
+        "huetripo:961128",
+        "huetripo:281843",
+        "huetripo:155687",
+        "huetripo:490594",
+        "huetripo:932012",
+        "huetripo:323855",
+        "huetripo:321858",
+        "huetripo:813963",
+        "huetripo:175852",
+        "huetripo:187139",
+        "huetripo:897020",
+        "huetripo:008664",
+        "huetripo:622176",
+        "huetripo:602150",
+        "huetripo:623103",
+        "huetripo:349567",
+        "huetripo:318921",
+        "huetripo:378168",
+        "huetripo:793003"
+      ],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Chùa Bảo Quốc nằm ở đường Trần Phú, nhưng ngữ cảnh không có thông tin về quán ăn gần đó.",
+      "claims": [],
+      "supported": [],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": null,
+      "answer_correctness": 0.0,
+      "citation_hit": false,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10095.4,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1970,
+          "completion_tokens": 90,
+          "total_tokens": 2060,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 9,
+          "completion_tokens": 0,
+          "total_tokens": 9,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 605,
+          "completion_tokens": 44,
+          "total_tokens": 649,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "ne10",
+      "group": "near_place",
+      "split": "dev",
+      "question": "Cà phê gần chùa Bảo Quốc",
+      "retrieved": [
+        "huetripo:995392",
+        "huetripo:284101",
+        "huetripo:371393",
+        "huetripo:109957",
+        "huetripo:040635"
+      ],
+      "relevant": [
+        "huetripo:130256",
+        "huetripo:995392",
+        "huetripo:458735",
+        "huetripo:967406",
+        "huetripo:516867",
+        "huetripo:998909",
+        "huetripo:342621",
+        "huetripo:544744",
+        "huetripo:659480",
+        "huetripo:842599",
+        "huetripo:051725",
+        "huetripo:637147",
+        "huetripo:859896",
+        "huetripo:786445",
+        "huetripo:345813",
+        "huetripo:203713",
+        "huetripo:360304",
+        "huetripo:993823",
+        "huetripo:040635",
+        "huetripo:109957",
+        "huetripo:657899",
+        "huetripo:837150",
+        "huetripo:313307",
+        "huetripo:488394",
+        "huetripo:227575",
+        "huetripo:669664",
+        "huetripo:787169",
+        "huetripo:181379",
+        "huetripo:589081",
+        "huetripo:254750",
+        "huetripo:551675",
+        "huetripo:214243",
+        "huetripo:595981",
+        "huetripo:605560",
+        "huetripo:284101",
+        "huetripo:526797",
+        "huetripo:041637",
+        "huetripo:692263",
+        "huetripo:726144",
+        "huetripo:255479",
+        "huetripo:371393",
+        "huetripo:135270",
+        "huetripo:401888"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:995392",
+        "huetripo:284101",
+        "huetripo:371393"
+      ],
+      "answerable": true,
+      "text": "Chùa Bảo Quốc nằm ở đường Trần Phú, nên các quán cà phê gần đó bao gồm CHAIYO, Kool Kafe và Cà Phê Phú Gia Vân.",
+      "claims": [
+        "Chùa Bảo Quốc nằm ở đường Trần Phú.",
+        "CHAIYO là một quán cà phê gần Chùa Bảo Quốc.",
+        "Kool Kafe là một quán cà phê gần Chùa Bảo Quốc.",
+        "Cà Phê Phú Gia Vân là một quán cà phê gần Chùa Bảo Quốc."
+      ],
+      "supported": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 0.0,
+      "answer_correctness": 0.2857142857142857,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 11585.4,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1970,
+          "completion_tokens": 94,
+          "total_tokens": 2064,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 8,
+          "completion_tokens": 0,
+          "total_tokens": 8,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 592,
+          "completion_tokens": 135,
+          "total_tokens": 727,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 810,
+          "completion_tokens": 322,
+          "total_tokens": 1132,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by01",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Ở Huế có bảo tàng nào?",
+      "retrieved": [
+        "huetripo:033096",
+        "huetripo:536447",
+        "huetripo:744966",
+        "huetripo:137498",
+        "huetripo:700417"
+      ],
+      "relevant": [
+        "huetripo:744966",
+        "huetripo:033096",
+        "huetripo:752990",
+        "huetripo:610503",
+        "huetripo:066285",
+        "huetripo:700417",
+        "huetripo:536447",
+        "huetripo:137498"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:033096",
+        "huetripo:536447",
+        "huetripo:744966"
+      ],
+      "answerable": true,
+      "text": "Tại Huế có nhiều bảo tàng như Bảo tàng Hồ Chí Minh, Bảo tàng Cổ vật Cung đình Huế và Bảo tàng Gốm cổ Sông Hương.",
+      "claims": [
+        "Huế có nhiều bảo tàng.",
+        "Bảo tàng Hồ Chí Minh nằm tại Huế.",
+        "Bảo tàng Cổ vật Cung đình Huế nằm tại Huế.",
+        "Bảo tàng Gốm cổ Sông Hương nằm tại Huế."
+      ],
+      "supported": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.8888888888888888,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22691.9,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1971,
+          "completion_tokens": 89,
+          "total_tokens": 2060,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 9,
+          "completion_tokens": 0,
+          "total_tokens": 9,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 686,
+          "completion_tokens": 88,
+          "total_tokens": 774,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 876,
+          "completion_tokens": 322,
+          "total_tokens": 1198,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by02",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Nhà hàng chay nào ở Huế?",
+      "retrieved": [
+        "huetripo:378430",
+        "huetripo:065588",
+        "huetripo:588308",
+        "huetripo:725223",
+        "huetripo:226279"
+      ],
+      "relevant": [
+        "huetripo:588308",
+        "huetripo:912311",
+        "huetripo:596425",
+        "huetripo:892115",
+        "huetripo:780989",
+        "huetripo:991652",
+        "huetripo:226279",
+        "huetripo:012662",
+        "huetripo:378430",
+        "huetripo:957846",
+        "huetripo:170220",
+        "huetripo:063827",
+        "huetripo:606704",
+        "huetripo:537273",
+        "huetripo:161214",
+        "huetripo:065588",
+        "huetripo:166472",
+        "huetripo:491137",
+        "huetripo:621998",
+        "huetripo:773405",
+        "huetripo:045842",
+        "huetripo:119890",
+        "huetripo:251801",
+        "huetripo:429185",
+        "huetripo:243140",
+        "huetripo:769132",
+        "huetripo:882255",
+        "huetripo:609011",
+        "huetripo:094008",
+        "huetripo:321858",
+        "huetripo:545366"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:378430",
+        "huetripo:065588",
+        "huetripo:588308"
+      ],
+      "answerable": true,
+      "text": "Tại Huế có nhiều nhà hàng chay nổi bật như Sala, An Nhiên và Tĩnh.",
+      "claims": [
+        "Huế có nhiều nhà hàng chay.",
+        "Sala là một nhà hàng chay tại Huế.",
+        "An Nhiên là một nhà hàng chay tại Huế.",
+        "Tĩnh là một nhà hàng chay tại Huế."
+      ],
+      "supported": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "context_precision": 0.95,
+      "context_recall": 0.8,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.6666666666666666,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 23189.9,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1971,
+          "completion_tokens": 89,
+          "total_tokens": 2060,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1071,
+          "completion_tokens": 79,
+          "total_tokens": 1150,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1242,
+          "completion_tokens": 272,
+          "total_tokens": 1514,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by03",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Chùa nào ở Huế được đánh giá cao?",
+      "retrieved": [
+        "huetripo:309127",
+        "huetripo:320461",
+        "huetripo:695546",
+        "huetripo:860594",
+        "huetripo:248230"
+      ],
+      "relevant": [
+        "huetripo:238067",
+        "huetripo:767835",
+        "huetripo:197559",
+        "huetripo:736460",
+        "huetripo:672780",
+        "huetripo:865952",
+        "huetripo:172360",
+        "huetripo:323862",
+        "huetripo:224399",
+        "huetripo:880638",
+        "huetripo:710305",
+        "huetripo:862938",
+        "huetripo:861861",
+        "huetripo:597147",
+        "huetripo:563314",
+        "huetripo:672346",
+        "huetripo:309127"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:309127",
+        "huetripo:695546"
+      ],
+      "answerable": true,
+      "text": "Chùa Diêm Phụng có mức đánh giá cao nhất với 4.8/5.",
+      "claims": [
+        "Chùa Diêm Phụng có mức đánh giá là 4.8.",
+        "Mức đánh giá của Chùa Diêm Phụng là 4.8 trên thang điểm 5."
+      ],
+      "supported": [
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 0.2,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22475.9,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1974,
+          "completion_tokens": 88,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 13,
+          "completion_tokens": 0,
+          "total_tokens": 13,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 980,
+          "completion_tokens": 74,
+          "total_tokens": 1054,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1164,
+          "completion_tokens": 301,
+          "total_tokens": 1465,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by04",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Những cây cầu nổi tiếng ở Huế?",
+      "retrieved": [
+        "huetripo:922167",
+        "huetripo:601245",
+        "huetripo:003939",
+        "huetripo:928795",
+        "huetripo:282608"
+      ],
+      "relevant": [
+        "huetripo:948370",
+        "huetripo:003939",
+        "huetripo:664215",
+        "huetripo:214688",
+        "huetripo:851447"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:003939",
+        "huetripo:601245"
+      ],
+      "answerable": true,
+      "text": "Huế có ba cây cầu nổi tiếng là Cầu Dã Viên, Cầu Trung Đạo và Cầu Hai.",
+      "claims": [
+        "Huế có ba cây cầu nổi tiếng.",
+        "Một trong những cây cầu nổi tiếng ở Huế là Cầu Dã Viên.",
+        "Một trong những cây cầu nổi tiếng ở Huế là Cầu Trung Đạo.",
+        "Một trong những cây cầu nổi tiếng ở Huế là Cầu Hai."
+      ],
+      "supported": [
+        false,
+        true,
+        false,
+        false
+      ],
+      "context_precision": 0.3333333333333333,
+      "context_recall": 0.2,
+      "faithfulness": 0.25,
+      "answer_correctness": 0.2857142857142857,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 26048.2,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 91,
+          "total_tokens": 2063,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 902,
+          "completion_tokens": 73,
+          "total_tokens": 975,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1101,
+          "completion_tokens": 321,
+          "total_tokens": 1422,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by05",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Lăng vua nào ở Huế nên đi?",
+      "retrieved": [
+        "huetripo:483480",
+        "huetripo:300955",
+        "huetripo:424131",
+        "huetripo:689381",
+        "huetripo:175774"
+      ],
+      "relevant": [
+        "huetripo:483480",
+        "huetripo:300955",
+        "huetripo:702970",
+        "huetripo:627150",
+        "huetripo:424131",
+        "huetripo:689381",
+        "huetripo:175774"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:483480",
+        "huetripo:300955",
+        "huetripo:424131"
+      ],
+      "answerable": true,
+      "text": "Bạn có thể tham quan Lăng vua Tự Đức, Lăng vua Thiệu Trị hoặc Lăng vua Minh Mạng tại Cố đô Huế.",
+      "claims": [
+        "Bạn có thể tham quan Lăng vua Tự Đức.",
+        "Bạn có thể tham quan Lăng vua Thiệu Trị.",
+        "Bạn có thể tham quan Lăng vua Minh Mạng.",
+        "Các lăng này nằm tại Cố đô Huế."
+      ],
+      "supported": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 1.0,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.5714285714285714,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22571.6,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 89,
+          "total_tokens": 2061,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 790,
+          "completion_tokens": 87,
+          "total_tokens": 877,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 972,
+          "completion_tokens": 337,
+          "total_tokens": 1309,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by06",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Chợ nào ở Huế đông vui?",
+      "retrieved": [
+        "huetripo:759007",
+        "huetripo:204249",
+        "huetripo:187639",
+        "huetripo:840067",
+        "huetripo:642849"
+      ],
+      "relevant": [
+        "huetripo:759007",
+        "huetripo:731025",
+        "huetripo:110397",
+        "huetripo:386551",
+        "huetripo:917746",
+        "huetripo:517244",
+        "huetripo:599957",
+        "huetripo:787397"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:759007"
+      ],
+      "answerable": true,
+      "text": "Chợ Đông Ba là trung tâm thương mại lớn nhất và đông vui nhất ở Huế.",
+      "claims": [
+        "Chợ Đông Ba là trung tâm thương mại lớn nhất ở Huế.",
+        "Chợ Đông Ba là nơi đông vui nhất ở Huế."
+      ],
+      "supported": [
+        true,
+        false
+      ],
+      "context_precision": 1.0,
+      "context_recall": 0.2,
+      "faithfulness": 0.5,
+      "answer_correctness": 0.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 21978.1,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1971,
+          "completion_tokens": 88,
+          "total_tokens": 2059,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 953,
+          "completion_tokens": 52,
+          "total_tokens": 1005,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1094,
+          "completion_tokens": 231,
+          "total_tokens": 1325,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by07",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Quán bún bò Huế nào ngon?",
+      "retrieved": [
+        "huetripo:937980",
+        "huetripo:575981",
+        "huetripo:908482",
+        "huetripo:264100",
+        "huetripo:799262"
+      ],
+      "relevant": [
+        "huetripo:937980",
+        "huetripo:552909",
+        "huetripo:526646",
+        "huetripo:908482",
+        "huetripo:362570",
+        "huetripo:528750"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:937980",
+        "huetripo:908482",
+        "huetripo:575981",
+        "huetripo:264100",
+        "huetripo:799262"
+      ],
+      "answerable": true,
+      "text": "Bún bò Huế Sen có đánh giá cao nhất với 4.7/5. Bún bò O Xuân cũng rất nổi tiếng với điểm số 4.9/5 dù chỉ mới có ít lượt đánh giá. Bạn còn có thể thử Bún bò bà Gái hoặc Bún bò Mệ Kéo để trải nghiệm thêm [huetripo:575981, huetripo:264100, huetripo:799262].",
+      "claims": [
+        "Bún bò Huế Sen có điểm đánh giá cao nhất là 4.7/5.",
+        "Bún bò O Xuân nổi tiếng với điểm số 4.9/5.",
+        "Bún bò O Xuân mới chỉ có ít lượt đánh giá.",
+        "Bạn có thể thử Bún bò bà Gái để trải nghiệm thêm.",
+        "Bạn có thể thử Bún bò Mệ Kéo để trải nghiệm thêm."
+      ],
+      "supported": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "context_precision": 0.8333333333333333,
+      "context_recall": 0.4,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 24859.6,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1971,
+          "completion_tokens": 91,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 11,
+          "completion_tokens": 0,
+          "total_tokens": 11,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 905,
+          "completion_tokens": 218,
+          "total_tokens": 1123,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1269,
+          "completion_tokens": 427,
+          "total_tokens": 1696,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by08",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Biển nào gần Huế để tắm?",
+      "retrieved": [
+        "huetripo:928795",
+        "huetripo:874437",
+        "huetripo:891750",
+        "huetripo:295729",
+        "huetripo:290712"
+      ],
+      "relevant": [
+        "huetripo:779954",
+        "huetripo:102632",
+        "huetripo:928216",
+        "huetripo:295729",
+        "huetripo:177693",
+        "huetripo:753251",
+        "huetripo:874437",
+        "huetripo:175153",
+        "huetripo:928795",
+        "huetripo:427043",
+        "huetripo:120006",
+        "huetripo:979341",
+        "huetripo:267413",
+        "huetripo:891750",
+        "huetripo:069755"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:928795",
+        "huetripo:874437",
+        "huetripo:891750"
+      ],
+      "answerable": true,
+      "text": "Bạn có thể chọn các bãi biển như Cửa biển Tư Hiền, Biển Lăng Cô hoặc Biển Thuận An.",
+      "claims": [
+        "Bạn có thể chọn bãi biển Cửa biển Tư Hiền.",
+        "Bạn có thể chọn bãi biển Lăng Cô.",
+        "Bạn có thể chọn bãi biển Thuận An."
+      ],
+      "supported": [
+        true,
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 0.8,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.0,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 24077.0,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1971,
+          "completion_tokens": 86,
+          "total_tokens": 2057,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 9,
+          "completion_tokens": 0,
+          "total_tokens": 9,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1049,
+          "completion_tokens": 125,
+          "total_tokens": 1174,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1196,
+          "completion_tokens": 250,
+          "total_tokens": 1446,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by09",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Quán cà phê muối ở Huế",
+      "retrieved": [
+        "huetripo:406004",
+        "huetripo:254866",
+        "huetripo:658058",
+        "huetripo:181209",
+        "huetripo:389732"
+      ],
+      "relevant": [
+        "huetripo:254866",
+        "huetripo:658058",
+        "huetripo:487984",
+        "huetripo:406004"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:254866",
+        "huetripo:658058",
+        "huetripo:389732"
+      ],
+      "answerable": true,
+      "text": "Huế có nhiều quán cà phê muối nổi tiếng như Cà Phê Muối Huế, DeChill - Cà Phê Muối Huế và UNITE coffee.",
+      "claims": [
+        "Huế có nhiều quán cà phê muối nổi tiếng.",
+        "Cà Phê Muối Huế là một quán cà phê muối nổi tiếng ở Huế.",
+        "DeChill là một quán cà phê muối nổi tiếng ở Huế.",
+        "UNITE coffee là một quán cà phê muối nổi tiếng ở Huế."
+      ],
+      "supported": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "context_precision": 1.0,
+      "context_recall": 0.75,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.75,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 23829.2,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1970,
+          "completion_tokens": 91,
+          "total_tokens": 2061,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 843,
+          "completion_tokens": 131,
+          "total_tokens": 974,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1075,
+          "completion_tokens": 370,
+          "total_tokens": 1445,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "by10",
+      "group": "by_category",
+      "split": "dev",
+      "question": "Nhà hàng Nhật ở Huế",
+      "retrieved": [
+        "huetripo:383225",
+        "huetripo:768910",
+        "huetripo:422641",
+        "huetripo:978136",
+        "huetripo:467517"
+      ],
+      "relevant": [
+        "huetripo:768910",
+        "huetripo:422641",
+        "huetripo:942888",
+        "huetripo:383225"
+      ],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:383225",
+        "huetripo:768910",
+        "huetripo:978136"
+      ],
+      "answerable": true,
+      "text": "Huế có nhiều nhà hàng Nhật Bản nổi tiếng như Kyodai, Shinosushi và Yen.",
+      "claims": [
+        "Huế có nhiều nhà hàng Nhật Bản.",
+        "Kyodai là một nhà hàng Nhật Bản ở Huế.",
+        "Shinosushi là một nhà hàng Nhật Bản ở Huế.",
+        "Yen là một nhà hàng Nhật Bản ở Huế."
+      ],
+      "supported": [
+        true,
+        true,
+        true,
+        false
+      ],
+      "context_precision": 1.0,
+      "context_recall": 0.75,
+      "faithfulness": 0.75,
+      "answer_correctness": 0.25,
+      "citation_hit": true,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22751.2,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1969,
+          "completion_tokens": 89,
+          "total_tokens": 2058,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 7,
+          "completion_tokens": 0,
+          "total_tokens": 7,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1065,
+          "completion_tokens": 86,
+          "total_tokens": 1151,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1255,
+          "completion_tokens": 327,
+          "total_tokens": 1582,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "un01",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Khách sạn nào gần Đại Nội Huế?",
+      "retrieved": [
+        "huetripo:039509",
+        "huetripo:449632",
+        "huetripo:051114",
+        "huetripo:200310",
+        "huetripo:390655"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về khách sạn gần Đại Nội Huế.",
+      "claims": [],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 1.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 21933.3,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 89,
+          "total_tokens": 2061,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 10,
+          "completion_tokens": 0,
+          "total_tokens": 10,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 667,
+          "completion_tokens": 36,
+          "total_tokens": 703,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "un02",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Quán phở nào ngon nhất ở Hà Nội?",
+      "retrieved": [
+        "huetripo:694502",
+        "huetripo:085561",
+        "huetripo:590262",
+        "huetripo:543476",
+        "huetripo:166550"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Không có quán phở nào ở Hà Nội trong ngữ cảnh này.",
+      "claims": [],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 1.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10819.7,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1974,
+          "completion_tokens": 88,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 13,
+          "completion_tokens": 0,
+          "total_tokens": 13,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 961,
+          "completion_tokens": 75,
+          "total_tokens": 1036,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "un03",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Chùa Thiên Mụ có wifi không?",
+      "retrieved": [
+        "huetripo:197559",
+        "huetripo:517713",
+        "huetripo:591521",
+        "huetripo:371056",
+        "huetripo:519096"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về việc Chùa Thiên Mụ có wifi hay không.",
+      "claims": [],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 1.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10082.3,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 91,
+          "total_tokens": 2063,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 631,
+          "completion_tokens": 39,
+          "total_tokens": 670,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "un04",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Đại Nội có chỗ đậu xe ô tô không?",
+      "retrieved": [
+        "huetripo:189429",
+        "huetripo:759007",
+        "huetripo:528862",
+        "huetripo:386551",
+        "huetripo:840067"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về việc Đại Nội có chỗ đậu xe ô tô không.",
+      "claims": [],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 1.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10299.9,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1974,
+          "completion_tokens": 88,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1358,
+          "completion_tokens": 40,
+          "total_tokens": 1398,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "un05",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Homestay nào ở Huế rẻ dưới 300 nghìn?",
+      "retrieved": [
+        "huetripo:319303",
+        "huetripo:075442",
+        "huetripo:726134",
+        "huetripo:942160",
+        "huetripo:845015"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "fallback",
+      "cited": [
+        "huetripo:319303"
+      ],
+      "answerable": true,
+      "text": "Hana Coffee &amp; Homestay (quán cà phê)\nĐịa chỉ: 14A kiệt 64 Nguyễn Công Trứ, Phường Thuận Hóa, Thành phố Huế\nGiờ mở cửa (nguồn, chưa xác minh): chưa có dữ liệu\nGiá tham khảo: 25,000 – 45,000 VND (tham khảo, mỗi người)\nĐiện thoại: (+84) 905 688 745\nNguồn: https://huetripo.hue.gov.vn/co-so-an-uong/quan-ca-phetra/hana-coffee-amp-homestay--319303",
+      "claims": [
+        "Tên quán cà phê là Hana Coffee & Homestay.",
+        "Địa chỉ của quán nằm tại 14A kiệt 64 Nguyễn Công Trứ.",
+        "Quán tọa lạc ở Phường Thuận Hóa.",
+        "Quán thuộc Thành phố Huế.",
+        "Giờ mở cửa hiện chưa có dữ liệu xác minh.",
+        "Giá tham khảo cho mỗi người là từ 25,000 đến 45,000 VND.",
+        "Số điện thoại liên hệ của quán là (+84) 905 688 745."
+      ],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": null,
+      "citation_hit": null,
+      "judge_error": true,
+      "error": null,
+      "latency_ms": 11137.7,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1977,
+          "completion_tokens": 94,
+          "total_tokens": 2071,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 13,
+          "completion_tokens": 0,
+          "total_tokens": 13,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1297,
+          "completion_tokens": 86,
+          "total_tokens": 1383,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 2776,
+          "completion_tokens": 267,
+          "total_tokens": 3043,
+          "calls": 3
+        }
+      }
+    },
+    {
+      "id": "un06",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Chợ Bến Thành mở cửa mấy giờ?",
+      "retrieved": [
+        "huetripo:033595",
+        "huetripo:938280",
+        "huetripo:008789",
+        "huetripo:599957",
+        "huetripo:110397"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Chợ Bến Thành không có trong dữ liệu, chỉ có Chợ Bến Ngự và Chợ Thông.",
+      "claims": [],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 1.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22493.8,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1972,
+          "completion_tokens": 90,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 623,
+          "completion_tokens": 70,
+          "total_tokens": 693,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "un07",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Quán nào ở Huế có menu tiếng Hàn?",
+      "retrieved": [
+        "huetripo:652702",
+        "huetripo:165525",
+        "huetripo:948421",
+        "huetripo:297664",
+        "huetripo:496029"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "llm",
+      "cited": [
+        "huetripo:652702",
+        "huetripo:165525"
+      ],
+      "answerable": true,
+      "text": "Kitchen Seoul Korean BBQ và GoGi House AEON MALL Huế đều phục vụ các món ăn truyền thống Hàn Quốc như mì lạnh, cơm trộn và kim chi.",
+      "claims": [
+        "Kitchen Seoul Korean BBQ là một nhà hàng.",
+        "GoGi House AEON MALL Huế là một nhà hàng.",
+        "Kitchen Seoul Korean BBQ phục vụ các món ăn truyền thống Hàn Quốc.",
+        "GoGi House AEON MALL Huế phục vụ các món ăn truyền thống Hàn Quốc.",
+        "Kitchen Seoul Korean BBQ phục vụ mì lạnh.",
+        "GoGi House AEON MALL Huế phục vụ mì lạnh.",
+        "Kitchen Seoul Korean BBQ phục vụ cơm trộn.",
+        "GoGi House AEON MALL Huế phục vụ cơm trộn.",
+        "Kitchen Seoul Korean BBQ phục vụ kim chi.",
+        "GoGi House AEON MALL Huế phục vụ kim chi."
+      ],
+      "supported": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": 1.0,
+      "answer_correctness": 0.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 11265.9,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1973,
+          "completion_tokens": 85,
+          "total_tokens": 2058,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 12,
+          "completion_tokens": 0,
+          "total_tokens": 12,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 938,
+          "completion_tokens": 104,
+          "total_tokens": 1042,
+          "calls": 1
+        }
+      },
+      "judge_usage": {
+        "judge": {
+          "prompt_tokens": 1042,
+          "completion_tokens": 252,
+          "total_tokens": 1294,
+          "calls": 2
+        }
+      }
+    },
+    {
+      "id": "un08",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Đặt vé máy bay Hà Nội đi Huế ở đâu rẻ?",
+      "retrieved": [
+        "huetripo:447592",
+        "huetripo:531787",
+        "huetripo:860594",
+        "huetripo:499556",
+        "huetripo:650442"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về việc đặt vé máy bay Hà Nội đi Huế.",
+      "claims": [],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 1.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 22237.5,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1976,
+          "completion_tokens": 86,
+          "total_tokens": 2062,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 14,
+          "completion_tokens": 0,
+          "total_tokens": 14,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1208,
+          "completion_tokens": 40,
+          "total_tokens": 1248,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "un09",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Lăng Tự Đức có cho mang thú cưng vào không?",
+      "retrieved": [
+        "huetripo:387723",
+        "huetripo:390308",
+        "huetripo:458064",
+        "huetripo:759007",
+        "huetripo:391171"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về việc Lăng Tự Đức có cho mang thú cưng vào hay không.",
+      "claims": [],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 1.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10354.4,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1975,
+          "completion_tokens": 90,
+          "total_tokens": 2065,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 14,
+          "completion_tokens": 0,
+          "total_tokens": 14,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 1157,
+          "completion_tokens": 46,
+          "total_tokens": 1203,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    },
+    {
+      "id": "un10",
+      "group": "unanswerable",
+      "split": "dev",
+      "question": "Bãi biển Mỹ Khê ở Đà Nẵng có đẹp không?",
+      "retrieved": [
+        "huetripo:874437",
+        "huetripo:175153",
+        "huetripo:928795",
+        "huetripo:891750",
+        "huetripo:295729"
+      ],
+      "relevant": [],
+      "mode": "hybrid",
+      "source": "refusal",
+      "cited": [],
+      "answerable": false,
+      "text": "Dữ liệu chưa có thông tin về bãi biển Mỹ Khê.",
+      "claims": [],
+      "supported": [],
+      "context_precision": null,
+      "context_recall": null,
+      "faithfulness": null,
+      "answer_correctness": 1.0,
+      "citation_hit": null,
+      "judge_error": false,
+      "error": null,
+      "latency_ms": 10045.8,
+      "usage": {
+        "extractor": {
+          "prompt_tokens": 1975,
+          "completion_tokens": 92,
+          "total_tokens": 2067,
+          "calls": 1
+        },
+        "embedding": {
+          "prompt_tokens": 16,
+          "completion_tokens": 0,
+          "total_tokens": 16,
+          "calls": 1
+        },
+        "rag_generator": {
+          "prompt_tokens": 978,
+          "completion_tokens": 35,
+          "total_tokens": 1013,
+          "calls": 1
+        }
+      },
+      "judge_usage": {}
+    }
+  ]
+}
