@@ -44,11 +44,12 @@ from app.evaluation.planning_metrics import budget_compliant, constraint_checks,
 from app.evaluation.spies import spy_poi_search
 from app.evaluation.stats import mean, percentile, rate
 from app.rag.answer import RagAnswerer, build_context
-from app.rag.facts import check_facts
+from app.rag.facts import _phones, _times, check_facts
 from app.rag.index import EmbedClient, EmbeddingStore
 from app.rag.retrieve import Retriever
 from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.place import Place
+from app.services.poi_search import normalize_vietnamese
 from app.understanding.evaluate import EVAL_REF
 from app.understanding.extract import OllamaExtractor
 from app.understanding.understand import understand
@@ -117,11 +118,14 @@ def _rag_record(
     item: RagItem, answerer: Any, judge: Any, understand_fn: Callable[[str, Any], Any]
 ) -> dict[str, Any]:
     k = getattr(answerer, "k", DEFAULT_K)
-    with record_usage() as usage:
-        started = time.perf_counter()
-        parsed = understand_fn(item.question, None)
-        result = answerer.answer(item.question, parsed)
-        latency_ms = _ms(started)
+    try:
+        with record_usage() as usage:
+            started = time.perf_counter()
+            parsed = understand_fn(item.question, None)
+            result = answerer.answer(item.question, parsed)
+            latency_ms = _ms(started)
+    except Exception as exc:  # one bad item must not stop the suite
+        return _rag_error_record(item, f"{type(exc).__name__}: {exc}")
     retrieved = [hit.poi_id for hit in result.retrieval.hits]
     gold_answerable = item.group != "unanswerable"
     citation_hit = bool(set(result.cited_poi_ids) & set(item.relevant_poi_ids)) if gold_answerable else None
@@ -166,25 +170,73 @@ def _rag_record(
         "answer_correctness": correctness,
         "citation_hit": citation_hit,
         "judge_error": judge_error,
+        "error": None,
         "latency_ms": latency_ms,
         "usage": _usage_dict(usage),
         "judge_usage": _usage_dict(judge_usage),
     }
 
 
+def _rag_error_record(item: RagItem, error: str) -> dict[str, Any]:
+    """A record for an item whose retrieval or answering crashed: every metric is missing."""
+    return {
+        "id": item.id,
+        "group": item.group,
+        "split": item.split,
+        "question": item.question,
+        "retrieved": [],
+        "relevant": list(item.relevant_poi_ids),
+        "mode": None,
+        "source": None,
+        "cited": [],
+        "answerable": None,
+        "text": "",
+        "claims": [],
+        "supported": [],
+        "context_precision": None,
+        "context_recall": None,
+        "faithfulness": None,
+        "answer_correctness": None,
+        "citation_hit": None,
+        "judge_error": False,
+        "error": error,
+        "latency_ms": None,
+        "usage": {},
+        "judge_usage": {},
+    }
+
+
+def _claim_states(claim: str, mismatch: Any) -> bool:
+    """Does the claim state the wrong fact? Times and phones compare parsed values, the rest folded text."""
+    value = str(mismatch.value)
+    if mismatch.kind == "time":
+        hour, _, minute = value.partition(":")
+        return (int(hour), int(minute)) in _times(claim)
+    if mismatch.kind == "phone":
+        return value in _phones(claim)
+    folded = normalize_vietnamese(value)
+    return bool(folded) and folded in normalize_vietnamese(claim)
+
+
 def _apply_fact_overrides(
     claims: Sequence[str], supported: Sequence[bool], result: Any, by_id: Mapping[str, Place]
 ) -> list[bool]:
-    """A fact the checker finds wrong makes every claim containing it unsupported, whatever the judge said."""
+    """A fact the checker finds wrong makes every claim stating it unsupported, whatever the judge said.
+
+    A wrong fact no claim states adds one False verdict per distinct (kind, value).
+    """
     verdicts = list(supported)
     cited = [by_id[poi_id] for poi_id in result.cited_poi_ids if poi_id in by_id]
+    seen: set[tuple[str, str]] = set()
     for mismatch in check_facts(result.raw_text, cited):
-        value = str(mismatch.value)
-        hit = False
-        for index, claim in enumerate(claims):
-            if value and value in claim:
-                verdicts[index], hit = False, True
-        if not hit:
+        key = (mismatch.kind, str(mismatch.value))
+        if key in seen:
+            continue
+        seen.add(key)
+        matched = [i for i, claim in enumerate(claims) if _claim_states(claim, mismatch)]
+        for index in matched:
+            verdicts[index] = False
+        if not matched:
             verdicts.append(False)
     return verdicts
 
@@ -195,7 +247,7 @@ def _rag_summary(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     correct_refusals = [r for r in refusals if r["group"] == "unanswerable"]
     usages = [r["usage"] for r in records]
     judge_tokens = sum(c["total_tokens"] for r in records for c in r["judge_usage"].values())
-    latencies = [r["latency_ms"] for r in records]
+    latencies = [r["latency_ms"] for r in records if r["latency_ms"] is not None]
     groups = sorted({r["group"] for r in records})
     return {
         "n": len(records),
@@ -204,8 +256,11 @@ def _rag_summary(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "refusal_precision": _ratio(len(correct_refusals), len(refusals)),
         "refusal_recall": _ratio(len(correct_refusals), len(unanswerable)),
         "judge_errors": sum(1 for r in records if r["judge_error"]),
+        "errors": sum(1 for r in records if r["error"] is not None),
+        "refusal_count": len(refusals),
+        "n_scored": {name: sum(1 for r in records if r[name] is not None) for name in RAG_METRICS},
         "fallback_count": sum(1 for r in records if r["source"] == "fallback"),
-        "mode_counts": dict(Counter(r["mode"] for r in records)),
+        "mode_counts": dict(Counter(r["mode"] for r in records if r["mode"] is not None)),
         **_latency_stats(latencies),
         "tokens_per_turn": _tokens_per_turn(usages),
         "judge_tokens_total": judge_tokens,
@@ -370,7 +425,7 @@ def _agents_summary(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     plans = [item for r in records for item in r["feasibility"]]
     with_constraints = [r for r in records if r["constraints"]]
     types = sorted({name for r in with_constraints for name in r["constraints"]})
-    turns = [turn for r in records for turn in r["turns"]]
+    turns = [turn for r in records for turn in r["turns"] if turn["error"] is None]
     by_handler: dict[str, list[float]] = {}
     for turn in turns:
         by_handler.setdefault(turn["handler"], []).append(turn["latency_ms"])

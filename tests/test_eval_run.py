@@ -17,6 +17,7 @@ from typing import Any  # noqa: E402
 from app.core.config import hue_database_path  # noqa: E402
 from app.evaluation.gold import RagItem, Scenario, ScenarioExpect  # noqa: E402
 from app.evaluation.harness import build_harness  # noqa: E402
+from app.evaluation.judge import JudgeError  # noqa: E402
 from app.evaluation.run import run_agents_suite, run_rag_suite  # noqa: E402
 from app.rag.answer import REFUSAL_TEXT, RagAnswer  # noqa: E402
 from app.rag.retrieve import Retriever  # noqa: E402
@@ -35,6 +36,9 @@ RAG_SUMMARY_KEYS = {
     "refusal_precision",
     "refusal_recall",
     "judge_errors",
+    "errors",
+    "refusal_count",
+    "n_scored",
     "fallback_count",
     "mode_counts",
     "latency_p50_ms",
@@ -184,3 +188,115 @@ def test_rag_suite_scores_an_answer_and_a_refusal() -> None:
     assert summary["refusal_precision"] == 1.0
     assert summary["refusal_recall"] == 1.0
     assert summary["per_group"]["single_place"]["context_recall"] == 1.0
+
+
+def _item(item_id: str, question: str, group: str = "single_place", relevant: list[str] | None = None) -> RagItem:
+    return RagItem(
+        id=item_id,
+        split="dev",
+        group=group,  # type: ignore[arg-type]
+        question=question,
+        relevant_poi_ids=["huetripo:3"] if relevant is None else relevant,
+        reference_answer="Chùa Thiên Mụ ở Huế.",
+    )
+
+
+def test_rag_suite_counts_judge_errors_and_leaves_them_out_of_the_means() -> None:
+    class FlakyJudge(FakeJudge):
+        def support(self, claims: list[str], context: str) -> list[bool]:
+            if "bad" in self.current:
+                raise JudgeError("two bad replies")
+            return [True, False]
+
+        current = ""
+
+        def claims(self, answer: str) -> list[str]:
+            self.current = answer
+            return ["c1", "c2"]
+
+    class TwoAnswers(FakeAnswerer):
+        def answer(self, question: str, parsed: Any = None) -> RagAnswer:
+            retrieval = self.retriever.retrieve(question, None, 5)
+            text = "bad answer" if "hỏng" in question else "good answer"
+            return RagAnswer(text, text, ["huetripo:3"], True, "llm", retrieval)
+
+    items = [_item("ok", "Chùa Thiên Mụ ở đâu?"), _item("bad", "Chùa Thiên Mụ hỏng?")]
+    result = run_rag_suite(items, TwoAnswers(), FlakyJudge(), lambda text, ctx: None)
+    summary, records = result["summary"], result["records"]
+    assert summary["judge_errors"] == 1
+    assert records[1]["judge_error"] is True
+    assert records[1]["faithfulness"] is None and records[1]["answer_correctness"] is None
+    assert summary["faithfulness"] == records[0]["faithfulness"] == 0.5
+    assert summary["n_scored"]["faithfulness"] == 1
+    assert summary["n_scored"]["context_recall"] == 2
+
+
+def test_rag_fact_override_flips_the_claim_stating_a_wrong_time() -> None:
+    class WrongTime(FakeAnswerer):
+        def answer(self, question: str, parsed: Any = None) -> RagAnswer:
+            retrieval = self.retriever.retrieve(question, None, 5)
+            return RagAnswer("Mở cửa 05:00.", "Mở cửa 05:00 [huetripo:3].", ["huetripo:3"], True, "llm", retrieval)
+
+    class Lenient(FakeJudge):
+        def claims(self, answer: str) -> list[str]:
+            return ["Mở cửa 05h00"]
+
+        def support(self, claims: list[str], context: str) -> list[bool]:
+            return [True]
+
+    result = run_rag_suite([_item("t", "Chùa Thiên Mụ mở cửa lúc nào?")], WrongTime(), Lenient(), lambda t, c: None)
+    record = result["records"][0]
+    assert record["supported"] == [False]
+    assert record["faithfulness"] == 0.0
+
+
+def test_rag_fact_override_adds_one_false_when_no_claim_states_the_fact() -> None:
+    class WrongTime(FakeAnswerer):
+        def answer(self, question: str, parsed: Any = None) -> RagAnswer:
+            retrieval = self.retriever.retrieve(question, None, 5)
+            raw = "Mở cửa 05:00 [huetripo:3]. Đóng cửa 05:00 [huetripo:3]."
+            return RagAnswer("x", raw, ["huetripo:3"], True, "llm", retrieval)
+
+    result = run_rag_suite([_item("t", "Chùa Thiên Mụ mở cửa?")], WrongTime(), FakeJudge(), lambda t, c: None)
+    assert result["records"][0]["supported"] == [True, False, False]
+
+
+def test_rag_item_that_raises_is_recorded_and_the_suite_continues() -> None:
+    class Crashing(FakeAnswerer):
+        def answer(self, question: str, parsed: Any = None) -> RagAnswer:
+            if "nổ" in question:
+                raise RuntimeError("boom")
+            return super().answer(question, parsed)
+
+    items = [_item("boom", "Chùa nổ?"), _item("ok", "Chùa Thiên Mụ ở đâu?")]
+    result = run_rag_suite(items, Crashing(), FakeJudge(), lambda t, c: None)
+    summary, records = result["summary"], result["records"]
+    assert "RuntimeError" in records[0]["error"] and records[0]["context_recall"] is None
+    assert summary["errors"] == 1 and summary["n"] == 2
+    assert summary["context_recall"] == 1.0
+    assert summary["n_scored"]["context_recall"] == 1
+
+
+def test_agents_suite_records_a_crashing_turn_and_scores_the_next_scenario() -> None:
+    calls = {"n": 0}
+
+    def make_harness():  # type: ignore[no-untyped-def]
+        h = build_harness(_rules, None)
+        calls["n"] += 1
+        if calls["n"] == 1:
+
+            async def boom(conversation: str, user: str, text: str) -> Any:
+                raise RuntimeError("provider down")
+
+            h.service.handle = boom  # type: ignore[method-assign]
+        return h
+
+    places = {p.id: p for p in HuePlacesRepository(hue_database_path()).list_all()}
+    result = run_agents_suite(_scenarios(), make_harness, places, rag_enabled=False)
+    first, second = result["records"]
+    assert first["turns"][0]["error"] and "provider down" in first["turns"][0]["error"]
+    assert first["task_success"] is False and first["final_state"] == "failed"
+    assert result["summary"]["errors"] == 1
+    assert second["task_success"] is True
+    assert result["summary"]["latency_p50_ms"] is not None
+    assert "none" not in result["summary"]["latency_by_handler"]
