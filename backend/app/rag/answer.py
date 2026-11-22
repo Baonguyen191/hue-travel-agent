@@ -40,6 +40,7 @@ Quy tắc:
 - Mỗi câu nói về một địa điểm phải kết thúc bằng mã của địa điểm trong ngoặc vuông, ví dụ [huetripo:531787].
 - Giờ mở cửa, giá, số điện thoại, địa chỉ phải chép đúng như trong ngữ cảnh. Không đoán, không làm tròn.
 - Nếu ngữ cảnh không trả lời được câu hỏi: answerable = false, answer là một câu nói rằng dữ liệu chưa có thông tin, cited_poi_ids rỗng.
+- Dòng có "(cách ... km)" là địa điểm gần nơi được hỏi; câu hỏi "gần ..." trả lời bằng các địa điểm đó và nêu khoảng cách.
 - Trả lời ngắn bằng tiếng Việt, tối đa 5 câu, gợi ý tối đa 3 địa điểm.
 - cited_poi_ids liệt kê mọi mã đã dùng, theo thứ tự xuất hiện."""
 
@@ -66,8 +67,16 @@ class RagAnswer:
     error: str | None = None
 
 
-def build_context(hits: Sequence[Hit], by_id: Mapping[str, Place]) -> str:
-    return "\n".join(f"[{hit.poi_id}] {document_text(by_id[hit.poi_id])}" for hit in hits if hit.poi_id in by_id)
+def build_context(hits: Sequence[Hit], by_id: Mapping[str, Place], anchor_name: str | None = None) -> str:
+    lines: list[str] = []
+    for hit in hits:
+        if hit.poi_id not in by_id:
+            continue
+        text = document_text(by_id[hit.poi_id])
+        if anchor_name is not None and hit.distance_km is not None:
+            text = f"{text} (cách {anchor_name} {hit.distance_km:.1f} km)"
+        lines.append(f"[{hit.poi_id}] {text}")
+    return "\n".join(lines)
 
 
 def strip_citations(text: str) -> str:
@@ -102,7 +111,7 @@ class RagAnswerer:
         by_id = self.retriever.by_id
         context_ids = [hit.poi_id for hit in retrieval.hits]
         try:
-            output = self._generate(question, build_context(retrieval.hits, by_id))
+            output = self._generate(question, build_context(retrieval.hits, by_id, retrieval.anchor_name))
         except RagError as error:
             return self._fallback(retrieval, str(error))
         listed = CITE_RE.findall(output.answer) + output.cited_poi_ids

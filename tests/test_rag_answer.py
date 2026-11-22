@@ -17,8 +17,8 @@ import json  # noqa: E402
 import httpx  # noqa: E402
 
 from app.core.usage import record_usage  # noqa: E402
-from app.rag.answer import REFUSAL_TEXT, RagAnswerer, strip_citations  # noqa: E402
-from app.rag.retrieve import Retriever  # noqa: E402
+from app.rag.answer import REFUSAL_TEXT, RagAnswerer, build_context, strip_citations  # noqa: E402
+from app.rag.retrieve import Hit, Retriever  # noqa: E402
 from test_rag_retrieve import PLACES  # noqa: E402
 
 
@@ -122,3 +122,17 @@ def test_malformed_ollama_message_falls_back_without_raising() -> None:
 
 def test_strip_citations() -> None:
     assert strip_citations("A [huetripo:1]. B [huetripo:2] và C.") == "A. B và C."
+
+
+def test_build_context_shows_distance_to_the_anchor() -> None:
+    by_id = {place.id: place for place in PLACES}
+    hit = Hit(poi_id="huetripo:3", score=1.0, distance_km=0.42)
+    context = build_context([hit], by_id, anchor_name="Chùa Bảo Quốc")
+    assert "(cách Chùa Bảo Quốc 0.4 km)" in context
+
+
+def test_build_context_without_anchor_has_no_distance() -> None:
+    by_id = {place.id: place for place in PLACES}
+    hit = Hit(poi_id="huetripo:3", score=1.0, distance_km=0.42)
+    assert "cách" not in build_context([hit], by_id)
+    assert "cách" not in build_context([Hit(poi_id="huetripo:3", score=1.0)], by_id, anchor_name="Chùa Bảo Quốc")

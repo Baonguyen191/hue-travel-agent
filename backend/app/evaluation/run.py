@@ -140,7 +140,9 @@ def _rag_record(
         else:
             try:
                 claims = judge.claims(result.text)
-                context = build_context(result.retrieval.hits, answerer.retriever.by_id)
+                context = build_context(
+                    result.retrieval.hits, answerer.retriever.by_id, result.retrieval.anchor_name
+                )
                 supported = _apply_fact_overrides(
                     claims, judge.support(claims, context), result, answerer.retriever.by_id
                 )

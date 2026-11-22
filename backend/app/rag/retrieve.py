@@ -22,6 +22,7 @@ from app.rag.index import EmbedClient, EmbedError, EmbeddingStore, document_text
 from app.schemas.place import Place
 from app.services.poi_search import haversine_km, normalize_vietnamese
 from app.services.preferences import map_preferences
+from app.understanding.link import link_places
 from app.understanding.models import ParsedQuery
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,8 @@ RRF_K = 60
 CANDIDATES = 50
 ANCHOR_RADIUS_KM = 2.0
 _TOKEN = re.compile(r"[a-z0-9]+")
+_GAN_WORD = re.compile(r"\bgần\b", re.IGNORECASE)
+_FOOD_QUESTION = re.compile(r"\b(an gi|an trua|an toi|an sang|quan an|cho an|an uong)\b")
 _warned = False
 
 
@@ -90,6 +93,7 @@ class Hit:
 class RetrievalResult:
     hits: list[Hit]
     mode: Literal["hybrid", "bm25"]
+    anchor_name: str | None = None
 
 
 class Retriever:
@@ -158,12 +162,19 @@ class Retriever:
             )
             for poi_id in ordered
         ]
-        return RetrievalResult(hits=hits, mode=mode)
+        return RetrievalResult(hits=hits, mode=mode, anchor_name=anchor.name if anchor is not None else None)
 
     def _anchor(self, question: str, parsed: ParsedQuery | None) -> Place | None:
-        if parsed is None or parsed.place_query is None or not parsed.place_query.poi_id:
-            return None
         if " gan " not in f" {normalize_vietnamese(question)} ":
+            return None
+        matches = list(_GAN_WORD.finditer(question))
+        if matches:
+            tail = question[matches[-1].end() :].strip()
+            if tail:
+                linked = link_places([tail], self.places)
+                if linked and linked[0].poi_id in self.by_id:
+                    return self.by_id[linked[0].poi_id]
+        if parsed is None or parsed.place_query is None or not parsed.place_query.poi_id:
             return None
         return self.by_id.get(parsed.place_query.poi_id)
 
@@ -176,10 +187,19 @@ class Retriever:
                 if self.places[i].id != anchor.id
                 and haversine_km(anchor.lat, anchor.lon, self.places[i].lat, self.places[i].lon) <= ANCHOR_RADIUS_KM
             ]
-        text = question
-        if parsed is not None and parsed.place_query is not None and parsed.place_query.text:
-            text = re.sub(re.escape(parsed.place_query.text), " ", text, flags=re.IGNORECASE)
-        categories, _ = map_preferences([text])
+            # The anchor's own name may name a category ("chùa" for a pagoda); it is not a filter.
+            categories, _ = map_preferences([question])
+            categories = [category for category in categories if category != anchor.category]
+            category_text = question
+        else:
+            category_text = question
+            if parsed is not None and parsed.place_query is not None and parsed.place_query.text:
+                category_text = re.sub(
+                    re.escape(parsed.place_query.text), " ", category_text, flags=re.IGNORECASE
+                )
+            categories, _ = map_preferences([category_text])
+        if not categories and _FOOD_QUESTION.search(normalize_vietnamese(category_text)):
+            categories = ["restaurant"]
         if categories:
             narrowed = [i for i in allowed if self.places[i].category in categories]
             if narrowed:

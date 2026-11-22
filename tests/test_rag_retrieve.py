@@ -33,6 +33,26 @@ PLACES = [
 ]
 
 
+# Anchors and categories for "gần X" questions. All restaurants and cafes sit within 2 km of the
+# anchors they are meant for; the lăng test has no religious place in range.
+NEAR_PLACES = [
+    make_place("huetripo:20", name="Chợ Đông Ba Huế", category="market", lat=16.4716, lon=107.5865),
+    make_place("huetripo:21", name="Quán Cà phê Chiều", category="cafe", lat=16.4725, lon=107.5872),
+    make_place("huetripo:22", name="Bún bò Đông Ba", category="restaurant", lat=16.4720, lon=107.5860),
+    make_place("huetripo:23", name="Ga Huế", category="attraction", lat=16.4440, lon=107.5940),
+    make_place("huetripo:24", name="Cà phê Sân Ga", category="cafe", lat=16.4445, lon=107.5945),
+    make_place("huetripo:25", name="Bún hến Bến Ngự", category="restaurant", lat=16.4660, lon=107.5850),
+    make_place("huetripo:26", name="Chùa Bảo Quốc", category="religious", lat=16.4655, lon=107.5835),
+    make_place("huetripo:27", name="Lăng Vua Tự Đức", category="historic", lat=16.4103, lon=107.5714),
+    make_place("huetripo:28", name="Bún bò Tự Đức", category="restaurant", lat=16.4115, lon=107.5725),
+]
+
+
+def _parsed_without_poi(text: str) -> ParsedQuery:
+    mention = PlaceMention(text=text, poi_id=None, name=None, score=0.0)
+    return ParsedQuery(intent=Intent.PLACE_INFO, source=QuSource.RULES, place_query=mention)
+
+
 @pytest.fixture(autouse=True)
 def _reset_warned(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(retrieve_module, "_warned", False)
@@ -172,3 +192,61 @@ def test_embed_failure_falls_back_to_bm25(tmp_path) -> None:
     result = Retriever(PLACES, store, client).retrieve("chùa Thiên Mụ", None)
     assert result.mode == "bm25"
     assert result.hits[0].poi_id == "huetripo:3"
+
+
+def _categories(retriever: Retriever, result) -> set[str]:
+    return {retriever.by_id[hit.poi_id].category for hit in result.hits}
+
+
+def test_anchor_comes_from_text_after_gan_not_from_place_query() -> None:
+    retriever = Retriever(NEAR_PLACES)
+    question = "Có quán cà phê nào gần chợ Đông Ba Huế không?"
+    result = retriever.retrieve(question, _parsed("huetripo:21", text="quán cà phê"), k=5)
+    assert result.anchor_name == "Chợ Đông Ba Huế"
+    assert result.hits
+    assert "huetripo:20" not in {hit.poi_id for hit in result.hits}
+    assert all(hit.distance_km is not None for hit in result.hits)
+
+
+def test_anchor_falls_back_to_place_query_when_tail_links_nothing() -> None:
+    result = Retriever(NEAR_PLACES).retrieve("Ga Huế gần đây có gì vui?", _parsed("huetripo:23", text="Ga Huế"), k=5)
+    assert result.anchor_name == "Ga Huế"
+    assert result.hits
+    assert all(hit.distance_km is not None for hit in result.hits)
+
+
+def test_question_without_gan_has_no_anchor() -> None:
+    result = Retriever(NEAR_PLACES).retrieve("Chợ Đông Ba Huế mở cửa lúc mấy giờ", _parsed("huetripo:20"), k=5)
+    assert result.anchor_name is None
+    assert all(hit.distance_km is None for hit in result.hits)
+
+
+def test_category_filter_keeps_cafe_when_place_query_text_holds_the_category() -> None:
+    retriever = Retriever(NEAR_PLACES)
+    result = retriever.retrieve("Cà phê gần Ga Huế chỗ nào?", _parsed_without_poi("Cà phê gần Ga Huế"), k=5)
+    assert result.hits
+    assert _categories(retriever, result) == {"cafe"}
+
+
+def test_category_filter_ignores_the_anchor_own_category() -> None:
+    retriever = Retriever(NEAR_PLACES)
+    result = retriever.retrieve("Quán ăn gần chùa Bảo Quốc", _parsed("huetripo:26", text="chùa Bảo Quốc"), k=5)
+    assert result.anchor_name == "Chùa Bảo Quốc"
+    assert result.hits
+    assert _categories(retriever, result) == {"restaurant"}
+
+
+def test_food_question_near_anchor_filters_to_restaurants() -> None:
+    retriever = Retriever(NEAR_PLACES)
+    result = retriever.retrieve("Ăn gì gần chợ Đông Ba Huế?", _parsed_without_poi("chợ Đông Ba Huế"), k=5)
+    assert result.hits
+    assert _categories(retriever, result) == {"restaurant"}
+
+
+def test_food_question_with_anchor_on_the_way_filters_to_restaurants() -> None:
+    retriever = Retriever(NEAR_PLACES)
+    result = retriever.retrieve(
+        "Gần lăng vua Tự Đức có chỗ nào ăn trưa?", _parsed_without_poi("lăng vua Tự Đức"), k=5
+    )
+    assert result.hits
+    assert _categories(retriever, result) == {"restaurant"}
