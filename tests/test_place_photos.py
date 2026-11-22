@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 from app.api.places import get_photo_service, get_repository  # noqa: E402
 from app.main import app  # noqa: E402
 from app.schemas.place import Place  # noqa: E402
-from app.services.photos import PhotoService  # noqa: E402
+from app.services.photos import PhotoService, cache_path  # noqa: E402
 
 SOURCE = "https://huetripo.hue.gov.vn/uploads/a.jpg"
 
@@ -163,3 +163,43 @@ def test_upstream_failures_are_502_and_never_cached(setup, handler) -> None:
     client, _, cache = setup(handler)
     assert client.get("/api/v1/places/huetripo:1/photo", params={"w": 160}).status_code == 502
     assert not cache.exists() or list(cache.iterdir()) == []
+
+
+def deny_replace(*args, **kwargs):
+    raise PermissionError("target is open in another request")
+
+
+def test_concurrent_cache_write_keeps_the_file_the_other_request_wrote(setup, monkeypatch) -> None:
+    """The other request finished and is streaming the file while this one tries to replace it."""
+    cache_holder: list[Path] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        # The competing request lands its file while this request is still downloading.
+        target = cache_path(cache_holder[0], "huetripo:1", 160)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(b"RIFFother")
+        return httpx.Response(200, content=jpeg())
+
+    client, _, cache = setup(handler)
+    cache_holder.append(cache)
+    monkeypatch.setattr("app.services.photos.os.replace", deny_replace)
+    response = client.get("/api/v1/places/huetripo:1/photo", params={"w": 160})
+    assert response.status_code == 200
+    assert response.content == b"RIFFother"
+    assert list(cache.glob("*.tmp")) == []
+
+
+def test_unwritable_cache_without_a_winner_is_502_and_leaves_no_temp_file(setup, monkeypatch) -> None:
+    client, _, cache = setup(ok)
+    monkeypatch.setattr("app.services.photos.os.replace", deny_replace)
+    assert client.get("/api/v1/places/huetripo:1/photo", params={"w": 160}).status_code == 502
+    assert list(cache.glob("*.tmp")) == []
+
+
+def test_very_tall_source_is_fitted_into_the_webp_limit(setup) -> None:
+    client, _, _ = setup(lambda request: httpx.Response(200, content=jpeg(1000, 20000)))
+    response = client.get("/api/v1/places/huetripo:1/photo", params={"w": 160})
+    assert response.status_code == 200
+    width, height = Image.open(io.BytesIO(response.content)).size
+    assert width <= 160
+    assert height <= 320

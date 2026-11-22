@@ -47,17 +47,21 @@ def cache_path(cache_dir: Path, poi_id: str, width: int) -> Path:
 
 
 def resize_to_webp(data: bytes, width: int) -> bytes:
-    """Fit the image to `width` (never upscale), keep the aspect ratio, encode WebP."""
+    """Fit the image into `width` x 2*`width` (never upscale), keep the aspect ratio, encode WebP."""
     try:
         with Image.open(io.BytesIO(data)) as source:
             image = ImageOps.exif_transpose(source).convert("RGB")
     except (UnidentifiedImageError, OSError, ValueError, Image.DecompressionBombError) as error:
         raise PhotoUpstreamError(f"cannot decode photo: {error}") from error
-    if image.width > width:
-        height = max(1, round(image.height * width / image.width))
-        image = image.resize((width, height), Image.Resampling.LANCZOS)
+    scale = min(width / image.width, (2 * width) / image.height, 1.0)
+    if scale < 1:
+        size = (max(1, round(image.width * scale)), max(1, round(image.height * scale)))
+        image = image.resize(size, Image.Resampling.LANCZOS)
     out = io.BytesIO()
-    image.save(out, "WEBP", quality=WEBP_QUALITY)
+    try:
+        image.save(out, "WEBP", quality=WEBP_QUALITY)
+    except (OSError, ValueError) as error:
+        raise PhotoUpstreamError(f"cannot encode photo: {error}") from error
     return out.getvalue()
 
 
@@ -82,10 +86,17 @@ class PhotoService:
         try:
             with os.fdopen(handle, "wb") as temp_file:
                 temp_file.write(encoded)
-            os.replace(temp_name, target)
         except BaseException:
             Path(temp_name).unlink(missing_ok=True)
             raise
+        try:
+            os.replace(temp_name, target)
+        except OSError as error:
+            # Windows refuses to replace a file another request is streaming; that file is the same photo.
+            Path(temp_name).unlink(missing_ok=True)
+            if target.exists():
+                return target
+            raise PhotoUpstreamError(f"cannot write cache file: {error}") from error
         return target
 
     def _download(self, url: str) -> bytes:
