@@ -153,3 +153,69 @@ unfixed, because Task 8 was allowed to tune only the RAG components.
    in every run.
 7. **One embed failure per run.** One `/api/embed` call returned 500 during a model reload in each
    of dev run 1 and test. That question used BM25 only (`mode_counts`).
+
+## After the chat redesign (2026-11-24)
+
+The chat changed after these numbers were measured: required and optional slots are asked before
+the plan starts, a summary waits for "ok", budget checks come early, the guide answers place
+descriptions, and place edits are handled. The scenario set changed too. The v1 set (`scenarios_v1.jsonl`,
+results in `agents_dev.json`, `agents_test.json`) has one message per scenario in the old flow.
+The v2 set (`scenarios_v2.jsonl`, results in `agents_v2_dev.json`, `agents_v2_test.json`) keeps
+every v1 id and adds turns for the questions the new chat asks, plus 12 new scenarios. v2 has about
+4.5 turns per scenario against 1.4 in v1, and each v2 turn is a real answer to a question. The two sets
+are therefore different, and the comparison is only indicative. The v1 columns are the old code, the v2
+columns the new code, both with the LLM extractor (`qwen3.5:4b`) and the same mock providers.
+
+| Metric | v1 dev (old code) | v1 test (old code) | v2 dev (new code) | v2 test (new code) |
+|---|---|---|---|---|
+| Scenarios (n) | 25 | 15 | 33 | 19 |
+| Task success rate | 0.88 | 0.667 | 0.970 | 0.842 |
+| Routing accuracy (handler per turn) | 1.00 | 0.864 | 0.981 | 0.941 |
+| Tool correctness: exact set | 0.92 | 0.733 | 0.939 | 0.842 |
+| Tool correctness: precision / recall | 1.00 / 0.933 | 1.00 / 0.730 | 0.987 / 0.973 | 0.972 / 0.875 |
+| Budget compliance rate | 0.75 (n=4) | 0.50 (n=2) | 1.00 (n=6) | 1.00 (n=2) |
+| Schedule feasibility rate | 1.00 (20 plans) | 1.00 (9 plans) | 1.00 (27 plans) | 1.00 (15 plans) |
+| Constraint satisfaction rate | 0.778 (n=18) | 0.636 (n=11) | 0.955 (n=22) | 0.833 (n=12) |
+| Chat turn latency p50 / p95 | 2.35 s / 4.54 s | 2.37 s / 4.65 s | 2.21 s / 2.58 s | 2.15 s / 2.75 s |
+| Turns per scenario (total turns) | 1.40 (35) | 1.47 (22) | 4.70 (155) | 4.47 (85) |
+
+Notes on the table:
+
+- Latency is the chat turn time over all turns (RAG answers included where a turn used them). The v2 turns
+  are a different mix from v1, so the p50 and p95 are not a like-for-like speed comparison.
+- Budget compliance and constraint satisfaction have small n. Treat differences under about 0.1 as noise.
+- The v2 dev and test results were produced with the scenario turns adjusted once after an LLM dry run of
+  the whole v2 set (see the `note` fields in `data/eval/scenarios_v2.jsonl`). No chat code was changed for
+  the evaluation.
+
+### v2 failing scenarios
+
+Dev (4 of 33 failed on task success or tool/constraint checks):
+
+- **s14** ("Mình ở Huế, 2 người, đi chơi 2 ngày từ 20/12"): "ở Huế" is not read as the origin, so the chat
+  asks for the origin again and never plans. This is the known origin defect from the v1 failure list (example 7).
+- **s20** ("Ở Huế, 2 người, chơi 2 ngày từ 6/12, ngân sách 5 triệu"): the same origin defect. The origin
+  question then takes "ẩm thực" as the origin, so the plan starts from "Ẩm Thực" and calls transport
+  (expected not called). The plan is still awaiting approval.
+- **s41** (target conversation, "Hà Nội" for the origin): the reply "Hà Nội" is read as a destination outside Huế
+  and refused as out of scope, so the origin slot stays open for one turn. The scenario still reaches
+  awaiting approval with 3 days and 2 people, but the routing check fails on that turn.
+- **s48** ("Sông Hương có gì hay?"): routed to place_info, not guide. The place is not linked to a single
+  POI, so the guide text is not used. The answer does not call rag.
+
+Test (5 of 19 failed):
+
+- **s16** ("Ở Huế, 3 người, tham quan 3 ngày từ 5/12"): the origin defect again; the plan never starts.
+- **s23** ("Ở Huế, 2 người, chơi 3 ngày từ 13/12, ngân sách 300 nghìn"): the origin defect; the origin
+  is taken from the answer "ẩm thực", so transport is called (expected not called).
+- **s28** ("không uống cà phê"): the plan still contains a café. The category exclusion for cafe is not applied
+  (v1 failure example 8); the must-include lăng Minh Mạng is satisfied.
+- **s37** ("Ở Huế, 2 người, chơi 2 ngày từ 6/12", then budget, approve and book): the origin defect; no plan
+  starts, so the approval and booking turns have no plan and the scenario ends failed.
+- **s49** ("Hồ Thủy Tiên có gì hay?"): routed to out_of_scope, not guide. The question was not understood as
+  a place question.
+
+Routing and tool failures in v2 cluster on one cause: the chat does not read "Ở Huế" as the origin
+(s14, s16, s20, s23, s37, and a reason for the s20/s23 transport calls). Fixing that single defect would
+move five of the nine failing scenarios.
+

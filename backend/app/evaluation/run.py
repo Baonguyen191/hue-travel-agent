@@ -37,7 +37,7 @@ from app.core.config import (
 from app.core.usage import record_usage
 from app.evaluation import rag_metrics
 from app.evaluation.agent_metrics import handler_hits, tool_counts, tools_exact
-from app.evaluation.gold import RAG_EVAL_FILE, SCENARIO_FILE, RagItem, Scenario, load_jsonl
+from app.evaluation.gold import RAG_EVAL_FILE, SCENARIO_FILES, RagItem, Scenario, load_jsonl
 from app.evaluation.harness import USER, EvalHarness, build_harness, final_state
 from app.evaluation.judge import Judge, JudgeError
 from app.evaluation.planning_metrics import budget_compliant, constraint_checks, schedule_feasible
@@ -415,7 +415,7 @@ def _constraints(payload: Mapping[str, Any] | None, expect: Any) -> dict[str, bo
         return {}
     if payload is None:
         return {name: False for name in constraint_checks({}, expect)}
-    return constraint_checks(payload.get("itinerary") or {}, expect)
+    return constraint_checks(payload.get("itinerary") or {}, expect, payload.get("request") or None)
 
 
 def _agents_summary(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
@@ -494,6 +494,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="System metrics for the Hue travel chat.")
     parser.add_argument("--suite", choices=["rag", "agents", "all"], default="all")
     parser.add_argument("--split", choices=["dev", "test", "all"], default="dev")
+    parser.add_argument(
+        "--scenarios", choices=sorted(SCENARIO_FILES), default="v2",
+        help="chat scenario set: v1 (the original one-message flow) or v2 (the chat after the redesign)",
+    )
     parser.add_argument("--judge-model", default="qwen3.5:9b")
     parser.add_argument("--no-llm", action="store_true", help="rules-based understanding, no Ollama")
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
@@ -514,6 +518,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         },
         "k": DEFAULT_K,
         "split": args.split,
+        "scenarios": args.scenarios,
         "date": date.today().isoformat(),
         "eval_ref": EVAL_REF.isoformat(),
         "extractor": "ollama" if llm else "rules",
@@ -538,7 +543,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             items = load_jsonl(RAG_EVAL_FILE, RagItem, args.split)
             result = run_rag_suite(items, answerer, Judge(ollama_url(), args.judge_model), understand_fn)
         else:
-            scenarios = load_jsonl(SCENARIO_FILE, Scenario, args.split)
+            scenarios = load_jsonl(SCENARIO_FILES[args.scenarios], Scenario, args.split)
             shared = answerer
 
             def make_harness() -> EvalHarness:
@@ -546,7 +551,9 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return build_harness(understand_fn, rag)
 
             result = run_agents_suite(scenarios, make_harness, places_by_id, rag_enabled=shared is not None)
-        path = _write(args.out_dir, f"{suite}_{args.split}", config, result)
+        # v1 keeps the historical names (agents_dev.json); other sets get their own (agents_v2_dev.json).
+        stem = f"{suite}_{args.split}" if suite == "rag" or args.scenarios == "v1" else f"{suite}_{args.scenarios}_{args.split}"
+        path = _write(args.out_dir, stem, config, result)
         print(f"{suite} suite ({args.split}) -> {path}")
         print(json.dumps(result["summary"], ensure_ascii=False, indent=2, default=str))
         ran += 1

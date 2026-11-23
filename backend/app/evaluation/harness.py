@@ -12,6 +12,7 @@ from app.agents.booking import BookingAgent
 from app.agents.orchestrator import Orchestrator
 from app.agents.search import SearchAgent
 from app.chat import texts
+from app.chat.draft import next_questions
 from app.chat.schemas import BookingCard, ChatReply, PlanCard
 from app.chat.service import ChatService
 from app.chat.store import ChatStore
@@ -83,9 +84,19 @@ def final_state(handler: str, reply: ChatReply, h: EvalHarness, conversation_id:
         return "answered"
     if handler == "out_of_scope":
         return "refused"
+    if handler == "smalltalk":
+        return "answered"
+    if handler == "guide":
+        return "answered"
+    if handler == "cancel":
+        return "cancelled"
     pending = reply.pending_confirmation or {}
-    if pending.get("kind") in {"approve", "book"}:
+    if pending.get("kind") in {"approve", "book", "confirm_trip"}:
         return "confirming"
-    if handler in {"plan_new", "confirm_defaults"} and (reply.quick_replies or reply.pending_confirmation):
-        return "clarifying"
+    if handler == "plan_new":
+        # A turn that asks the open slots carries no buttons; the question text is recomputed from the draft.
+        # The one-time budget note is in the turn only before it is marked noted, so both forms count.
+        draft = h.chats.context(conversation_id).draft
+        if reply.text in {next_questions(draft), next_questions({**draft, "precheck_noted": False})}:
+            return "clarifying"
     return "failed"

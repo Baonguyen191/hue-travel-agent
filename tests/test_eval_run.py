@@ -82,9 +82,9 @@ def _scenarios() -> list[Scenario]:
         id="t1",
         split="dev",
         group="plan_full",
-        turns=["Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12"],
+        turns=["Đi Huế 2 ngày từ 20/12 từ Hà Nội 2 người ngân sách 5 triệu thích ẩm thực", "tùy", "tùy", "ok"],
         expect=ScenarioExpect(
-            handlers=["plan_new"],
+            handlers=["plan_new", "plan_new", "plan_new", "start_trip"],
             final_state="awaiting_approval",
             trace=["search", "itinerary", "budget", "validate", "approval"],
             tools_called=["poi_search", "hotel", "transport"],
@@ -300,3 +300,26 @@ def test_agents_suite_records_a_crashing_turn_and_scores_the_next_scenario() -> 
     assert second["task_success"] is True
     assert result["summary"]["latency_p50_ms"] is not None
     assert "none" not in result["summary"]["latency_by_handler"]
+
+
+def test_v2_scenarios_pass_without_llm() -> None:
+    """Three small v2 scenarios (a cancelled summary, smalltalk, a weather refusal) pass with rules-only understanding."""
+    from app.evaluation.gold import SCENARIO_FILES, load_jsonl
+
+    wanted = {"s44", "s45", "s47"}
+    scenarios = [s for s in load_jsonl(SCENARIO_FILES["v2"], Scenario, "all") if s.id in wanted]
+    places = {p.id: p for p in HuePlacesRepository(hue_database_path()).list_all()}
+    result = run_agents_suite(scenarios, lambda: build_harness(_rules, None), places, rag_enabled=False)
+    summary = result["summary"]
+    assert AGENT_SUMMARY_KEYS <= set(summary)
+    assert summary["n"] == 3
+    assert summary["task_success_rate"] == 1.0
+    assert summary["routing_accuracy"] == 1.0
+    assert summary["tool_exact_rate"] == 1.0
+    assert summary["errors"] == 0
+    assert {r["id"]: r["final_state"] for r in result["records"]} == {
+        "s44": "cancelled",
+        "s45": "answered",
+        "s47": "refused",
+    }
+

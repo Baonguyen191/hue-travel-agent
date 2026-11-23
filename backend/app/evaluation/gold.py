@@ -14,6 +14,7 @@ from app.core.config import PROJECT_ROOT
 EVAL_DIR = PROJECT_ROOT / "data" / "eval"
 RAG_EVAL_FILE = EVAL_DIR / "rag_eval_v1.jsonl"
 SCENARIO_FILE = EVAL_DIR / "scenarios_v1.jsonl"
+SCENARIO_FILES = {"v1": SCENARIO_FILE, "v2": EVAL_DIR / "scenarios_v2.jsonl"}
 
 Split = Literal["dev", "test"]
 Tool = Literal["transport", "hotel", "booking", "poi_search", "rag"]
@@ -24,10 +25,13 @@ Handler = Literal[
     "ask_approve",
     "ask_book",
     "out_of_scope",
+    "smalltalk",
     "confirm_defaults",
     "run_approve",
     "run_book",
     "cancel",
+    "start_trip",
+    "guide",
 ]
 FinalState = Literal[
     "awaiting_approval",
@@ -37,6 +41,7 @@ FinalState = Literal[
     "clarifying",
     "confirming",
     "refused",
+    "cancelled",
     "failed",
 ]
 RagGroup = Literal["single_place", "near_place", "by_category", "unanswerable"]
@@ -71,6 +76,7 @@ class ConstraintExpect(BaseModel):
     categories: list[str] = Field(default_factory=list)
     num_days: int | None = None
     start_date: date | None = None
+    people: int | None = None
 
 
 class ScenarioExpect(BaseModel):

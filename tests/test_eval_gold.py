@@ -17,6 +17,7 @@ from app.core.config import hue_database_path  # noqa: E402
 from app.evaluation.gold import (  # noqa: E402
     RAG_EVAL_FILE,
     SCENARIO_FILE,
+    SCENARIO_FILES,
     RagItem,
     Scenario,
     load_jsonl,
@@ -146,3 +147,27 @@ def test_real_scenario_file_is_valid() -> None:
             continue
         for poi_id in [*constraints.must_include, *constraints.exclude]:
             assert repo.get_by_id(poi_id) is not None, (scenario.id, poi_id)
+
+
+def test_real_v2_scenario_file_is_valid() -> None:
+    scenarios = load_jsonl(SCENARIO_FILES["v2"], Scenario, "all")
+    repo = HuePlacesRepository(hue_database_path())
+
+    assert len(scenarios) == 52
+    ids = [scenario.id for scenario in scenarios]
+    assert len(set(ids)) == len(ids)
+    assert set(SCENARIO_FILES) == {"v1", "v2"}
+
+    splits = Counter(scenario.split for scenario in scenarios)
+    assert (splits["dev"], splits["test"]) == (33, 19)
+
+    v1_ids = {scenario.id for scenario in load_jsonl(SCENARIO_FILE, Scenario, "all")}
+    assert v1_ids <= set(ids)  # every v1 scenario is kept under its id
+
+    for scenario in scenarios:
+        constraints = scenario.expect.constraints
+        if constraints is None:
+            continue
+        for poi_id in [*constraints.must_include, *constraints.exclude]:
+            assert repo.get_by_id(poi_id) is not None, (scenario.id, poi_id)
+

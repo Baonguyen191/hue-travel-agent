@@ -58,8 +58,10 @@ def schedule_feasible(
     return not problems, unchecked, problems
 
 
-def constraint_checks(itinerary: Mapping[str, Any], expect: ConstraintExpect) -> dict[str, bool]:
-    """One pass/fail per constraint type the gold states."""
+def constraint_checks(
+    itinerary: Mapping[str, Any], expect: ConstraintExpect, request: Mapping[str, Any] | None = None
+) -> dict[str, bool]:
+    """One pass/fail per constraint type the gold states; `request` is the saved TripRequest (for the party size)."""
     events = _events(itinerary)
     poi_ids = {event["poi_id"] for event in events if event.get("poi_id")}
     categories = {event["category"] for event in events if event.get("category")}
@@ -77,4 +79,6 @@ def constraint_checks(itinerary: Mapping[str, Any], expect: ConstraintExpect) ->
         checks["num_days"] = len(days) == expect.num_days
     if expect.start_date is not None:
         checks["start_date"] = bool(days) and str(days[0]["date"]) == expect.start_date.isoformat()
+    if expect.people is not None:
+        checks["people"] = request is not None and request.get("people") == expect.people
     return checks
