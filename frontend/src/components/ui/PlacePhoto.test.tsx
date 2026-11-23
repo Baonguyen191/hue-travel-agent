@@ -1,6 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { PlacePhoto, photoUrl } from ".";
+import type { Place } from "../../api/types";
+import placeJson from "../../test/fixtures/place-531787.json";
+import { PlacePhoto, isIllustrative, photoUrl } from ".";
 
 describe("PlacePhoto", () => {
   it("builds the proxy URL for each size", () => {
@@ -30,10 +32,39 @@ describe("PlacePhoto", () => {
     expect(screen.getByTestId("place-illustration")).toHaveAttribute("data-category", "default");
   });
 
+  it("labels the real image as an illustrative photo when asked", () => {
+    render(<PlacePhoto poiId="huetripo:1" name="Bún bò" category="restaurant" size="md" illustrative />);
+    expect(screen.getByText("Ảnh minh hoạ")).toHaveClass("absolute", "right-2", "top-2");
+  });
+
+  it("does not show the illustrative badge by default", () => {
+    render(<PlacePhoto poiId="huetripo:1" name="Đại Nội Huế" category="historic" size="md" />);
+    expect(screen.queryByText("Ảnh minh hoạ")).not.toBeInTheDocument();
+  });
+
+  it("hides the illustrative badge once the image fails and the illustration shows", () => {
+    render(<PlacePhoto poiId="huetripo:1" name="Bún bò" category="restaurant" size="md" illustrative />);
+    fireEvent.error(screen.getByRole("img", { name: "Bún bò" }));
+    expect(screen.queryByText("Ảnh minh hoạ")).not.toBeInTheDocument();
+    expect(screen.getByTestId("place-illustration")).toBeInTheDocument();
+  });
+
   it("fills the full width at fixed heights for the banner aspect", () => {
     render(<PlacePhoto poiId="huetripo:1" name="Banner" category="historic" size="lg" aspect="banner" />);
     const wrapper = screen.getByRole("img", { name: "Banner" }).parentElement;
     expect(wrapper).toHaveClass("h-48", "w-full");
     expect(wrapper).not.toHaveClass("aspect-video");
+  });
+});
+
+describe("isIllustrative", () => {
+  const place = placeJson as Place;
+
+  it("is true only for a generic Commons picture of the category", () => {
+    expect(isIllustrative({ photo: { url: "/x", kind: "commons_illustrative", author: null, license: null, credit_url: null } })).toBe(true);
+    expect(isIllustrative({ photo: { url: "/x", kind: "commons_place", author: null, license: null, credit_url: null } })).toBe(false);
+    expect(isIllustrative({ photo: { url: "/x", kind: "source", author: null, license: null, credit_url: null } })).toBe(false);
+    expect(isIllustrative({ photo: null })).toBe(false);
+    expect(isIllustrative(place)).toBe(false);
   });
 });

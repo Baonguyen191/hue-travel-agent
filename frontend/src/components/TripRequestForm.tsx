@@ -292,7 +292,7 @@ export function TripRequestForm({ initial, missing = [], submitLabel, pending = 
                 <label
                   key={option.value}
                   className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm font-medium has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-kim ${
-                    checked ? "border-son bg-son text-on-son" : "border-vien bg-nga text-muc-soft"
+                    checked ? "border-kim bg-kim text-muc" : "border-vien bg-nga text-muc-soft"
                   }`}
                 >
                   <input

@@ -31,6 +31,21 @@ describe("PlaceCard", () => {
     expect(photo.getAttribute("src")).toMatch(/\?w=480$/);
   });
 
+  it("labels a generic Commons photo as an illustration", () => {
+    renderCard({
+      ...place,
+      photo: { url: "/x", kind: "commons_illustrative", author: null, license: null, credit_url: null },
+    });
+
+    expect(screen.getByText("Ảnh minh hoạ")).toBeInTheDocument();
+  });
+
+  it("does not label the source's own photo", () => {
+    renderCard({ ...place, photo: { url: "/x", kind: "source", author: null, license: null, credit_url: null } });
+
+    expect(screen.queryByText("Ảnh minh hoạ")).not.toBeInTheDocument();
+  });
+
   it("shows rating, reference price with the unit caveat, and unverified hours", () => {
     renderCard(place);
 

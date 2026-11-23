@@ -3,12 +3,25 @@ import {
   describePrice,
   describeRating,
   formatDate,
+  formatDayMonthTime,
   formatKm,
   formatMinutes,
   formatTime,
   formatVnd,
   formatVndRange,
 } from "./format";
+
+describe("formatDayMonthTime", () => {
+  it("reads day/month and clock time from a naive local datetime", () => {
+    expect(formatDayMonthTime("2026-12-04T19:00:00")).toBe("04/12 19:00");
+    expect(formatDayMonthTime("2026-12-08T04:50:00")).toBe("08/12 04:50");
+  });
+
+  it("returns a dash for missing or malformed input", () => {
+    expect(formatDayMonthTime(null)).toBe("—");
+    expect(formatDayMonthTime("tối mai")).toBe("—");
+  });
+});
 
 describe("formatVnd", () => {
   it("groups thousands with dots and adds the dong sign", () => {

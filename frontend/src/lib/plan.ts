@@ -1,7 +1,7 @@
 // Derived views of a plan record. The API keeps two statuses: the stored trip status (which is not
 // updated after approval) and the checkpoint status (the live graph state). The checkpoint wins when present.
-import type { ItineraryEvent, PlanRecord, Place, SearchResult } from "../api/types";
-import { formatDate, formatKm, formatMinutes, formatTime } from "./format";
+import type { ItineraryEvent, ItinerarySlot, PlanRecord, Place, SearchResult, TravelLeg } from "../api/types";
+import { formatDate, formatDayMonthTime, formatKm, formatMinutes, formatTime } from "./format";
 import { translateWarnings } from "./warnings";
 import { CATEGORY_LABEL } from "./labels";
 
@@ -47,7 +47,47 @@ const MEAL_LABEL: Record<string, string> = { LUNCH: "Bữa trưa", DINNER: "Bữ
 export function eventKindLabel(event: ItineraryEvent): string {
   if (event.kind === "VISIT") return "Tham quan";
   if (event.kind === "MEAL") return (event.meal && MEAL_LABEL[event.meal]) || "Ăn uống";
+  if (event.kind === "REST") return "Nghỉ";
   return event.kind;
+}
+
+export const SLOT_LABEL: Record<ItinerarySlot, string> = {
+  morning: "Sáng",
+  lunch: "Trưa",
+  rest: "Nghỉ trưa",
+  afternoon: "Chiều",
+  cafe: "Cà phê",
+  sunset: "Hoàng hôn",
+  dinner: "Tối",
+};
+
+/** "Sáng", "Hoàng hôn", ...; null when the event has no slot (older plans). */
+export function slotLabel(slot: ItinerarySlot | null | undefined): string | null {
+  return slot ? (SLOT_LABEL[slot] ?? null) : null;
+}
+
+export const MODE_LABEL: Record<TravelLeg["mode"], string> = {
+  BUS: "Xe giường nằm",
+  TRAIN: "Tàu hỏa",
+  FLIGHT: "Máy bay",
+};
+
+/** Finds the outbound or return leg; undefined when the plan has none (older plans). */
+export function findTravelLeg(legs: TravelLeg[] | undefined, direction: TravelLeg["direction"]): TravelLeg | undefined {
+  return legs?.find((leg) => leg.direction === direction);
+}
+
+/**
+ * "04/12 19:00 → 05:30 · Xe giường nằm Hà Nội → Huế · ước tính". The MÔ PHỎNG badge is rendered
+ * beside this text by the component, not inside it.
+ */
+export function travelLegText(leg: TravelLeg): string {
+  const mode = MODE_LABEL[leg.mode] ?? leg.mode;
+  const estimate = leg.estimated ? " · ước tính" : "";
+  // An overnight leg names the arrival day too ("26/11 19:00 → 27/11 07:30").
+  const sameDay = leg.depart_at.slice(0, 10) === leg.arrive_at.slice(0, 10);
+  const arrive = sameDay ? formatTime(leg.arrive_at) : formatDayMonthTime(leg.arrive_at);
+  return `${formatDayMonthTime(leg.depart_at)} → ${arrive} · ${mode} ${leg.origin} → ${leg.destination}${estimate}`;
 }
 
 export function categoryLabel(category: string | null): string {

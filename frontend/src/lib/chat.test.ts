@@ -60,6 +60,18 @@ describe("confirmation and quick replies", () => {
     expect(visibleQuickReplies(reply)).toEqual(["Từ Hà Nội, 2 người", "Dùng mặc định"]);
   });
 
+  it("shows the trip summary as text only: no confirmation buttons for confirm_trip", () => {
+    const base = replyOf(chatClarifyDefaults);
+    const reply: ChatReply = {
+      ...base,
+      quick_replies: [],
+      pending_confirmation: { kind: "confirm_trip" },
+    };
+
+    expect(showsConfirmation(reply, true)).toBe(false);
+    expect(visibleQuickReplies(reply)).toEqual([]);
+  });
+
   it("drops the approve chip when the plan card already offers the budget option", () => {
     const reply = replyOf(chatPlan);
 

@@ -3,16 +3,18 @@ import { describe, expect, it } from "vitest";
 import { Button, CategoryChip, MockBadge, Notice, SectionHeading, buttonClass } from ".";
 
 describe("ui kit", () => {
-  it("renders a primary button by default with the son colour and type=button", () => {
+  it("renders a primary button by default in gold with dark text and type=button", () => {
     render(<Button>Duyệt</Button>);
     const button = screen.getByRole("button", { name: "Duyệt" });
     expect(button).toHaveAttribute("type", "button");
-    expect(button.className).toContain("bg-son");
+    expect(button.className).toContain("bg-kim");
+    expect(button.className).toContain("text-muc");
+    expect(button.className).not.toContain("bg-son");
   });
 
   it("gives outline and secondary variants their own colours", () => {
     expect(buttonClass("outline")).toContain("border-son");
-    expect(buttonClass("secondary")).toContain("bg-kim");
+    expect(buttonClass("secondary")).toContain("bg-kim-soft");
   });
 
   it("labels a category chip in Vietnamese", () => {

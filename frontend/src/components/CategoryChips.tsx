@@ -8,7 +8,7 @@ interface CategoryChipsProps {
 
 function chipClass(pressed: boolean): string {
   const base = "rounded-full px-3 py-1.5 text-sm font-medium ring-1 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-son";
-  return pressed ? `${base} bg-son text-on-son ring-son` : `${base} bg-nga text-son ring-vien hover:ring-kim`;
+  return pressed ? `${base} bg-kim text-muc ring-kim` : `${base} bg-nga text-son ring-vien hover:ring-kim`;
 }
 
 /** Single-choice category filter; "Tất cả" clears it. Each chip exposes aria-pressed. */

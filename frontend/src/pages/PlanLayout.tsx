@@ -180,19 +180,19 @@ export function PlanLayout() {
         <NavLink
           to={`/plan/${threadId}`}
           end
-          className={({ isActive }) => `rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${isActive ? "bg-son text-on-son ring-son" : "bg-nga text-son ring-vien hover:ring-kim"}`}
+          className={({ isActive }) => `rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${isActive ? "bg-kim text-muc ring-kim" : "bg-nga text-son ring-vien hover:ring-kim"}`}
         >
           Lịch trình
         </NavLink>
         <NavLink
           to={`/plan/${threadId}/budget`}
-          className={({ isActive }) => `rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${isActive ? "bg-son text-on-son ring-son" : "bg-nga text-son ring-vien hover:ring-kim"}`}
+          className={({ isActive }) => `rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${isActive ? "bg-kim text-muc ring-kim" : "bg-nga text-son ring-vien hover:ring-kim"}`}
         >
           Ngân sách &amp; duyệt
         </NavLink>
         <NavLink
           to={`/plan/${threadId}/booking`}
-          className={({ isActive }) => `rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${isActive ? "bg-son text-on-son ring-son" : "bg-nga text-son ring-vien hover:ring-kim"}`}
+          className={({ isActive }) => `rounded-full px-4 py-1.5 text-sm font-semibold ring-1 ${isActive ? "bg-kim text-muc ring-kim" : "bg-nga text-son ring-vien hover:ring-kim"}`}
         >
           Đặt chỗ
         </NavLink>

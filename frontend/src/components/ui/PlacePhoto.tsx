@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { API_BASE } from "../../api/client";
+import type { Place } from "../../api/types";
 import { PlaceIllustration } from "./PlaceIllustration";
 
 export type PhotoSize = "sm" | "md" | "lg";
@@ -18,6 +19,11 @@ export function photoUrl(poiId: string, size: PhotoSize): string {
   return `${API_BASE}/places/${encodeURIComponent(poiId)}/photo?w=${PHOTO_WIDTH[size]}`;
 }
 
+/** True when the photo is a generic Commons picture of the category rather than this place. */
+export function isIllustrative(place: Pick<Place, "photo">): boolean {
+  return place.photo?.kind === "commons_illustrative";
+}
+
 interface PlacePhotoProps {
   poiId: string | null;
   name: string;
@@ -25,10 +31,12 @@ interface PlacePhotoProps {
   size: PhotoSize;
   aspect?: PhotoAspect;
   className?: string;
+  /** Labels the real image as "Ảnh minh hoạ" (generic category picture). Ignored for the illustration. */
+  illustrative?: boolean;
 }
 
 /** The place photo from the backend proxy, in a fixed-ratio box; the category illustration when there is none. */
-export function PlacePhoto({ poiId, name, category, size, aspect = "4/3", className = "" }: PlacePhotoProps) {
+export function PlacePhoto({ poiId, name, category, size, aspect = "4/3", className = "", illustrative = false }: PlacePhotoProps) {
   const src = poiId ? photoUrl(poiId, size) : null;
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
@@ -52,6 +60,9 @@ export function PlacePhoto({ poiId, name, category, size, aspect = "4/3", classN
           <span className="sr-only">{name}</span>
         </>
       )}
+      {showImage && illustrative ? (
+        <span className="absolute right-2 top-2 rounded-full bg-muc/75 px-2 py-0.5 text-xs font-medium text-nga">Ảnh minh hoạ</span>
+      ) : null}
     </div>
   );
 }

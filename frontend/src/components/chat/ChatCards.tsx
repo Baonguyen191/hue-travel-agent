@@ -3,7 +3,7 @@ import type { BookingItem, ChatBookingCard, ChatCard, ChatPlaceCard, ChatPlanCar
 import { budgetStatusLabel, optionLabelText } from "../../lib/budget";
 import { bookingStatusLabel, bookingStatusTone } from "../../lib/booking";
 import { formatDate, formatVnd, formatVndRange } from "../../lib/format";
-import { statusLabel, statusTone } from "../../lib/plan";
+import { slotLabel, statusLabel, statusTone } from "../../lib/plan";
 import { approvable } from "../../lib/chat";
 import { CategoryChip, LINK, MockBadge, Ornament, PILL, PlacePhoto, TONE_CLASS, buttonClass, cardClass } from "../ui";
 
@@ -12,6 +12,7 @@ const CARD = cardClass("mt-2 text-sm text-muc");
 const KIND_LABEL: Record<string, string> = {
   VISIT: "Tham quan",
   MEAL_BREAK: "Nghỉ ăn trưa",
+  REST: "Nghỉ",
 };
 const MEAL_LABEL: Record<string, string> = {
   LUNCH: "Ăn trưa",
@@ -69,7 +70,9 @@ function PlanCardView({ card, live, disabled, onSend }: { card: ChatPlanCard; li
                 {day.items.map((item, itemIndex) => (
                   <li key={`${day.date}-${itemIndex}`} className="min-w-0">
                     <PlacePhoto poiId={item.poi_id} name={item.name} category={null} size="sm" className="rounded-lg" />
-                    <p className="mt-1 text-xs leading-tight">
+                    <p className="mt-1 text-xs leading-tight" title={[item.reason, item.intro].filter(Boolean).join(" ") || undefined}>
+                      {slotLabel(item.slot) ? <span className="text-muc-soft">{slotLabel(item.slot)}</span> : null}
+                      {slotLabel(item.slot) ? " " : null}
                       <span className="font-semibold text-son">{item.time}</span>{" "}
                       <span className="text-muc">{item.name}</span>{" "}
                       <span className="text-muc-soft">({planItemKindLabel(item.kind, item.meal)})</span>
@@ -123,7 +126,14 @@ function PlaceCardView({ card }: { card: ChatPlaceCard }) {
   return (
     <section aria-label={`Địa điểm: ${card.name}`} className={CARD}>
       <Ornament />
-      <PlacePhoto poiId={card.poi_id} name={card.name} category={card.category} size="md" aspect="16/9" />
+      <PlacePhoto
+        poiId={card.poi_id}
+        name={card.name}
+        category={card.category}
+        size="md"
+        aspect="16/9"
+        illustrative={Boolean(card.photo_illustrative)}
+      />
       <div className="p-3">
         <h3 className="font-serif font-semibold text-son">{card.name}</h3>
         <p className="mt-1">

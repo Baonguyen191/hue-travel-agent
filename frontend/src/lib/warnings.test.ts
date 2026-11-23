@@ -41,6 +41,15 @@ describe("translateWarning", () => {
     );
   });
 
+  it("translates the fallback warnings for a transport mode or hotel tier with no offer", () => {
+    expect(translateWarning("No BUS offer is available; showing all transport modes.")).toBe(
+      "Không có xe theo phương tiện bạn chọn; đang hiện mọi phương tiện.",
+    );
+    expect(translateWarning("No THREE_STAR offer is available; showing all hotel tiers.")).toBe(
+      "Không có chỗ ở theo loại bạn chọn; đang hiện mọi loại.",
+    );
+  });
+
   it("translates the attempt reason the orchestrator reports for a failed plan", () => {
     expect(translateWarning("no budget option")).toBe("Không có phương án ngân sách.");
   });

@@ -135,4 +135,17 @@ describe("toTripRequest", () => {
 
     expect(request).toMatchObject({ keyword: "chùa", center_lat: 16.46, center_lon: 107.58, radius_km: 3 });
   });
+
+  it("keeps the transport, hotel tier and pace of the base request", () => {
+    const base = { ...dod.request!, transport_mode: "train" as const, hotel_tier: "resort" as const, pace: "relaxed" as const };
+    const request = toTripRequest(valuesFromParsed(dod), base);
+
+    expect(request).toMatchObject({ transport_mode: "train", hotel_tier: "resort", pace: "relaxed" });
+  });
+
+  it("sends any transport and stay as null and the moderate pace when there is no base request", () => {
+    const request = toTripRequest(complete(), null);
+
+    expect(request).toMatchObject({ transport_mode: null, hotel_tier: null, pace: "moderate" });
+  });
 });

@@ -6,7 +6,7 @@ import { Ornament } from "./ui";
 const NAV_LINK = "border-b-2 px-1 py-1 text-sm font-medium transition-colors";
 
 function navClass({ isActive }: { isActive: boolean }): string {
-  return `${NAV_LINK} ${isActive ? "border-kim text-on-son" : "border-transparent text-on-son/75 hover:text-on-son"}`;
+  return `${NAV_LINK} ${isActive ? "border-kim text-son" : "border-transparent text-muc-soft hover:text-son"}`;
 }
 
 export function Layout() {
@@ -14,10 +14,10 @@ export function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-giay">
-      <header className="bg-son text-on-son">
+      <header className="bg-nga text-muc">
         <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-3 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-col gap-1 md:flex-row md:items-center md:gap-8">
-            <span className="font-serif text-xl font-bold tracking-wide">Hue Travel</span>
+            <span className="font-serif text-xl font-bold tracking-wide text-son">Hue Travel</span>
             <nav aria-label="Chính" className="flex flex-wrap gap-5">
               <NavLink to="/" end className={navClass}>
                 Trò chuyện
@@ -27,7 +27,7 @@ export function Layout() {
               </NavLink>
             </nav>
           </div>
-          <span className="text-xs text-on-son/80">Người dùng thử: {shortUserId(userId)} — chưa phải đăng nhập</span>
+          <span className="text-xs text-muc-soft">Người dùng thử: {shortUserId(userId)} — chưa phải đăng nhập</span>
         </div>
       </header>
       <Ornament />

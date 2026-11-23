@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import type { Place } from "../api/types";
 import { describePrice, describeRating } from "../lib/format";
 import { CONFIDENCE_LABEL } from "../lib/labels";
-import { CategoryChip, PlacePhoto, LINK, cardClass } from "./ui";
+import { CategoryChip, PlacePhoto, LINK, cardClass, isIllustrative } from "./ui";
 
 export function placeDetailPath(poiId: string): string {
   return `/explore/${encodeURIComponent(poiId)}`;
@@ -21,7 +21,7 @@ interface PlaceCardProps {
 export function PlaceCard({ place }: PlaceCardProps) {
   return (
     <article className={cardClass("flex flex-col")}>
-      <PlacePhoto poiId={place.id} name={place.name} category={place.category} size="md" />
+      <PlacePhoto poiId={place.id} name={place.name} category={place.category} size="md" illustrative={isIllustrative(place)} />
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-start justify-between gap-2">
           <h2 className="font-serif text-base font-semibold leading-snug text-son">

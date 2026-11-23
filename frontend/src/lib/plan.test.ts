@@ -3,7 +3,32 @@ import type { PlanRecord } from "../api/types";
 import planApproved from "../test/fixtures/plan-approved.json";
 import planWaiting from "../test/fixtures/plan.json";
 import { translateWarnings } from "./warnings";
-import { effectiveStatus, eventKindLabel, isApproved, isWaiting, placesById, summarizeWarnings, travelText } from "./plan";
+import type { TravelLeg } from "../api/types";
+import {
+  MODE_LABEL,
+  SLOT_LABEL,
+  effectiveStatus,
+  eventKindLabel,
+  findTravelLeg,
+  isApproved,
+  isWaiting,
+  placesById,
+  slotLabel,
+  summarizeWarnings,
+  travelLegText,
+  travelText,
+} from "./plan";
+
+const bus: TravelLeg = {
+  direction: "OUTBOUND",
+  mode: "BUS",
+  origin: "Hà Nội",
+  destination: "Huế",
+  depart_at: "2026-12-04T19:00:00",
+  arrive_at: "2026-12-05T05:30:00",
+  estimated: true,
+  mock: true,
+};
 
 const waiting = planWaiting as unknown as PlanRecord;
 const approved = planApproved as unknown as PlanRecord;
@@ -88,5 +113,70 @@ describe("timeline helpers", () => {
   it("indexes candidate places by id", () => {
     const first = waiting.payload.search.poi_candidates[0].place;
     expect(placesById(waiting.payload.search).get(first.id)?.name).toBe(first.name);
+  });
+
+  it("labels rest blocks as rest", () => {
+    expect(eventKindLabel({ ...waiting.payload.itinerary.days[0].events[0], kind: "REST" })).toBe("Nghỉ");
+  });
+});
+
+describe("slot labels", () => {
+  it("maps every slot to its Vietnamese label", () => {
+    expect(SLOT_LABEL).toEqual({
+      morning: "Sáng",
+      lunch: "Trưa",
+      rest: "Nghỉ trưa",
+      afternoon: "Chiều",
+      cafe: "Cà phê",
+      sunset: "Hoàng hôn",
+      dinner: "Tối",
+    });
+  });
+
+  it("returns null for events without a slot, so older plans show no label", () => {
+    expect(slotLabel("sunset")).toBe("Hoàng hôn");
+    expect(slotLabel(null)).toBeNull();
+    expect(slotLabel(undefined)).toBeNull();
+  });
+});
+
+describe("travel legs", () => {
+  it("names each transport mode in Vietnamese", () => {
+    expect(MODE_LABEL).toEqual({ BUS: "Xe giường nằm", TRAIN: "Tàu hỏa", FLIGHT: "Máy bay" });
+  });
+
+  it("writes the outbound leg as depart day/month and time, arrival time, mode, route and estimate", () => {
+    expect(travelLegText(bus)).toBe("04/12 19:00 → 05/12 05:30 · Xe giường nằm Hà Nội → Huế · ước tính");
+  });
+
+  it("drops the estimate marker when the time is not estimated", () => {
+    expect(travelLegText({ ...bus, mode: "TRAIN", direction: "RETURN", origin: "Huế", destination: "Hà Nội", estimated: false })).toBe(
+      "04/12 19:00 → 05/12 05:30 · Tàu hỏa Huế → Hà Nội",
+    );
+    expect(travelLegText({ ...bus, mode: "FLIGHT" })).toContain("· Máy bay Hà Nội → Huế");
+  });
+
+  it("finds a leg by direction and returns undefined when there is none", () => {
+    const legs = [bus, { ...bus, direction: "RETURN" as const, origin: "Huế", destination: "Hà Nội" }];
+    expect(findTravelLeg(legs, "RETURN")?.origin).toBe("Huế");
+    expect(findTravelLeg(legs, "OUTBOUND")?.origin).toBe("Hà Nội");
+    expect(findTravelLeg(undefined, "OUTBOUND")).toBeUndefined();
+    expect(findTravelLeg([bus], "RETURN")).toBeUndefined();
+  });
+});
+
+describe("travel legs on the same day", () => {
+  it("writes only the arrival time when the leg lands the same day", () => {
+    const flight = {
+      direction: "OUTBOUND" as const,
+      mode: "FLIGHT" as const,
+      origin: "Hà Nội",
+      destination: "Huế",
+      depart_at: "2026-12-05T06:00:00",
+      arrive_at: "2026-12-05T07:20:00",
+      estimated: true,
+      mock: true,
+    };
+    expect(travelLegText(flight)).toBe("05/12 06:00 → 07:20 · Máy bay Hà Nội → Huế · ước tính");
   });
 });

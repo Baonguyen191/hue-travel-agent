@@ -18,6 +18,11 @@ import { isApproved, isWaiting } from "../lib/plan";
 import { translateWarning, translateWarnings } from "../lib/warnings";
 import { usePlan } from "./PlanLayout";
 
+/** Labelled options use their Vietnamese name; the others are numbered so they can be told apart. */
+function optionName(option: BudgetOption, index: number): string {
+  return option.label ? optionLabelText(option.label) : `#${index + 1}`;
+}
+
 function transportText(offer: TransportOffer | null): string {
   return offer ? `${offer.provider} · ${formatVnd(offer.price_vnd)}` : "—";
 }
@@ -165,7 +170,7 @@ export function BudgetTab() {
         {budget.options.map((option, index) => (
           <li key={`card-${option.label ?? "none"}-${index}`} className={`space-y-3 ${cardClass("p-4")}`}>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="font-serif font-semibold text-son">Phương án {optionLabelText(option.label)}</p>
+              <p className="font-serif font-semibold text-son">Phương án {optionName(option, index)}</p>
               <span className={`${PILL} ${TONE_CLASS[budgetStatusTone(option.budget_status)]}`}>
                 {budgetStatusLabel(option.budget_status)}
               </span>
@@ -215,7 +220,7 @@ export function BudgetTab() {
             {budget.options.map((option, index) => (
               <tr key={`${option.label ?? "none"}-${index}`} className="align-top">
                 <td className="border-b border-vien py-3 pr-3">
-                  <p className="font-semibold">{optionLabelText(option.label)}</p>
+                  <p className="font-semibold">{optionName(option, index)}</p>
                   {option.label === null ? <p className="text-xs text-muc-soft">chưa có nhãn</p> : null}
                 </td>
                 <td className="border-b border-vien py-3 pr-3">{transportText(option.transport_outbound)}</td>
@@ -246,7 +251,7 @@ export function BudgetTab() {
         {budget.options.map((option, index) => (
           <details key={`items-${index}`} className={cardClass("p-4")}>
             <summary className="cursor-pointer text-sm font-semibold text-muc">
-              Phương án {optionLabelText(option.label)} · {option.items.length} mục
+              Phương án {optionName(option, index)} · {option.items.length} mục
             </summary>
             {option.items.length === 0 ? (
               <p className="pt-2 text-sm text-muc-soft">Không có mục chi phí.</p>

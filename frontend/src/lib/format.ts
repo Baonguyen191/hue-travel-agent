@@ -28,6 +28,12 @@ export function formatTime(value: string | null | undefined): string {
   return match ? `${match[1]}:${match[2]}` : "—";
 }
 
+/** "2026-12-04T19:00:00" -> "04/12 19:00". Read by slicing; unparseable input -> "—". */
+export function formatDayMonthTime(value: string | null | undefined): string {
+  const match = value?.match(/^\d{4}-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+  return match ? `${match[2]}/${match[1]} ${match[3]}:${match[4]}` : "—";
+}
+
 /** "2026-12-05" -> "05/12/2026". Unparseable input is returned unchanged. */
 export function formatDate(value: string | null | undefined): string {
   const match = value?.match(/^(\d{4})-(\d{2})-(\d{2})/);

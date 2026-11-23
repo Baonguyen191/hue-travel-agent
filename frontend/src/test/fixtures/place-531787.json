@@ -18,6 +18,23 @@
   "is_free_claim": false,
   "summary": "Đại Nội Huế từng là trung tâm chính trị, văn hóa và là nơi sinh hoạt của 13 vị vua triều Nguyễn trong suốt 143 năm. Được UNESCO vinh danh là Di sản Văn hóa Thế giới vào năm 1993, quần thể kiến trúc đồ sộ và cổ kính này là một kiệt tác nghệ thuật rực rỡ. Đến với Đại Nội, du khách sẽ bước vào một hành trình vượt thời gian, tận mắt chiêm ngưỡng vẻ đẹp uy nghi và cảm nhận trọn vẹn thời kỳ vàng son của hoàng gia Việt Nam xưa.",
   "photo_url": "https://huetripo.hue.gov.vn/uploads/DiaDiem/2026/Khamphahue-PhuongTienDiDenDaiNoi_1776758195.png",
+  "guide": {
+    "text": "Đại Nội Huế là quần thể cung điện nằm trong Kinh thành Huế, từng là nơi ở và làm việc của các vua triều Nguyễn.\n\nQuần thể được UNESCO công nhận là Di sản Văn hóa Thế giới năm 1993.",
+    "title": "Đại Nội (Huế)",
+    "url": "https://vi.wikipedia.org/wiki/%C4%90%E1%BA%A1i_N%E1%BB%99i_(Hu%E1%BA%BF)",
+    "license": "CC BY-SA 4.0",
+    "retrieved_at": "2026-11-20",
+    "sections": [
+      {
+        "heading": "Lịch sử",
+        "text": "Kinh thành Huế được xây dựng từ năm 1805 dưới triều vua Gia Long.\n\nQua nhiều đời vua, quần thể được mở rộng và trùng tu."
+      },
+      {
+        "heading": "Kiến trúc",
+        "text": "Các công trình gồm cổng Ngọ Môn, điện Thái Hòa và các cung điện nội đình."
+      }
+    ]
+  },
   "source": "huetripo.hue.gov.vn",
   "source_url": "https://huetripo.hue.gov.vn/diem-tham-quan/di-tich/dai-noi-hue-531787",
   "source_place_id": "b7677e73-0d3a-4759-9839-3cbde594b0bc",

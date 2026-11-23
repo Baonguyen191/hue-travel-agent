@@ -10,13 +10,21 @@ import { placeDetailPath } from "./PlaceCard";
 const HUE_CENTER: LatLngTuple = [16.4637, 107.5909];
 const OSM_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
-/** Fits the map view to the given points; does nothing when there are none. */
+/**
+ * Fits the map view to the given points; does nothing when there are none.
+ * Refits only when the coordinates change (callers pass a new array each render), and without
+ * animation: a zoom animation still running when the map unmounts (day or tab switch) makes
+ * Leaflet throw "Cannot read properties of undefined (reading '_leaflet_pos')".
+ */
 export function FitToPoints({ points }: { points: LatLngTuple[] }) {
   const map = useMap();
+  const signature = points.map(([lat, lon]) => `${lat},${lon}`).join(";");
   useEffect(() => {
     if (points.length === 0) return;
-    map.fitBounds(latLngBounds(points), { padding: [24, 24], maxZoom: 15 });
-  }, [map, points]);
+    map.fitBounds(latLngBounds(points), { padding: [24, 24], maxZoom: 15, animate: false });
+    // `signature` stands for `points`: same coordinates, same view.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, signature]);
   return null;
 }
 

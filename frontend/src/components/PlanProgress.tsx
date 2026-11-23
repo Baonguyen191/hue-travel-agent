@@ -54,7 +54,7 @@ export function PlanProgress({ active }: PlanProgressProps) {
               <span
                 aria-hidden="true"
                 className={`flex size-5 items-center justify-center rounded-full text-xs font-bold ${
-                  done ? "bg-kim text-muc" : running ? "animate-pulse bg-son text-on-son ring-2 ring-kim" : "bg-vien text-muc-soft"
+                  done ? "bg-kim text-muc" : running ? "animate-pulse bg-kim-soft text-son ring-2 ring-kim" : "bg-vien text-muc-soft"
                 }`}
               >
                 {done ? "✓" : index + 1}

@@ -154,5 +154,9 @@ export function toTripRequest(values: FormValues, base?: TripRequest | null): Tr
     center_lat: base?.center_lat ?? null,
     center_lon: base?.center_lon ?? null,
     radius_km: base?.radius_km ?? null,
+    // The form does not edit these slots, so they come from the parsed or saved request.
+    transport_mode: base?.transport_mode ?? null,
+    hotel_tier: base?.hotel_tier ?? null,
+    pace: base?.pace ?? "moderate",
   };
 }

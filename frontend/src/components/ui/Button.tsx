@@ -4,8 +4,8 @@ export type ButtonVariant = "primary" | "secondary" | "outline";
 export type ButtonSize = "sm" | "md";
 
 const VARIANT: Record<ButtonVariant, string> = {
-  primary: "bg-son text-on-son hover:bg-son-dark",
-  secondary: "bg-kim text-muc hover:brightness-95",
+  primary: "bg-kim text-muc hover:brightness-95",
+  secondary: "bg-kim-soft text-son ring-1 ring-vien hover:ring-kim",
   outline: "border-[1.5px] border-son bg-transparent text-son hover:bg-son-soft",
 };
 

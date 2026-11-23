@@ -70,6 +70,14 @@ const RULES: Rule[] = [
   [/^No transport quote is available; no price was inferred\.?$/, () => "Không có báo giá xe; không suy đoán giá."],
   [/^No hotel quote is available; no price was inferred\.?$/, () => "Không có báo giá khách sạn; không suy đoán giá."],
   [
+    /^No (BUS|TRAIN|FLIGHT) offer is available; showing all transport modes\.?$/,
+    () => "Không có xe theo phương tiện bạn chọn; đang hiện mọi phương tiện.",
+  ],
+  [
+    /^No (HOMESTAY|THREE_STAR|FOUR_STAR) offer is available; showing all hotel tiers\.?$/,
+    () => "Không có chỗ ở theo loại bạn chọn; đang hiện mọi loại.",
+  ],
+  [
     /^(POI source|Transport provider|Hotel provider) timed out; its offers were omitted\.?$/,
     (m) => `${PROVIDER_VN[m[1]]} quá thời gian chờ; bỏ qua các báo giá của nguồn này.`,
   ],
@@ -107,6 +115,9 @@ const RULES: Rule[] = [
   [/^Free according to source.?$/, () => "Nguồn ghi là miễn phí."],
   [/^No admission price in the source.?$/, () => "Nguồn không có giá vé."],
   [/^No compatible provider offer.?$/, () => "Không có báo giá phù hợp từ nhà cung cấp."],
+
+  // Itinerary shape (step 6)
+  [/^Sunset time is an estimate for the month \(Huế, local time\)\.?$/, () => "Giờ hoàng hôn là ước lượng theo tháng (giờ Huế)."],
 
   // Plan attempts and approval
   [/^no budget option$/, () => "Không có phương án ngân sách."],

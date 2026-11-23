@@ -12,7 +12,8 @@ export const CHAT_LLM_MODEL = "qwen3.5:4b";
 const APPROVE_PREFIX = "Duyệt ";
 const CONFIRM_TEXT = "đồng ý";
 const CANCEL_TEXT = "huỷ";
-const DEFAULTS_KIND = "defaults";
+/** Pending kinds shown as text only: the answer is typed, never a confirm button. "defaults" is kept for old conversations. */
+const TEXT_ONLY_KINDS: ReadonlySet<string> = new Set(["defaults", "confirm_trip"]);
 const AWAITING = "AWAITING_APPROVAL";
 
 export interface ChatMessage {
@@ -58,7 +59,7 @@ export function quickReplyLabel(text: string): string {
 /** Only the last bot message keeps its confirmation: an older pending step was already cancelled by the backend. */
 export function showsConfirmation(reply: ChatReply, isLast: boolean): boolean {
   const kind = reply.pending_confirmation?.kind;
-  return isLast && kind !== undefined && kind !== DEFAULTS_KIND;
+  return isLast && kind !== undefined && !TEXT_ONLY_KINDS.has(kind);
 }
 
 /**
@@ -67,7 +68,7 @@ export function showsConfirmation(reply: ChatReply, isLast: boolean): boolean {
  */
 export function visibleQuickReplies(reply: ChatReply): string[] {
   const kind = reply.pending_confirmation?.kind;
-  if (kind !== undefined && kind !== DEFAULTS_KIND) return [];
+  if (kind !== undefined && !TEXT_ONLY_KINDS.has(kind)) return [];
   const card = reply.cards.find((item): item is ChatPlanCard => item.kind === "plan_summary");
   const offersApprove = card !== undefined && approvable(card.status, card.budget_options.length);
   return reply.quick_replies.filter((text) => !(offersApprove && text.startsWith(APPROVE_PREFIX)));

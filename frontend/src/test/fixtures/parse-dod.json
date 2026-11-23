@@ -15,7 +15,10 @@
     ],
     "center_lat": null,
     "center_lon": null,
-    "radius_km": null
+    "radius_km": null,
+    "transport_mode": null,
+    "hotel_tier": null,
+    "pace": "moderate"
   },
   "missing_fields": [],
   "source": "RULES",

@@ -17,6 +17,17 @@ export type PriceStatus = "REFERENCE_RANGE" | "FREE_CLAIM" | "UNKNOWN";
 
 // ---- Places (/api/v1/places) ----
 
+/** "source": the POI's own photo; "commons_place": a Commons photo of this POI; "commons_illustrative": a generic Commons photo of the category. */
+export type PhotoKind = "source" | "commons_place" | "commons_illustrative";
+
+export interface PlacePhotoInfo {
+  url: string;
+  kind: PhotoKind;
+  author: string | null;
+  license: string | null;
+  credit_url: string | null;
+}
+
 export interface Place {
   id: string;
   name: string;
@@ -38,11 +49,26 @@ export interface Place {
   is_free_claim: boolean;
   summary: string | null;
   photo_url: string | null;
+  /** Optional so fixtures without it stay valid; null or missing means no photo info. */
+  photo?: PlacePhotoInfo | null;
+  /** Lead of a Vietnamese Wikipedia article (plain text). Absent or null means no guide text. */
+  guide?: PlaceGuide | null;
   source: string;
   source_url: string | null;
   source_place_id: string;
   collected_at: string;
   raw_attributes: Record<string, unknown>;
+}
+
+export interface PlaceGuide {
+  text: string;
+  title: string;
+  url: string;
+  license: string;
+  /** YYYY-MM-DD */
+  retrieved_at: string;
+  /** Up to three named sections of the article. Optional: older responses omit it. */
+  sections?: { heading: string; text: string }[];
 }
 
 export interface PlacePage {
@@ -78,9 +104,14 @@ export interface TripRequest {
   categories: PlaceCategory[];
   keyword: string | null;
   preferences: string[];
+  themes?: string[];
   center_lat: number | null;
   center_lon: number | null;
   radius_km: number | null;
+  /** null or absent means any: the cheapest offer. */
+  transport_mode?: "bus" | "train" | "flight" | null;
+  hotel_tier?: "homestay" | "hotel" | "resort" | null;
+  pace?: "relaxed" | "moderate" | "packed";
 }
 
 /** Observed: "RULES" and "FORM_FALLBACK" (no OpenAI key); "RULES+OPENAI" when OpenAI filled fields. */
@@ -161,7 +192,10 @@ export interface SearchResult {
 
 // ---- Itinerary payload ----
 
-export type ItineraryEventKind = "VISIT" | "MEAL" | "MEAL_BREAK" | "BUFFER";
+export type ItineraryEventKind = "VISIT" | "MEAL" | "MEAL_BREAK" | "BUFFER" | "REST";
+
+/** Time-of-day slot the planner assigned to an event. Optional: plans saved before slots existed have none. */
+export type ItinerarySlot = "morning" | "lunch" | "rest" | "afternoon" | "cafe" | "sunset" | "dinner";
 
 export interface ItineraryEvent {
   kind: ItineraryEventKind;
@@ -178,12 +212,29 @@ export interface ItineraryEvent {
   travel_distance_km: number | null;
   travel_minutes_estimated: number | null;
   warnings: string[];
+  slot?: ItinerarySlot | null;
+  /** One fact-based "why" line built by code (matched interest, slot, must-include, rating). */
+  reason?: string | null;
+  /** One sentence from the stored guide text; shown only when a source exists. */
+  intro?: string | null;
 }
 
 export interface ItineraryDay {
   date: string;
   events: ItineraryEvent[];
   warnings: string[];
+}
+
+/** Overland trip leg shown before day 1 (OUTBOUND) and after the last day (RETURN). Times are naive local. */
+export interface TravelLeg {
+  direction: "OUTBOUND" | "RETURN";
+  mode: "BUS" | "TRAIN" | "FLIGHT";
+  origin: string;
+  destination: string;
+  depart_at: string;
+  arrive_at: string;
+  estimated: boolean;
+  mock: boolean;
 }
 
 export interface ItineraryResult {
@@ -193,6 +244,9 @@ export interface ItineraryResult {
   merged_poi_ids: string[];
   warnings: string[];
   validation: { valid: boolean; warnings: string[] };
+  travel_legs?: TravelLeg[];
+  /** Estimated sunset clock time for the trip, e.g. "17:10". */
+  sunset_estimate?: string | null;
 }
 
 // ---- Budget payload ----
@@ -363,6 +417,11 @@ export interface ChatPlanItem {
   meal: "LUNCH" | "DINNER" | "CAFE" | null;
   /** Null for breaks and stops without a source POI. */
   poi_id: string | null;
+  slot?: ItinerarySlot | null;
+  /** Shown only as a tooltip on the compact chat card. */
+  reason?: string | null;
+  /** One sentence from the stored guide text; tooltip only. */
+  intro?: string | null;
 }
 
 export interface ChatPlanDay {
@@ -399,6 +458,8 @@ export interface ChatPlaceCard {
   price_max_vnd: number | null;
   phone: string | null;
   source_url: string | null;
+  /** True when the card photo is a generic Commons picture of the category, not this place. */
+  photo_illustrative?: boolean;
 }
 
 export interface ChatBookingCard {
@@ -410,7 +471,7 @@ export type ChatCard = ChatPlanCard | ChatPlaceCard | ChatBookingCard;
 
 /** Set while the bot waits for "đồng ý" (approve, book) or for an answer (defaults). */
 export interface PendingConfirmation {
-  kind: "approve" | "book" | "defaults" | (string & {});
+  kind: "approve" | "book" | "defaults" | "confirm_trip" | (string & {});
   option?: OptionLabel;
   version?: number;
   quote_hash?: string;
