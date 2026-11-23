@@ -264,3 +264,36 @@ def test_hue_origin_has_no_transport_lines_and_says_no_intercity_transport_is_ne
         assert option.transport_return is None
         assert "Bạn đã ở Huế: không cần xe liên tỉnh." in option.warnings
         assert option.hotel is not None
+
+
+def _chosen_request(**changes: object) -> TripRequest:
+    return _request().model_copy(update=changes)
+
+
+def test_bus_and_homestay_choice_makes_every_budget_option_use_them() -> None:
+    request = _chosen_request(transport_mode="bus", hotel_tier="homestay")
+    search = asyncio.run(
+        SearchAgent(REPO, MockTransportProvider(), MockHotelProvider()).search(request)
+    )
+    result = BudgetAgent(ALL_OPTIONS).build(request, search)
+
+    assert result.options
+    for option in result.options:
+        assert option.transport_outbound is not None and option.transport_return is not None
+        assert option.transport_outbound.provider == "Hue Sleeper Bus Demo"
+        assert option.transport_return.provider == "Hue Sleeper Bus Demo"
+        assert option.hotel is not None and option.hotel.hotel_name == "Old Quarter Homestay Demo"
+
+
+def test_flight_and_resort_choice_makes_the_cheapest_option_use_them() -> None:
+    request = _chosen_request(transport_mode="flight", hotel_tier="resort")
+    search = asyncio.run(
+        SearchAgent(REPO, MockTransportProvider(), MockHotelProvider()).search(request)
+    )
+    result = BudgetAgent(ALL_OPTIONS).build(request, search)
+    cheapest = _find(result, "FLIGHT", "FOUR_STAR")
+
+    assert cheapest.transport_outbound.provider == "Hue Air Demo"
+    assert cheapest.transport_return.provider == "Hue Air Demo"
+    assert cheapest.hotel.hotel_name == "Perfume River Demo Resort"
+    assert all(option.transport_outbound.mode == "FLIGHT" for option in result.options)

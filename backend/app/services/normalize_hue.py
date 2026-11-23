@@ -12,6 +12,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from app.schemas.place import Place
+from app.services.photo_fallbacks import resolve_photo
 
 ADDRESS_KEY = "Địa chỉ"
 RATING_KEY = "Đánh giá"
@@ -124,6 +125,7 @@ def normalize_place(row: Mapping[str, Any]) -> Place:
         price_status = "UNKNOWN"
 
     opening_hours_raw = optional_text(row["opening_hours_raw"])
+    photo_url = optional_text(attributes.get(PHOTO_KEY))
     return Place(
         id=row["id"],
         name=row["name"],
@@ -143,7 +145,8 @@ def normalize_place(row: Mapping[str, Any]) -> Place:
         price_status=price_status,
         is_free_claim=is_free_claim,
         summary=optional_text(attributes.get(SUMMARY_KEY)),
-        photo_url=optional_text(attributes.get(PHOTO_KEY)),
+        photo_url=photo_url,
+        photo=resolve_photo(row["id"], row["name"], row["category"], photo_url),
         source=row["source"],
         source_url=optional_text(attributes.get(SOURCE_URL_KEY)),
         source_place_id=row["source_place_id"],

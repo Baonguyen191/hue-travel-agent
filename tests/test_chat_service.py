@@ -126,15 +126,34 @@ def _plan_card(reply: ChatReply) -> PlanCard:
     return cards[0]
 
 
-PLAN_TRIP = "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12"
+PLAN_TRIP = "Đi Huế 2 ngày từ 20/12 từ Hà Nội 2 người ngân sách 5 triệu thích ẩm thực"
 
 
 # ---------------------------------------------------------------------------
-# plan_new: clarification, defaults gate, start
+# plan_new: open slots are asked until the trip is specified, then the plan starts
 # ---------------------------------------------------------------------------
 
 
-def test_missing_start_and_duration_asks_with_quick_replies_and_stores_the_draft() -> None:
+def _slot(fields: dict[str, Any], **kwargs: Any) -> ParsedQuery:
+    """A scripted answer to an open slot: a plan message that carries these fields."""
+    return _scripted(Intent.PLAN_NEW, clarification="Bạn cho mình thêm thông tin nhé?", fields=fields, **kwargs)
+
+
+def _is_summary(reply: ChatReply) -> bool:
+    return (reply.pending_confirmation or {}).get("kind") == "confirm_trip"
+
+
+async def _plan_ready(h: Harness, conversation: str) -> ChatReply:
+    """The trip in one message, then "tùy" to each optional question, then "ok" to the summary (S4)."""
+    reply = await h.say(conversation, PLAN_TRIP)
+    for _ in range(4):
+        if any(isinstance(card, PlanCard) for card in reply.cards):
+            break
+        reply = await h.say(conversation, "ok" if _is_summary(reply) else "tùy")
+    return reply
+
+
+def test_missing_start_and_duration_asks_for_them_and_stores_the_draft() -> None:
     async def scenario():
         h = Harness()
         reply = await h.say("c-clarify", "Đi Huế đi chơi vui")
@@ -142,7 +161,7 @@ def test_missing_start_and_duration_asks_with_quick_replies_and_stores_the_draft
 
     h, reply = _run(scenario)
 
-    assert reply.quick_replies
+    assert reply.quick_replies == []
     assert "ngày nào" in reply.text
     assert reply.pending_confirmation is None
     assert h.starts == []
@@ -150,7 +169,7 @@ def test_missing_start_and_duration_asks_with_quick_replies_and_stores_the_draft
     assert "num_days" not in h.chats.context("c-clarify").draft
 
 
-def test_next_message_is_merged_into_the_draft_and_the_plan_starts_only_after_defaults_are_confirmed() -> None:
+def test_a_stated_length_is_merged_and_the_next_two_open_slots_are_asked() -> None:
     async def scenario():
         h = Harness()
         await h.say("c-merge", "Đi Huế 2 ngày")
@@ -163,26 +182,190 @@ def test_next_message_is_merged_into_the_draft_and_the_plan_starts_only_after_de
     assert draft_after_first["num_days"] == 2
     assert h.chats.context("c-merge").draft["start_date"] == "2026-12-20"
     assert h.chats.context("c-merge").draft["num_days"] == 2
-    assert second.pending_confirmation == {"kind": "defaults"}
+    assert second.text.endswith("1. Bạn xuất phát từ đâu?\n2. Bạn đi mấy người?")
+    assert second.pending_confirmation is None
     assert h.starts == []
 
 
-def test_complete_request_with_defaulted_origin_asks_once_and_never_starts_a_plan_unconfirmed() -> None:
+def test_missing_origin_and_people_are_asked_and_no_plan_starts() -> None:
     async def scenario():
         h = Harness()
-        reply = await h.say("c-defaults", "Đi Huế 2 ngày từ 20/12")
+        reply = await h.say("c-ask-two", "Đi Huế 2 ngày từ 20/12")
         return h, reply
 
     h, reply = _run(scenario)
 
-    assert "mặc định: Huế, 1 người" in reply.text
-    assert reply.quick_replies == list(texts.DEFAULT_REPLIES)
-    assert reply.pending_confirmation == {"kind": "defaults"}
+    assert reply.text.endswith("1. Bạn xuất phát từ đâu?\n2. Bạn đi mấy người?")
+    assert reply.quick_replies == []
+    assert reply.pending_confirmation is None
     assert h.starts == []
-    assert h.chats.context("c-defaults").thread_id is None
+    assert h.chats.context("c-ask-two").thread_id is None
 
 
-def test_defaults_are_not_started_by_an_unrelated_message() -> None:
+def test_a_plan_message_during_slot_filling_fills_the_draft_and_the_plan_waits_for_the_rest() -> None:
+    h = Harness()
+    h.fake.script(
+        "Từ Hà Nội, 2 người",
+        _scripted(
+            Intent.MODIFY_PLAN,
+            fields={"origin": "Hà Nội", "destination": "Huế", "people": 2},
+            changes=[PlanChange(kind=PlanChangeKind.SET_PEOPLE, value=2, text="2 người")],
+        ),
+    )
+
+    async def scenario():
+        await h.say("c-modify-draft", "Đi Huế 3 ngày từ 28/11")
+        return await h.say("c-modify-draft", "Từ Hà Nội, 2 người")
+
+    reply = _run(scenario)
+    draft = h.chats.context("c-modify-draft").draft
+
+    assert reply.text.endswith("1. Ngân sách khoảng bao nhiêu cho cả chuyến?\n2. " + texts.QUESTIONS["interests"])
+    assert draft["origin"] == "Hà Nội"
+    assert draft["people"] == 2
+    assert h.starts == []
+
+
+def test_target_conversation_asks_each_open_slot_and_starts_the_plan_only_after_the_last_one() -> None:
+    h = Harness()
+    h.fake.script(
+        "tôi muốn đi Huế 3 ngày 2 đêm với người yêu",
+        _slot({"destination": "Huế", "num_days": 3, "people": 2}),
+    )
+    h.fake.script("ngày mai", _slot({"start_date": date(2026, 11, 24)}))
+    h.fake.script(
+        "6 triệu; ẩm thực, thiên nhiên, ngắm cảnh",
+        _slot({"budget_vnd": 6_000_000, "categories": ["restaurant", "cafe", "attraction"]}),
+    )
+    messages = [
+        "tôi muốn đi Huế 3 ngày 2 đêm với người yêu",
+        "ngày mai",
+        "Hà Nội",
+        "6 triệu; ẩm thực, thiên nhiên, ngắm cảnh",
+        "giữ 6 triệu, xe giường nằm, homestay",
+        "thong thả, không",
+        "ok",
+    ]
+
+    async def scenario():
+        return [await h.say("c-target", text) for text in messages]
+
+    replies = _run(scenario)
+    first, second, third, fourth, fifth, summary, last = replies
+
+    assert first.text.splitlines()[-2:] == ["1. Bạn muốn đi Huế từ ngày nào?", "2. Bạn xuất phát từ đâu?"]
+    assert second.text.splitlines()[0] == "Mình ghi nhận: Huế, 2 người, thứ Ba 24/11 – thứ Năm 26/11 (3 ngày 2 đêm)."
+    assert second.text.splitlines()[-2:] == ["1. Bạn xuất phát từ đâu?", "2. Ngân sách khoảng bao nhiêu cho cả chuyến?"]
+    assert third.text.splitlines()[-2:] == ["1. Ngân sách khoảng bao nhiêu cho cả chuyến?", "2. " + texts.QUESTIONS["interests"]]
+    assert fourth.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["transport"], "2. " + texts.QUESTIONS["stay"]]
+    assert fifth.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["pace"], "2. " + texts.QUESTIONS["places"]]
+    for reply in replies[:5]:
+        assert reply.cards == [] and reply.quick_replies == [] and reply.pending_confirmation is None
+    assert summary.text.startswith(texts.SUMMARY_HEAD) and _is_summary(summary)
+    assert _plan_card(last).version == 1
+    assert len(h.starts) == 1
+    assert (h.starts[0].origin, h.starts[0].people) == ("Hà Nội", 2)
+    assert h.starts[0].start_date == date(2026, 11, 24)
+    assert h.starts[0].end_date == date(2026, 11, 26)
+    assert h.starts[0].budget_vnd == 6_000_000
+
+
+def test_an_early_answer_fills_transport_and_stay_so_they_are_never_asked() -> None:
+    h = Harness()
+    h.fake.script("5 triệu, ẩm thực", _slot({"budget_vnd": 8_000_000, "categories": ["restaurant"]}))
+
+    async def scenario():
+        first = await h.say("c-early", "Đi Huế 3 ngày từ 28/11 từ Hà Nội 2 người, xe giường nằm, homestay")
+        second = await h.say("c-early", "5 triệu, ẩm thực")
+        return first, second
+
+    first, second = _run(scenario)
+    draft = h.chats.context("c-early").draft
+
+    assert first.text.splitlines()[-2:] == ["1. Ngân sách khoảng bao nhiêu cho cả chuyến?", "2. " + texts.QUESTIONS["interests"]]
+    assert draft["transport_mode"] == "bus"
+    assert draft["hotel_tier"] == "homestay"
+    assert texts.QUESTIONS["transport"] not in second.text
+    assert texts.QUESTIONS["stay"] not in second.text
+    assert second.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["pace"], "2. " + texts.QUESTIONS["places"]]
+
+
+def test_tuy_settles_the_optional_questions_that_were_asked() -> None:
+    async def scenario():
+        h = Harness()
+        first = await h.say("c-tuy", PLAN_TRIP)
+        second = await h.say("c-tuy", "tùy")
+        draft = h.chats.context("c-tuy").draft
+        third = await h.say("c-tuy", "thong thả, không")
+        fourth = await h.say("c-tuy", "ok")
+        return h, first, second, draft, third, fourth
+
+    h, first, second, draft, third, fourth = _run(scenario)
+
+    assert first.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["transport"], "2. " + texts.QUESTIONS["stay"]]
+    assert draft["transport_mode"] == "any"
+    assert draft["hotel_tier"] == "any"
+    assert second.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["pace"], "2. " + texts.QUESTIONS["places"]]
+    assert third.text.startswith(texts.SUMMARY_HEAD)
+    assert _plan_card(fourth)
+    assert len(h.starts) == 1
+
+
+def test_no_quick_replies_while_the_slots_are_open() -> None:
+    messages = ["Đi Huế 2 ngày", "20/12", "Hà Nội", "2 người", "5 triệu", "ẩm thực", "tùy", "tùy", "ok"]
+
+    async def scenario():
+        h = Harness()
+        return [await h.say("c-no-replies", text) for text in messages]
+
+    replies = _run(scenario)
+
+    for reply in replies[:-2]:
+        assert reply.quick_replies == [], reply.text
+        assert reply.pending_confirmation is None
+    assert replies[-2].quick_replies == [] and _is_summary(replies[-2])
+    assert _plan_card(replies[-1])
+    assert replies[-1].quick_replies == [f"Duyệt {option.label}" for option in _plan_card(replies[-1]).budget_options]
+
+
+def test_a_place_question_during_slot_filling_is_answered_and_the_draft_is_kept() -> None:
+    h = Harness()
+
+    async def scenario():
+        await h.say("c-place-draft", "Đi Huế 2 ngày từ 20/12")
+        before = dict(h.chats.context("c-place-draft").draft)
+        reply = await h.say("c-place-draft", "Đại Nội có mở cửa lúc mấy giờ?")
+        after = dict(h.chats.context("c-place-draft").draft)
+        h.fake.script("Từ Hà Nội, 2 người", _slot({"origin": "Hà Nội", "people": 2}))
+        answered = await h.say("c-place-draft", "Từ Hà Nội, 2 người")
+        return before, reply, after, answered
+
+    before, reply, after, answered = _run(scenario)
+
+    assert DAI_NOI_HOURS in reply.text
+    assert any(isinstance(card, PlaceCard) for card in reply.cards)
+    assert after == before
+    assert answered.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["budget"], "2. " + texts.QUESTIONS["interests"]]
+    assert h.starts == []
+
+
+def test_weather_and_another_city_during_slot_filling_keep_their_own_replies() -> None:
+    async def scenario():
+        h = Harness()
+        await h.say("c-scope-draft", "Đi Huế 2 ngày từ 20/12")
+        weather = await h.say("c-scope-draft", "Huế mai có mưa không?")
+        other = await h.say("c-scope-draft", "Đi Đà Nẵng 3 ngày từ 10/12")
+        return h, weather, other
+
+    h, weather, other = _run(scenario)
+
+    assert weather.text == texts.WEATHER
+    assert other.text == texts.OUT_OF_SCOPE
+    assert h.chats.context("c-scope-draft").draft["start_date"] == "2026-12-20"
+    assert h.starts == []
+
+
+def test_an_unrelated_answer_asks_the_open_slots_again_and_never_starts_a_plan() -> None:
     async def scenario():
         h = Harness()
         await h.say("c-noguess", "Đi Huế 2 ngày từ 20/12")
@@ -191,30 +374,14 @@ def test_defaults_are_not_started_by_an_unrelated_message() -> None:
 
     h, reply = _run(scenario)
 
+    assert reply.text.endswith("1. Bạn xuất phát từ đâu?\n2. Bạn đi mấy người?")
     assert h.starts == []
-    assert reply.pending_confirmation == {"kind": "defaults"}
 
 
-def test_dung_mac_dinh_starts_the_plan_with_confirmed_defaults() -> None:
+def test_a_stated_origin_and_people_are_merged_and_the_plan_starts_after_the_optional_questions() -> None:
     async def scenario():
         h = Harness()
-        await h.say("c-yes-defaults", "Đi Huế 2 ngày từ 20/12")
-        reply = await h.say("c-yes-defaults", "Dùng mặc định")
-        return h, reply
-
-    h, reply = _run(scenario)
-
-    assert len(h.starts) == 1
-    assert h.starts[0].origin == "Huế"
-    assert h.starts[0].people == 1
-    assert _plan_card(reply).status == "AWAITING_APPROVAL"
-    assert h.chats.context("c-yes-defaults").thread_id is not None
-
-
-def test_stated_origin_and_people_start_the_plan_at_once_with_plan_card_and_quick_replies() -> None:
-    async def scenario():
-        h = Harness()
-        reply = await h.say("c-plan", PLAN_TRIP)
+        reply = await _plan_ready(h, "c-plan")
         return h, reply
 
     h, reply = _run(scenario)
@@ -225,7 +392,7 @@ def test_stated_origin_and_people_start_the_plan_at_once_with_plan_card_and_quic
     assert h.starts[0].people == 2
     assert card.version == 1
     assert len(card.days) == 2
-    assert all(item.kind in ("VISIT", "MEAL", "MEAL_BREAK") for day in card.days for item in day.items)
+    assert all(item.kind in ("VISIT", "MEAL", "MEAL_BREAK", "REST") for day in card.days for item in day.items)
     assert card.budget_options
     assert reply.quick_replies == [f"Duyệt {option.label}" for option in card.budget_options]
     assert reply.understanding.source == "RULES"
@@ -242,21 +409,6 @@ def test_plan_items_carry_poi_ids_for_places_and_none_for_meal_breaks() -> None:
     items = [item for day in card.days for item in day.items]
     assert any(item.poi_id is not None and item.poi_id.startswith("huetripo:") for item in items)
     assert all(item.poi_id is None for item in items if item.kind == "MEAL_BREAK")
-
-
-def test_defaults_answer_with_a_stated_origin_is_merged_and_starts_the_plan() -> None:
-    async def scenario():
-        h = Harness()
-        await h.say("c-answer", "Đi Huế 2 ngày từ 20/12")
-        reply = await h.say("c-answer", "Từ Hà Nội, 2 người")
-        return h, reply
-
-    h, reply = _run(scenario)
-
-    assert len(h.starts) == 1
-    assert h.starts[0].origin == "Hà Nội"
-    assert h.starts[0].people == 2
-    assert _plan_card(reply)
 
 
 def test_a_plan_that_is_too_long_asks_for_fewer_days() -> None:
@@ -276,8 +428,7 @@ def test_a_plan_that_is_too_long_asks_for_fewer_days() -> None:
 
 
 async def _planned(h: Harness, conversation: str) -> PlanCard:
-    reply = await h.say(conversation, PLAN_TRIP)
-    return _plan_card(reply)
+    return _plan_card(await _plan_ready(h, conversation))
 
 
 def test_approve_asks_for_confirmation_and_only_a_confirming_message_approves() -> None:
@@ -556,7 +707,7 @@ def test_history_lists_the_turns_in_order_and_refuses_another_owner() -> None:
 
 
 def test_context_round_trips_through_json() -> None:
-    context = ChatContext(draft={"num_days": 2}, thread_id="t", pending={"kind": "defaults"}, keys={"q": "k"})
+    context = ChatContext(draft={"num_days": 2}, thread_id="t", pending={"kind": "approve", "option": "BUDGET", "version": 1}, keys={"q": "k"})
 
     assert ChatContext.from_json(context.to_json()) == context
     assert ChatContext.from_json(None) == ChatContext()
@@ -625,3 +776,317 @@ def test_handler_log_records_one_name_per_turn() -> None:
         assert h.service.handler_log == ["out_of_scope", "plan_new"]
 
     _run(scenario)
+
+
+# ---------------------------------------------------------------------------
+# Smalltalk and weather: fixed templates, no quick replies
+# ---------------------------------------------------------------------------
+
+
+def test_greeting_gets_the_assistant_intro_and_an_example_without_quick_replies() -> None:
+    async def scenario():
+        h = Harness()
+        return await h.say("c-hello", "xin chào")
+
+    reply = _run(scenario)
+
+    assert "trợ lý lập lịch du lịch Huế" in reply.text
+    assert texts.SMALLTALK_EXAMPLE in reply.text
+    assert reply.quick_replies == []
+    assert reply.understanding.intent == "smalltalk"
+
+
+def test_thanks_after_a_plan_gets_the_waiting_nudge_and_no_quick_replies() -> None:
+    async def scenario():
+        h = Harness()
+        await _planned(h, "c-thanks")
+        reply = await h.say("c-thanks", "cảm ơn bạn")
+        return h, reply
+
+    h, reply = _run(scenario)
+
+    assert texts.THANKS in reply.text
+    assert texts.PLAN_WAITING_NUDGE in reply.text
+    assert reply.quick_replies == []
+    assert len(h.starts) == 1
+
+
+def test_weather_question_gets_the_weather_refusal() -> None:
+    async def scenario():
+        h = Harness()
+        h.fake.script("Huế mai có mưa không?", _scripted(Intent.OUT_OF_SCOPE))
+        return await h.say("c-weather", "Huế mai có mưa không?")
+
+    reply = _run(scenario)
+
+    assert reply.text == texts.WEATHER
+    assert reply.quick_replies == []
+
+
+# ---------------------------------------------------------------------------
+# Early budget check (S2) turn by turn: 3 triệu, bus, homestay, food, 2 people, 3 days
+# ---------------------------------------------------------------------------
+
+WARN_TRIP = "Đi Huế 3 ngày từ 05/12 từ Hà Nội 2 người"
+WARN_BUDGET = "3 triệu, ẩm thực"
+WARN_STAY = "xe giường nằm, homestay"
+WARN_LINE = (
+    "Lưu ý: phương án rẻ nhất (xe khách + homestay) ước tính 5,15–6,16 triệu, "
+    "vượt ngân sách 2,15–3,16 triệu. Bạn muốn tăng ngân sách, hay giữ 3 triệu để mình chọn phương án tiết kiệm nhất?"
+)
+
+
+def _warning_harness(conversation: str) -> tuple[Harness, list[str]]:
+    """A harness scripted for the over-budget trip; returns it with the messages up to the stay answer."""
+    h = Harness()
+    h.fake.script(WARN_TRIP, _slot({"origin": "Hà Nội", "people": 2, "start_date": date(2026, 12, 5), "num_days": 3}))
+    h.fake.script(WARN_BUDGET, _slot({"budget_vnd": 3_000_000, "categories": ["restaurant", "cafe", "market"]}))
+    h.fake.script(WARN_STAY, _slot({}))
+    return h, [WARN_TRIP, WARN_BUDGET, WARN_STAY]
+
+
+def test_over_budget_pre_check_warns_on_the_turn_after_stay_and_the_plan_does_not_start() -> None:
+    h, messages = _warning_harness("c-warn")
+
+    async def scenario():
+        return [await h.say("c-warn", text) for text in messages]
+
+    first, second, third = _run(scenario)
+
+    assert first.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["budget"], "2. " + texts.QUESTIONS["interests"]]
+    assert second.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["transport"], "2. " + texts.QUESTIONS["stay"]]
+    assert "vượt ngân sách" in third.text
+    assert third.text.splitlines()[-1] == WARN_LINE  # asked alone
+    assert all(not isinstance(card, PlanCard) for card in third.cards)
+    assert third.pending_confirmation is None
+    assert h.starts == []
+    context = h.chats.context("c-warn")
+    assert context.thread_id is None
+    assert context.draft["precheck"]["min"] == 5_150_000
+    assert context.draft["precheck"]["max"] == 6_160_000
+    assert (context.draft["precheck"]["mode"], context.draft["precheck"]["tier"]) == ("BUS", "HOMESTAY")
+
+
+def test_keeping_the_budget_moves_on_to_the_next_open_question() -> None:
+    h, messages = _warning_harness("c-keep")
+    h.fake.script("giữ", _slot({}))
+    h.fake.script("thong thả, không", _slot({}))
+
+    async def scenario():
+        for text in messages:
+            await h.say("c-keep", text)
+        kept = await h.say("c-keep", "giữ")
+        draft_after_keep = dict(h.chats.context("c-keep").draft)
+        await h.say("c-keep", "thong thả, không")
+        planned = await h.say("c-keep", "ok")
+        return kept, draft_after_keep, planned
+
+    kept, draft_after_keep, planned = _run(scenario)
+
+    assert "vượt ngân sách" not in kept.text
+    # The budget check is asked alone, so "giữ" settles only it: pace is still open and asked
+    # now with the places question instead of being lost as "tùy".
+    assert kept.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["pace"], "2. " + texts.QUESTIONS["places"]]
+    assert draft_after_keep["budget_accepted"] is True
+    assert "pace" not in draft_after_keep
+    assert h.starts[0].budget_vnd == 3_000_000
+    assert _plan_card(planned).version == 1
+    assert len(h.starts) == 1
+
+
+def test_keeping_the_budget_by_repeating_the_current_amount_counts_as_keep() -> None:
+    h, messages = _warning_harness("c-same")
+    h.fake.script("giữ 3 triệu", _slot({"budget_vnd": 3_000_000}))
+
+    async def scenario():
+        for text in messages:
+            await h.say("c-same", text)
+        return await h.say("c-same", "giữ 3 triệu")
+
+    reply = _run(scenario)
+
+    assert "vượt ngân sách" not in reply.text
+    assert reply.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["pace"], "2. " + texts.QUESTIONS["places"]]
+
+
+def test_a_higher_budget_reruns_the_check_and_asks_the_next_unit_without_a_warning() -> None:
+    h, messages = _warning_harness("c-raise")
+    h.fake.script("10 triệu", _slot({"budget_vnd": 10_000_000}))
+
+    async def scenario():
+        for text in messages:
+            await h.say("c-raise", text)
+        return await h.say("c-raise", "10 triệu")
+
+    reply = _run(scenario)
+    context = h.chats.context("c-raise")
+
+    assert "vượt ngân sách" not in reply.text
+    assert reply.text.splitlines()[-2:] == ["1. " + texts.QUESTIONS["pace"], "2. " + texts.QUESTIONS["places"]]
+    assert context.draft["budget_vnd"] == 10_000_000
+    assert context.draft["precheck"]["min"] == 5_150_000
+    assert h.starts == []
+
+
+def test_an_unrelated_answer_to_the_budget_warning_asks_it_again() -> None:
+    h, messages = _warning_harness("c-again")
+    h.fake.script("hmm để xem", _slot({}))
+
+    async def scenario():
+        for text in messages:
+            await h.say("c-again", text)
+        return await h.say("c-again", "hmm để xem")
+
+    reply = _run(scenario)
+
+    # The unanswered pace question is settled by this message (the optional-slot rule); the budget is asked again.
+    assert reply.text.splitlines()[-1] == WARN_LINE  # asked alone
+    assert h.starts == []
+
+
+# ---------------------------------------------------------------------------
+# Summary before planning (S4) and edits at the summary (S5)
+# ---------------------------------------------------------------------------
+
+
+async def _to_summary(h: Harness, conversation: str) -> ChatReply:
+    """The trip in one message, then "tùy" to the two optional questions: the summary waits."""
+    reply = await h.say(conversation, PLAN_TRIP)
+    for _ in range(2):
+        reply = await h.say(conversation, "tùy")
+    return reply
+
+
+def _summary_lines(reply: ChatReply) -> list[str]:
+    return [line for line in reply.text.splitlines() if line.startswith("- ")]
+
+
+def test_a_complete_draft_gets_the_summary_and_no_plan_starts() -> None:
+    async def scenario():
+        h = Harness()
+        return h, await _to_summary(h, "c-summary")
+
+    h, reply = _run(scenario)
+
+    assert reply.text.startswith(texts.SUMMARY_HEAD)
+    assert reply.text.endswith(texts.SUMMARY_TAIL)
+    assert reply.pending_confirmation == {"kind": "confirm_trip"}
+    assert reply.cards == [] and reply.quick_replies == []
+    assert h.starts == []
+    assert not any(line.endswith(texts.CHANGED_MARK) for line in reply.text.splitlines())
+
+
+def test_ok_at_the_summary_starts_exactly_one_plan() -> None:
+    async def scenario():
+        h = Harness()
+        await _to_summary(h, "c-ok")
+        return h, await h.say("c-ok", "ok")
+
+    h, reply = _run(scenario)
+
+    assert _plan_card(reply).version == 1
+    assert len(h.starts) == 1
+    assert h.chats.context("c-ok").draft == {}
+
+
+def test_a_pace_step_at_the_summary_resends_it_with_the_pace_marked_and_no_plan() -> None:
+    async def scenario():
+        h = Harness()
+        await _to_summary(h, "c-pace")
+        reply = await h.say("c-pace", "thêm số lượng điểm đến")
+        return h, reply
+
+    h, reply = _run(scenario)
+
+    assert _summary_lines(reply)[4] == "- Nhịp độ: đi nhiều, 5 điểm tham quan mỗi ngày ← đã đổi"
+    marked = [line for line in reply.text.splitlines() if line.endswith(texts.CHANGED_MARK)]
+    assert marked == [_summary_lines(reply)[4]]
+    assert reply.pending_confirmation == {"kind": "confirm_trip"}
+    assert h.starts == []
+
+
+def test_a_budget_edit_at_the_summary_reruns_the_check_and_marks_only_the_budget() -> None:
+    h = Harness()
+    h.fake.script("8 triệu", _slot({"budget_vnd": 8_000_000}))
+
+    async def scenario():
+        before = await _to_summary(h, "c-budget")
+        after = await h.say("c-budget", "8 triệu")
+        return before, after
+
+    before, after = _run(scenario)
+
+    marked = [line for line in after.text.splitlines() if line.endswith(texts.CHANGED_MARK)]
+    assert len(marked) == 1 and marked[0].startswith("- Ngân sách: 8 triệu")
+    assert after.pending_confirmation == {"kind": "confirm_trip"}
+    assert h.starts == []
+    assert h.chats.context("c-budget").draft["budget_vnd"] == 8_000_000
+    assert "precheck" in h.chats.context("c-budget").draft
+
+
+def test_a_cancel_word_keeps_the_draft_and_no_plan_starts() -> None:
+    async def scenario():
+        h = Harness()
+        await _to_summary(h, "c-cancel")
+        reply = await h.say("c-cancel", "huỷ")
+        return h, reply
+
+    h, reply = _run(scenario)
+
+    assert reply.text == texts.CANCELLED
+    assert reply.pending_confirmation is None
+    assert h.starts == []
+    draft = h.chats.context("c-cancel").draft
+    assert draft["origin"] == "Hà Nội" and draft["budget_vnd"] == 5_000_000
+
+
+def test_a_place_question_at_the_summary_is_answered_and_ok_still_starts_the_plan() -> None:
+    h = Harness()
+    h.fake.script(
+        "Đại Nội có mở cửa lúc mấy giờ?",
+        _scripted(
+            Intent.PLACE_INFO,
+            place_query=PlaceMention(text="Đại Nội", poi_id=DAI_NOI, name="Đại Nội Huế", score=1.0),
+        ),
+    )
+
+    async def scenario():
+        await _to_summary(h, "c-question")
+        answer = await h.say("c-question", "Đại Nội có mở cửa lúc mấy giờ?")
+        kept = h.chats.context("c-question").pending
+        planned = await h.say("c-question", "ok")
+        return answer, kept, planned
+
+    answer, kept, planned = _run(scenario)
+
+    assert DAI_NOI_HOURS in answer.text
+    assert answer.text != texts.CANCELLED
+    assert kept == {"kind": "confirm_trip"}
+    assert _plan_card(planned).version == 1
+    assert len(h.starts) == 1
+
+
+def test_smalltalk_at_the_summary_keeps_the_summary_waiting() -> None:
+    async def scenario():
+        h = Harness()
+        await _to_summary(h, "c-thanks-summary")
+        reply = await h.say("c-thanks-summary", "cảm ơn bạn")
+        return h, reply
+
+    h, reply = _run(scenario)
+
+    assert texts.THANKS in reply.text
+    assert h.chats.context("c-thanks-summary").pending == {"kind": "confirm_trip"}
+    assert h.starts == []
+
+
+def test_a_confirming_word_after_the_summary_is_not_read_as_an_edit() -> None:
+    async def scenario():
+        h = Harness()
+        await _to_summary(h, "c-lich")
+        return h, await h.say("c-lich", "Lên lịch!")
+
+    h, reply = _run(scenario)
+
+    assert _plan_card(reply).version == 1
+    assert len(h.starts) == 1

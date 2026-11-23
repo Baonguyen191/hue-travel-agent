@@ -326,6 +326,78 @@ def test_modify_plan_maps_place_and_day_changes_with_linked_ids() -> None:
     assert query.changes[1].value == 1
 
 
+def test_modify_plan_set_people_reads_the_number_from_the_text() -> None:
+    extractor = FakeExtractor(
+        intent="modify_plan",
+        changes=[{"kind": "set_people", "text": "Đổi thành 4 người", "value": "}]}}{"}],
+    )
+    context = ConversationContext(request=_request())
+
+    query = understand("x", REF, context, extractor=extractor, places=PLACES)
+
+    assert query.changes[0].value == 4
+    assert query.request is not None
+    assert query.request.people == 4
+
+
+def test_modify_plan_set_budget_reads_a_spoken_amount() -> None:
+    extractor = FakeExtractor(
+        intent="modify_plan",
+        changes=[{"kind": "set_budget", "text": "Tăng ngân sách lên 10 triệu", "value": "10 triệu"}],
+    )
+    context = ConversationContext(request=_request())
+
+    query = understand("x", REF, context, extractor=extractor, places=PLACES)
+
+    assert query.changes[0].value == 10_000_000
+    assert query.request is not None
+    assert query.request.budget_vnd == 10_000_000
+
+
+def test_modify_plan_category_word_becomes_an_exclude_category() -> None:
+    extractor = FakeExtractor(
+        intent="modify_plan",
+        changes=[{"kind": "remove_place", "text": "bỏ chùa", "value": None}],
+    )
+    context = ConversationContext(request=_request())
+
+    query = understand("x", REF, context, extractor=extractor, places=PLACES)
+
+    assert [(c.kind, c.value) for c in query.changes] == [
+        (PlanChangeKind.EXCLUDE_CATEGORY, "religious")
+    ]
+    assert query.request is not None
+    assert "religious" in query.request.exclude_categories
+
+
+def test_modify_plan_remove_place_with_leading_verb_links_the_place() -> None:
+    extractor = FakeExtractor(
+        intent="modify_plan",
+        changes=[{"kind": "remove_place", "text": "Bỏ Đại Nội", "value": None}],
+    )
+    context = ConversationContext(request=_request())
+
+    query = understand("x", REF, context, extractor=extractor, places=PLACES)
+
+    assert [(c.kind, c.value) for c in query.changes] == [(PlanChangeKind.REMOVE_PLACE, "p2")]
+    assert query.request is not None
+    assert query.request.exclude_poi_ids == ["p2"]
+
+
+def test_modify_plan_add_place_with_a_phrase_links_the_place() -> None:
+    extractor = FakeExtractor(
+        intent="modify_plan",
+        changes=[{"kind": "add_place", "text": "Thêm chợ Đông Ba vào lịch", "value": "chợ Đông Ba"}],
+    )
+    context = ConversationContext(request=_request())
+
+    query = understand("x", REF, context, extractor=extractor, places=PLACES)
+
+    assert [(c.kind, c.value) for c in query.changes] == [(PlanChangeKind.ADD_PLACE, "p3")]
+    assert query.request is not None
+    assert query.request.must_include_poi_ids == ["p3"]
+
+
 def test_modify_plan_applies_changes_to_context_request() -> None:
     extractor = FakeExtractor(
         intent="modify_plan",
@@ -379,18 +451,38 @@ def test_apply_changes_include_and_exclude_category() -> None:
         _request(), [PlanChange(kind=PlanChangeKind.INCLUDE_CATEGORY, value="cafe")]
     )
     assert included.categories == ["cafe"]
+    assert included.exclude_categories == []
     removed, _ = apply_changes(
         included, [PlanChange(kind=PlanChangeKind.EXCLUDE_CATEGORY, value="cafe")]
     )
     assert removed.categories == []
+    assert removed.exclude_categories == ["cafe"]
+    reincluded, _ = apply_changes(
+        removed, [PlanChange(kind=PlanChangeKind.INCLUDE_CATEGORY, value="cafe")]
+    )
+    assert reincluded.categories == ["cafe"]
+    assert reincluded.exclude_categories == []
 
 
-def test_apply_changes_place_edits_are_left_to_the_orchestrator() -> None:
+def test_apply_changes_place_edits_become_must_include_and_exclude_ids() -> None:
+    added, notes = apply_changes(
+        _request(), [PlanChange(kind=PlanChangeKind.ADD_PLACE, value="p3", text="chợ Đông Ba")]
+    )
+    assert added.must_include_poi_ids == ["p3"]
+    assert notes == []
+    removed, _ = apply_changes(
+        added, [PlanChange(kind=PlanChangeKind.REMOVE_PLACE, value="p3", text="chợ Đông Ba")]
+    )
+    assert removed.must_include_poi_ids == []
+    assert removed.exclude_poi_ids == ["p3"]
+
+
+def test_apply_changes_unlinked_place_edit_gives_a_note() -> None:
     changed, notes = apply_changes(
-        _request(), [PlanChange(kind=PlanChangeKind.ADD_PLACE, text="quán cà phê")]
+        _request(), [PlanChange(kind=PlanChangeKind.REMOVE_PLACE, text="Bỏ Nhà Nào Đó")]
     )
     assert changed == _request()
-    assert any("add_place" in note for note in notes)
+    assert any("Không tìm thấy" in note for note in notes)
 
 
 def test_apply_changes_invalid_result_keeps_original_with_note() -> None:
@@ -440,3 +532,102 @@ def test_rules_trip_question_with_days_stays_plan_new() -> None:
     query = understand("Lên lịch Huế 2 ngày từ 20/12, đi Đại Nội không?", REF)
 
     assert query.intent is Intent.PLAN_NEW
+
+
+# ---------------------------------------------------------------------------
+# Smalltalk: greetings and thanks are not a plan, and not out of scope either
+# ---------------------------------------------------------------------------
+
+
+def test_rules_greeting_is_smalltalk() -> None:
+    query = understand("xin chào", REF)
+
+    assert query.intent is Intent.SMALLTALK
+    assert query.request is None
+
+
+def test_llm_out_of_scope_thanks_becomes_smalltalk() -> None:
+    query = understand("cảm ơn bạn", REF, extractor=FakeExtractor(intent="out_of_scope"), places=PLACES)
+
+    assert query.intent is Intent.SMALLTALK
+
+
+@pytest.mark.parametrize(
+    ("text", "overrides"),
+    [
+        # Bare answers to a clarifying question; the model sees them alone and says smalltalk.
+        ("ngày mai", {"date_text": "ngày mai"}),
+        ("ok", {}),
+    ],
+)
+def test_llm_smalltalk_without_rule_match_is_a_trip_message(text: str, overrides: dict[str, Any]) -> None:
+    extractor = FakeExtractor(intent="smalltalk", **overrides)
+    query = understand(text, REF, extractor=extractor, places=PLACES)
+
+    assert query.intent is Intent.PLAN_NEW
+
+
+@pytest.mark.parametrize(
+    ("text", "people"),
+    [
+        ("tôi muốn đi Huế 3 ngày 2 đêm với người yêu", 2),
+        ("đi Huế 2 ngày cùng vợ", 2),
+        ("vợ chồng mình muốn đi Huế 3 ngày", 2),
+        ("đi Huế 3 ngày với người yêu và 2 bạn", None),  # a bigger group: not inferred
+        ("đi Huế 3 ngày cùng gia đình", None),
+        ("đi Huế 3 ngày", None),
+    ],
+)
+def test_couple_without_head_count_is_two_people(text: str, people: int | None) -> None:
+    query = understand(text, REF, extractor=FakeExtractor(intent="plan_new"), places=PLACES)
+
+    assert query.fields.get("people") == people
+
+
+def test_stated_head_count_wins_over_couple() -> None:
+    extractor = FakeExtractor(intent="plan_new", people=3)
+    query = understand("đi Huế với người yêu, 3 người", REF, extractor=extractor, places=PLACES)
+
+    assert query.fields.get("people") == 3
+
+
+def test_llm_smalltalk_confirmed_by_rules_stays_smalltalk() -> None:
+    query = understand("xin chào", REF, extractor=FakeExtractor(intent="smalltalk"), places=PLACES)
+
+    assert query.intent is Intent.SMALLTALK
+
+
+def test_llm_plan_new_with_trip_details_stays_plan_new() -> None:
+    text = "chào bạn, cho mình đi Huế 3 ngày từ 5/12"
+    query = understand(text, REF, extractor=FakeExtractor(intent="plan_new"), places=PLACES)
+
+    assert query.intent is Intent.PLAN_NEW
+
+
+def test_nature_and_scenery_interests_become_the_nature_theme_not_the_park_category() -> None:
+    parsed = understand("đi Huế 3 ngày từ 5/12, thích thiên nhiên và ngắm cảnh", REF)
+
+    assert parsed.fields["themes"] == ["nature"]
+    assert "park" not in parsed.fields["categories"]
+    assert parsed.request is not None
+    assert parsed.request.themes == ["nature"]
+
+
+def test_parse_reads_transport_stay_and_pace_from_the_message() -> None:
+    query = understand(
+        "Đi Huế 2 ngày từ 20/12 từ Hà Nội 2 người, đi tàu, ở resort, lịch thong thả", REF
+    )
+
+    assert query.request is not None
+    assert query.request.transport_mode == "train"
+    assert query.request.hotel_tier == "resort"
+    assert query.request.pace == "relaxed"
+
+
+def test_parse_leaves_unstated_slots_as_any_and_moderate_pace() -> None:
+    query = understand("Đi Huế 2 ngày từ 20/12 từ Hà Nội 2 người", REF)
+
+    assert query.request is not None
+    assert query.request.transport_mode is None
+    assert query.request.hotel_tier is None
+    assert query.request.pace == "moderate"

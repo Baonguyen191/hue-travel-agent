@@ -12,7 +12,15 @@ from fastapi.responses import FileResponse
 from app.core.config import hue_database_path, photo_cache_dir
 from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.place import Place, PlaceCategory, PlacePage, PlaceSearchPage
-from app.services.photos import WIDTHS, PhotoService, PhotoUnavailable, PhotoUpstreamError
+from app.services.guide import guide_for
+from app.services.photo_fallbacks import illustrative_photo
+from app.services.photos import (
+    WIDTHS,
+    PhotoService,
+    PhotoUnavailable,
+    PhotoUpstreamError,
+    cache_key_for,
+)
 from app.services.poi_search import search_places
 
 router = APIRouter(prefix="/api/v1/places", tags=["places"])
@@ -94,7 +102,7 @@ def get_place(poi_id: str, repository: Repository) -> Place:
         raise HTTPException(status_code=503, detail="Hue SQLite source file is unavailable.") from error
     if place is None:
         raise HTTPException(status_code=404, detail="POI was not found in the Hue source.")
-    return place
+    return place.model_copy(update={"guide": guide_for(poi_id)})
 
 
 @functools.cache
@@ -103,6 +111,7 @@ def get_photo_service() -> PhotoService:
 
 
 PHOTO_CACHE_CONTROL = "public, max-age=2592000, immutable"
+FALLBACK_CACHE_CONTROL = "public, max-age=3600"
 
 
 @router.get("/{poi_id}/photo", response_class=FileResponse)
@@ -121,11 +130,25 @@ def get_place_photo(
         raise HTTPException(status_code=503, detail="Hue SQLite source file is unavailable.") from error
     if place is None:
         raise HTTPException(status_code=404, detail="POI was not found in the Hue source.")
+    if place.photo is None:
+        raise HTTPException(status_code=404, detail="This place has no photo.")
     try:
-        path = photos.get(poi_id, place.photo_url, w)
+        path = photos.get(cache_key_for(poi_id, place.photo), place.photo.url, w)
     except PhotoUnavailable as error:
         raise HTTPException(status_code=404, detail="This place has no photo.") from error
     except PhotoUpstreamError as error:
-        logger.warning("photo for %s unavailable: %s", poi_id, error)
-        raise HTTPException(status_code=502, detail="The source photo could not be loaded.") from error
+        if place.photo.kind != "source":
+            logger.warning("photo for %s unavailable: %s", poi_id, error)
+            raise HTTPException(status_code=502, detail="The source photo could not be loaded.") from error
+        # Serve a curated stand-in now, and retry the source on a later request (short cache lifetime).
+        logger.warning("source photo for %s unavailable, serving illustrative photo: %s", poi_id, error)
+        fallback = illustrative_photo(place.id, place.name, place.category)
+        if fallback is None:
+            raise HTTPException(status_code=502, detail="The source photo could not be loaded.") from error
+        try:
+            path = photos.get(cache_key_for(poi_id, fallback), fallback.url, w)
+        except (PhotoUnavailable, PhotoUpstreamError) as fallback_error:
+            logger.warning("illustrative photo for %s unavailable: %s", poi_id, fallback_error)
+            raise HTTPException(status_code=502, detail="The source photo could not be loaded.") from error
+        return FileResponse(path, media_type="image/webp", headers={"Cache-Control": FALLBACK_CACHE_CONTROL})
     return FileResponse(path, media_type="image/webp", headers={"Cache-Control": PHOTO_CACHE_CONTROL})

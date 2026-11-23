@@ -128,8 +128,9 @@ Các trường:
 - intent: plan_new (xin lập lịch đi chơi, kể cả khi chưa nêu ngày hay số ngày; câu hỏi chung về
   việc đi Huế là plan_new), modify_plan (sửa lịch đã có: bỏ điểm, thêm ngày,
   đổi số người), place_info (hỏi giờ mở cửa, giá vé, vị trí của một địa điểm), approve (đồng ý
-  một gói ngân sách), book (xin đặt chỗ), out_of_scope (không phải du lịch Huế: thành phố khác,
-  thời tiết, đặt vé, viết văn...).
+  một gói ngân sách), book (xin đặt chỗ), smalltalk (chào hỏi, cảm ơn, tạm biệt, hỏi bạn là ai
+  hay làm được gì; không có thông tin chuyến đi), out_of_scope (không phải du lịch Huế: thành phố
+  khác, thời tiết, đặt vé, viết văn...).
 - date_text: cụm chỉ thời điểm đi, chép nguyên văn, ví dụ "cuối tuần này", "thứ 7 tới", "20/12".
 - duration_text: cụm chỉ số ngày đi, chép nguyên văn, ví dụ "2 ngày", "2n1đ".
 - origin: nơi xuất phát nếu nêu rõ. city: thành phố đến nếu nêu rõ và không phải Huế.
@@ -312,6 +313,26 @@ _EXAMPLES: tuple[tuple[str, dict[str, Any]], ...] = (
             "soft_preferences": [],
             "changes": [],
             "approve_option": "BUDGET",
+        },
+    ),
+    (
+        "Chào bạn, bạn giúp được gì cho mình?",
+        {
+            "intent": "smalltalk",
+            "date_text": None,
+            "duration_text": None,
+            "origin": None,
+            "people": None,
+            "rooms": None,
+            "budget_text": None,
+            "city": None,
+            "interest_phrases": [],
+            "must_include_mentions": [],
+            "exclude_mentions": [],
+            "exclude_category_phrases": [],
+            "soft_preferences": [],
+            "changes": [],
+            "approve_option": None,
         },
     ),
 )

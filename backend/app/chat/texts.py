@@ -8,19 +8,40 @@ from app.schemas.booking import BookingResult
 from app.schemas.place import Place
 
 CONFIRM_WORDS = frozenset({"dong y", "ok", "okay", "xac nhan", "co", "yes"})
-DEFAULT_WORDS = frozenset({"dung mac dinh", "mac dinh"})
 CANCEL_WORDS = frozenset({"huy", "huy bo", "khong", "thoi", "bo qua"})
 YES_REPLIES = ("Đồng ý", "Huỷ")
-DEFAULTS_QUESTION = "Bạn xuất phát từ đâu và đi mấy người? (mặc định: Huế, 1 người)"
-DEFAULT_REPLIES = ("Từ Hà Nội, 2 người", "Dùng mặc định")
 NO_PLAN = "Bạn chưa có lịch trình nào. Hãy cho mình biết ngày đi và số ngày đi Huế."
 NEED_APPROVAL = "Bạn cần duyệt một phương án trước khi đặt."
 NOT_WAITING = "Phương án này không còn chờ duyệt. Hãy lên lịch mới nếu bạn muốn thay đổi."
 CANCELLED = "Đã huỷ xác nhận. Bạn cứ nói tiếp nhé."
 OUT_OF_SCOPE = "Xin lỗi, hiện mình chỉ lên kế hoạch cho chuyến đi Huế. Bạn muốn lên lịch đi Huế không?"
+SMALLTALK_EXAMPLE = 'Bạn thử nhắn: "Tôi đi Huế 3 ngày 2 đêm từ 05/12, xuất phát Hà Nội, 2 người".'
+GREETING = "Chào bạn! Mình là trợ lý lập lịch du lịch Huế. Mình lên lịch trình theo ngày, ước tính chi phí, trả lời giờ mở cửa và giá vé của địa điểm ở Huế, và đặt xe, phòng ở chế độ mô phỏng."
+IDENTITY = "Mình là trợ lý lập lịch du lịch Huế, dùng dữ liệu địa điểm từ huetripo.hue.gov.vn. Mình lên lịch trình, ước tính chi phí và trả lời câu hỏi về địa điểm ở Huế. Xe, khách sạn và đặt chỗ đều là MÔ PHỎNG, chưa đặt thật."
+THANKS = "Không có gì, rất vui được giúp bạn!"
+GOODBYE = "Tạm biệt bạn, chúc chuyến đi Huế vui vẻ!"
+PLAN_WAITING_NUDGE = "Lịch trình của bạn đang chờ duyệt; bạn có thể duyệt hoặc nhắn thay đổi bất cứ lúc nào."
+PLAN_APPROVED_NUDGE = 'Phương án đã được duyệt; nhắn "Đặt vé và khách sạn" khi bạn sẵn sàng.'
+WEATHER = "Mình chưa có dữ liệu thời tiết nên không trả lời được; bạn xem dự báo của nchmf.gov.vn trước khi đi nhé. Mình có thể lên lịch đi Huế cho bạn."
 PLACE_MISSING = "Mình chưa tìm thấy địa điểm đó trong dữ liệu Huế. Bạn thử nêu tên khác nhé?"
+GUIDE_SOURCE = "Nguồn: Wikipedia tiếng Việt (CC BY-SA 4.0) · {url}"
+SUMMARY_SOURCE = "Nguồn: huetripo.hue.gov.vn"
+NO_DESCRIPTION = "Nguồn dữ liệu không có phần giới thiệu về nơi này."
 CHOOSE_OPTION = "Bạn muốn duyệt phương án nào?"
 UNVERIFIED = "Giờ mở cửa lấy từ nguồn dữ liệu, chưa xác minh."
+# The summary before planning (S4, S5). Confirm words beyond CONFIRM_WORDS start the plan at the summary.
+SUMMARY_HEAD = "Mình tóm tắt lại chuyến đi:"
+SUMMARY_TAIL = "Mình lên lịch theo thông tin này nhé? Nếu cần sửa gì, bạn cứ nhắn."
+CHANGED_MARK = " ← đã đổi"
+TRIP_CONFIRM_WORDS = frozenset({"len lich", "len lich di", "duoc", "chot", "ok luon", "dong y luon"})
+CHEAPEST = "chọn rẻ nhất"
+SUMMARY_TRANSPORT = {"bus": "xe giường nằm", "train": "tàu hỏa", "flight": "máy bay"}
+SUMMARY_STAY = {"homestay": "homestay", "hotel": "khách sạn", "resort": "resort"}
+SUMMARY_PACE = {
+    "relaxed": "thong thả, 3 điểm tham quan mỗi ngày",
+    "moderate": "vừa phải, 4 điểm tham quan mỗi ngày",
+    "packed": "đi nhiều, 5 điểm tham quan mỗi ngày",
+}
 _CATEGORY_NAMES = {
     "restaurant": "quán ăn",
     "cafe": "quán cà phê",
@@ -31,13 +52,86 @@ _CATEGORY_NAMES = {
     "park": "công viên",
     "museum": "bảo tàng",
 }
-_EVENT_NAMES = {"VISIT": "tham quan", "MEAL": "ăn", "MEAL_BREAK": "nghỉ ăn trưa"}
+
+
+def category_name(code: str) -> str:
+    """The Vietnamese name of a place category code (religious -> tôn giáo)."""
+    return _CATEGORY_NAMES.get(code, code)
+
+
+_EVENT_NAMES = {"VISIT": "tham quan", "MEAL": "ăn", "MEAL_BREAK": "nghỉ ăn trưa", "REST": "nghỉ trưa"}
 _OPTION_NAMES = {"BUDGET": "Tiết kiệm", "BALANCED": "Cân bằng", "COMFORT": "Thoải mái"}
 
 
 def option_name(label: str) -> str:
     """The Vietnamese name of a budget option code (BUDGET -> Tiết kiệm)."""
     return _OPTION_NAMES.get(label, label)
+
+
+# One question per slot. Required slots are asked until filled; optional slots once.
+QUESTIONS = {
+    "origin": "Bạn xuất phát từ đâu?",
+    "people": "Bạn đi mấy người?",
+    "budget": "Ngân sách khoảng bao nhiêu cho cả chuyến?",
+    "interests": "Bạn thích gì: di tích, ẩm thực, chùa chiền, thiên nhiên, cà phê ngắm cảnh…?",
+    "transport": "Bạn muốn đi Huế bằng gì: xe giường nằm, tàu hỏa hay máy bay?",
+    "stay": "Bạn muốn ở đâu: homestay, khách sạn hay resort?",
+    "pace": "Bạn muốn lịch thong thả (3 điểm mỗi ngày), vừa phải (4) hay đi nhiều (5)?",
+    "places": 'Có nơi nào nhất định muốn đến hoặc muốn tránh không? (Không có thì bạn nhắn "không".)',
+}
+
+
+def when_question(need_start: bool, need_days: bool) -> str:
+    """Asks the start date, the length, or both, whichever is still unknown."""
+    if need_start and need_days:
+        return "Bạn muốn đi Huế từ ngày nào và đi mấy ngày?"
+    if need_start:
+        return "Bạn muốn đi Huế từ ngày nào?"
+    return "Bạn định đi Huế mấy ngày?"
+
+
+def too_many_days(max_days: int) -> str:
+    return f"Mình chỉ lên lịch tối đa {max_days} ngày. Bạn muốn đi mấy ngày?"
+
+
+_MODE_NAMES = {"BUS": "xe khách", "TRAIN": "tàu hỏa", "FLIGHT": "máy bay"}
+_TIER_NAMES = {"HOMESTAY": "homestay", "THREE_STAR": "khách sạn", "FOUR_STAR": "resort"}
+
+
+def budget_warning(
+    *, low: str, high: str, over_low: str, over_high: str, budget: str, mode: str | None, tier: str | None
+) -> str:
+    """The early budget check (S2): the cheapest option's range, the excess, and the two choices."""
+    names = [name for name in (_MODE_NAMES.get(mode or ""), _TIER_NAMES.get(tier or "")) if name]
+    detail = f" ({' + '.join(names)})" if names else ""
+    return (
+        f"Lưu ý: phương án rẻ nhất{detail} ước tính {money_range(low, high)}, "
+        f"vượt ngân sách {money_range(over_low, over_high)}. "
+        f"Bạn muốn tăng ngân sách, hay giữ {budget} để mình chọn phương án tiết kiệm nhất?"
+    )
+
+
+def budget_raise_question(*, low: str, high: str, mode: str | None, tier: str | None) -> str:
+    """After "tăng ngân sách" with no amount: ask for the new amount and say what the cheapest needs."""
+    names = [name for name in (_MODE_NAMES.get(mode or ""), _TIER_NAMES.get(tier or "")) if name]
+    detail = f" ({' + '.join(names)})" if names else ""
+    return (
+        f"Bạn muốn tăng ngân sách lên bao nhiêu? Phương án rẻ nhất{detail} cần khoảng "
+        f"{money_range(low, high)}. Bạn cũng có thể đổi phương tiện hoặc chỗ ở cho rẻ hơn."
+    )
+
+
+def soft_budget_note(low: str, high: str) -> str:
+    """The one-time note when the cheapest estimate may slightly exceed the budget (S2)."""
+    return f"Chi phí ước tính {money_range(low, high)}, có thể vượt ngân sách một chút."
+
+
+def money_range(low: str, high: str) -> str:
+    """"5,15–6,16 triệu" when both ends are in millions; otherwise both ends in full."""
+    unit = " triệu"
+    if low.endswith(unit) and high.endswith(unit):
+        return f"{low[: -len(unit)]}–{high}"
+    return f"{low}–{high}"
 
 
 def invalid(detail: str) -> str:
@@ -117,6 +211,14 @@ def place_text(place: Place, phone: str | None) -> str:
         f"Nguồn: {place.source_url or 'chưa có dữ liệu'}",
     ]
     return "\n".join(lines)
+
+
+def guide_text(name: str, sentences: Sequence[str], url: str) -> str:
+    return f"{name}: {' '.join(sentences)}\n{GUIDE_SOURCE.format(url=url)}"
+
+
+def summary_text(name: str, summary: str) -> str:
+    return f"{name}: {summary.strip()}\n{SUMMARY_SOURCE}"
 
 
 def nearby_text(places: Sequence[tuple[Place, float]]) -> str:

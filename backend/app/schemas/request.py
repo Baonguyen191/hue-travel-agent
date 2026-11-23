@@ -3,10 +3,19 @@
 from __future__ import annotations
 
 from datetime import date
+from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
 from app.schemas.place import PlaceCategory
+
+# Trip themes are cross-cutting interests. They are not place categories: "nature" ranks
+# attractions by source type ("Thiên nhiên") and favours view cafés.
+Theme = Literal["nature"]
+# None means any: the cheapest offer wins, as before. Search and Budget keep only matching offers.
+TransportModeChoice = Literal["bus", "train", "flight"]
+HotelTierChoice = Literal["homestay", "hotel", "resort"]
+Pace = Literal["relaxed", "moderate", "packed"]
 
 
 class TripRequest(BaseModel):
@@ -22,12 +31,16 @@ class TripRequest(BaseModel):
     categories: list[PlaceCategory] = Field(default_factory=list)
     keyword: str | None = Field(default=None, min_length=1, max_length=200)
     preferences: list[str] = Field(default_factory=list, max_length=10)
+    themes: list[Theme] = Field(default_factory=list)
     center_lat: float | None = Field(default=None, ge=-90, le=90)
     center_lon: float | None = Field(default=None, ge=-180, le=180)
     radius_km: float | None = Field(default=None, gt=0, le=100)
     must_include_poi_ids: list[str] = Field(default_factory=list, max_length=10)
     exclude_poi_ids: list[str] = Field(default_factory=list, max_length=50)
     exclude_categories: list[PlaceCategory] = Field(default_factory=list)
+    transport_mode: TransportModeChoice | None = None
+    hotel_tier: HotelTierChoice | None = None
+    pace: Pace = "moderate"
 
     @model_validator(mode="after")
     def validate_dates_and_coordinates(self) -> "TripRequest":

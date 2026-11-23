@@ -1,7 +1,7 @@
 """Chat service: understand each message, then answer it through the trip orchestrator.
 
 Gates:
-- A plan starts only when origin and party size are stated or confirmed (no guessed defaults).
+- A plan starts only when every required slot is filled (`draft.pending_units` is empty); no default is guessed.
 - Approve and book always ask first and run only on a confirming message; any other message
   cancels the pending step, and that message is then handled as new.
 - Facts about places, prices and plans come from the data. A RAG place answer is LLM text, shown only when every checked fact matches the cited POIs.
@@ -18,18 +18,32 @@ from uuid import uuid4
 
 from app.agents.booking import ApprovalRequiredError, BookingAgent
 from app.agents.orchestrator import NotWaitingError, Orchestrator, StalePlanError
-from app.chat import texts
+from app.chat import slots, texts
 from app.chat.cards import nearby_places, phone_of, place_card, plan_card
 from app.chat.context import ChatContext
-from app.chat.draft import build_request, confirm_defaults, merge_draft, missing_defaults, missing_question
+from app.chat.draft import (
+    build_request,
+    asked_units,
+    mark_asked,
+    merge_draft,
+    next_questions,
+    pending_soft_note,
+    precheck_due,
+    precheck_key,
+    summary_lines,
+    summary_text,
+)
 from app.chat.schemas import BookingCard, ChatReply, UnderstandingInfo
 from app.chat.store import ChatStore
 from app.db.store import PlanStore
 from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.request import TripRequest
+from app.services.guide import guide_for, guide_sentences
+from app.services.origin import is_hue_name
 from app.services.poi_search import normalize_vietnamese
 from app.services.quote import UnknownOptionError
 from app.understanding.models import ApproveOption, Intent, ParsedQuery, PlanChange, PlanChangeKind
+from app.understanding.smalltalk import smalltalk_kind
 from app.understanding.understand import ConversationContext, apply_changes
 
 if TYPE_CHECKING:
@@ -47,8 +61,14 @@ _CHANGE_FORMS: dict[PlanChangeKind, str] = {
     PlanChangeKind.SET_BUDGET: "đổi ngân sách thành {value} VND",
     PlanChangeKind.INCLUDE_CATEGORY: "thêm loại {value}",
     PlanChangeKind.EXCLUDE_CATEGORY: "bỏ loại {value}",
+    PlanChangeKind.ADD_PLACE: "thêm {value}",
+    PlanChangeKind.REMOVE_PLACE: "bỏ {value}",
 }
 MAX_PLACE_CARDS = 3
+# Intents that answer an open slot while a draft is filling.
+_SLOT_INTENTS = (Intent.PLAN_NEW, Intent.MODIFY_PLAN, Intent.OUT_OF_SCOPE)
+# Folded cues that ask for a description of a place ("Hồ Thủy Tiên có gì hay?"), matched as whole words.
+_DESCRIPTION_CUES = ("co gi hay", "co gi dep", "co gi", "gioi thieu", "ke ve", "lich su", "noi tieng", "o day co gi", "the nao")
 
 
 class ChatService:
@@ -114,21 +134,44 @@ class ChatService:
         pending = context.pending or {}
         context.pending = None
         folded = normalize_vietnamese(text).strip(" .!?")
-        confirms = folded in texts.CONFIRM_WORDS or (
-            pending.get("kind") == "defaults" and folded in texts.DEFAULT_WORDS
-        )
-        if confirms:
+        if pending.get("kind") == "confirm_trip":
+            return await self._answer_summary(user_id, text, parsed, context, pending, folded)
+        if folded in texts.CONFIRM_WORDS:
             return await self._execute(user_id, pending, parsed, context)
         if folded in texts.CANCEL_WORDS:
             self._note("cancel")
             return self._reply(parsed, texts.CANCELLED)
+        if parsed.intent is Intent.PLACE_INFO:
+            context.pending = pending  # a place question leaves the approval or booking step waiting
+        return None
+
+    async def _answer_summary(
+        self,
+        user_id: str,
+        text: str,
+        parsed: ParsedQuery,
+        context: ChatContext,
+        pending: dict[str, Any],
+        folded: str,
+    ) -> ChatReply | None:
+        """At the summary (S4, S5): a confirming message starts the plan, a cancel word keeps the draft,
+        an edit goes to the slot filling, and a question or smalltalk is answered while the summary waits."""
+        if folded in texts.CONFIRM_WORDS or folded in texts.TRIP_CONFIRM_WORDS:
+            self._note("start_trip")
+            context.draft = {**context.draft, "confirmed": True}
+            reply = await self._start_plan(user_id, parsed, context)
+            if "confirmed" in context.draft:  # the plan did not start: the draft stays, unconfirmed
+                context.draft = {key: value for key, value in context.draft.items() if key != "confirmed"}
+            return reply
+        if folded in texts.CANCEL_WORDS:
+            self._note("cancel")
+            return self._reply(parsed, texts.CANCELLED)
+        if parsed.intent in _SLOT_INTENTS and not (_is_weather(text) or _is_other_city(parsed)):
+            return None  # an edit: _dispatch merges it into the draft and sends the summary again
+        context.pending = pending  # a question or smalltalk: answered by _dispatch, the summary still waits
         return None
 
     async def _execute(self, user_id: str, pending: dict[str, Any], parsed: ParsedQuery, context: ChatContext) -> ChatReply:
-        if pending.get("kind") == "defaults":
-            context.draft = confirm_defaults(context.draft)
-            self._note("confirm_defaults")
-            return await self._start_plan(user_id, parsed, context)
         if pending.get("kind") == "approve":
             self._note("run_approve")
             return await self._run_approve(user_id, pending, parsed, context)
@@ -137,9 +180,20 @@ class ChatService:
 
     async def _dispatch(self, user_id: str, text: str, parsed: ParsedQuery, context: ChatContext) -> ChatReply:
         intent = parsed.intent
-        if intent is Intent.PLAN_NEW:
+        if _is_filling(context) and intent in _SLOT_INTENTS:
+            # While slots are open, a plan, change or out-of-scope message answers them. Weather and
+            # other cities keep their refusals, without quick replies, and the draft stays as it is.
+            if _is_weather(text) or _is_other_city(parsed):
+                return self._out_of_scope(text, parsed, quick=False)
             self._note("plan_new")
-            return await self._plan_new(user_id, parsed, context)
+            return await self._plan_new(user_id, text, parsed.model_copy(update={"intent": Intent.PLAN_NEW}), context)
+        if intent is Intent.PLAN_NEW and _is_weather(text) and not _is_trip_detail(parsed, context):
+            # The rule parser (Ollama down) reads "Thời tiết Huế…" as a Huế trip: answer the
+            # weather refusal instead of starting to ask for dates.
+            return self._out_of_scope(text, parsed, quick=True)
+        if intent is Intent.PLAN_NEW or (intent is Intent.MODIFY_PLAN and _is_trip_detail(parsed, context)):
+            self._note("plan_new")
+            return await self._plan_new(user_id, text, parsed.model_copy(update={"intent": Intent.PLAN_NEW}), context)
         if intent is Intent.MODIFY_PLAN:
             self._note("modify")
             return await self._modify(user_id, parsed, context)
@@ -152,18 +206,78 @@ class ChatService:
         if intent is Intent.BOOK:
             self._note("ask_book")
             return self._ask_book(parsed, context)
-        self._note("out_of_scope")
-        return self._reply(parsed, texts.OUT_OF_SCOPE, replies=["Lên kế hoạch đi Huế"])
+        if intent is Intent.SMALLTALK:
+            self._note("smalltalk")
+            return self._smalltalk(text, parsed, context)
+        return self._out_of_scope(text, parsed, quick=True)
 
-    async def _plan_new(self, user_id: str, parsed: ParsedQuery, context: ChatContext) -> ChatReply:
-        context.draft = merge_draft(context.draft, parsed)
-        question = missing_question(context.draft)
-        if question is not None:
-            return self._reply(parsed, question[0], replies=question[1])
-        if missing_defaults(context.draft):
-            context.pending = {"kind": "defaults"}
-            return self._reply(parsed, texts.DEFAULTS_QUESTION, replies=texts.DEFAULT_REPLIES, pending=context.pending)
-        return await self._start_plan(user_id, parsed, context)
+    def _out_of_scope(self, text: str, parsed: ParsedQuery, *, quick: bool) -> ChatReply:
+        """The weather refusal, or the polite refusal of other trips; quick replies only outside slot filling."""
+        self._note("out_of_scope")
+        if _is_weather(text):
+            return self._reply(parsed, texts.WEATHER)
+        return self._reply(parsed, texts.OUT_OF_SCOPE, replies=["Lên kế hoạch đi Huế"] if quick else [])
+
+    def _smalltalk(self, text: str, parsed: ParsedQuery, context: ChatContext) -> ChatReply:
+        """A fixed template answer; a plan in the chat gets a one-line status nudge instead of an example."""
+        kind = smalltalk_kind(text) or "greeting"
+        body = {
+            "greeting": texts.GREETING,
+            "identity": texts.IDENTITY,
+            "thanks": texts.THANKS,
+            "goodbye": texts.GOODBYE,
+        }[kind]
+        plan = self._latest_plan(context)
+        if plan is not None:
+            approved = self.plans.active_approval(plan["plan_id"]) is not None
+            nudge = texts.PLAN_APPROVED_NUDGE if approved else texts.PLAN_WAITING_NUDGE
+        elif kind in ("greeting", "identity"):
+            nudge = texts.SMALLTALK_EXAMPLE
+        else:
+            nudge = ""
+        return self._reply(parsed, f"{body} {nudge}".strip())
+
+    async def _plan_new(self, user_id: str, text: str, parsed: ParsedQuery, context: ChatContext) -> ChatReply:
+        """Fill the draft from this message; ask the next two open slots, or start the plan when none is open."""
+        draft = slots.take_answers(merge_draft(context.draft, parsed), text, parsed.fields)
+        if precheck_due(draft):
+            draft["precheck"] = await self._precheck(draft)
+        question = next_questions(draft)
+        if question is None:
+            return self._summary(parsed, draft, context)
+        if pending_soft_note(draft) is not None:
+            draft["precheck_noted"] = True
+        context.draft = mark_asked(draft, asked_units(draft))
+        return self._reply(parsed, question)
+
+    def _summary(self, parsed: ParsedQuery, draft: dict[str, Any], context: ChatContext) -> ChatReply:
+        """The summary of a complete draft; the plan waits for a confirming message (S4)."""
+        text = summary_text(draft, self._name_of, previous=draft.get("summary_lines"))
+        draft["summary_lines"] = summary_lines(draft, self._name_of)
+        context.draft = draft
+        context.pending = {"kind": "confirm_trip"}
+        return self._reply(parsed, text, pending=context.pending)
+
+    def _name_of(self, poi_id: str) -> str | None:
+        place = self.places.get_by_id(poi_id)
+        return place.name if place is not None else None
+
+    async def _precheck(self, draft: dict[str, Any]) -> dict[str, Any]:
+        """The cheapest estimate for the draft's request (S2). A missing estimate is stored too, so it is not retried."""
+        key = precheck_key(draft) or ""
+        try:
+            estimate = await self.orchestrator.estimate(build_request(draft))
+        except ValueError:  # the same refusal _start_plan reports as an invalid request
+            estimate = None
+        if estimate is None:
+            return {"key": key, "min": None, "max": None, "mode": None, "tier": None}
+        return {
+            "key": key,
+            "min": estimate.min_vnd,
+            "max": estimate.max_vnd,
+            "mode": estimate.transport_mode,
+            "tier": estimate.hotel_tier,
+        }
 
     async def _start_plan(self, user_id: str, parsed: ParsedQuery, context: ChatContext) -> ChatReply:
         try:
@@ -201,10 +315,41 @@ class ChatService:
         if not state["waiting"]:
             return self._reply(parsed, texts.plan_failed(state["warnings"]))
         context.request = updated.model_dump(mode="json")
-        prefix = texts.changes_applied(_change_lines(parsed.changes), notes)
+        prefix = texts.changes_applied(
+            _change_lines(
+                parsed.changes,
+                lambda poi_id: (p.name if (p := self.places.get_by_id(poi_id)) else None),
+            ),
+            notes,
+        )
         return self._plan_reply(parsed, state, prefix)
 
     async def _place_info(self, text: str, parsed: ParsedQuery) -> ChatReply:
+        """A description question about a linked place is answered from the stored guide text (S10); other
+        place questions get the facts answer."""
+        mention = parsed.place_query
+        poi_id = mention.poi_id if mention is not None else None
+        if poi_id is not None and _asks_description(text):
+            self._note("guide")
+            return await self._description(poi_id, text, parsed)
+        return await self._place_facts(text, parsed)
+
+    async def _description(self, poi_id: str, text: str, parsed: ParsedQuery) -> ChatReply:
+        """The guide lead when the corpus has one, else the huetripo summary, else the facts answer with a note.
+        The guide and summary are copied from stored text; no LLM writes them."""
+        place = self.places.get_by_id(poi_id)
+        if place is None:
+            return self._reply(parsed, texts.PLACE_MISSING)
+        cards = [place_card(place)]
+        guide = guide_for(poi_id)
+        if guide is not None:
+            return self._reply(parsed, texts.guide_text(place.name, guide_sentences(poi_id, 4), guide.url), cards=cards)
+        if place.summary:
+            return self._reply(parsed, texts.summary_text(place.name, place.summary), cards=cards)
+        reply = await self._place_facts(text, parsed)
+        return reply.model_copy(update={"text": f"{reply.text}\n{texts.NO_DESCRIPTION}"})
+
+    async def _place_facts(self, text: str, parsed: ParsedQuery) -> ChatReply:
         """RAG answer when configured; the template answer otherwise or when RAG fails."""
         if self.rag is not None:
             try:
@@ -320,6 +465,11 @@ def _option_in(text: str) -> str | None:
     return match.group(1) if match else None
 
 
+def _asks_description(text: str) -> bool:
+    folded = normalize_vietnamese(text)
+    return any(re.search(r"\b" + re.escape(cue) + r"\b", folded) for cue in _DESCRIPTION_CUES)
+
+
 def _quick_intent(text: str, parsed: ParsedQuery) -> ParsedQuery:
     """Recognise the chat's own quick replies, which the rule parser would read as a new plan."""
     folded = normalize_vietnamese(text)
@@ -331,5 +481,54 @@ def _quick_intent(text: str, parsed: ParsedQuery) -> ParsedQuery:
     return parsed
 
 
-def _change_lines(changes: Sequence[PlanChange]) -> list[str]:
-    return [_CHANGE_FORMS[change.kind].format(value=change.value) for change in changes if change.kind in _CHANGE_FORMS]
+_TRIP_FIELDS = ("origin", "people", "rooms", "budget_vnd", "num_days", "start_date")
+# Weather cues, folded. The bot has no weather data, so it refuses with a pointer to the forecast.
+_WEATHER_PHRASES = ("thoi tiet", "nhiet do", "du bao", "troi mua", "co mua", "mua khong", "nang khong")
+
+
+def _is_weather(text: str) -> bool:
+    folded = normalize_vietnamese(text)
+    return any(phrase in folded for phrase in _WEATHER_PHRASES)
+
+
+def _is_other_city(parsed: ParsedQuery) -> bool:
+    destination = parsed.fields.get("destination")
+    return destination is not None and not is_hue_name(destination)
+
+
+def _is_filling(context: ChatContext) -> bool:
+    """A draft is being filled for a plan that has not started yet."""
+    return bool(context.draft) and context.thread_id is None
+
+
+def _is_trip_detail(parsed: ParsedQuery, context: ChatContext) -> bool:
+    """A MODIFY_PLAN with no plan to modify, carrying trip details, is the start of a new plan."""
+    if context.thread_id is not None:
+        return False
+    if context.draft:
+        return True
+    return any(parsed.fields.get(name) is not None for name in _TRIP_FIELDS)
+
+
+_CATEGORY_KINDS = (PlanChangeKind.INCLUDE_CATEGORY, PlanChangeKind.EXCLUDE_CATEGORY)
+_PLACE_KINDS = (PlanChangeKind.ADD_PLACE, PlanChangeKind.REMOVE_PLACE)
+
+
+def _change_lines(
+    changes: Sequence[PlanChange], name_of: Callable[[str], str | None]
+) -> list[str]:
+    """One Vietnamese line per change: categories by name, places by name (skipped when unknown)."""
+    lines: list[str] = []
+    for change in changes:
+        if change.kind not in _CHANGE_FORMS or change.value is None:
+            continue
+        if change.kind in _PLACE_KINDS:
+            name = name_of(str(change.value))
+            if name is None:
+                continue
+            lines.append(_CHANGE_FORMS[change.kind].format(value=name))
+        elif change.kind in _CATEGORY_KINDS:
+            lines.append(_CHANGE_FORMS[change.kind].format(value=texts.category_name(str(change.value))))
+        else:
+            lines.append(_CHANGE_FORMS[change.kind].format(value=change.value))
+    return lines

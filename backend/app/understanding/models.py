@@ -24,6 +24,7 @@ class Intent(StrEnum):
     APPROVE = "approve"
     BOOK = "book"
     OUT_OF_SCOPE = "out_of_scope"
+    SMALLTALK = "smalltalk"
 
 
 class ApproveOption(StrEnum):

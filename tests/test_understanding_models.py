@@ -39,6 +39,7 @@ def test_intent_values_match_spec() -> None:
         "approve",
         "book",
         "out_of_scope",
+        "smalltalk",
     }
 
 

@@ -16,10 +16,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "backend"))
 
 from app.api.places import get_photo_service, get_repository  # noqa: E402
 from app.main import app  # noqa: E402
-from app.schemas.place import Place  # noqa: E402
-from app.services.photos import PhotoService, cache_path  # noqa: E402
+from app.schemas.place import Place, PlacePhoto  # noqa: E402
+from app.services.photo_fallbacks import resolve_photo  # noqa: E402
+from app.services.photos import PhotoService, cache_key_for, cache_path  # noqa: E402
 
 SOURCE = "https://huetripo.hue.gov.vn/uploads/a.jpg"
+COMMONS = "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a.jpg"
+AUTO = object()
 
 
 def jpeg(width: int = 1200, height: int = 800) -> bytes:
@@ -28,12 +31,19 @@ def jpeg(width: int = 1200, height: int = 800) -> bytes:
     return buffer.getvalue()
 
 
-def place(poi_id: str = "huetripo:1", photo_url: str | None = SOURCE) -> Place:
+def place(
+    poi_id: str = "huetripo:1",
+    photo_url: str | None = SOURCE,
+    photo: object = AUTO,
+    category: str = "historic",
+) -> Place:
+    if photo is AUTO:
+        photo = PlacePhoto(kind="source", url=photo_url) if photo_url == SOURCE else None
     return Place.model_validate(
         {
             "id": poi_id,
             "name": "Đại Nội Huế",
-            "category": "historic",
+            "category": category,
             "lat": 16.47,
             "lon": 107.58,
             "opening_hours_confidence": "UNVERIFIED",
@@ -42,6 +52,7 @@ def place(poi_id: str = "huetripo:1", photo_url: str | None = SOURCE) -> Place:
             "source_place_id": poi_id.split(":")[1],
             "collected_at": datetime(2026, 11, 1, tzinfo=timezone.utc),
             "photo_url": photo_url,
+            "photo": photo,
             "raw_attributes": {},
         }
     )
@@ -134,13 +145,16 @@ def test_unknown_place_and_place_without_photo_are_404(setup) -> None:
     ],
 )
 def test_disallowed_source_is_404_without_network(setup, url) -> None:
-    client, upstream, _ = setup(ok, place(photo_url=url))
+    client, upstream, _ = setup(ok, place(photo_url=url, photo=PlacePhoto(kind="source", url=url)))
     assert client.get("/api/v1/places/huetripo:1/photo", params={"w": 160}).status_code == 404
     assert upstream.calls == []
 
 
 def test_redirect_off_host_is_502(setup) -> None:
-    client, _, cache = setup(lambda request: httpx.Response(302, headers={"location": "https://evil.example/x.jpg"}))
+    client, _, cache = setup(
+        lambda request: httpx.Response(302, headers={"location": "https://evil.example/x.jpg"}),
+        place(category="park"),  # no curated stand-in for this category, so the failure stays a 502
+    )
     assert client.get("/api/v1/places/huetripo:1/photo", params={"w": 160}).status_code == 502
     assert not cache.exists() or list(cache.iterdir()) == []
 
@@ -160,7 +174,7 @@ def timeout(request: httpx.Request) -> httpx.Response:
     ids=["status-500", "timeout", "garbage", "oversize"],
 )
 def test_upstream_failures_are_502_and_never_cached(setup, handler) -> None:
-    client, _, cache = setup(handler)
+    client, _, cache = setup(handler, place(category="park"))  # no curated stand-in, so the failure stays a 502
     assert client.get("/api/v1/places/huetripo:1/photo", params={"w": 160}).status_code == 502
     assert not cache.exists() or list(cache.iterdir()) == []
 
@@ -203,3 +217,48 @@ def test_very_tall_source_is_fitted_into_the_webp_limit(setup) -> None:
     width, height = Image.open(io.BytesIO(response.content)).size
     assert width <= 160
     assert height <= 320
+
+
+def test_place_without_source_photo_is_served_from_commons(setup) -> None:
+    illustrative = resolve_photo("huetripo:88", "Bún bò", "restaurant", None)
+    restaurant = place("huetripo:88", photo_url=None, photo=illustrative, category="restaurant")
+    client, upstream, cache = setup(ok, restaurant)
+    response = client.get("/api/v1/places/huetripo:88/photo", params={"w": 480})
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/webp"
+    assert response.headers["cache-control"] == "public, max-age=2592000, immutable"
+    assert upstream.calls == [restaurant.photo.url]
+    cached = list(cache.glob("*.webp"))
+    assert len(cached) == 1
+    assert cached[0].name.startswith("commons_")
+    assert cached[0].name == f"{cache_key_for('huetripo:88', restaurant.photo)}_480.webp"
+
+
+def test_places_sharing_one_commons_photo_share_one_download(setup) -> None:
+    shared = PlacePhoto(kind="commons_illustrative", url=COMMONS)
+    first = place("huetripo:a", photo_url=None, photo=shared, category="cafe")
+    second = place("huetripo:b", photo_url=None, photo=shared, category="cafe")
+    client, upstream, cache = setup(ok, first, second)
+    assert client.get("/api/v1/places/huetripo:a/photo", params={"w": 160}).status_code == 200
+    assert client.get("/api/v1/places/huetripo:b/photo", params={"w": 160}).status_code == 200
+    assert upstream.calls == [COMMONS]
+    assert len(list(cache.glob("*.webp"))) == 1
+
+
+def test_failed_source_falls_back_to_illustrative_photo_and_is_not_cached(setup) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "huetripo.hue.gov.vn":
+            return httpx.Response(500)
+        return ok(request)
+
+    client, upstream, cache = setup(handler, place("huetripo:1", category="historic"))
+    response = client.get("/api/v1/places/huetripo:1/photo", params={"w": 160})
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/webp"
+    assert response.headers["cache-control"] == "public, max-age=3600"
+    assert upstream.calls[0] == SOURCE
+    assert upstream.calls[1].startswith("https://thumb.wikimedia.org/")
+    names = [path.name for path in cache.glob("*.webp")]
+    assert len(names) == 1
+    assert names[0].startswith("commons_")
+    assert not (cache / "huetripo_1_160.webp").exists()

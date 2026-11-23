@@ -19,11 +19,13 @@ class MealPicker:
         places: HuePlacesRepository | None,
         radius_km: float,
         allowed: Callable[[Place], bool] | None = None,
+        prefer: Callable[[Place], bool] | None = None,
     ) -> None:
         self._candidates = list(candidates)
         self._places = places
         self._radius_km = radius_km
         self._allowed = allowed or (lambda place: True)
+        self._prefer = prefer or (lambda place: False)
         self._used: set[str] = set()
         self._pools: dict[str, list[Place]] = {}
 
@@ -61,12 +63,13 @@ class MealPicker:
         return list(pool.values())
 
     def _rank(self, place: Place, lat: float, lon: float) -> tuple[object, ...]:
-        """Inside the radius: specialty, rating, then distance. Beyond it: nearest first."""
+        """Inside the radius: preferred, specialty, rating, then distance. Beyond it: nearest first."""
         distance = haversine_km(lat, lon, place.lat, place.lon)
         if distance > self._radius_km:
             return (True, distance, place.id)
         return (
             False,
+            not self._prefer(place),
             not is_hue_specialty(place),
             -(place.rating_value or 0.0),
             distance,

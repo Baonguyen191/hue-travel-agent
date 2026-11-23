@@ -22,6 +22,7 @@ from app.core.config import hue_database_path, ollama_url, rag_embed_model, rag_
 from app.core.usage import add_usage
 from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.place import Place
+from app.services.guide import guide_for
 
 DEFAULT_TIMEOUT = 120.0
 EMBED_BATCH = 32
@@ -84,7 +85,12 @@ def document_text(place: Place) -> str:
         parts.append(f"Đánh giá: {place.rating_value}/5 ({place.rating_count or 0} lượt)")
     if place.summary:
         parts.append(place.summary.strip().rstrip("."))
-    return ". ".join(parts) + ("." if place.summary else "")
+    # The guide lead is part of the document only for POIs in the guide corpus, so other documents keep their
+    # text and hash; the index re-embeds just the documents whose text changed.
+    guide = guide_for(place.id)
+    if guide is not None:
+        parts.append(f"Giới thiệu: {guide.text.rstrip('.')}")
+    return ". ".join(parts) + ("." if place.summary or guide is not None else "")
 
 
 def text_hash(text: str) -> str:

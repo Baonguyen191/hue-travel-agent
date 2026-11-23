@@ -24,6 +24,9 @@ class PlanItem(BaseModel):
     kind: str
     meal: str | None = None
     poi_id: str | None = None
+    slot: str | None = None
+    reason: str | None = None
+    intro: str | None = None
 
 
 class PlanDay(BaseModel):
@@ -59,6 +62,7 @@ class PlaceCard(BaseModel):
     price_max_vnd: int | None = None
     phone: str | None = None
     source_url: str | None = None
+    photo_illustrative: bool = False
 
 
 class BookingCard(BaseModel):

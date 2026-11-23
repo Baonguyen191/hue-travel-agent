@@ -19,6 +19,38 @@ PlaceCategory = Literal[
 ]
 OpeningHoursConfidence = Literal["UNVERIFIED", "PARTIAL", "UNKNOWN"]
 PriceStatus = Literal["REFERENCE_RANGE", "FREE_CLAIM", "UNKNOWN"]
+PhotoKind = Literal["source", "commons_place", "commons_illustrative"]
+
+
+class PlacePhoto(BaseModel):
+    """Where the photo shown for a place comes from. `commons_illustrative` does not show the place itself."""
+
+    url: str
+    kind: PhotoKind
+    author: str | None = None
+    license: str | None = None
+    credit_url: str | None = None
+
+
+class GuideSection(BaseModel):
+    """One short section of the article (a level-2 heading and its text), shown after the lead."""
+
+    heading: str
+    text: str
+
+
+class PlaceGuide(BaseModel):
+    """The lead of a Vietnamese Wikipedia article about the place (CC BY-SA 4.0), with its source.
+
+    `sections` holds up to three short sections of the same article in article order; `text` stays the lead.
+    """
+
+    text: str
+    title: str
+    url: str
+    license: str
+    retrieved_at: str
+    sections: list[GuideSection] = []
 
 
 class Place(BaseModel):
@@ -43,6 +75,8 @@ class Place(BaseModel):
     is_free_claim: bool = False
     summary: str | None = None
     photo_url: str | None = None
+    photo: PlacePhoto | None = None
+    guide: PlaceGuide | None = None
     source: str
     source_url: str | None = None
     source_place_id: str

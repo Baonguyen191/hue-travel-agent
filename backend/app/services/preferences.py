@@ -6,8 +6,52 @@ matches only as a whole word, so `cho` does not match `choi`.
 
 from __future__ import annotations
 
+import re
+
 from app.schemas.place import Place, PlaceCategory
+from app.schemas.request import Theme, TripRequest
 from app.services.poi_search import normalize_vietnamese
+
+NATURE_THEME: Theme = "nature"
+
+# Normalized phrases that mean "nature and scenery"; whole-word match, see `map_themes`.
+NATURE_PHRASES: tuple[str, ...] = (
+    "thien nhien",
+    "ngam canh",
+    "phong canh",
+    "canh dep",
+    "hoang hon",
+    "song nuoc",
+    "song huong",
+    "doi thong",
+    "bien",
+    "check in",
+)
+
+# Normalized name terms that make a cafe a view cafe (riverside, garden, lake, rooftop).
+VIEW_CAFE_TERMS: tuple[str, ...] = (
+    "garden",
+    "riverside",
+    "song",
+    "ho",
+    "view",
+    "vuon",
+    "doi",
+    "rooftop",
+)
+
+# Source type ("Loại hình (theo nguồn)" after the last "/"), normalized.
+_NATURE_SOURCE_TYPE = "thien nhien"
+_FOOD_MARKET_SOURCE_TYPES = frozenset({"cho", "cua hang dac san va qua tang"})
+# Normalized name terms that mark a shopping centre or supermarket, never a food market.
+_MARKET_CHAIN_TERMS: tuple[str, ...] = (
+    "sieu thi",
+    "vincom",
+    "go",
+    "mart",
+    "plaza",
+    "trung tam thuong mai",
+)
 
 # Normalized preference phrase -> categories it implies.
 PREFERENCE_CATEGORIES: dict[str, tuple[PlaceCategory, ...]] = {
@@ -23,7 +67,7 @@ PREFERENCE_CATEGORIES: dict[str, tuple[PlaceCategory, ...]] = {
     "tam linh": ("religious",),
     "den thap": ("religious",),
     "dac san": ("restaurant",),
-    "am thuc": ("restaurant",),
+    "am thuc": ("restaurant", "cafe", "market"),
     "an uong": ("restaurant",),
     "mon hue": ("restaurant",),
     "quan an": ("restaurant",),
@@ -33,12 +77,14 @@ PREFERENCE_CATEGORIES: dict[str, tuple[PlaceCategory, ...]] = {
     "coffee": ("cafe",),
     "cho": ("market",),
     "mua sam": ("market",),
-    "thien nhien": ("park", "attraction"),
+    "thien nhien": ("attraction",),
     "cong vien": ("park", "attraction"),
-    "song nuoc": ("park", "attraction"),
-    "check in": ("park", "attraction"),
-    "song huong": ("park", "attraction"),
-    "phong canh": ("park", "attraction"),
+    "song nuoc": ("attraction",),
+    "check in": ("attraction",),
+    "song huong": ("attraction",),
+    "phong canh": ("attraction",),
+    "ngam canh": ("attraction",),
+    "hoang hon": ("attraction",),
     "bao tang": ("museum",),
 }
 
@@ -142,3 +188,62 @@ def is_hue_specialty(place: Place) -> bool:
         return False
     text = f"{normalize_vietnamese(place.name)} {normalize_vietnamese(place.summary or '')}"
     return any(_contains_phrase(text, term) for term in HUE_SPECIALTY_TERMS)
+
+
+def _plain(text: str) -> str:
+    """Normalized text with punctuation as spaces, so `GO!` reads as the word `go`."""
+    return " ".join(re.sub(r"[^0-9a-z]+", " ", normalize_vietnamese(text)).split())
+
+
+def source_type(place: Place) -> str | None:
+    """The source's type: the part of `Loại hình (theo nguồn)` after the last "/"; None if missing."""
+    value = place.raw_attributes.get("Loại hình (theo nguồn)")
+    if not value:
+        return None
+    return str(value).rsplit("/", 1)[-1].strip() or None
+
+
+def map_themes(preferences: list[str]) -> list[str]:
+    """["nature"] when any preference names nature or scenery, else []."""
+    for preference in preferences:
+        text = _plain(preference)
+        if any(_contains_phrase(text, phrase) for phrase in NATURE_PHRASES):
+            return [NATURE_THEME]
+    return []
+
+
+def request_themes(request: TripRequest) -> list[str]:
+    """Themes stated on the request plus those implied by its free-text preferences."""
+    themes = list(request.themes)
+    for theme in map_themes(request.preferences):
+        if theme not in themes:
+            themes.append(theme)
+    return themes
+
+
+def is_food_market(place: Place) -> bool:
+    """A market where people eat or buy food: a "Chợ" or specialty shop, not a mall or supermarket."""
+    if place.category != "market":
+        return False
+    kind = source_type(place)
+    name = _plain(place.name)
+    food_type = kind is not None and _plain(kind) in _FOOD_MARKET_SOURCE_TYPES
+    # Some markets carry another source type (Chợ Đông Ba is "Di tích"); the name still says "Chợ".
+    named_market = _contains_phrase(name, "cho")
+    if not (food_type or named_market):
+        return False
+    return not any(_contains_phrase(name, term) for term in _MARKET_CHAIN_TERMS)
+
+
+def is_nature(place: Place) -> bool:
+    """A place whose source type is "Thiên nhiên" (nature and scenery)."""
+    kind = source_type(place)
+    return kind is not None and _plain(kind) == _NATURE_SOURCE_TYPE
+
+
+def is_view_cafe(place: Place) -> bool:
+    """A cafe whose name names a view: a garden, river, lake, hill or rooftop."""
+    if place.category != "cafe":
+        return False
+    name = _plain(place.name)
+    return any(_contains_phrase(name, term) for term in VIEW_CAFE_TERMS)

@@ -229,3 +229,50 @@ def test_resume_without_a_waiting_plan_is_refused() -> None:
 
     with pytest.raises(ValueError):
         asyncio.run(scenario())
+
+
+def test_estimate_prices_the_cheapest_option_and_saves_nothing() -> None:
+    store = PlanStore("sqlite://")
+    request = TripRequest(
+        origin="Hà Nội",
+        destination="Huế",
+        start_date=date(2026, 12, 5),
+        end_date=date(2026, 12, 7),
+        people=2,
+        budget_vnd=3_000_000,
+        categories=["restaurant", "cafe", "market"],
+        transport_mode="bus",
+        hotel_tier="homestay",
+    )
+
+    async def scenario() -> tuple[Any, Any]:
+        orchestrator = _orchestrator(InMemorySaver(), store)
+        estimate = await orchestrator.estimate(request)
+        return estimate, await orchestrator.state("thread-estimate")
+
+    estimate, state = asyncio.run(scenario())
+
+    assert estimate is not None
+    assert isinstance(estimate.min_vnd, int) and isinstance(estimate.max_vnd, int)
+    assert estimate.min_vnd <= estimate.max_vnd
+    assert (estimate.min_vnd, estimate.max_vnd) == (5_150_000, 6_160_000)
+    assert (estimate.transport_mode, estimate.hotel_tier) == ("BUS", "HOMESTAY")
+    assert state is None
+    assert store.latest("thread-estimate") is None
+
+
+def test_estimate_is_none_without_any_transport_or_hotel_offer() -> None:
+    request = TripRequest(
+        origin="Huế",
+        destination="Huế",
+        start_date=date(2026, 12, 5),
+        end_date=date(2026, 12, 5),
+        people=2,
+        budget_vnd=3_000_000,
+        categories=["restaurant"],
+    )
+
+    async def scenario() -> Any:
+        return await _orchestrator(InMemorySaver(), PlanStore("sqlite://")).estimate(request)
+
+    assert asyncio.run(scenario()) is None

@@ -52,6 +52,7 @@ def place_card(place: Place) -> PlaceCard:
         price_max_vnd=place.price_max_vnd,
         phone=phone_of(place),
         source_url=place.source_url,
+        photo_illustrative=place.photo is not None and place.photo.kind == "commons_illustrative",
     )
 
 
@@ -75,5 +76,6 @@ def nearby_places(place: Place, places: list[Place]) -> list[tuple[Place, float]
 
 def _item(event: ItineraryEvent) -> PlanItem:
     return PlanItem(
-        time=event.start_at.strftime("%H:%M"), name=event.name, kind=event.kind, meal=event.meal, poi_id=event.poi_id
+        time=event.start_at.strftime("%H:%M"), name=event.name, kind=event.kind, meal=event.meal,
+        poi_id=event.poi_id, slot=event.slot, reason=event.reason, intro=event.intro,
     )

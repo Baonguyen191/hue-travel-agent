@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import sys
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from functools import lru_cache
 from pathlib import Path
 
@@ -21,10 +21,12 @@ from app.agents.search import SearchAgent  # noqa: E402
 from app.providers.hotel_mock import MockHotelProvider  # noqa: E402
 from app.providers.transport_mock import MockTransportProvider  # noqa: E402
 from app.repositories.hue_places import HuePlacesRepository  # noqa: E402
+from app.schemas.place import Place  # noqa: E402
 from app.schemas.request import TripRequest  # noqa: E402
 from app.services.itinerary_optimizer import (  # noqa: E402
     ItineraryAgent,
     ItineraryConfig,
+    _reason,
     parse_simple_opening_window,
 )
 from app.services.poi_search import haversine_km  # noqa: E402
@@ -33,8 +35,10 @@ from app.schemas.itinerary import (  # noqa: E402
     ItineraryEvent,
     ItineraryResult,
     ItineraryValidation,
+    TravelLeg,
 )
 from app.services.itinerary_validator import validate_itinerary  # noqa: E402
+from app.services.preferences import source_type  # noqa: E402
 
 
 def _request() -> TripRequest:
@@ -370,3 +374,301 @@ def test_no_landmark_is_reported_unfit_while_a_non_landmark_is_scheduled_that_da
             continue
         for warning in day.warnings:
             assert not any(name in warning for name in landmark_names), (day.date, warning)
+
+
+def _nature_request() -> TripRequest:
+    return TripRequest(
+        origin="Hà Nội",
+        destination="Huế",
+        start_date=date(2026, 11, 24),
+        end_date=date(2026, 11, 26),
+        people=2,
+        budget_vnd=6_000_000,
+        categories=["restaurant", "cafe", "market", "attraction"],
+        themes=["nature"],
+        preferences=["ẩm thực", "thiên nhiên", "ngắm cảnh"],
+    )
+
+
+def test_nature_trip_plan_has_no_park_bridge_or_mall_visit() -> None:
+    request = _nature_request()
+    search = asyncio.run(
+        SearchAgent(_repo(), MockTransportProvider(), MockHotelProvider()).search(request)
+    )
+    result = ItineraryAgent(places=_repo()).plan(request, search)
+    visits = [event for day in result.days for event in day.events if event.kind == "VISIT"]
+
+    assert visits
+    assert all(event.category != "park" for event in visits)
+    assert not [event.name for event in visits if "Vincom" in event.name or "Siêu thị" in event.name]
+
+
+def test_nature_trip_has_at_most_one_real_market_visit_per_day() -> None:
+    request = _nature_request()
+    search = asyncio.run(
+        SearchAgent(_repo(), MockTransportProvider(), MockHotelProvider()).search(request)
+    )
+    result = ItineraryAgent(places=_repo()).plan(request, search)
+    repo = _repo()
+    day_count = (request.end_date - request.start_date).days + 1
+    market_days = [
+        (day.date, event)
+        for day in result.days
+        for event in day.events
+        if event.kind == "VISIT" and event.category == "market"
+    ]
+    specialty_visits = [
+        event.name
+        for _, event in market_days
+        if source_type(repo.get_by_id(event.poi_id)) == "Cửa hàng đặc sản và quà tặng"
+    ]
+
+    assert len(market_days) <= day_count
+    dates = [visit_date for visit_date, _ in market_days]
+    assert len(dates) == len(set(dates))
+    assert specialty_visits == []
+
+
+_NATURE_ATTRACTION_TYPES = {"Thiên nhiên", "Văn hoá", "Nông thôn", "Làng nghề truyền thống"}
+
+
+def test_nature_trip_fills_each_day_and_takes_a_cafe_break_on_the_first_two_days() -> None:
+    request = _nature_request()
+    search = asyncio.run(
+        SearchAgent(_repo(), MockTransportProvider(), MockHotelProvider()).search(request)
+    )
+    repo = _repo()
+    result = ItineraryAgent(places=repo).plan(request, search)
+
+    for day in result.days:
+        visits = [event for event in day.events if event.kind == "VISIT"]
+        assert len(visits) >= 3, day.date
+        assert sum(1 for event in visits if event.category == "market") <= 1, day.date
+        for event in visits:
+            if event.category == "attraction":
+                assert source_type(repo.get_by_id(event.poi_id)) in _NATURE_ATTRACTION_TYPES, event.name
+    for day in result.days[:2]:
+        assert any(event.kind == "MEAL" and event.meal == "CAFE" for event in day.events), day.date
+
+
+_NATURE_THEME_ATTRIBUTES = {"Loại hình (theo nguồn)": "Điểm du lịch, tài nguyên / Thiên nhiên"}
+
+
+def _nature_plan(
+    pace: str = "moderate", origin: str = "Hà Nội", transport_mode: str | None = None
+) -> ItineraryResult:
+    request = _nature_request().model_copy(
+        update={"pace": pace, "origin": origin, "transport_mode": transport_mode}
+    )
+    search = asyncio.run(
+        SearchAgent(_repo(), MockTransportProvider(), MockHotelProvider()).search(request)
+    )
+    return ItineraryAgent(places=_repo()).plan(request, search)
+
+
+def _full_days(result: ItineraryResult) -> list[ItineraryDay]:
+    """Every day but the return day when the trip has a return leg."""
+    return result.days[:-1] if result.travel_legs else result.days
+
+
+@pytest.mark.parametrize("pace,expected", [("relaxed", [3, 3]), ("moderate", [4, 4]), ("packed", [4, 5])])
+def test_pace_gives_exact_sightseeing_stops_on_the_first_two_days(pace: str, expected: list[int]) -> None:
+    # Sunset included. Day 1 starts at 08:34 after the bus, which leaves room for 4 stops only.
+    result = _nature_plan(pace)
+    counts = [sum(1 for event in day.events if event.kind == "VISIT") for day in result.days]
+
+    assert counts[:2] == expected
+    assert all(count <= {"relaxed": 3, "moderate": 4, "packed": 5}[pace] for count in counts)
+
+
+def test_cafe_ends_within_twenty_minutes_before_the_sunset_stop() -> None:
+    for day in _nature_plan("packed").days[:2]:
+        cafe = next(event for event in day.events if event.slot == "cafe")
+        sunset = next(event for event in day.events if event.slot == "sunset")
+        assert timedelta(0) <= sunset.start_at - cafe.end_at <= timedelta(minutes=20), day.date
+
+
+def test_stroll_and_long_visits_are_capped_at_their_length() -> None:
+    from app.services.itinerary_optimizer import visit_duration_minutes
+
+    lake = _repo().get_by_id("huetripo:528750").model_copy(update={
+        "name": "Hồ Thái Dịch", "category": "attraction", "visit_minutes": 120,
+        "raw_attributes": _NATURE_THEME_ATTRIBUTES,
+    })
+    hill = lake.model_copy(update={"name": "Đồi Thiên An", "visit_minutes": 150})
+    assert visit_duration_minutes(lake, ItineraryConfig())[0] == 60
+    assert visit_duration_minutes(hill, ItineraryConfig())[0] == 90
+
+
+def test_full_days_have_rest_after_lunch_a_cafe_a_sunset_and_dinner_after_it() -> None:
+    result = _nature_plan()
+    for day in _full_days(result):
+        lunch = next(event for event in day.events if event.slot == "lunch")
+        rest = next(event for event in day.events if event.kind == "REST")
+        sunset = next(event for event in day.events if event.slot == "sunset")
+        dinner = next(event for event in day.events if event.slot == "dinner")
+
+        assert rest.start_at == lunch.end_at
+        assert rest.end_at - rest.start_at == timedelta(minutes=60)
+        assert any(event.kind == "MEAL" and event.meal == "CAFE" for event in day.events), day.date
+        assert sunset.kind == "VISIT" and sunset.poi_id is not None
+        assert sunset.start_at.time() == time(16, 40)  # 17:10 sunset in November, minus 30 min
+        assert sunset.end_at - sunset.start_at == timedelta(minutes=45)
+        assert dinner.start_at >= sunset.end_at, day.date
+
+
+def test_sunset_estimate_is_stored_for_the_first_trip_month() -> None:
+    assert _nature_plan().sunset_estimate == "17:10"
+
+
+def test_every_non_buffer_event_has_a_slot_and_the_slot_matches_its_kind() -> None:
+    expected_meal_slot = {"LUNCH": "lunch", "DINNER": "dinner", "CAFE": "cafe"}
+    for day in _nature_plan().days:
+        for event in day.events:
+            if event.kind == "BUFFER":
+                assert event.slot is None
+                continue
+            assert event.slot is not None, (day.date, event.name)
+            if event.kind == "MEAL":
+                assert event.slot == expected_meal_slot[event.meal]
+            elif event.kind == "MEAL_BREAK":
+                assert event.slot == "lunch"
+            elif event.kind == "REST":
+                assert event.slot == "rest"
+            elif event.slot != "sunset":
+                assert event.slot in ("morning", "afternoon"), event.name
+
+
+@pytest.mark.parametrize("mode,outbound,inbound,back_out,back_in", [
+    ("bus", "2026-11-23 19:00", "2026-11-24 07:30", "2026-11-26 19:00", "2026-11-27 07:30"),
+    ("train", "2026-11-23 19:30", "2026-11-24 09:00", "2026-11-26 19:30", "2026-11-27 09:00"),
+    ("flight", "2026-11-24 06:00", "2026-11-24 07:20", "2026-11-26 18:30", "2026-11-26 19:50"),
+])
+def test_travel_legs_for_hanoi_use_fixed_times_per_mode(
+    mode: str, outbound: str, inbound: str, back_out: str, back_in: str
+) -> None:
+    legs = _nature_plan(transport_mode=mode).travel_legs
+
+    assert [leg.direction for leg in legs] == ["OUTBOUND", "RETURN"]
+    assert all(leg.mode == mode.upper() and leg.estimated and leg.mock for leg in legs)
+    assert legs[0].origin == "Hà Nội" and legs[0].destination == "Huế"
+    assert legs[1].origin == "Huế" and legs[1].destination == "Hà Nội"
+    assert legs[0].depart_at == datetime.fromisoformat(outbound)
+    assert legs[0].arrive_at == datetime.fromisoformat(inbound)
+    assert legs[1].depart_at == datetime.fromisoformat(back_out)
+    assert legs[1].arrive_at == datetime.fromisoformat(back_in)
+
+
+def test_day_one_starts_after_the_bus_arrival_plus_an_hour() -> None:
+    first = next(event for event in _nature_plan(transport_mode="bus").days[0].events if event.kind != "BUFFER")
+
+    assert first.start_at.time() >= time(8, 30)
+
+
+def test_no_travel_legs_when_the_trip_starts_in_hue() -> None:
+    result = _nature_plan(origin="Huế")
+
+    assert result.travel_legs == []
+    assert result.days[0].events
+
+
+def test_last_day_has_no_event_after_the_return_departure_minus_an_hour() -> None:
+    last = _nature_plan(transport_mode="bus").days[-1]
+    deadline = datetime.combine(last.date, time(18, 0))  # bus departs 19:00
+
+    assert all(event.end_at <= deadline for event in last.events if event.kind != "BUFFER")
+
+
+def test_return_day_dinner_is_late_afternoon_not_right_after_the_last_stop() -> None:
+    last = _nature_plan(transport_mode="bus").days[-1]
+    dinners = [event for event in last.events if event.slot == "dinner"]
+
+    # Bus at 19:00: dinner ends by 18:00 and starts no earlier than 18:00 - 75 min.
+    assert dinners, "the return day keeps an early dinner"
+    assert dinners[0].start_at.time() >= time(16, 45)
+    assert dinners[0].end_at.time() <= time(18, 0)
+
+
+def _synthetic(poi_id: str, **updates) -> Place:
+    base = _repo().get_by_id("huetripo:528750")
+    return base.model_copy(update={"id": poi_id, "summary": None, **updates})
+
+
+def _reason_of(
+    place: Place, *, kind: str = "VISIT", meal: str | None = None, slot: str | None = None,
+    must: tuple[str, ...] = (), categories: tuple[str, ...] = (), themes: tuple[str, ...] = (),
+) -> str | None:
+    request = TripRequest(
+        origin="Hà Nội", destination="Huế", start_date=date(2026, 11, 24), end_date=date(2026, 11, 26),
+        people=2, categories=list(categories), themes=list(themes), must_include_poi_ids=list(must),
+    )
+    event = ItineraryEvent(
+        kind=kind, meal=meal, slot=slot, poi_id=place.id, name=place.name, category=place.category,
+        start_at=_at(11), end_at=_at(12),
+    )
+    return _reason(event, place, request, "nature" in themes)
+
+
+def test_reason_must_include_wins_over_every_other_fact() -> None:
+    place = _synthetic("test:must", name="Cafe Riverside", category="cafe", rating_value=4.9, rating_count=900)
+
+    assert _reason_of(place, kind="MEAL", meal="CAFE", must=("test:must",)) == "bạn muốn đến"
+
+
+def test_reason_sunset_slot_and_view_cafe_and_specialty() -> None:
+    sunset_place = _synthetic("test:sunset", name="Sông Đông Ba", category="attraction", raw_attributes={})
+    view_cafe = _synthetic("test:cafe", name="Riverside Garden Cafe", category="cafe")
+    specialty = _synthetic("test:bun", name="Bún bò Huế Ngon", category="restaurant")
+
+    assert _reason_of(sunset_place, slot="sunset") == "điểm ngắm hoàng hôn"
+    assert _reason_of(view_cafe, kind="MEAL", meal="CAFE", slot="cafe") == "cà phê có view"
+    assert _reason_of(specialty, kind="MEAL", meal="LUNCH", slot="lunch") == "đặc sản Huế"
+
+
+def test_reason_nature_needs_the_nature_theme_then_category_then_rating() -> None:
+    nature = _synthetic(
+        "test:doi", name="Đồi Thiên An", category="attraction", raw_attributes=_NATURE_THEME_ATTRIBUTES
+    )
+
+    assert _reason_of(nature, themes=("nature",)) == "hợp sở thích thiên nhiên"
+    assert _reason_of(nature, categories=("attraction",)) == "hợp sở thích tham quan"
+    assert _reason_of(nature) is None
+
+
+def test_reason_category_and_rating_formats() -> None:
+    market = _synthetic("test:cho", name="Chợ Test", category="market", raw_attributes={})
+    rated = _synthetic("test:rated", name="Điểm đẹp", category="historic", rating_value=4.5, rating_count=197)
+    weak = _synthetic("test:weak", name="Điểm thường", category="historic", rating_value=4.2, rating_count=300)
+    few = _synthetic("test:few", name="Điểm mới", category="historic", rating_value=4.8, rating_count=12)
+
+    assert _reason_of(market, categories=("market",)) == "hợp sở thích chợ"
+    assert _reason_of(rated) == "4,5/5, 197 lượt"
+    assert _reason_of(weak) is None
+    assert _reason_of(few) is None
+
+
+def test_travel_leg_and_slot_fields_round_trip_through_json() -> None:
+    leg = TravelLeg(
+        direction="OUTBOUND", mode="BUS", origin="Hà Nội", destination="Huế",
+        depart_at=datetime(2026, 11, 23, 19, 0), arrive_at=datetime(2026, 11, 24, 7, 30),
+    )
+    rest = ItineraryEvent(kind="REST", start_at=_at(12), end_at=_at(13), name="Nghỉ trưa", slot="rest")
+    sunset = _visit("huetripo:A", "attraction", 16).model_copy(
+        update={"slot": "sunset", "reason": "điểm ngắm hoàng hôn"}
+    )
+    result = ItineraryResult(
+        days=[_day([rest, sunset])],
+        unplanned_poi_ids=[],
+        warnings=[],
+        validation=ItineraryValidation(valid=True, warnings=[]),
+        travel_legs=[leg],
+        sunset_estimate="17:10",
+    )
+
+    payload = result.model_dump(mode="json")
+    restored = ItineraryResult.model_validate(payload)
+
+    assert restored == result
+    assert payload["travel_legs"][0]["mock"] is True
+    assert payload["days"][0]["events"][0]["kind"] == "REST"
+    assert ItineraryResult.model_validate({**payload, "travel_legs": []}).travel_legs == []

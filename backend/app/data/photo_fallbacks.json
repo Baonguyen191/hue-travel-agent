@@ -1,0 +1,927 @@
+{
+  "places": {
+    "huetripo:544139": {
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/%C4%90i%E1%BB%87n_Voi_R%C3%A9.jpg/1280px-%C4%90i%E1%BB%87n_Voi_R%C3%A9.jpg",
+      "page_url": "https://commons.wikimedia.org/wiki/File:%C4%90i%E1%BB%87n_Voi_R%C3%A9.jpg",
+      "author": "Christophe95",
+      "license": "CC BY-SA 4.0"
+    },
+    "huetripo:019472": {
+      "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Tr%E1%BA%A5n_B%C3%ACnh_%C4%91%C3%A0i.JPG/1280px-Tr%E1%BA%A5n_B%C3%ACnh_%C4%91%C3%A0i.JPG",
+      "page_url": "https://commons.wikimedia.org/wiki/File:Tr%E1%BA%A5n_B%C3%ACnh_%C4%91%C3%A0i.JPG",
+      "author": "Lưu Ly at Vietnamese Wikipedia",
+      "license": "Public domain"
+    }
+  },
+  "categories": {
+    "restaurant": [
+      {
+        "keywords": [
+          "bánh canh"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/B%C3%A1nh_canh_cua.jpg/1280px-B%C3%A1nh_canh_cua.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_canh_cua.jpg",
+            "author": "SauceSupreme",
+            "license": "CC BY 2.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/B%C3%A1nh_canh_t%E1%BA%A1i_Ng%C3%A3_B%E1%BA%A3y.JPG/1280px-B%C3%A1nh_canh_t%E1%BA%A1i_Ng%C3%A3_B%E1%BA%A3y.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_canh_t%E1%BA%A1i_Ng%C3%A3_B%E1%BA%A3y.JPG",
+            "author": "Tonbi ko",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/B%C3%A1nh_canh_c%C3%A1_l%C3%B3c_S%C3%A0i_G%C3%B2n_2012-07-02_11.53.24.jpg/1280px-B%C3%A1nh_canh_c%C3%A1_l%C3%B3c_S%C3%A0i_G%C3%B2n_2012-07-02_11.53.24.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_canh_c%C3%A1_l%C3%B3c_S%C3%A0i_G%C3%B2n_2012-07-02_11.53.24.jpg",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e6/B%C3%A1nh_canh_gi%C3%B2_heo.jpg/1280px-B%C3%A1nh_canh_gi%C3%B2_heo.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_canh_gi%C3%B2_heo.jpg",
+            "author": "SauceSupreme",
+            "license": "CC BY 2.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "hến"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/H%E1%BA%BFn_tr%E1%BB%99n.jpg/1280px-H%E1%BA%BFn_tr%E1%BB%99n.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:H%E1%BA%BFn_tr%E1%BB%99n.jpg",
+            "author": "Lucas Jans from USA",
+            "license": "CC BY-SA 2.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%28gian_h%C3%A0ng_c%C6%A1m_h%E1%BA%BFn_Th%C3%B4n_V%C4%A9%29.jpg/1280px-L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%28gian_h%C3%A0ng_c%C6%A1m_h%E1%BA%BFn_Th%C3%B4n_V%C4%A9%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_(gian_h%C3%A0ng_c%C6%A1m_h%E1%BA%BFn_Th%C3%B4n_V%C4%A9).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_c%C6%A1m_h%E1%BA%BFn_V%C4%A9_D%E1%BA%A1_%283%29.jpg/1280px-L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_c%C6%A1m_h%E1%BA%BFn_V%C4%A9_D%E1%BA%A1_%283%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_c%C6%A1m_h%E1%BA%BFn_V%C4%A9_D%E1%BA%A1_(3).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "bún đậu",
+          "mắm tôm"
+        ],
+        "photos": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/5/5a/B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m.jpg",
+            "author": "trungnguyen299",
+            "license": "CC BY-SA 2.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/11/B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m_%282019%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m_(2019).jpg",
+            "author": "Baoothersks",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m_%281%29.jpg/1280px-B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m_(1).jpg",
+            "author": "phuongkim1981",
+            "license": "CC BY 2.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m%2C_b%C3%BAn_nem_r%C3%A1n.JPG/1280px-B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m%2C_b%C3%BAn_nem_r%C3%A1n.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_%C4%91%E1%BA%ADu_m%E1%BA%AFm_t%C3%B4m,_b%C3%BAn_nem_r%C3%A1n.JPG",
+            "author": "Viethavvh",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "thịt nướng"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/47/Bun_thit_nuong.jpg/1280px-Bun_thit_nuong.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Bun_thit_nuong.jpg",
+            "author": "Lưu Ly",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/3/36/Vietnamese_bowl_of_grilled_pork%2C_bun_thit_nuong.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Vietnamese_bowl_of_grilled_pork,_bun_thit_nuong.jpg",
+            "author": "HungryHuy",
+            "license": "CC BY 2.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/B%C3%BAn_th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng_c%E1%BA%A3ng_C%C3%A1t_L%C3%A1i%2C_ng10th5n2022_%28th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng_than_kh%C3%B3i%29_%281%29.jpg/1280px-B%C3%BAn_th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng_c%E1%BA%A3ng_C%C3%A1t_L%C3%A1i%2C_ng10th5n2022_%28th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng_than_kh%C3%B3i%29_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng_c%E1%BA%A3ng_C%C3%A1t_L%C3%A1i,_ng10th5n2022_(th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng_than_kh%C3%B3i)_(1).jpg",
+            "author": "Phương Huy",
+            "license": "CC0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "lẩu"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/L%E1%BA%A9u_b%C3%B2_t%E1%BA%A1i_qu%C3%A1n_B%C3%B2_c%C6%B0%E1%BB%9Di_%283%29.jpg/1280px-L%E1%BA%A9u_b%C3%B2_t%E1%BA%A1i_qu%C3%A1n_B%C3%B2_c%C6%B0%E1%BB%9Di_%283%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%E1%BA%A9u_b%C3%B2_t%E1%BA%A1i_qu%C3%A1n_B%C3%B2_c%C6%B0%E1%BB%9Di_(3).jpg",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7d/M%C3%B3n_l%E1%BA%A9u_%C4%83n_v%E1%BB%9Bi_th%E1%BB%8Bt_b%C3%B2_%E1%BB%9F_H%C3%A0_N%E1%BB%99i_th%C3%A1ng_7_n%C4%83m_2018_%283%29.jpg/1280px-M%C3%B3n_l%E1%BA%A9u_%C4%83n_v%E1%BB%9Bi_th%E1%BB%8Bt_b%C3%B2_%E1%BB%9F_H%C3%A0_N%E1%BB%99i_th%C3%A1ng_7_n%C4%83m_2018_%283%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:M%C3%B3n_l%E1%BA%A9u_%C4%83n_v%E1%BB%9Bi_th%E1%BB%8Bt_b%C3%B2_%E1%BB%9F_H%C3%A0_N%E1%BB%99i_th%C3%A1ng_7_n%C4%83m_2018_(3).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/M%C3%B3n_l%E1%BA%A9u_%C4%83n_v%E1%BB%9Bi_th%E1%BB%8Bt_b%C3%B2_%E1%BB%9F_H%C3%A0_N%E1%BB%99i_th%C3%A1ng_7_n%C4%83m_2018_%285%29.jpg/1280px-M%C3%B3n_l%E1%BA%A9u_%C4%83n_v%E1%BB%9Bi_th%E1%BB%8Bt_b%C3%B2_%E1%BB%9F_H%C3%A0_N%E1%BB%99i_th%C3%A1ng_7_n%C4%83m_2018_%285%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:M%C3%B3n_l%E1%BA%A9u_%C4%83n_v%E1%BB%9Bi_th%E1%BB%8Bt_b%C3%B2_%E1%BB%9F_H%C3%A0_N%E1%BB%99i_th%C3%A1ng_7_n%C4%83m_2018_(5).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "lòng"
+        ],
+        "photos": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Ch%C3%A1o_l%C3%B2ng.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1o_l%C3%B2ng.jpg",
+            "author": "hongnhung106",
+            "license": "CC BY 2.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/Ch%C3%A1o_l%C3%B2ng_B%C3%ACnh_Long_ng%C3%A0y_02_th%C3%A1ng_11_n%C4%83m_2018_%281%29.jpg/1280px-Ch%C3%A1o_l%C3%B2ng_B%C3%ACnh_Long_ng%C3%A0y_02_th%C3%A1ng_11_n%C4%83m_2018_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1o_l%C3%B2ng_B%C3%ACnh_Long_ng%C3%A0y_02_th%C3%A1ng_11_n%C4%83m_2018_(1).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/48/Chao_long.jpg/1280px-Chao_long.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Chao_long.jpg",
+            "author": "LittleT889",
+            "license": "CC BY 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "cháo"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Ch%C3%A1o_g%C3%A0_nh%C3%A0_l%C3%A0m%2C_th%C3%A1ng_5_n%C4%83m_2020_%281%29.jpg/1280px-Ch%C3%A1o_g%C3%A0_nh%C3%A0_l%C3%A0m%2C_th%C3%A1ng_5_n%C4%83m_2020_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1o_g%C3%A0_nh%C3%A0_l%C3%A0m,_th%C3%A1ng_5_n%C4%83m_2020_(1).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3d/Ch%C3%A1o_g%C3%A0_nh%C3%A0_l%C3%A0m%2C_th%C3%A1ng_5_n%C4%83m_2020_%282%29.jpg/1280px-Ch%C3%A1o_g%C3%A0_nh%C3%A0_l%C3%A0m%2C_th%C3%A1ng_5_n%C4%83m_2020_%282%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1o_g%C3%A0_nh%C3%A0_l%C3%A0m,_th%C3%A1ng_5_n%C4%83m_2020_(2).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a3/Ch%C3%A1o_g%C3%A0_x%C3%A9_phay_%E1%BB%9F_P3_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2018.jpg/1280px-Ch%C3%A1o_g%C3%A0_x%C3%A9_phay_%E1%BB%9F_P3_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2018.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1o_g%C3%A0_x%C3%A9_phay_%E1%BB%9F_P3_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2018.jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "cơm tấm"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0c/C%C6%A1m_t%E1%BA%A5m_S%C3%A0i_G%C3%B2n_%28s%C6%B0%E1%BB%9Dn_tr%E1%BB%A9ng%29%2C_ng15th8n2022.jpg/1280px-C%C6%A1m_t%E1%BA%A5m_S%C3%A0i_G%C3%B2n_%28s%C6%B0%E1%BB%9Dn_tr%E1%BB%A9ng%29%2C_ng15th8n2022.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_t%E1%BA%A5m_S%C3%A0i_G%C3%B2n_(s%C6%B0%E1%BB%9Dn_tr%E1%BB%A9ng),_ng15th8n2022.jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Com-Tam-2008.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Com-Tam-2008.jpg",
+            "author": "Kham Tran",
+            "license": "CC BY-SA 3.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/C%C6%A1m_t%E1%BA%A5m_b%C3%AC_ch%E1%BA%A3.jpg/1280px-C%C6%A1m_t%E1%BA%A5m_b%C3%AC_ch%E1%BA%A3.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_t%E1%BA%A5m_b%C3%AC_ch%E1%BA%A3.jpg",
+            "author": "Vietcuongdao",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "ếch"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Ch%C3%A1o_%E1%BA%BFch_Sing-ga-po_T%C3%A2n_Ph%C3%BA_th%C3%A1ng_1_n%C4%83m_2018_%281%29.jpg/1280px-Ch%C3%A1o_%E1%BA%BFch_Sing-ga-po_T%C3%A2n_Ph%C3%BA_th%C3%A1ng_1_n%C4%83m_2018_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1o_%E1%BA%BFch_Sing-ga-po_T%C3%A2n_Ph%C3%BA_th%C3%A1ng_1_n%C4%83m_2018_(1).jpg",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a5/Ch%C3%A1o_%E1%BA%BFch_Sing-ga-po_T%C3%A2n_Ph%C3%BA_th%C3%A1ng_1_n%C4%83m_2018_%284%29.jpg/1280px-Ch%C3%A1o_%E1%BA%BFch_Sing-ga-po_T%C3%A2n_Ph%C3%BA_th%C3%A1ng_1_n%C4%83m_2018_%284%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ch%C3%A1o_%E1%BA%BFch_Sing-ga-po_T%C3%A2n_Ph%C3%BA_th%C3%A1ng_1_n%C4%83m_2018_(4).jpg",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "gà"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/C%C6%A1m_g%C3%A0_chi%C3%AAn_%E1%BB%9F_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2017_%281%29.jpg/1280px-C%C6%A1m_g%C3%A0_chi%C3%AAn_%E1%BB%9F_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2017_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_g%C3%A0_chi%C3%AAn_%E1%BB%9F_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2017_(1).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ca/G%C3%A0_n%C6%B0%E1%BB%9Bng_ng%C5%A9_v%E1%BB%8B_%E1%BB%9F_nh%C3%A0_l%C3%A0m%2C_th%C3%A1ng_5_n%C4%83m_2021_%281%29.jpg/1280px-G%C3%A0_n%C6%B0%E1%BB%9Bng_ng%C5%A9_v%E1%BB%8B_%E1%BB%9F_nh%C3%A0_l%C3%A0m%2C_th%C3%A1ng_5_n%C4%83m_2021_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:G%C3%A0_n%C6%B0%E1%BB%9Bng_ng%C5%A9_v%E1%BB%8B_%E1%BB%9F_nh%C3%A0_l%C3%A0m,_th%C3%A1ng_5_n%C4%83m_2021_(1).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9e/C%C6%A1m_g%C3%A0_ki%E1%BB%83u_Vi%E1%BB%87t_Nam_%28c%C6%A1m_chi%C3%AAn_g%C3%A0_r%C3%A1n%29_eHy_th%C3%A1ng_6_n%C4%83m_2018.jpg/1280px-C%C6%A1m_g%C3%A0_ki%E1%BB%83u_Vi%E1%BB%87t_Nam_%28c%C6%A1m_chi%C3%AAn_g%C3%A0_r%C3%A1n%29_eHy_th%C3%A1ng_6_n%C4%83m_2018.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_g%C3%A0_ki%E1%BB%83u_Vi%E1%BB%87t_Nam_(c%C6%A1m_chi%C3%AAn_g%C3%A0_r%C3%A1n)_eHy_th%C3%A1ng_6_n%C4%83m_2018.jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "quay"
+        ],
+        "photos": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Ph%E1%BB%9F_v%E1%BB%8Bt_quay.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ph%E1%BB%9F_v%E1%BB%8Bt_quay.jpg",
+            "author": "Hoangvanjidan",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "hải sản",
+          "hàu"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_h%C3%A0u_n%C6%B0%E1%BB%9Bng_v%C3%A0_t%C3%B4m_n%C6%B0%E1%BB%9Bng_%281%29.jpg/1280px-L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_h%C3%A0u_n%C6%B0%E1%BB%9Bng_v%C3%A0_t%C3%B4m_n%C6%B0%E1%BB%9Bng_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_h%C3%A0u_n%C6%B0%E1%BB%9Bng_v%C3%A0_t%C3%B4m_n%C6%B0%E1%BB%9Bng_(1).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b6/L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_h%C3%A0u_n%C6%B0%E1%BB%9Bng_v%C3%A0_t%C3%B4m_n%C6%B0%E1%BB%9Bng_%282%29.jpg/1280px-L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_h%C3%A0u_n%C6%B0%E1%BB%9Bng_v%C3%A0_t%C3%B4m_n%C6%B0%E1%BB%9Bng_%282%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_h%C3%A0u_n%C6%B0%E1%BB%9Bng_v%C3%A0_t%C3%B4m_n%C6%B0%E1%BB%9Bng_(2).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "chay"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/G%E1%BB%8Fi_Cu%E1%BB%91n_Chay_Vietnamese_Fresh_Vegetarian_Spring_Roll_2019-1599.jpg/1280px-G%E1%BB%8Fi_Cu%E1%BB%91n_Chay_Vietnamese_Fresh_Vegetarian_Spring_Roll_2019-1599.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:G%E1%BB%8Fi_Cu%E1%BB%91n_Chay_Vietnamese_Fresh_Vegetarian_Spring_Roll_2019-1599.jpg",
+            "author": "Paul R. Burley",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/M%C3%B3n_chay_c%C3%BAng_%C3%94ng_n%C4%83m_2017_%282%29.jpg/1280px-M%C3%B3n_chay_c%C3%BAng_%C3%94ng_n%C4%83m_2017_%282%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:M%C3%B3n_chay_c%C3%BAng_%C3%94ng_n%C4%83m_2017_(2).jpg",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/49/Vegan_Vietnamese_at_H%26D_Chay%2C_Berlin.jpg/1280px-Vegan_Vietnamese_at_H%26D_Chay%2C_Berlin.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Vegan_Vietnamese_at_H%26D_Chay,_Berlin.jpg",
+            "author": "Andy Hay",
+            "license": "CC BY 2.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "cơm"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f1/C%C6%A1m_chi%C3%AAn_D%C6%B0%C6%A1ng_Ch%C3%A2u_%E1%BB%9F_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2017.jpg/1280px-C%C6%A1m_chi%C3%AAn_D%C6%B0%C6%A1ng_Ch%C3%A2u_%E1%BB%9F_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2017.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_chi%C3%AAn_D%C6%B0%C6%A1ng_Ch%C3%A2u_%E1%BB%9F_%C4%90%C3%B4ng_H%C3%A0_n%C4%83m_2017.jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/11/C%C6%A1m_tr%E1%BB%A9ng_chi%C3%AAn_t%E1%BA%A1i_s%C3%A2n_bay_Ph%C3%BA_B%C3%A0i_%28th%C3%A1ng_9_n%C4%83m_2018%29_%281%29.jpg/1280px-C%C6%A1m_tr%E1%BB%A9ng_chi%C3%AAn_t%E1%BA%A1i_s%C3%A2n_bay_Ph%C3%BA_B%C3%A0i_%28th%C3%A1ng_9_n%C4%83m_2018%29_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_tr%E1%BB%A9ng_chi%C3%AAn_t%E1%BA%A1i_s%C3%A2n_bay_Ph%C3%BA_B%C3%A0i_(th%C3%A1ng_9_n%C4%83m_2018)_(1).jpg",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dd/C%C6%A1m_chi%C3%AAn_c%C3%A1_m%E1%BA%B7n_%E1%BB%9F_cf_Qu%E1%BB%91c_H%C3%B9ng_ng%C3%A0y_01.10_n%C4%83m_2018_%282%29.jpg/1280px-C%C6%A1m_chi%C3%AAn_c%C3%A1_m%E1%BA%B7n_%E1%BB%9F_cf_Qu%E1%BB%91c_H%C3%B9ng_ng%C3%A0y_01.10_n%C4%83m_2018_%282%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C6%A1m_chi%C3%AAn_c%C3%A1_m%E1%BA%B7n_%E1%BB%9F_cf_Qu%E1%BB%91c_H%C3%B9ng_ng%C3%A0y_01.10_n%C4%83m_2018_(2).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "pizza"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/71/Pizza_Vi%E1%BB%87t_Nam_t%E1%BA%A1i_Lottemart_2016.jpg/1280px-Pizza_Vi%E1%BB%87t_Nam_t%E1%BA%A1i_Lottemart_2016.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Pizza_Vi%E1%BB%87t_Nam_t%E1%BA%A1i_Lottemart_2016.jpg",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/Pizza_Vi%E1%BB%87t_Nam_%28SNaT_2018%29_%2810%29.jpg/1280px-Pizza_Vi%E1%BB%87t_Nam_%28SNaT_2018%29_%2810%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Pizza_Vi%E1%BB%87t_Nam_(SNaT_2018)_(10).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/55/Pizza_Vi%E1%BB%87t_Nam_%28SNaT_2018%29_%288%29.jpg/1280px-Pizza_Vi%E1%BB%87t_Nam_%28SNaT_2018%29_%288%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Pizza_Vi%E1%BB%87t_Nam_(SNaT_2018)_(8).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "bánh xèo"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e5/B%C3%A1nh_x%C3%A8o_1.jpg/1280px-B%C3%A1nh_x%C3%A8o_1.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_x%C3%A8o_1.jpg",
+            "author": "Kent Wang from Austin, TX",
+            "license": "CC BY-SA 2.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/9/95/B%C3%A1nh_x%C3%A8o_2.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_x%C3%A8o_2.jpg",
+            "author": "Thang Nguyen from Nottingham, United Kingdom",
+            "license": "CC BY-SA 2.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/9/92/B%C3%A1nh_x%C3%A8o_%2820-8-2020%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_x%C3%A8o_(20-8-2020).jpg",
+            "author": "Baoothersks",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "bánh cuốn"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/B%C3%A1nh_cu%E1%BB%91n_nh%C3%A2n_th%E1%BB%8Bt.JPG/1280px-B%C3%A1nh_cu%E1%BB%91n_nh%C3%A2n_th%E1%BB%8Bt.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_cu%E1%BB%91n_nh%C3%A2n_th%E1%BB%8Bt.JPG",
+            "author": "Casablanca1911 at vi.wikipedia",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Banh_Cuon_2.jpg/1280px-Banh_Cuon_2.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Banh_Cuon_2.jpg",
+            "author": "Shyamal",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/B%C3%A1nh_cu%E1%BB%91n_ch%E1%BA%A3_l%E1%BB%A5a.jpg/1280px-B%C3%A1nh_cu%E1%BB%91n_ch%E1%BA%A3_l%E1%BB%A5a.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_cu%E1%BB%91n_ch%E1%BA%A3_l%E1%BB%A5a.jpg",
+            "author": "stu_spivack",
+            "license": "CC BY-SA 2.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "bánh bao"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/58/B%C3%A1nh_bao_2.jpg/1280px-B%C3%A1nh_bao_2.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_bao_2.jpg",
+            "author": "Baoothersks",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/B%C3%A1nh_bao_3.jpg/1280px-B%C3%A1nh_bao_3.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_bao_3.jpg",
+            "author": "Baoothersks",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/B%C3%A1nh_bao.jpg/1280px-B%C3%A1nh_bao.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%A1nh_bao.jpg",
+            "author": "Baoothersks",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "chè"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_%28ch%C3%A8_h%E1%BA%A1t_sen%29_%281%29.jpg/1280px-L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_%28ch%C3%A8_h%E1%BA%A1t_sen%29_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_(ch%C3%A8_h%E1%BA%A1t_sen)_(1).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/08/L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_%28ch%C3%A8_%C4%91%E1%BA%ADu_xanh_%C4%91%C3%A1nh%29.jpg/1280px-L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_%28ch%C3%A8_%C4%91%E1%BA%ADu_xanh_%C4%91%C3%A1nh%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_(ch%C3%A8_%C4%91%E1%BA%ADu_xanh_%C4%91%C3%A1nh).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d1/L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_%28ch%C3%A8_h%E1%BA%A1t_sen%29_%282%29.jpg/1280px-L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_%28ch%C3%A8_h%E1%BA%A1t_sen%29_%282%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%E1%BB%85_h%E1%BB%99i_%E1%BA%A9m_th%E1%BB%B1c_C%E1%BB%ADa_Vi%E1%BB%87t_th4n2023_%C4%91%E1%BA%B7c_s%E1%BA%A3n_m%C3%B3n_ch%C3%A8_Hu%E1%BA%BF_(ch%C3%A8_h%E1%BA%A1t_sen)_(2).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "khoai lang"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/42/Roasted_Sweet_Potato.jpg/1280px-Roasted_Sweet_Potato.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Roasted_Sweet_Potato.jpg",
+            "author": "Nizil Shah",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Roasted_sweet_potato.jpg/1280px-Roasted_sweet_potato.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Roasted_sweet_potato.jpg",
+            "author": "Silentpilot",
+            "license": "CC0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "trà"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Milk_Tea_1.jpg/1280px-Milk_Tea_1.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Milk_Tea_1.jpg",
+            "author": "Gaurav Dhwaj Khadka",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Fresh_Milk_Tea_1.jpg/1280px-Fresh_Milk_Tea_1.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Fresh_Milk_Tea_1.jpg",
+            "author": "Gaurav Dhwaj Khadka",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Fresh_Milk_Tea_2.jpg/1280px-Fresh_Milk_Tea_2.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Fresh_Milk_Tea_2.jpg",
+            "author": "Gaurav Dhwaj Khadka",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "cafe",
+          "coffee"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Ca_Phe_Sua_Da.jpg/1280px-Ca_Phe_Sua_Da.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ca_Phe_Sua_Da.jpg",
+            "author": "Clarin",
+            "license": "CC BY 2.5"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Vietnamese_Hot_Drip_Coffee_-_The_Big_Bowl.jpg/1280px-Vietnamese_Hot_Drip_Coffee_-_The_Big_Bowl.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Vietnamese_Hot_Drip_Coffee_-_The_Big_Bowl.jpg",
+            "author": "Andy Li",
+            "license": "CC0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/C%C3%80_PH%C3%8A_S%E1%BB%AEA_PHA_PHIN.jpg/1280px-C%C3%80_PH%C3%8A_S%E1%BB%AEA_PHA_PHIN.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C3%80_PH%C3%8A_S%E1%BB%AEA_PHA_PHIN.jpg",
+            "author": "Souradeep.Dasgupta",
+            "license": "CC BY 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "bánh"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5e/M%E1%BB%99t_v%C3%A0i_lo%E1%BA%A1i_b%C3%A1nh_Vi%E1%BB%87t_Nam.jpg/1280px-M%E1%BB%99t_v%C3%A0i_lo%E1%BA%A1i_b%C3%A1nh_Vi%E1%BB%87t_Nam.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:M%E1%BB%99t_v%C3%A0i_lo%E1%BA%A1i_b%C3%A1nh_Vi%E1%BB%87t_Nam.jpg",
+            "author": "Baoothersks",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Banhchay.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Banhchay.JPG",
+            "author": "Conbo at vi.wikipedia",
+            "license": "Public domain"
+          }
+        ]
+      },
+      {
+        "keywords": [],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/00/Bun-Bo-Hue-from-Huong-Giang-2011.jpg/1280px-Bun-Bo-Hue-from-Huong-Giang-2011.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Bun-Bo-Hue-from-Huong-Giang-2011.jpg",
+            "author": "Kham Tran - www.khamtran.com",
+            "license": "CC BY 3.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ee/B%C3%BAn_b%C3%B2_Hu%E1%BA%BF_minh28397.jpg/1280px-B%C3%BAn_b%C3%B2_Hu%E1%BA%BF_minh28397.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_b%C3%B2_Hu%E1%BA%BF_minh28397.jpg",
+            "author": "Minh28397",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/B%C3%BAn_b%C3%B2_Hu%E1%BA%BF-Feb_2025.jpg/1280px-B%C3%BAn_b%C3%B2_Hu%E1%BA%BF-Feb_2025.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_b%C3%B2_Hu%E1%BA%BF-Feb_2025.jpg",
+            "author": "TarnishedPath",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Bun_Bo_Hue_1.jpg/1280px-Bun_Bo_Hue_1.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Bun_Bo_Hue_1.jpg",
+            "author": "SauceSupreme",
+            "license": "CC BY 2.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/B%C3%BAn_b%C3%B2_Hu%E1%BA%BF_%2820201109%29.jpg/1280px-B%C3%BAn_b%C3%B2_Hu%E1%BA%BF_%2820201109%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_b%C3%B2_Hu%E1%BA%BF_(20201109).jpg",
+            "author": "Baoothersks",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f8/B%C3%BAn_b%C3%B2_gi%C3%B2_%C4%90%C3%B4ng_Ba_ng17th10n2020_%281%29.jpg/1280px-B%C3%BAn_b%C3%B2_gi%C3%B2_%C4%90%C3%B4ng_Ba_ng17th10n2020_%281%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:B%C3%BAn_b%C3%B2_gi%C3%B2_%C4%90%C3%B4ng_Ba_ng17th10n2020_(1).jpg",
+            "author": "Phương Huy",
+            "license": "CC0"
+          }
+        ]
+      }
+    ],
+    "cafe": [
+      {
+        "keywords": [
+          "trà"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/67/Milk_Tea_1.jpg/1280px-Milk_Tea_1.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Milk_Tea_1.jpg",
+            "author": "Gaurav Dhwaj Khadka",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9b/Fresh_Milk_Tea_1.jpg/1280px-Fresh_Milk_Tea_1.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Fresh_Milk_Tea_1.jpg",
+            "author": "Gaurav Dhwaj Khadka",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Fresh_Milk_Tea_2.jpg/1280px-Fresh_Milk_Tea_2.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Fresh_Milk_Tea_2.jpg",
+            "author": "Gaurav Dhwaj Khadka",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Ca_Phe_Sua_Da.jpg/1280px-Ca_Phe_Sua_Da.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ca_Phe_Sua_Da.jpg",
+            "author": "Clarin",
+            "license": "CC BY 2.5"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Vietnamese_Hot_Drip_Coffee_-_The_Big_Bowl.jpg/1280px-Vietnamese_Hot_Drip_Coffee_-_The_Big_Bowl.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Vietnamese_Hot_Drip_Coffee_-_The_Big_Bowl.jpg",
+            "author": "Andy Li",
+            "license": "CC0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/C%C3%80_PH%C3%8A_S%E1%BB%AEA_PHA_PHIN.jpg/1280px-C%C3%80_PH%C3%8A_S%E1%BB%AEA_PHA_PHIN.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C3%80_PH%C3%8A_S%E1%BB%AEA_PHA_PHIN.jpg",
+            "author": "Souradeep.Dasgupta",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/C%C3%A0_Ph%C3%AA_S%E1%BB%AFa_%C4%90%C3%A1_-_%C4%90%E1%BA%B7c_tr%C6%B0ng_c%E1%BB%A7a_Vi%E1%BB%87t_Nam.jpg/1280px-C%C3%A0_Ph%C3%AA_S%E1%BB%AFa_%C4%90%C3%A1_-_%C4%90%E1%BA%B7c_tr%C6%B0ng_c%E1%BB%A7a_Vi%E1%BB%87t_Nam.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C3%A0_Ph%C3%AA_S%E1%BB%AFa_%C4%90%C3%A1_-_%C4%90%E1%BA%B7c_tr%C6%B0ng_c%E1%BB%A7a_Vi%E1%BB%87t_Nam.jpg",
+            "author": "Capheongbi",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/85/M%E1%BB%99t_ly_c%C3%A0_ph%C3%AA_nguy%C3%AAn_ch%E1%BA%A5t_%E1%BB%9F_Vi%E1%BB%87t_Nam.jpg/1280px-M%E1%BB%99t_ly_c%C3%A0_ph%C3%AA_nguy%C3%AAn_ch%E1%BA%A5t_%E1%BB%9F_Vi%E1%BB%87t_Nam.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:M%E1%BB%99t_ly_c%C3%A0_ph%C3%AA_nguy%C3%AAn_ch%E1%BA%A5t_%E1%BB%9F_Vi%E1%BB%87t_Nam.jpg",
+            "author": "Capheongbi",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/C%C3%A0_ph%C3%AA_t%C3%A1ch_%C4%91en_n%C4%83m_2018.jpg/1280px-C%C3%A0_ph%C3%AA_t%C3%A1ch_%C4%91en_n%C4%83m_2018.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:C%C3%A0_ph%C3%AA_t%C3%A1ch_%C4%91en_n%C4%83m_2018.jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      }
+    ],
+    "market": [
+      {
+        "keywords": [
+          "kẹo"
+        ],
+        "photos": [
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Peanut-%26-White-Sesame-Candy.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Peanut-%26-White-Sesame-Candy.jpg",
+            "author": "Original uploader was Glio at zh.wikipedia",
+            "license": "CC BY-SA 3.0"
+          }
+        ]
+      },
+      {
+        "keywords": [],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_01.jpg/1280px-Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_01.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Dong_Ba_Market_(Hue)_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_(July_2024)_-_img_01.jpg",
+            "author": "Chainwit.",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_02.jpg/1280px-Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_02.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Dong_Ba_Market_(Hue)_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_(July_2024)_-_img_02.jpg",
+            "author": "Chainwit.",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_03.jpg/1280px-Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_03.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Dong_Ba_Market_(Hue)_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_(July_2024)_-_img_03.jpg",
+            "author": "Chainwit.",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_04.jpg/1280px-Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_04.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Dong_Ba_Market_(Hue)_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_(July_2024)_-_img_04.jpg",
+            "author": "Chainwit.",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_05.jpg/1280px-Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_05.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Dong_Ba_Market_(Hue)_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_(July_2024)_-_img_05.jpg",
+            "author": "Chainwit.",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c4/Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_06.jpg/1280px-Dong_Ba_Market_%28Hue%29_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_%28July_2024%29_-_img_06.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Dong_Ba_Market_(Hue)_-_Ch%E1%BB%A3_%C4%90%C3%B4ng_Ba_Hu%E1%BA%BF_(July_2024)_-_img_06.jpg",
+            "author": "Chainwit.",
+            "license": "CC BY 4.0"
+          }
+        ]
+      }
+    ],
+    "historic": [
+      {
+        "keywords": [
+          "đình"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/%C4%90%C3%ACnh_l%C3%A0ng_Kim_Long.jpg/1280px-%C4%90%C3%ACnh_l%C3%A0ng_Kim_Long.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:%C4%90%C3%ACnh_l%C3%A0ng_Kim_Long.jpg",
+            "author": "Christophe95",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/c/c5/%C4%90%C3%ACnh_L%C3%A0ng_Quang_%C4%90i%E1%BB%83m.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:%C4%90%C3%ACnh_L%C3%A0ng_Quang_%C4%90i%E1%BB%83m.jpg",
+            "author": "Duclocpro89",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5f/%C4%90%C3%ACnh_l%C3%A0ng_An_N%C3%B4ng.jpg/1280px-%C4%90%C3%ACnh_l%C3%A0ng_An_N%C3%B4ng.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:%C4%90%C3%ACnh_l%C3%A0ng_An_N%C3%B4ng.jpg",
+            "author": "Lê Huỳnh Bộ",
+            "license": "CC BY-SA 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/%C4%90%C3%ACnh_l%C3%A0ng_V%C5%A9_%C4%90%E1%BA%A1i.JPG/1280px-%C4%90%C3%ACnh_l%C3%A0ng_V%C5%A9_%C4%90%E1%BA%A1i.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:%C4%90%C3%ACnh_l%C3%A0ng_V%C5%A9_%C4%90%E1%BA%A1i.JPG",
+            "author": "Kien1980v (thảo luận) 13:52, ngày 13 tháng 6 năm 2018 (UTC)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Ki%E1%BA%BFn_tr%C3%BAc_%C4%91%C3%ACnh_l%C3%A0ng_%E1%BB%9F_C%C3%A1t_S%C6%A1n%2C_T%E1%BA%BFt_n%C4%83m_2017_%285%29.jpg/1280px-Ki%E1%BA%BFn_tr%C3%BAc_%C4%91%C3%ACnh_l%C3%A0ng_%E1%BB%9F_C%C3%A1t_S%C6%A1n%2C_T%E1%BA%BFt_n%C4%83m_2017_%285%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Ki%E1%BA%BFn_tr%C3%BAc_%C4%91%C3%ACnh_l%C3%A0ng_%E1%BB%9F_C%C3%A1t_S%C6%A1n,_T%E1%BA%BFt_n%C4%83m_2017_(5).jpg",
+            "author": "Phương Huy",
+            "license": "CC BY-SA 4.0"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "địa đạo"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/21/W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_x.JPG/1280px-W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_x.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_x.JPG",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_5.JPG/1280px-W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_5.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_5.JPG",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/R%E1%BB%ABng_c%C3%A2y_trong_%C4%91%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi.jpg/1280px-R%E1%BB%ABng_c%C3%A2y_trong_%C4%91%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:R%E1%BB%ABng_c%C3%A2y_trong_%C4%91%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi.jpg",
+            "author": "Phương Huy (thảo luận)",
+            "license": "Public domain"
+          }
+        ]
+      },
+      {
+        "keywords": [
+          "lăng",
+          "tẩm",
+          "mộ"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Mausoleum_of_Emperor_Dong_Khanh_%28Hue%29_-_L%C4%83ng_%C4%90%E1%BB%93ng_Kh%C3%A1nh_%282024_July%29_-_img_05.jpg/1280px-Mausoleum_of_Emperor_Dong_Khanh_%28Hue%29_-_L%C4%83ng_%C4%90%E1%BB%93ng_Kh%C3%A1nh_%282024_July%29_-_img_05.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Mausoleum_of_Emperor_Dong_Khanh_(Hue)_-_L%C4%83ng_%C4%90%E1%BB%93ng_Kh%C3%A1nh_(2024_July)_-_img_05.jpg",
+            "author": "Chainwit.",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-01.jpg/1280px-Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-01.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-01.jpg",
+            "author": "CEphoto, Uwe Aranas",
+            "license": "CC BY-SA 3.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/68/Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-11.jpg/1280px-Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-11.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-11.jpg",
+            "author": "CEphoto, Uwe Aranas",
+            "license": "CC BY-SA 3.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e1/Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-16.jpg/1280px-Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-16.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Hue_Vietnam_Tomb-of-Emperor-Minh-Mang-16.jpg",
+            "author": "CEphoto, Uwe Aranas",
+            "license": "CC BY-SA 3.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/L%C4%83ng_Kh%E1%BA%A3i_%C4%90%E1%BB%8Bnh.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%C4%83ng_Kh%E1%BA%A3i_%C4%90%E1%BB%8Bnh.JPG",
+            "author": "LÊ TẤN LỘC at Vietnamese Wikipedia",
+            "license": "CC BY-SA 3.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/2/2f/L%C4%83ng_vua_Thi%E1%BB%87u_Tr%E1%BB%8B.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%C4%83ng_vua_Thi%E1%BB%87u_Tr%E1%BB%8B.JPG",
+            "author": "LÊ TẤN LỘC at Vietnamese Wikipedia",
+            "license": "CC BY-SA 3.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/f/f6/L%C4%83ng_vua_Gia_Long_6.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:L%C4%83ng_vua_Gia_Long_6.JPG",
+            "author": "LÊ TẤN LỘC at Vietnamese Wikipedia",
+            "license": "CC BY-SA 3.0"
+          },
+          {
+            "url": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Xung_Khi%C3%AAm_T%E1%BA%A1_%28L%C4%83ng_T%E1%BB%B1_%C4%90%E1%BB%A9c%29.JPG",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Xung_Khi%C3%AAm_T%E1%BA%A1_(L%C4%83ng_T%E1%BB%B1_%C4%90%E1%BB%A9c).JPG",
+            "author": "LÊ TẤN LỘC at Vietnamese Wikipedia",
+            "license": "CC BY-SA 3.0"
+          }
+        ]
+      },
+      {
+        "keywords": [],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Vietnam%2C_Hue%2C_Imperial_City_of_Hue%2C_Meridian_Gate.jpg/1280px-Vietnam%2C_Hue%2C_Imperial_City_of_Hue%2C_Meridian_Gate.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Vietnam,_Hue,_Imperial_City_of_Hue,_Meridian_Gate.jpg",
+            "author": "Vyacheslav Argenberg",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Meridian_Gate%2C_Hue_%28I%29.jpg/1280px-Meridian_Gate%2C_Hue_%28I%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Meridian_Gate,_Hue_(I).jpg",
+            "author": "This Photo was taken by Supanut Arunoprayote. Feel free to use any of my images, but please mention me as the author and may send me a message. (สามารถใช้ภาพได้อิสระ แต่กรุณาใส่เครดิตผู้ถ่ายและอาจส่งข้อความบอกกล่าวด้วย) Please do not upload an updated image here without consultation with the Author. The author would like to make corrections only at his own source. This ensures that the changes are preserved.Please if you think that any changes should be required, please inform the author.Otherwise you can upload a new image with a new name. Please use one of the templates derivative or extract.",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Vietnam%2C_Hue%2C_Imperial_City_of_Hue%2C_Meridian_Gate_2.jpg/1280px-Vietnam%2C_Hue%2C_Imperial_City_of_Hue%2C_Meridian_Gate_2.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Vietnam,_Hue,_Imperial_City_of_Hue,_Meridian_Gate_2.jpg",
+            "author": "Vyacheslav Argenberg",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7b/Vietnam%2C_Hue%2C_Imperial_City_of_Hue%2C_Gate.jpg/1280px-Vietnam%2C_Hue%2C_Imperial_City_of_Hue%2C_Gate.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Vietnam,_Hue,_Imperial_City_of_Hue,_Gate.jpg",
+            "author": "Vyacheslav Argenberg",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Di%C3%AAn_Th%E1%BB%8D_palace_Hue_Imperial_City.jpg/1280px-Di%C3%AAn_Th%E1%BB%8D_palace_Hue_Imperial_City.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Di%C3%AAn_Th%E1%BB%8D_palace_Hue_Imperial_City.jpg",
+            "author": "Andre Hospers",
+            "license": "CC BY 4.0"
+          },
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Di%C3%AAn_Th%E1%BB%8D_palace_Hue_Imperial_City_%2885648%29.jpg/1280px-Di%C3%AAn_Th%E1%BB%8D_palace_Hue_Imperial_City_%2885648%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Di%C3%AAn_Th%E1%BB%8D_palace_Hue_Imperial_City_(85648).jpg",
+            "author": "Andre Hospers",
+            "license": "CC BY 4.0"
+          }
+        ]
+      }
+    ],
+    "religious": [
+      {
+        "keywords": [
+          "chùa"
+        ],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/88/Hue_Vietnam_Thien-Mu-Temple-and-Pagoda-03.jpg/1280px-Hue_Vietnam_Thien-Mu-Temple-and-Pagoda-03.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:Hue_Vietnam_Thien-Mu-Temple-and-Pagoda-03.jpg",
+            "author": "CEphoto, Uwe Aranas",
+            "license": "CC BY-SA 3.0"
+          }
+        ]
+      },
+      {
+        "keywords": [],
+        "photos": [
+          {
+            "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/A_set_of_incense_burners-_you_can_imagine_the_scale_and_grandeur_in_the_citadel%27s_heydays_%2830961094834%29.jpg/1280px-A_set_of_incense_burners-_you_can_imagine_the_scale_and_grandeur_in_the_citadel%27s_heydays_%2830961094834%29.jpg",
+            "page_url": "https://commons.wikimedia.org/wiki/File:A_set_of_incense_burners-_you_can_imagine_the_scale_and_grandeur_in_the_citadel%27s_heydays_(30961094834).jpg",
+            "author": "shankar s. from Dubai, united arab emirates",
+            "license": "CC BY 2.0"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -11,7 +11,8 @@ State holds plain JSON-compatible dicts so the checkpointer never pickles pydant
 
 from __future__ import annotations
 
-from dataclasses import replace
+import asyncio
+from dataclasses import dataclass, replace
 from typing import Any, TypedDict
 
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -34,6 +35,16 @@ AWAITING = "AWAITING_APPROVAL"
 APPROVED = "APPROVED"
 FAILED = "FAILED_VALIDATION"
 _AWAIT_NODE = "await_approval"
+
+
+@dataclass(frozen=True)
+class BudgetEstimate:
+    """The cheapest matching option's total range and the transport and hotel codes it uses (None when absent)."""
+
+    min_vnd: int
+    max_vnd: int
+    transport_mode: str | None
+    hotel_tier: str | None
 
 
 class StalePlanError(ValueError):
@@ -76,7 +87,7 @@ def itinerary_config_for(retries: int) -> ItineraryConfig:
     base = ItineraryConfig()
     if retries == 0:
         return base
-    max_visits = 2 if retries >= 3 else base.max_visits_per_day - 1
+    max_visits = 2 if retries >= 3 else 3
     return replace(base, max_visits_per_day=max_visits, cafe_break=retries < 2)
 
 
@@ -218,6 +229,32 @@ class Orchestrator:
             check_constraints(TripRequest.model_validate(value["request"]), self.itinerary.places)
         await self.graph.ainvoke(Command(resume=value), _config(thread_id))
         return await self.state(thread_id)
+
+    async def estimate(self, request: TripRequest) -> BudgetEstimate | None:
+        """Price the cheapest matching option the way the workflow does; nothing is checkpointed or saved.
+
+        None when the search finds neither transport nor hotel offers, or the budget has no option.
+        """
+        check_constraints(request, self.itinerary.places)
+        search = await self.search.search(request)
+        if not search.transport_offers and not search.hotel_offers:
+            return None
+        return await asyncio.to_thread(self._cheapest, request, search)
+
+    def _cheapest(self, request: TripRequest, search: SearchResult) -> BudgetEstimate | None:
+        agent = ItineraryAgent(config=itinerary_config_for(0), places=self.itinerary.places)
+        itinerary = agent.plan(request, search)
+        result = self.budget.build(request, search, visit_poi_ids=itinerary.poi_ids())
+        if not result.options:
+            return None
+        cheapest = min(result.options, key=lambda option: option.known_total_vnd)
+        outbound = cheapest.transport_outbound
+        return BudgetEstimate(
+            min_vnd=cheapest.known_total_vnd,
+            max_vnd=cheapest.known_total_max_vnd,
+            transport_mode=outbound.mode if outbound is not None else None,
+            hotel_tier=cheapest.hotel.tier if cheapest.hotel is not None else None,
+        )
 
     async def state(self, thread_id: str) -> dict[str, Any] | None:
         """Return the checkpointed workflow summary, or None when the thread has no checkpoint."""

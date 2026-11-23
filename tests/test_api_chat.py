@@ -21,7 +21,7 @@ from app.main import app  # noqa: E402
 
 ALICE = {"X-User-Id": "alice"}
 BOB = {"X-User-Id": "bob"}
-PLAN_TRIP = "Từ Hà Nội, 2 người, đi Huế 2 ngày từ 20/12"
+PLAN_TRIP = "Đi Huế 2 ngày từ 20/12 từ Hà Nội 2 người ngân sách 5 triệu thích ẩm thực"
 
 
 def test_rag_construction_failure_disables_rag_instead_of_raising(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -69,13 +69,18 @@ def test_post_answers_with_a_reply_that_carries_the_understanding_source(client:
     body = response.json()
     assert body["message_id"]
     assert body["understanding"]["source"] == "RULES"
-    assert body["quick_replies"]
+    assert body["quick_replies"] == []
 
 
 def test_post_a_complete_request_returns_a_plan_summary_card(client: TestClient) -> None:
     conversation = _conversation()
 
-    response = client.post(f"/api/v1/chat/{conversation}", json={"text": PLAN_TRIP}, headers=ALICE)
+    client.post(f"/api/v1/chat/{conversation}", json={"text": PLAN_TRIP}, headers=ALICE)
+    # Transport and stay come next; "tùy" settles them, then pace and places, which "tùy" settles too.
+    # The summary waits for "ok" before the plan starts (S4).
+    client.post(f"/api/v1/chat/{conversation}", json={"text": "tùy"}, headers=ALICE)
+    client.post(f"/api/v1/chat/{conversation}", json={"text": "tùy"}, headers=ALICE)
+    response = client.post(f"/api/v1/chat/{conversation}", json={"text": "ok"}, headers=ALICE)
 
     assert response.status_code == 200
     cards = response.json()["cards"]

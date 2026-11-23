@@ -53,6 +53,8 @@ def _event_line(event: ItineraryEvent, places: dict[str, Place]) -> str:
     elif event.kind == "MEAL":
         head = f"{_MEAL_LABELS.get(event.meal or '', '[Ăn]')} {event.name}"
         details = [_travel_text(event), _meal_price(place), _hours_text(place), event.poi_id or "-"]
+    elif event.kind == "REST":
+        return f"{_span(event)}  [Nghỉ trưa] {event.name}"
     else:
         return f"{_span(event)}  {_MEAL_LABELS['LUNCH']} {event.name}"
     return "  ".join([f"{_span(event)}  {head}", *details])

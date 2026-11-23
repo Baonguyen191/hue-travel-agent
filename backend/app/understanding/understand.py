@@ -26,7 +26,7 @@ from app.core.config import hue_database_path
 from app.repositories.hue_places import HuePlacesRepository
 from app.schemas.place import Place, PlaceCategory
 from app.schemas.request import TripRequest
-from app.services.preferences import map_preferences
+from app.services.preferences import map_preferences, map_themes
 from app.understanding.normalize import strip_diacritics
 from app.services.vi_request_parser import HUE_NAME, parse_vietnamese_request
 from app.understanding.dates import resolve_date_text
@@ -42,6 +42,7 @@ from app.understanding.models import (
     QuSource,
 )
 from app.understanding.normalize import parse_budget_vnd, parse_duration
+from app.understanding.smalltalk import smalltalk_kind
 
 DEFAULT_ORIGIN = HUE_NAME
 DEFAULT_PEOPLE = 1
@@ -51,7 +52,7 @@ MAX_PEOPLE = 20
 # Interest phrases the preference table does not cover (folded). Whole-word match, checked after
 # map_preferences; they only add categories the user clearly asked for.
 INTEREST_SYNONYMS: dict[str, tuple[PlaceCategory, ...]] = {
-    "ngam canh": ("park", "attraction"),
+    "ngam canh": ("attraction",),
     "tham quan": ("attraction",),
     "bien": ("attraction",),
     "van hoa": ("museum",),
@@ -98,6 +99,7 @@ class _Draft:
     phrases: list[str] = field(default_factory=list)
     soft: list[str] = field(default_factory=list)
     categories: list[PlaceCategory] = field(default_factory=list)
+    themes: list[str] = field(default_factory=list)
     exclude_categories: list[PlaceCategory] = field(default_factory=list)
     must: list[PlaceMention] = field(default_factory=list)
     exclude: list[PlaceMention] = field(default_factory=list)
@@ -105,6 +107,10 @@ class _Draft:
     place_query: PlaceMention | None = None
     approve: ApproveOption | None = None
     notes: list[str] = field(default_factory=list)
+    # Optional slots stated in the message: "bus" / "train" / "flight", "homestay" / "hotel" / "resort", "relaxed" / ...
+    transport_mode: str | None = None
+    hotel_tier: str | None = None
+    pace: str | None = None
 
 
 @functools.cache
@@ -127,15 +133,48 @@ def understand(
     """Understand one message. Without an extractor the rule parser is used alone."""
     ref = ref_date or date.today()
     if extractor is None:
-        return _to_query(_draft_from_rules(text, ref, places), context)
+        return _to_query(_infer_couple(_with_slots(_draft_from_rules(text, ref, places), text), text), context)
     try:
         extraction = extractor.extract(text, ref)
     except ExtractionError as error:
         draft = _draft_from_rules(text, ref, places)
         draft.notes.append(f"Ollama không dùng được ({error}); hiểu bằng luật.")
-        return _to_query(draft, context)
+        return _to_query(_infer_couple(_with_slots(draft, text), text), context)
     catalog = load_places() if places is None else places
-    return _to_query(_draft_from_extraction(text, ref, extraction, catalog), context)
+    draft = _draft_from_extraction(text, ref, extraction, catalog)
+    return _to_query(_infer_couple(_with_slots(draft, text), text), context)
+
+
+def _with_slots(draft: _Draft, text: str) -> _Draft:
+    """Read the optional slots (transport, stay, pace) the message states; unstated ones stay None."""
+    from app.chat.slots import value_of  # lazy: app.chat.slots imports this module
+
+    draft.transport_mode = value_of("transport", text)
+    draft.hotel_tier = value_of("stay", text)
+    draft.pace = value_of("pace", text)
+    return draft
+
+
+# Companions that make a party of two when no head count is given ("đi với người yêu").
+_COUPLE_WORDS = ("nguoi yeu", "ny", "vo", "chong", "ban gai", "ban trai")
+# Any of these means a bigger or unknown group, so nothing is inferred.
+_GROUP_WORDS = ("ban be", "gia dinh", "ca nha", "nhom", "cac ban", "con", "bo me", "ong ba", "va")
+
+
+def _infer_couple(draft: _Draft, text: str) -> _Draft:
+    """A new trip "với người yêu / vợ / chồng" with no head count is two people, with a note."""
+    if draft.intent is not Intent.PLAN_NEW or draft.people is not None:
+        return draft
+    padded = f" {' '.join(_fold_words(text))} "
+    if any(f" {word} " in padded for word in _GROUP_WORDS):
+        return draft
+    couple = " vo chong " in padded or any(
+        f" {lead} {word} " in padded for lead in ("voi", "cung") for word in _COUPLE_WORDS
+    )
+    if couple:
+        draft.people = 2
+        draft.notes.append("Hiểu là 2 người vì bạn đi cùng người yêu hoặc vợ/chồng.")
+    return draft
 
 
 # ---------------------------------------------------------------------------
@@ -182,6 +221,15 @@ def _is_other_city(destination: str | None) -> bool:
     return destination is not None and destination != HUE_NAME
 
 
+def _has_trip_details(draft: _Draft) -> bool:
+    """Any stated trip value makes the message a trip request, not smalltalk."""
+    return (
+        any(value is not None for value in (draft.start, draft.num_days, draft.people, draft.origin, draft.budget))
+        or bool(draft.must)
+        or bool(draft.date_text)
+    )
+
+
 def _draft_from_rules(text: str, ref: date, places: Sequence[Place] | None = None) -> _Draft:
     fields = parse_vietnamese_request(text, ref).fields
     draft = _Draft(source=QuSource.RULES)
@@ -194,7 +242,10 @@ def _draft_from_rules(text: str, ref: date, places: Sequence[Place] | None = Non
     draft.budget = fields.get("budget_vnd")
     draft.phrases = list(fields.get("preferences", []))
     draft.categories, draft.soft = _map_interest_phrases(draft.phrases)
-    if _is_other_city(draft.destination):
+    draft.themes = map_themes(draft.phrases)
+    if smalltalk_kind(text) is not None and not _has_trip_details(draft):
+        draft.intent = Intent.SMALLTALK
+    elif _is_other_city(draft.destination):
         draft.intent = Intent.OUT_OF_SCOPE
     elif _is_place_question(text, fields):
         mention = _rules_place_query(text, load_places() if places is None else places)
@@ -314,13 +365,26 @@ def _draft_from_extraction(
     draft.budget = parse_budget_vnd(extraction.budget_text or "") or rules.get("budget_vnd")
     draft.phrases = list(extraction.interest_phrases)
     draft.categories, unmapped = _map_interest_phrases(draft.phrases)
+    draft.themes = map_themes(draft.phrases)
     draft.soft = [*unmapped, *extraction.soft_preferences]
     draft.exclude_categories, _ = map_preferences(extraction.exclude_category_phrases)
     draft.must = link_places(extraction.must_include_mentions, catalog, draft.notes)
     draft.exclude = link_places(extraction.exclude_mentions, catalog, draft.notes)
-    draft.changes = [_to_change(item, catalog) for item in extraction.changes]
+    draft.changes = [change for item in extraction.changes for change in _to_changes(item, catalog)]
     draft.approve = extraction.approve_option
     _settle_intent(draft)
+    is_smalltalk = smalltalk_kind(text) is not None and not _has_trip_details(draft)
+    if (
+        draft.intent in (Intent.OUT_OF_SCOPE, Intent.PLAN_NEW)
+        and is_smalltalk
+        and not _is_other_city(draft.destination)
+    ):
+        draft.intent = Intent.SMALLTALK
+    elif draft.intent is Intent.SMALLTALK and not is_smalltalk:
+        # The model reads one message alone, so a bare answer to a clarifying question
+        # ("ngày mai", "ok") can come back as smalltalk. Only the rules decide smalltalk;
+        # otherwise it is a trip message and the chat's plan flow asks for what is missing.
+        draft.intent = Intent.PLAN_NEW
     return draft
 
 
@@ -333,19 +397,109 @@ def _settle_intent(draft: _Draft) -> None:
         draft.must = []
 
 
-def _to_change(item: Any, catalog: Sequence[Place]) -> PlanChange:
-    return PlanChange(kind=item.kind, value=_change_value(item, catalog), text=item.text)
+# Edit words of a place change, folded (no diacritics, lower case). Longest first, so the
+# longest matching phrase is stripped.
+_LEADING_EDIT_WORDS = tuple(
+    sorted(
+        (
+            "bo", "xoa", "loai bo", "loai", "them", "khong di", "khong muon di",
+            "dung di", "cho them",
+        ),
+        key=len,
+        reverse=True,
+    )
+)
+_TRAILING_EDIT_WORDS = tuple(
+    sorted(
+        (
+            "ra khoi lich trinh", "ra khoi lich", "khoi lich trinh", "khoi lich",
+            "vao lich trinh", "vao lich", "nua", "di",
+        ),
+        key=len,
+        reverse=True,
+    )
+)
+_PLACE_EDIT_KINDS = (PlanChangeKind.ADD_PLACE, PlanChangeKind.REMOVE_PLACE)
+_MAX_CATEGORY_PHRASE_WORDS = 2
+_EDGE_PUNCTUATION = " .,;:!?"
 
 
-def _change_value(item: Any, catalog: Sequence[Place]) -> str | int | None:
+def _fold_word(word: str) -> str:
+    return " ".join(_NON_WORD.sub(" ", strip_diacritics(word)).split())
+
+
+def _edit_target(text: str) -> str:
+    """The place phrase of an add/remove request: the edit words around it are removed."""
+    words = text.split()
+    keys = [_fold_word(word) for word in words]
+    start, end = 0, len(words)
+    changed = True
+    while changed:
+        changed = False
+        for edit in _LEADING_EDIT_WORDS:
+            count = len(edit.split())
+            if end - start > count and " ".join(keys[start : start + count]) == edit:
+                start += count
+                changed = True
+                break
+        for edit in _TRAILING_EDIT_WORDS:
+            count = len(edit.split())
+            if end - start > count and " ".join(keys[end - count : end]) == edit:
+                end -= count
+                changed = True
+                break
+    return " ".join(words[start:end]).strip(_EDGE_PUNCTUATION)
+
+
+def _to_changes(item: Any, catalog: Sequence[Place]) -> list[PlanChange]:
+    if item.kind in _PLACE_EDIT_KINDS:
+        return _place_changes(item, catalog)
+    return [PlanChange(kind=item.kind, value=_change_value(item), text=item.text)]
+
+
+def _place_changes(item: Any, catalog: Sequence[Place]) -> list[PlanChange]:
+    """A short phrase naming a category ("bỏ chùa") becomes category changes; otherwise a place link."""
+    raw = item.value if isinstance(item.value, str) and item.value.strip() else item.text
+    phrase = _edit_target(raw or "")
+    if not phrase:
+        return [PlanChange(kind=item.kind, value=None, text=item.text)]
+    if len(phrase.split()) <= _MAX_CATEGORY_PHRASE_WORDS:
+        categories = _phrase_categories(phrase)
+        if categories:
+            kind = (
+                PlanChangeKind.EXCLUDE_CATEGORY
+                if item.kind is PlanChangeKind.REMOVE_PLACE
+                else PlanChangeKind.INCLUDE_CATEGORY
+            )
+            return [PlanChange(kind=kind, value=category, text=item.text) for category in categories]
+    linked = link_places([phrase], catalog)
+    poi_id = linked[0].poi_id if linked else None
+    return [PlanChange(kind=item.kind, value=poi_id, text=item.text)]
+
+
+def _first_int(text: str) -> int | None:
+    match = re.search(r"\d+", text or "")
+    return int(match.group()) if match else None
+
+
+def _budget_value(item: Any) -> int | None:
+    amount = _int_or_none(item.value)
+    if amount is None and isinstance(item.value, str):
+        amount = parse_budget_vnd(item.value)
+    return amount if amount is not None else parse_budget_vnd(item.text)
+
+
+def _change_value(item: Any) -> str | int | None:
     if item.kind in (PlanChangeKind.ADD_DAYS, PlanChangeKind.REMOVE_DAYS):
         spec = parse_duration(item.text)
         if spec is not None:
             return spec.num_days
         return _int_or_none(item.value)
-    if item.kind in (PlanChangeKind.ADD_PLACE, PlanChangeKind.REMOVE_PLACE):
-        linked = link_places([item.text], catalog)
-        return linked[0].poi_id if linked else None
+    if item.kind is PlanChangeKind.SET_PEOPLE:
+        people = _int_or_none(item.value)
+        return people if people is not None else _first_int(item.text)
+    if item.kind is PlanChangeKind.SET_BUDGET:
+        return _budget_value(item)
     return item.value
 
 
@@ -469,7 +623,11 @@ def _build_request(draft: _Draft) -> tuple[TripRequest | None, str | None]:
         "rooms": draft.rooms or 1,
         "budget_vnd": draft.budget,
         "categories": list(draft.categories),
+        "themes": list(draft.themes),
         "preferences": draft.phrases[:10],
+        "transport_mode": draft.transport_mode,
+        "hotel_tier": draft.hotel_tier,
+        "pace": draft.pace or "moderate",
     }
     try:
         return TripRequest(**payload), None
@@ -490,6 +648,8 @@ def _fields(draft: _Draft) -> dict[str, Any]:
         "categories": list(draft.categories),
         "exclude_categories": list(draft.exclude_categories),
     }
+    if draft.themes:
+        fields["themes"] = list(draft.themes)
     if draft.num_days is not None:
         fields["duration_days"] = draft.num_days
         fields["nights"] = draft.num_days - 1
@@ -536,14 +696,44 @@ def _apply_dates(data: dict[str, Any], change: PlanChange, notes: list[str]) -> 
     data["end_date"] = new_start + length
 
 
+def _with(items: list[str], value: str) -> list[str]:
+    """`items` with `value` appended once."""
+    return items if value in items else [*items, value]
+
+
+def _without(items: list[str], value: str) -> list[str]:
+    return [item for item in items if item != value]
+
+
 def _apply_category(data: dict[str, Any], change: PlanChange) -> None:
+    """Include: wanted and not excluded. Exclude: not wanted and excluded."""
     value = str(change.value) if change.value is not None else ""
+    if not value:
+        return
     categories = list(data["categories"])
-    if change.kind is PlanChangeKind.INCLUDE_CATEGORY and value not in categories:
-        categories.append(value)
-    if change.kind is PlanChangeKind.EXCLUDE_CATEGORY and value in categories:
-        categories.remove(value)
-    data["categories"] = categories
+    excluded = list(data["exclude_categories"])
+    if change.kind is PlanChangeKind.INCLUDE_CATEGORY:
+        data["categories"] = _with(categories, value)
+        data["exclude_categories"] = _without(excluded, value)
+    else:
+        data["categories"] = _without(categories, value)
+        data["exclude_categories"] = _with(excluded, value)
+
+
+def _apply_place(data: dict[str, Any], change: PlanChange, notes: list[str]) -> None:
+    """Add: must include and not excluded. Remove: excluded and not must include."""
+    poi_id = str(change.value) if change.value is not None else ""
+    if not poi_id:
+        notes.append(f"Không tìm thấy địa điểm '{change.text}' trong dữ liệu Huế.")
+        return
+    must = list(data["must_include_poi_ids"])
+    excluded = list(data["exclude_poi_ids"])
+    if change.kind is PlanChangeKind.ADD_PLACE:
+        data["must_include_poi_ids"] = _with(must, poi_id)
+        data["exclude_poi_ids"] = _without(excluded, poi_id)
+    else:
+        data["exclude_poi_ids"] = _with(excluded, poi_id)
+        data["must_include_poi_ids"] = _without(must, poi_id)
 
 
 def _apply_one(data: dict[str, Any], change: PlanChange, notes: list[str]) -> None:
@@ -558,6 +748,8 @@ def _apply_one(data: dict[str, Any], change: PlanChange, notes: list[str]) -> No
         data["budget_vnd"] = _int_or_none(change.value) or data["budget_vnd"]
     elif kind in (PlanChangeKind.INCLUDE_CATEGORY, PlanChangeKind.EXCLUDE_CATEGORY):
         _apply_category(data, change)
+    elif kind in _PLACE_EDIT_KINDS:
+        _apply_place(data, change, notes)
     else:
         notes.append(f"Chưa tự động áp dụng '{change.kind.value}': {change.text or change.value}.")
 
@@ -567,8 +759,9 @@ def apply_changes(
 ) -> tuple[TripRequest, list[str]]:
     """Apply the changes to a copy of `request`; return the copy and notes for what was skipped.
 
-    Place changes (add_place, remove_place) are left to the orchestrator and reported as notes.
-    An invalid result returns the original request with a note.
+    Place changes become must-include and exclude poi ids (a place that did not link gives a note);
+    category changes become categories and exclude_categories. An invalid result returns the
+    original request with a note.
     """
     data = request.model_dump()
     notes: list[str] = []

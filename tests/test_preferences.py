@@ -12,11 +12,17 @@ BACKEND = ROOT / "backend"
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
+from app.repositories.hue_places import HuePlacesRepository  # noqa: E402
 from app.schemas.place import Place  # noqa: E402
 from app.services.preferences import (  # noqa: E402
     extract_keyword_hints,
+    is_food_market,
     is_hue_specialty,
+    is_nature,
+    is_view_cafe,
     map_preferences,
+    map_themes,
+    source_type,
 )
 
 
@@ -89,3 +95,55 @@ def test_specialty_restaurant_is_detected_by_name_or_summary() -> None:
 def test_non_specialty_or_non_restaurant_is_not_specialty() -> None:
     assert not is_hue_specialty(_place("Pizza Hut"))
     assert not is_hue_specialty(_place("Bún Bò Huế Cafe", category="cafe"))
+
+
+def _typed(name: str, category: str, source: str | None) -> Place:
+    """A place whose raw source type is `source` (None means the field is missing)."""
+    raw = {} if source is None else {"Loại hình (theo nguồn)": source}
+    return _place(name, category).model_copy(update={"raw_attributes": raw})
+
+
+def test_source_type_is_the_part_after_the_last_slash() -> None:
+    nature = _typed("Đồi Thiên An", "attraction", "Điểm du lịch, tài nguyên / Thiên nhiên")
+
+    assert source_type(nature) == "Thiên nhiên"
+    assert source_type(_typed("Không rõ", "market", None)) is None
+
+
+def test_nature_and_scenery_preferences_map_to_the_nature_theme() -> None:
+    assert map_themes(["thiên nhiên"]) == ["nature"]
+    assert map_themes(["ngắm cảnh"]) == ["nature"]
+    assert map_themes(["biển"]) == ["nature"]
+    assert map_themes(["ẩm thực"]) == []
+
+
+def test_food_preference_covers_restaurants_cafes_and_markets() -> None:
+    categories, unmapped = map_preferences(["ẩm thực"])
+
+    assert categories == ["restaurant", "cafe", "market"]
+    assert unmapped == []
+
+
+def test_thien_nhien_no_longer_maps_to_park() -> None:
+    categories, _ = map_preferences(["thiên nhiên"])
+
+    assert categories == ["attraction"]
+    assert "park" not in categories
+
+
+def test_food_market_rejects_supermarkets_and_malls_in_the_real_data() -> None:
+    places = HuePlacesRepository(BACKEND / "data" / "hue.sqlite")
+
+    assert not is_food_market(places.get_by_id("huetripo:778466"))  # Siêu thị GO! Huế
+    assert not is_food_market(places.get_by_id("huetripo:489415"))  # Vincom Plaza Huế
+    assert is_food_market(_typed("Chợ Xép", "market", "Chợ"))
+    assert is_food_market(_typed("Bánh lọc Huế bà Vân", "market", "Cửa hàng đặc sản và quà tặng"))
+    assert not is_food_market(_typed("Trung tâm thương mại X", "market", "Trung tâm thương mại"))
+
+
+def test_nature_and_view_cafe_predicates() -> None:
+    assert is_nature(_typed("Hồ Thủy Tiên", "attraction", "Điểm du lịch, tài nguyên / Thiên nhiên"))
+    assert not is_nature(_typed("Cầu Trường Tiền", "park", "Không gian công cộng"))
+    assert is_view_cafe(_typed("Riverside Coffee", "cafe", "trà"))
+    assert is_view_cafe(_typed("Nhà Bên Hồ Cafe", "cafe", "trà"))
+    assert not is_view_cafe(_typed("Túc Tắc Tea", "cafe", "trà"))

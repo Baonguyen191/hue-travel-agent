@@ -1,7 +1,9 @@
-"""Resized, cached copies of the source photos of Huế POIs.
+"""Resized, cached copies of the photos shown for Huế POIs.
 
-Only `photo_url` values on huetripo.hue.gov.vn over https are fetched, so a client can never make
-the server download an arbitrary URL. Failures are not cached; the next request tries again.
+Source photos come from huetripo.hue.gov.vn; Wikimedia Commons thumbnails are fetched only when a
+curated fallback (see `photo_fallbacks`) names them. Only https URLs on these hosts are fetched, so a
+client can never make the server download an arbitrary URL. Failures are not cached; the next request
+tries again.
 """
 
 from __future__ import annotations
@@ -10,13 +12,18 @@ import io
 import logging
 import os
 import tempfile
+import zlib
 from pathlib import Path
 from urllib.parse import urlsplit
 
 import httpx
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-ALLOWED_HOST = "huetripo.hue.gov.vn"
+from app.schemas.place import PlacePhoto
+
+SOURCE_HOST = "huetripo.hue.gov.vn"
+ALLOWED_HOSTS = frozenset({SOURCE_HOST, "thumb.wikimedia.org", "upload.wikimedia.org"})
+USER_AGENT = "HueTravelAgent/0.1 (https://www.mediawiki.org/wiki/API:Etiquette) httpx"
 WIDTHS = (160, 480, 960)
 MAX_BYTES = 15 * 1024 * 1024
 TIMEOUT_SECONDS = 10.0
@@ -35,10 +42,26 @@ class PhotoUpstreamError(Exception):
 
 
 def allowed_source(url: str | None) -> bool:
+    """True for an https URL on one of the hosts this service may download from."""
     if not url:
         return False
     parts = urlsplit(url)
-    return parts.scheme == "https" and parts.hostname == ALLOWED_HOST
+    return parts.scheme == "https" and parts.hostname in ALLOWED_HOSTS
+
+
+def is_source_host(url: str | None) -> bool:
+    """True only for an https URL on the Hue source host (huetripo)."""
+    if not url:
+        return False
+    parts = urlsplit(url)
+    return parts.scheme == "https" and parts.hostname == SOURCE_HOST
+
+
+def cache_key_for(poi_id: str, photo: PlacePhoto) -> str:
+    """Source photos are cached per place; Commons photos per file, so places sharing one share a copy."""
+    if photo.kind == "source":
+        return poi_id
+    return "commons_" + format(zlib.crc32(photo.url.encode("utf-8")), "08x")
 
 
 def cache_path(cache_dir: Path, poi_id: str, width: int) -> Path:
@@ -70,14 +93,19 @@ class PhotoService:
 
     def __init__(self, cache_dir: Path, transport: httpx.BaseTransport | None = None) -> None:
         self.cache_dir = cache_dir
-        self._client = httpx.Client(timeout=TIMEOUT_SECONDS, transport=transport, follow_redirects=False)
+        self._client = httpx.Client(
+            timeout=TIMEOUT_SECONDS,
+            transport=transport,
+            follow_redirects=False,
+            headers={"User-Agent": USER_AGENT},
+        )
 
-    def get(self, poi_id: str, photo_url: str | None, width: int) -> Path:
+    def get(self, cache_key: str, photo_url: str | None, width: int) -> Path:
         if not allowed_source(photo_url):
             if photo_url:
-                logger.warning("photo source not allowed for %s: %s", poi_id, photo_url)
-            raise PhotoUnavailable(poi_id)
-        target = cache_path(self.cache_dir, poi_id, width)
+                logger.warning("photo source not allowed for %s: %s", cache_key, photo_url)
+            raise PhotoUnavailable(cache_key)
+        target = cache_path(self.cache_dir, cache_key, width)
         if target.exists():
             return target
         encoded = resize_to_webp(self._download(photo_url), width)
